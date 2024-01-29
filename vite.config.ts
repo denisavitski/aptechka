@@ -3,6 +3,7 @@ import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import dtsPlugin from 'vite-plugin-dts'
 import packageJson from './package.json'
+import { vitePluginHTMLComponents } from 'vite-plugin-html-components'
 
 export default defineConfig((e) => {
   const isLibMode = e.mode === 'lib'
@@ -15,7 +16,7 @@ export default defineConfig((e) => {
             copyDtsFiles: true,
           }),
         ]
-      : [],
+      : [vitePluginHTMLComponents({ pages: ['index.html'] })],
     build: isLibMode
       ? {
           copyPublicDir: false,
@@ -63,12 +64,7 @@ export default defineConfig((e) => {
             }),
           },
         }
-      : {
-          outDir: 'site',
-          input: {
-            index: resolve(__dirname, 'index.html'),
-          },
-        },
+      : {},
     resolve: {
       alias: {
         $packages: resolve(__dirname, 'src/packages'),
