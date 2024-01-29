@@ -29,7 +29,7 @@ class Resizer extends Notifier<ResizerCallback> {
     }
   }
 
-  public subscribe(callback: ResizerCallback, order?: number) {
+  public override subscribe(callback: ResizerCallback, order?: number) {
     const unsub = super.subscribe(callback, order)
 
     if (!this.#isResizeScheduled) {

@@ -1,4 +1,5 @@
 node_modules
-dist/**
+lib/**
+site/**
 .turbo
 .DS_Store

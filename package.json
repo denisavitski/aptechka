@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -14,242 +14,243 @@
   },
   "license": "ISC",
   "images": [
-    "dist/"
+    "lib/"
   ],
   "type": "module",
   "exports": {
     "./animation": {
-      "require": "./dist/animation/index.cjs",
-      "default": "./dist/animation/index.js",
-      "types": "./dist/animation/index.d.ts"
+      "require": "./lib/animation/index.cjs",
+      "default": "./lib/animation/index.js",
+      "types": "./lib/animation/index.d.ts"
     },
     "./attribute": {
-      "require": "./dist/attribute/index.cjs",
-      "default": "./dist/attribute/index.js",
-      "types": "./dist/attribute/index.d.ts"
+      "require": "./lib/attribute/index.cjs",
+      "default": "./lib/attribute/index.js",
+      "types": "./lib/attribute/index.d.ts"
     },
     "./canvas-2d": {
-      "require": "./dist/canvas-2d/index.cjs",
-      "default": "./dist/canvas-2d/index.js",
-      "types": "./dist/canvas-2d/index.d.ts"
+      "require": "./lib/canvas-2d/index.cjs",
+      "default": "./lib/canvas-2d/index.js",
+      "types": "./lib/canvas-2d/index.d.ts"
     },
     "./controls": {
-      "require": "./dist/controls/index.cjs",
-      "default": "./dist/controls/index.js",
-      "types": "./dist/controls/index.d.ts"
+      "require": "./lib/controls/index.cjs",
+      "default": "./lib/controls/index.js",
+      "types": "./lib/controls/index.d.ts"
     },
     "./css-unit-parser": {
-      "require": "./dist/css-unit-parser/index.cjs",
-      "default": "./dist/css-unit-parser/index.js",
-      "types": "./dist/css-unit-parser/index.d.ts"
+      "require": "./lib/css-unit-parser/index.cjs",
+      "default": "./lib/css-unit-parser/index.js",
+      "types": "./lib/css-unit-parser/index.d.ts"
     },
     "./custom-element": {
-      "require": "./dist/custom-element/index.cjs",
-      "default": "./dist/custom-element/index.js",
-      "types": "./dist/custom-element/index.d.ts"
+      "require": "./lib/custom-element/index.cjs",
+      "default": "./lib/custom-element/index.js",
+      "types": "./lib/custom-element/index.d.ts"
     },
     "./device": {
-      "require": "./dist/device/index.cjs",
-      "default": "./dist/device/index.js",
-      "types": "./dist/device/index.d.ts"
+      "require": "./lib/device/index.cjs",
+      "default": "./lib/device/index.js",
+      "types": "./lib/device/index.d.ts"
     },
     "./element-constructor": {
-      "require": "./dist/element-constructor/index.cjs",
-      "default": "./dist/element-constructor/index.js",
-      "types": "./dist/element-constructor/index.d.ts"
+      "require": "./lib/element-constructor/index.cjs",
+      "default": "./lib/element-constructor/index.js",
+      "types": "./lib/element-constructor/index.d.ts"
     },
     "./en3": {
-      "require": "./dist/en3/index.cjs",
-      "default": "./dist/en3/index.js",
-      "types": "./dist/en3/index.d.ts"
+      "require": "./lib/en3/index.cjs",
+      "default": "./lib/en3/index.js",
+      "types": "./lib/en3/index.d.ts"
     },
     "./image": {
-      "require": "./dist/image/index.cjs",
-      "default": "./dist/image/index.js",
-      "types": "./dist/image/index.d.ts"
+      "require": "./lib/image/index.cjs",
+      "default": "./lib/image/index.js",
+      "types": "./lib/image/index.d.ts"
     },
     "./intersector": {
-      "require": "./dist/intersector/index.cjs",
-      "default": "./dist/intersector/index.js",
-      "types": "./dist/intersector/index.d.ts"
+      "require": "./lib/intersector/index.cjs",
+      "default": "./lib/intersector/index.js",
+      "types": "./lib/intersector/index.d.ts"
     },
     "./ladder": {
-      "require": "./dist/ladder/index.cjs",
-      "default": "./dist/ladder/index.js",
-      "types": "./dist/ladder/index.d.ts"
+      "require": "./lib/ladder/index.cjs",
+      "default": "./lib/ladder/index.js",
+      "types": "./lib/ladder/index.d.ts"
     },
     "./layout-box": {
-      "require": "./dist/layout-box/index.cjs",
-      "default": "./dist/layout-box/index.js",
-      "types": "./dist/layout-box/index.d.ts"
+      "require": "./lib/layout-box/index.cjs",
+      "default": "./lib/layout-box/index.js",
+      "types": "./lib/layout-box/index.d.ts"
     },
     "./loading": {
-      "require": "./dist/loading/index.cjs",
-      "default": "./dist/loading/index.js",
-      "types": "./dist/loading/index.d.ts"
+      "require": "./lib/loading/index.cjs",
+      "default": "./lib/loading/index.js",
+      "types": "./lib/loading/index.d.ts"
     },
     "./measurer": {
-      "require": "./dist/measurer/index.cjs",
-      "default": "./dist/measurer/index.js",
-      "types": "./dist/measurer/index.d.ts"
+      "require": "./lib/measurer/index.cjs",
+      "default": "./lib/measurer/index.js",
+      "types": "./lib/measurer/index.d.ts"
     },
     "./media": {
-      "require": "./dist/media/index.cjs",
-      "default": "./dist/media/index.js",
-      "types": "./dist/media/index.d.ts"
+      "require": "./lib/media/index.cjs",
+      "default": "./lib/media/index.js",
+      "types": "./lib/media/index.d.ts"
     },
     "./morph": {
-      "require": "./dist/morph/index.cjs",
-      "default": "./dist/morph/index.js",
-      "types": "./dist/morph/index.d.ts"
+      "require": "./lib/morph/index.cjs",
+      "default": "./lib/morph/index.js",
+      "types": "./lib/morph/index.d.ts"
     },
     "./notifier": {
-      "require": "./dist/notifier/index.cjs",
-      "default": "./dist/notifier/index.js",
-      "types": "./dist/notifier/index.d.ts"
+      "require": "./lib/notifier/index.cjs",
+      "default": "./lib/notifier/index.js",
+      "types": "./lib/notifier/index.d.ts"
     },
     "./order": {
-      "require": "./dist/order/index.cjs",
-      "default": "./dist/order/index.js",
-      "types": "./dist/order/index.d.ts"
+      "require": "./lib/order/index.cjs",
+      "default": "./lib/order/index.js",
+      "types": "./lib/order/index.d.ts"
     },
     "./resizer": {
-      "require": "./dist/resizer/index.cjs",
-      "default": "./dist/resizer/index.js",
-      "types": "./dist/resizer/index.d.ts"
+      "require": "./lib/resizer/index.cjs",
+      "default": "./lib/resizer/index.js",
+      "types": "./lib/resizer/index.d.ts"
     },
     "./router": {
-      "require": "./dist/router/index.cjs",
-      "default": "./dist/router/index.js",
-      "types": "./dist/router/index.d.ts"
+      "require": "./lib/router/index.cjs",
+      "default": "./lib/router/index.js",
+      "types": "./lib/router/index.d.ts"
     },
     "./scroll": {
-      "require": "./dist/scroll/index.cjs",
-      "default": "./dist/scroll/index.js",
-      "types": "./dist/scroll/index.d.ts"
+      "require": "./lib/scroll/index.cjs",
+      "default": "./lib/scroll/index.js",
+      "types": "./lib/scroll/index.d.ts"
     },
     "./scroll-entries": {
-      "require": "./dist/scroll-entries/index.cjs",
-      "default": "./dist/scroll-entries/index.js",
-      "types": "./dist/scroll-entries/index.d.ts"
+      "require": "./lib/scroll-entries/index.cjs",
+      "default": "./lib/scroll-entries/index.js",
+      "types": "./lib/scroll-entries/index.d.ts"
     },
     "./source": {
-      "require": "./dist/source/index.cjs",
-      "default": "./dist/source/index.js",
-      "types": "./dist/source/index.d.ts"
+      "require": "./lib/source/index.cjs",
+      "default": "./lib/source/index.js",
+      "types": "./lib/source/index.d.ts"
     },
     "./store": {
-      "require": "./dist/store/index.cjs",
-      "default": "./dist/store/index.js",
-      "types": "./dist/store/index.d.ts"
+      "require": "./lib/store/index.cjs",
+      "default": "./lib/store/index.js",
+      "types": "./lib/store/index.d.ts"
     },
     "./ticker": {
-      "require": "./dist/ticker/index.cjs",
-      "default": "./dist/ticker/index.js",
-      "types": "./dist/ticker/index.d.ts"
+      "require": "./lib/ticker/index.cjs",
+      "default": "./lib/ticker/index.js",
+      "types": "./lib/ticker/index.d.ts"
     },
     "./utils": {
-      "require": "./dist/utils/index.cjs",
-      "default": "./dist/utils/index.js",
-      "types": "./dist/utils/index.d.ts"
+      "require": "./lib/utils/index.cjs",
+      "default": "./lib/utils/index.js",
+      "types": "./lib/utils/index.d.ts"
     },
     "./video": {
-      "require": "./dist/video/index.cjs",
-      "default": "./dist/video/index.js",
-      "types": "./dist/video/index.d.ts"
+      "require": "./lib/video/index.cjs",
+      "default": "./lib/video/index.js",
+      "types": "./lib/video/index.d.ts"
     }
   },
   "typesVersions": {
     "*": {
       "animation": [
-        "dist/animation/index.d.ts"
+        "lib/animation/index.d.ts"
       ],
       "attribute": [
-        "dist/attribute/index.d.ts"
+        "lib/attribute/index.d.ts"
       ],
       "canvas-2d": [
-        "dist/canvas-2d/index.d.ts"
+        "lib/canvas-2d/index.d.ts"
       ],
       "controls": [
-        "dist/controls/index.d.ts"
+        "lib/controls/index.d.ts"
       ],
       "css-unit-parser": [
-        "dist/css-unit-parser/index.d.ts"
+        "lib/css-unit-parser/index.d.ts"
       ],
       "custom-element": [
-        "dist/custom-element/index.d.ts"
+        "lib/custom-element/index.d.ts"
       ],
       "device": [
-        "dist/device/index.d.ts"
+        "lib/device/index.d.ts"
       ],
       "element-constructor": [
-        "dist/element-constructor/index.d.ts"
+        "lib/element-constructor/index.d.ts"
       ],
       "en3": [
-        "dist/en3/index.d.ts"
+        "lib/en3/index.d.ts"
       ],
       "image": [
-        "dist/image/index.d.ts"
+        "lib/image/index.d.ts"
       ],
       "intersector": [
-        "dist/intersector/index.d.ts"
+        "lib/intersector/index.d.ts"
       ],
       "ladder": [
-        "dist/ladder/index.d.ts"
+        "lib/ladder/index.d.ts"
       ],
       "layout-box": [
-        "dist/layout-box/index.d.ts"
+        "lib/layout-box/index.d.ts"
       ],
       "loading": [
-        "dist/loading/index.d.ts"
+        "lib/loading/index.d.ts"
       ],
       "measurer": [
-        "dist/measurer/index.d.ts"
+        "lib/measurer/index.d.ts"
       ],
       "media": [
-        "dist/media/index.d.ts"
+        "lib/media/index.d.ts"
       ],
       "morph": [
-        "dist/morph/index.d.ts"
+        "lib/morph/index.d.ts"
       ],
       "notifier": [
-        "dist/notifier/index.d.ts"
+        "lib/notifier/index.d.ts"
       ],
       "order": [
-        "dist/order/index.d.ts"
+        "lib/order/index.d.ts"
       ],
       "resizer": [
-        "dist/resizer/index.d.ts"
+        "lib/resizer/index.d.ts"
       ],
       "router": [
-        "dist/router/index.d.ts"
+        "lib/router/index.d.ts"
       ],
       "scroll": [
-        "dist/scroll/index.d.ts"
+        "lib/scroll/index.d.ts"
       ],
       "scroll-entries": [
-        "dist/scroll-entries/index.d.ts"
+        "lib/scroll-entries/index.d.ts"
       ],
       "source": [
-        "dist/source/index.d.ts"
+        "lib/source/index.d.ts"
       ],
       "store": [
-        "dist/store/index.d.ts"
+        "lib/store/index.d.ts"
       ],
       "ticker": [
-        "dist/ticker/index.d.ts"
+        "lib/ticker/index.d.ts"
       ],
       "utils": [
-        "dist/utils/index.d.ts"
+        "lib/utils/index.d.ts"
       ],
       "video": [
-        "dist/video/index.d.ts"
+        "lib/video/index.d.ts"
       ]
     }
   },
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "vite --mode lib",
+    "build:lib": "tsc && vite build --mode lib",
+    "build:site": "tsc && vite build --mode site",
     "preview": "vite preview",
     "pp": "npm publish --access public"
   },
