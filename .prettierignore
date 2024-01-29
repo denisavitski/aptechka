@@ -1,0 +1,16 @@
+.gitignore
+.vscode
+.prettierignore
+.prettierrc
+node_modules
+package-lock.json
+dist
+dist/
+.DS_Store
+node_modules
+/build
+/.svelte-kit
+/package
+.env
+.env.*
+!.env.example

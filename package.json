@@ -1,0 +1,272 @@
+{
+  "name": "aptechka",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denisavitski/aptechka.git"
+  },
+  "homepage": "https://github.com/denisavitski/aptechka#readme",
+  "bugs": {
+    "url": "https://github.com/denisavitski/aptechka/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "ISC",
+  "images": [
+    "dist/"
+  ],
+  "type": "module",
+  "exports": {
+    "./animation": {
+      "require": "./dist/animation/index.cjs",
+      "default": "./dist/animation/index.js",
+      "types": "./dist/animation/index.d.ts"
+    },
+    "./attribute": {
+      "require": "./dist/attribute/index.cjs",
+      "default": "./dist/attribute/index.js",
+      "types": "./dist/attribute/index.d.ts"
+    },
+    "./canvas-2d": {
+      "require": "./dist/canvas-2d/index.cjs",
+      "default": "./dist/canvas-2d/index.js",
+      "types": "./dist/canvas-2d/index.d.ts"
+    },
+    "./controls": {
+      "require": "./dist/controls/index.cjs",
+      "default": "./dist/controls/index.js",
+      "types": "./dist/controls/index.d.ts"
+    },
+    "./css-unit-parser": {
+      "require": "./dist/css-unit-parser/index.cjs",
+      "default": "./dist/css-unit-parser/index.js",
+      "types": "./dist/css-unit-parser/index.d.ts"
+    },
+    "./custom-element": {
+      "require": "./dist/custom-element/index.cjs",
+      "default": "./dist/custom-element/index.js",
+      "types": "./dist/custom-element/index.d.ts"
+    },
+    "./device": {
+      "require": "./dist/device/index.cjs",
+      "default": "./dist/device/index.js",
+      "types": "./dist/device/index.d.ts"
+    },
+    "./element-constructor": {
+      "require": "./dist/element-constructor/index.cjs",
+      "default": "./dist/element-constructor/index.js",
+      "types": "./dist/element-constructor/index.d.ts"
+    },
+    "./en3": {
+      "require": "./dist/en3/index.cjs",
+      "default": "./dist/en3/index.js",
+      "types": "./dist/en3/index.d.ts"
+    },
+    "./image": {
+      "require": "./dist/image/index.cjs",
+      "default": "./dist/image/index.js",
+      "types": "./dist/image/index.d.ts"
+    },
+    "./intersector": {
+      "require": "./dist/intersector/index.cjs",
+      "default": "./dist/intersector/index.js",
+      "types": "./dist/intersector/index.d.ts"
+    },
+    "./ladder": {
+      "require": "./dist/ladder/index.cjs",
+      "default": "./dist/ladder/index.js",
+      "types": "./dist/ladder/index.d.ts"
+    },
+    "./layout-box": {
+      "require": "./dist/layout-box/index.cjs",
+      "default": "./dist/layout-box/index.js",
+      "types": "./dist/layout-box/index.d.ts"
+    },
+    "./loading": {
+      "require": "./dist/loading/index.cjs",
+      "default": "./dist/loading/index.js",
+      "types": "./dist/loading/index.d.ts"
+    },
+    "./measurer": {
+      "require": "./dist/measurer/index.cjs",
+      "default": "./dist/measurer/index.js",
+      "types": "./dist/measurer/index.d.ts"
+    },
+    "./media": {
+      "require": "./dist/media/index.cjs",
+      "default": "./dist/media/index.js",
+      "types": "./dist/media/index.d.ts"
+    },
+    "./morph": {
+      "require": "./dist/morph/index.cjs",
+      "default": "./dist/morph/index.js",
+      "types": "./dist/morph/index.d.ts"
+    },
+    "./notifier": {
+      "require": "./dist/notifier/index.cjs",
+      "default": "./dist/notifier/index.js",
+      "types": "./dist/notifier/index.d.ts"
+    },
+    "./order": {
+      "require": "./dist/order/index.cjs",
+      "default": "./dist/order/index.js",
+      "types": "./dist/order/index.d.ts"
+    },
+    "./resizer": {
+      "require": "./dist/resizer/index.cjs",
+      "default": "./dist/resizer/index.js",
+      "types": "./dist/resizer/index.d.ts"
+    },
+    "./router": {
+      "require": "./dist/router/index.cjs",
+      "default": "./dist/router/index.js",
+      "types": "./dist/router/index.d.ts"
+    },
+    "./scroll": {
+      "require": "./dist/scroll/index.cjs",
+      "default": "./dist/scroll/index.js",
+      "types": "./dist/scroll/index.d.ts"
+    },
+    "./scroll-entries": {
+      "require": "./dist/scroll-entries/index.cjs",
+      "default": "./dist/scroll-entries/index.js",
+      "types": "./dist/scroll-entries/index.d.ts"
+    },
+    "./source": {
+      "require": "./dist/source/index.cjs",
+      "default": "./dist/source/index.js",
+      "types": "./dist/source/index.d.ts"
+    },
+    "./store": {
+      "require": "./dist/store/index.cjs",
+      "default": "./dist/store/index.js",
+      "types": "./dist/store/index.d.ts"
+    },
+    "./ticker": {
+      "require": "./dist/ticker/index.cjs",
+      "default": "./dist/ticker/index.js",
+      "types": "./dist/ticker/index.d.ts"
+    },
+    "./utils": {
+      "require": "./dist/utils/index.cjs",
+      "default": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    },
+    "./video": {
+      "require": "./dist/video/index.cjs",
+      "default": "./dist/video/index.js",
+      "types": "./dist/video/index.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "animation": [
+        "dist/animation/index.d.ts"
+      ],
+      "attribute": [
+        "dist/attribute/index.d.ts"
+      ],
+      "canvas-2d": [
+        "dist/canvas-2d/index.d.ts"
+      ],
+      "controls": [
+        "dist/controls/index.d.ts"
+      ],
+      "css-unit-parser": [
+        "dist/css-unit-parser/index.d.ts"
+      ],
+      "custom-element": [
+        "dist/custom-element/index.d.ts"
+      ],
+      "device": [
+        "dist/device/index.d.ts"
+      ],
+      "element-constructor": [
+        "dist/element-constructor/index.d.ts"
+      ],
+      "en3": [
+        "dist/en3/index.d.ts"
+      ],
+      "image": [
+        "dist/image/index.d.ts"
+      ],
+      "intersector": [
+        "dist/intersector/index.d.ts"
+      ],
+      "ladder": [
+        "dist/ladder/index.d.ts"
+      ],
+      "layout-box": [
+        "dist/layout-box/index.d.ts"
+      ],
+      "loading": [
+        "dist/loading/index.d.ts"
+      ],
+      "measurer": [
+        "dist/measurer/index.d.ts"
+      ],
+      "media": [
+        "dist/media/index.d.ts"
+      ],
+      "morph": [
+        "dist/morph/index.d.ts"
+      ],
+      "notifier": [
+        "dist/notifier/index.d.ts"
+      ],
+      "order": [
+        "dist/order/index.d.ts"
+      ],
+      "resizer": [
+        "dist/resizer/index.d.ts"
+      ],
+      "router": [
+        "dist/router/index.d.ts"
+      ],
+      "scroll": [
+        "dist/scroll/index.d.ts"
+      ],
+      "scroll-entries": [
+        "dist/scroll-entries/index.d.ts"
+      ],
+      "source": [
+        "dist/source/index.d.ts"
+      ],
+      "store": [
+        "dist/store/index.d.ts"
+      ],
+      "ticker": [
+        "dist/ticker/index.d.ts"
+      ],
+      "utils": [
+        "dist/utils/index.d.ts"
+      ],
+      "video": [
+        "dist/video/index.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "pp": "npm publish --access public"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/three": "^0.160.0",
+    "vite": "^5.0.12",
+    "vite-plugin-dts": "^3.7.2"
+  },
+  "dependencies": {
+    "detect-gpu": "^5.0.37",
+    "three": "^0.160.1",
+    "urlpattern-polyfill": "^10.0.0"
+  },
+  "peerDependencies": {
+    "detect-gpu": "^5.0.37",
+    "three": "^0.160.1",
+    "urlpattern-polyfill": "^10.0.0"
+  }
+}

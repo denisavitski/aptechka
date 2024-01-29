@@ -1,0 +1,14 @@
+export enum RESIZE_ORDER {
+  DEVICE = -100000,
+  MEDIA,
+  SOURCE_MANAGER,
+  SCROLL,
+  LAYOUT_BOX,
+  EN3 = 100000,
+}
+
+export enum TICK_ORDER {
+  SCROLL = -100000,
+  LAYOUT_BOX,
+  EN3 = 100000,
+}
