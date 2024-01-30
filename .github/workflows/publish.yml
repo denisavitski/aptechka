@@ -6,15 +6,21 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: node
-        uses: actions/setup-node@v2
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
+      - name: Build lib
+        run: npm run build:lib
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v3
         with:
-          node-version: 20.11.0
-          registry-url: https://registry.npmjs.org
+          name: production-files
+          path: ./lib
       - name: publish
-        run: npm run build-and-publish
+        run: npm run pp
         working-directory: ./
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
