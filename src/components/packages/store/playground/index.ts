@@ -1,1 +1,2 @@
-console.log('Playground')
+import json from './pa.json'
+console.log(json)

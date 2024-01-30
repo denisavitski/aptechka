@@ -21,8 +21,6 @@
     "experimentalDecorators": true,
     "allowJs": true,
 
-    "types": ["vite/client"],
-
     "baseUrl": "./",
     "paths": {
       "@packages/*": ["src/components/packages/*"],
