@@ -1,6 +1,6 @@
 import { Notifier } from '../notifier';
 export type ResizerCallback = () => void;
-export declare const dispatchResizeEvent: (cause?: string | undefined) => void;
+export declare const dispatchResizeEvent: (cause?: any) => void;
 declare class Resizer extends Notifier<ResizerCallback> {
     #private;
     constructor();

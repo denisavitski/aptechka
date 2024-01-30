@@ -13,6 +13,7 @@ export interface StoreOptions<StoreType> {
     equalityCheck?: StoreEqualityCheckCallback<StoreType>;
     passport?: StorePassport;
     validate?: StoreValidateCallback<StoreType>;
+    skipSubscribeNotification?: boolean;
 }
 export declare class Store<StoreType = unknown, Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>> {
     #private;

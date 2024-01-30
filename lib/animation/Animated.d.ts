@@ -27,8 +27,8 @@ export declare abstract class Animated<Entry extends AnimatedEntry = AnimatedEnt
     set max(value: number | AnimatedEdgeFunction | undefined);
     get delta(): number;
     get progress(): number;
-    get setter(): Animated | undefined;
     get entry(): Entry;
+    get setter(): Animated | undefined;
     set setter(animated: Animated | undefined);
     set(value: number, equalize?: boolean): void;
     shift(value: number, equalize?: boolean): void;
