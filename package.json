@@ -251,8 +251,7 @@
     "dev": "vite --mode site",
     "build:lib": "tsc && vite build --mode lib",
     "build:site": "tsc && vite build --mode site",
-    "preview": "vite preview",
-    "pp":  "npm publish --access public"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
