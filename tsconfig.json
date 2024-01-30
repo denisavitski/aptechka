@@ -12,6 +12,8 @@
     "isolatedModules": true,
     "noEmit": true,
 
+    "moduleDetection": "force",
+
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

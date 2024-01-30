@@ -6,6 +6,14 @@ export class AccordionElement extends CustomElement {
   #axisAttribute = new Attribute(this, 'axis', 'y')
   #multipleAttribute = new Attribute(this, 'multiple', false)
 
+  constructor() {
+    super()
+
+    this.#axisAttribute.subscribe((e) => {
+      console.log(e)
+    })
+  }
+
   public get axisAttribute() {
     return this.#axisAttribute
   }
@@ -13,4 +21,8 @@ export class AccordionElement extends CustomElement {
   public get multipleAttribute() {
     return this.#multipleAttribute
   }
+
+  protected connectedCallback() {}
+
+  protected disconnectedCallback() {}
 }

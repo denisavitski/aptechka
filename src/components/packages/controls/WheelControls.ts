@@ -1,15 +1,17 @@
 import { Axes2D, isBrowser, getElement } from '@packages/utils'
 import { Controls } from './Controls'
 
+export type WheelControlsAxis = Axes2D | 'max'
+
 export interface WheelControlsOptions {
-  axis?: Axes2D
+  axis?: WheelControlsAxis
   speed?: number
   debounce?: boolean
   element?: HTMLElement
 }
 
 export class WheelControls extends Controls {
-  axis: Axes2D
+  axis: WheelControlsAxis
   speed: number
   debounce: boolean
 
@@ -56,7 +58,14 @@ export class WheelControls extends Controls {
       return
     }
 
-    delta = (this.axis === 'x' ? event.deltaX : event.deltaY) * this.speed
+    delta =
+      (this.axis === 'max'
+        ? Math.abs(event.deltaX) > Math.abs(event.deltaY)
+          ? event.deltaX
+          : event.deltaY
+        : this.axis === 'x'
+        ? event.deltaX
+        : event.deltaY) * this.speed
 
     event.stopPropagation()
     event.preventDefault()

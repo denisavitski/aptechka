@@ -5,6 +5,7 @@ import { ElementOrSelector, clamp, fix } from '@packages/utils'
 export interface AnimatedOptions extends StoreOptions<number>, TickerAddOptions {
   min?: number | AnimatedEdgeFunction
   max?: number | AnimatedEdgeFunction
+  default?: number
 }
 
 export type AnimatedEdgeFunction = () => number
@@ -34,14 +35,14 @@ export abstract class Animated<Entry extends AnimatedEntry = AnimatedEntry> exte
   #speed = 0
 
   constructor(options?: AnimatedOptions) {
-    super(0, options)
+    super(options?.default || 0, options)
 
     this.#order = options?.order
     this.#maxFPS = options?.maxFPS
     this.#culling = options?.culling
     this.#min = this.#getEdgeFunction(options?.min)
     this.#max = this.#getEdgeFunction(options?.max)
-    this.#target = this.current = 0
+    this.#target = this.current
   }
 
   public get target() {

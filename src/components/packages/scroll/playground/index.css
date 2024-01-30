@@ -1,0 +1,18 @@
+e-scroll {
+}
+
+section {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+div {
+  width: 20vmin;
+  height: 20vmin;
+
+  background-color: tomato;
+}

@@ -91,6 +91,7 @@ export class ScrollElement extends CustomElement {
     validate: (v) => Math.max(0, v - 1),
   })
   #sectionalAttribute = new Attribute<boolean>(this, 'sectional', false)
+  #wheelMaxDeltaAttribute = new Attribute<boolean>(this, 'wheel-max-delta', false)
   #infiniteAttribute = new Attribute<boolean>(this, 'infinite', false)
   #splitAttribute = new Attribute<boolean>(this, 'split', false)
   #dampingAttribute = new Attribute<number>(this, 'damping', 0.03)
@@ -187,11 +188,16 @@ export class ScrollElement extends CustomElement {
 
       this.#axisAttribute.subscribe(({ current }) => {
         this.#contentElement.style.flexDirection = current === 'x' ? 'row' : 'column'
-        this.#wheelControls.axis = current
+
+        this.#wheelControls.axis = this.#wheelMaxDeltaAttribute.current ? 'max' : current
 
         if (this.isConnected) {
           this.#resizeListener()
         }
+      })
+
+      this.#wheelMaxDeltaAttribute.subscribe((e) => {
+        this.#wheelControls.axis = e.current ? 'max' : this.#axisAttribute.current
       })
 
       this.#pagesAttribute.subscribe(() => {
@@ -389,28 +395,10 @@ export class ScrollElement extends CustomElement {
 
   protected connectedCallback() {
     this.#awake()
-
-    this.#axisAttribute.observe()
-    this.#pagesAttribute.observe()
-    this.#sectionalAttribute.observe()
-    this.#infiniteAttribute.observe()
-    this.#splitAttribute.observe()
-    this.#dampingAttribute.observe()
-    this.#disabledAttribute.observe()
-    this.#hibernatedAttribute.observe()
   }
 
   protected disconnectedCallback() {
     this.#hibernate()
-
-    this.#axisAttribute.unobserve()
-    this.#pagesAttribute.unobserve()
-    this.#sectionalAttribute.unobserve()
-    this.#infiniteAttribute.unobserve()
-    this.#splitAttribute.unobserve()
-    this.#dampingAttribute.unobserve()
-    this.#disabledAttribute.unobserve()
-    this.#hibernatedAttribute.unobserve()
   }
 
   #split() {
