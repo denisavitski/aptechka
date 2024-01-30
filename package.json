@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -252,7 +252,7 @@
     "build:lib": "tsc && vite build --mode lib",
     "build:site": "tsc && vite build --mode site",
     "preview": "vite preview",
-    "pp": "npm publish --access public"
+    "build-and-publish":  "npm run build:lib && npm publish --access public"
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
