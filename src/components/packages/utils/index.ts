@@ -46,9 +46,17 @@ export {
   calculateDistance,
   calculateDistanceWithRadius,
 } from './math'
-export { fix, roundTo, generateId } from './number'
+export { preciseNumber, roundNumberTo } from './number'
 export { isObject, cloneDeep, mergeDeep, isNullish, compareObjects, pick, omit } from './object'
-export { kebabToCamel, camelToKebab, snakeToDotted, toPascalCase, capitalize } from './string'
+export {
+  kebabToCamel,
+  camelToKebab,
+  snakeToDotted,
+  toPascalCase,
+  capitalize,
+  generateId,
+} from './string'
+export { getElementTransitionDurationMS, getElementTransitionDurationS } from './style'
 export type { Axes2D, Axes3D, Dot2D, Rect2D, Circle, Dot3D, Rect3D } from './ts-shape'
 export type {
   NestedKeys,

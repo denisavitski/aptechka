@@ -1,6 +1,6 @@
 import { StoreOptions, StoreEntry, Store, StoreCallback } from '@packages/store'
 import { ticker, TickerCallbackEntry, TickerCallback, TickerAddOptions } from '@packages/ticker'
-import { ElementOrSelector, clamp, fix } from '@packages/utils'
+import { ElementOrSelector, clamp, preciseNumber } from '@packages/utils'
 
 export interface AnimatedOptions extends StoreOptions<number>, TickerAddOptions {
   min?: number | AnimatedEdgeFunction
@@ -90,7 +90,7 @@ export abstract class Animated<Entry extends AnimatedEntry = AnimatedEntry> exte
   }
 
   public get progress() {
-    return this.delta ? fix((this.current - this.min) / this.delta, 6) : 0
+    return this.delta ? preciseNumber((this.current - this.min) / this.delta, 6) : 0
   }
 
   public override get entry(): Entry {

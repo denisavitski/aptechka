@@ -47,3 +47,18 @@ export function capitalize(string: string, everyWord = false) {
     return cfl(string)
   }
 }
+
+export function generateId(
+  length: number,
+  characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+): string {
+  const charactersLength = characters.length
+  const key = crypto.getRandomValues(new Uint8Array(length))
+
+  let generatedKey = ''
+  for (let i = 0; i < length; i++) {
+    generatedKey += characters.charAt(key[i] % charactersLength)
+  }
+
+  return generatedKey
+}

@@ -1,5 +1,5 @@
 import { TickerCallbackEntry } from '@packages/ticker'
-import { damp, fix } from '@packages/utils'
+import { damp, preciseNumber } from '@packages/utils'
 import { AnimatedOptions, Animated } from './Animated'
 
 export interface DampedOptions extends AnimatedOptions {
@@ -29,7 +29,7 @@ export class Damped extends Animated {
   }
 
   protected handleAnimationFrame(e: TickerCallbackEntry) {
-    if (fix(this.current, 4) === fix(this.target, 4)) {
+    if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
       this.unlistenAnimationFrame()
       this.current = this.target
     }

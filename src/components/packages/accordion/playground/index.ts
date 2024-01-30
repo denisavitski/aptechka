@@ -1,9 +1,11 @@
 const acc = document.querySelector('e-accordion')!
 
+const el = document.createElement('div')
+
 addEventListener('keydown', (e) => {
   if (e.key === '1') {
-    acc?.remove()
+    acc.appendChild(el)
   } else if (e.key === '2') {
-    document.body.appendChild(acc)
+    el.appendChild(document.createElement('div'))
   }
 })
