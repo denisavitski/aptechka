@@ -1,10 +1,13 @@
 import { CustomElement, define } from '@packages/custom-element'
-import { element, stylesheet } from '@packages/element-constructor'
+import { element, createStylesheet } from '@packages/element-constructor'
 import { TweakerElement } from './tweaker/TweakerElement'
-import { vars } from './shared'
+import { studioTheme } from './studioTheme'
+import { studioStorage } from './studioStorage'
 
-const style = stylesheet({
+const stylesheet = createStylesheet({
   ':host': {
+    fontFamily: 'sans-serif',
+
     position: 'fixed',
     top: '0',
     left: '0',
@@ -16,7 +19,7 @@ const style = stylesheet({
     width: '100%',
     height: '100%',
 
-    ...vars.style,
+    ...studioTheme.style,
   },
 })
 
@@ -25,11 +28,26 @@ export class StudioElement extends CustomElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(style)
+    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+
+    studioStorage.load()
 
     element(this, {
       shadowChildren: [new TweakerElement()],
     })
+  }
+
+  protected connectedCallback() {
+    window.addEventListener('beforeunload', this.#unloadListener)
+  }
+
+  protected disconnectedCallback() {
+    window.removeEventListener('beforeunload', this.#unloadListener)
+    studioStorage.save()
+  }
+
+  #unloadListener = () => {
+    studioStorage.save()
   }
 }
 

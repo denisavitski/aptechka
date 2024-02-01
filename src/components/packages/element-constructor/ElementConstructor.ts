@@ -1,11 +1,14 @@
 import { Store } from '@packages/store'
 import { isBrowser, camelToKebab } from '@packages/utils'
 
-export type ElementConstructorTagNameMap = HTMLElementTagNameMap & SVGElementTagNameMap
+export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
+  SVGElementTagNameMap
 
 export type ElementConstructorTagNames = keyof ElementConstructorTagNameMap
 
-export type ElementConstructorStringStoreClass = Store<string | null | undefined> | Store<string>
+export type ElementConstructorStringStoreClass =
+  | Store<string | null | undefined>
+  | Store<string>
 
 export type ElementConstructorStringArrayStoreClass =
   | Store<Array<string | null | undefined>>
@@ -13,7 +16,11 @@ export type ElementConstructorStringArrayStoreClass =
 
 export type ElementConstructorClass =
   | string
-  | Array<string | ElementConstructorStringStoreClass | ElementConstructorStringArrayStoreClass>
+  | Array<
+      | string
+      | ElementConstructorStringStoreClass
+      | ElementConstructorStringArrayStoreClass
+    >
   | ElementConstructorStringStoreClass
   | ElementConstructorStringArrayStoreClass
   | { [key: string]: boolean | Store<boolean> }
@@ -23,7 +30,10 @@ export type ElementConstructorStyleToken = Exclude<
   'length' | 'parentRule'
 >
 
-export type ElementConstructorStyleValue = string | Store<string | null | undefined> | Store<string>
+export type ElementConstructorStyleValue =
+  | string
+  | Store<string | null | undefined>
+  | Store<string>
 
 export type ElementConstructorStyle = Partial<{
   [K in ElementConstructorStyleToken]: ElementConstructorStyleValue
@@ -39,7 +49,8 @@ export type ElementConstructorJSS =
       [key: string]: ElementConstructorJSSWrapper | ElementConstructorStyle
     }
 
-export type ElementConstructorEventMap = HTMLElementEventMap & SVGElementEventMap
+export type ElementConstructorEventMap = HTMLElementEventMap &
+  SVGElementEventMap
 
 export type ElementConstructorEventNames = keyof ElementConstructorEventMap
 
@@ -65,61 +76,36 @@ export type ElementConstructorNativeAttribute<
   [K in keyof E]: E[K] extends string ? K : never
 }[keyof E]
 
-type ElementConstructorAttributeValue =
-  | string
-  | undefined
-  | null
-  | boolean
-  | number
-  | Store<string>
-  | Store<string | undefined | null>
-  | Store<boolean>
-  | Store<boolean | undefined | null>
-  | Store<number>
-  | Store<number | undefined | null>
-
-export type ElementConstructorNativeAttributes<T extends ElementConstructorTagNames> = Partial<{
-  [K in ElementConstructorNativeAttribute<T>]: ElementConstructorAttributeValue
+export type ElementConstructorNativeAttributes<
+  T extends ElementConstructorTagNames
+> = Partial<{
+  [K in ElementConstructorNativeAttribute<T>]: any
 }>
 
 export type ElementConstructorCustomAttributes = {
-  [key: string]: ElementConstructorAttributeValue
+  [key: string]: any
 }
 
 export type ElementConstructorAttributes<T extends ElementConstructorTagNames> =
-  | ElementConstructorNativeAttributes<T>
-  | ElementConstructorCustomAttributes
-
-export type ElementConstructorPrimitiveChild = string | number | boolean | null | undefined
-
-export type ElementConstructorSimpleChild =
-  | ElementConstructorPrimitiveChild
-  | ElementConstructor
-  | Node
-  | Array<ElementConstructorPrimitiveChild>
-  | Array<ElementConstructor>
-  | Array<Node>
-
-export type ElementConstructorStoreChild = Store<any>
-export type ElementConstructorStoreChildren = Store<Array<any>>
-
-export type ElementConstructorChildren = Array<
-  ElementConstructorSimpleChild | ElementConstructorStoreChild | ElementConstructorStoreChildren
->
+  ElementConstructorNativeAttributes<T> | ElementConstructorCustomAttributes
 
 export type ElementConstructorParent = Node | ElementConstructor
 
-export type ElementConstructorCreatedCallback<TagName extends ElementConstructorTagNames> = (
-  element: ElementConstructorTagNameMap[TagName]
-) => void
+export type ElementConstructorCreatedCallback<
+  TagName extends ElementConstructorTagNames
+> = (element: ElementConstructorTagNameMap[TagName]) => void
 
-export type ElementConstructorTagObject<TagName extends ElementConstructorTagNames> = {
+export type ElementConstructorTagObject<
+  TagName extends ElementConstructorTagNames
+> = {
   class?: ElementConstructorClass
-  style?: TagName extends 'style' ? ElementConstructorJSS : ElementConstructorStyle
+  style?: TagName extends 'style'
+    ? ElementConstructorJSS
+    : ElementConstructorStyle
   events?: ElementConstructorEvents
   attributes?: ElementConstructorAttributes<TagName>
-  children?: ElementConstructorChildren
-  shadowChildren?: ElementConstructorChildren
+  children?: any
+  shadowChildren?: any
   parent?: ElementConstructorParent
   svg?: boolean
   created?: ElementConstructorCreatedCallback<TagName>
@@ -135,7 +121,9 @@ export type ElementConstructorObject =
 
 export type ElementConstructorType = HTMLElement | SVGElement
 
-export class ElementConstructor<T extends ElementConstructorTagNames = ElementConstructorTagNames> {
+export class ElementConstructor<
+  T extends ElementConstructorTagNames = ElementConstructorTagNames
+> {
   #rootElements: Array<ElementConstructorType> = []
 
   constructor(object: ElementConstructorObject)
@@ -197,7 +185,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     return element
   }
 
-  #applyProperties(element: ElementConstructorType, properties?: ElementConstructorTagObject<any>) {
+  #applyProperties(
+    element: ElementConstructorType,
+    properties?: ElementConstructorTagObject<any>
+  ) {
     for (const k in properties) {
       const propertyName = k as keyof ElementConstructorTagObject<any>
 
@@ -212,7 +203,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
       } else if (propertyName === 'children') {
         this.#createChildren(element, properties[propertyName])
       } else if (propertyName === 'shadowChildren') {
-        this.#createChildren(element.shadowRoot || element, properties[propertyName])
+        this.#createChildren(
+          element.shadowRoot || element,
+          properties[propertyName]
+        )
       } else if (propertyName === 'parent') {
         this.#createParent(element, properties[propertyName])
       }
@@ -223,7 +217,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createClassList(element: ElementConstructorType, classObject?: ElementConstructorClass) {
+  #createClassList(
+    element: ElementConstructorType,
+    classObject?: ElementConstructorClass
+  ) {
     if (!classObject) {
       return
     } else if (typeof classObject === 'string') {
@@ -258,7 +255,9 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
 
   #manageStringStoreClass(
     element: ElementConstructorType,
-    store: ElementConstructorStringStoreClass | ElementConstructorStringArrayStoreClass
+    store:
+      | ElementConstructorStringStoreClass
+      | ElementConstructorStringArrayStoreClass
   ) {
     store.subscribe(({ current, previous }) => {
       if (previous) {
@@ -310,7 +309,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createAttributeStyle(element: ElementConstructorType, object: ElementConstructorStyle) {
+  #createAttributeStyle(
+    element: ElementConstructorType,
+    object: ElementConstructorStyle
+  ) {
     for (const k in object) {
       const token = k as ElementConstructorStyleToken
       const value = object[token]
@@ -325,7 +327,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createJSSStyle(element: ElementConstructorType, object: ElementConstructorJSS) {
+  #createJSSStyle(
+    element: ElementConstructorType,
+    object: ElementConstructorJSS
+  ) {
     for (const key in object) {
       const value = (object as any)[key]
 
@@ -373,7 +378,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createEvents(element: ElementConstructorType, events?: ElementConstructorEvents) {
+  #createEvents(
+    element: ElementConstructorType,
+    events?: ElementConstructorEvents
+  ) {
     if (!events) {
       return
     }
@@ -383,7 +391,11 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
       const listener = events[eventName]
 
       if (typeof listener === 'object') {
-        element.addEventListener(eventName, listener.callback as EventListener, listener.options)
+        element.addEventListener(
+          eventName,
+          listener.callback as EventListener,
+          listener.options
+        )
       } else if (typeof listener === 'function') {
         element.addEventListener(eventName, listener as EventListener)
       }
@@ -412,7 +424,10 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     name: string,
     value: string | boolean | number | null | undefined
   ) {
-    if (name in element && !(element.constructor as any)?.observedAttributes?.includes(name)) {
+    if (
+      name in element &&
+      !(element.constructor as any)?.observedAttributes?.includes(name)
+    ) {
       if (value != undefined) {
         ;(element as any)[name as any] = value.toString()
       }
@@ -423,15 +438,14 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createChildren(
-    root: ElementConstructorType | ShadowRoot,
-    children?: ElementConstructorChildren
-  ) {
+  #createChildren(root: ElementConstructorType | ShadowRoot, children?: any) {
     if (!children) {
       return
     }
 
-    children.forEach((child) => {
+    children = [children].flat()
+
+    children.forEach((child: any) => {
       if (child instanceof Store) {
         const storeRootElement = document.createElement('div')
         storeRootElement.style.display = 'contents'
@@ -456,7 +470,7 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     })
   }
 
-  #getChildrenArray(children: ElementConstructorSimpleChild) {
+  #getChildrenArray(children: any) {
     const arr = [children]
       .flat()
       .map((v) => {
@@ -494,10 +508,7 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #areNodesEqual(
-    currentChild: Node,
-    newChild: Exclude<ElementConstructorSimpleChild, ElementConstructor>
-  ) {
+  #areNodesEqual(currentChild: Node, newChild: any) {
     if (!newChild) {
       return false
     }
@@ -509,7 +520,7 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #getOrCreateNode(child: Exclude<ElementConstructorSimpleChild, ElementConstructor>) {
+  #getOrCreateNode(child: any) {
     if (child instanceof Node) {
       return child
     } else if (child != undefined) {
@@ -527,22 +538,25 @@ export class ElementConstructor<T extends ElementConstructorTagNames = ElementCo
     }
   }
 
-  #createParent(element: ElementConstructorType, parent?: ElementConstructorParent) {
+  #createParent(
+    element: ElementConstructorType,
+    parent?: ElementConstructorParent
+  ) {
     if (!parent) {
       return
     }
 
-    const parentNode = parent instanceof ElementConstructor ? parent.rootElements[0] : parent
+    const parentNode =
+      parent instanceof ElementConstructor ? parent.rootElements[0] : parent
 
     parentNode.appendChild(element)
   }
 }
 
 export function element(object: ElementConstructorObject): ElementConstructor
-export function element<T extends ElementConstructorTagNames = ElementConstructorTagNames>(
-  value: string,
-  object?: ElementConstructorTagObject<T>
-): ElementConstructor
+export function element<
+  T extends ElementConstructorTagNames = ElementConstructorTagNames
+>(value: string, object?: ElementConstructorTagObject<T>): ElementConstructor
 export function element(
   element: HTMLElement,
   object: ElementConstructorTagObject<any>
@@ -551,7 +565,9 @@ export function element(...args: any[]) {
   return new (ElementConstructor as any)(...args)
 }
 
-export function elementFactory(object: ElementConstructorObject): () => ElementConstructor
+export function elementFactory(
+  object: ElementConstructorObject
+): () => ElementConstructor
 export function elementFactory(
   element: HTMLElement,
   object: ElementConstructorTagObject<any>

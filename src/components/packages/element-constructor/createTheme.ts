@@ -1,14 +1,6 @@
 import { CamelToKebab, camelToKebab } from '@packages/utils'
-import { ElementConstructorJSS } from './ElementConstructor'
-import { style } from './htmlTags'
 
-export function stylesheet<T extends ElementConstructorJSS>(object?: T) {
-  const sheet = new CSSStyleSheet()
-  sheet.replaceSync(style(object).rootElements[0].innerHTML)
-  return sheet
-}
-
-export function cssvars<T extends { [key: string]: string }>(object: T) {
+export function createTheme<T extends { [key: string]: string }>(object: T) {
   const result: {
     [K in Extract<keyof T, string>]: {
       var: `var(--${CamelToKebab<K>})`

@@ -1,8 +1,15 @@
 import { StoreOptions, StoreEntry, Store, StoreCallback } from '@packages/store'
-import { ticker, TickerCallbackEntry, TickerCallback, TickerAddOptions } from '@packages/ticker'
+import {
+  ticker,
+  TickerCallbackEntry,
+  TickerCallback,
+  TickerAddOptions,
+} from '@packages/ticker'
 import { ElementOrSelector, clamp, preciseNumber } from '@packages/utils'
 
-export interface AnimatedOptions extends StoreOptions<number>, TickerAddOptions {
+export interface AnimatedOptions
+  extends StoreOptions<number, 'number'>,
+    TickerAddOptions {
   min?: number | AnimatedEdgeFunction
   max?: number | AnimatedEdgeFunction
   default?: number
@@ -19,10 +26,9 @@ export interface AnimatedEntry extends StoreEntry<number> {
   speed: number
 }
 
-export abstract class Animated<Entry extends AnimatedEntry = AnimatedEntry> extends Store<
-  number,
-  Entry
-> {
+export abstract class Animated<
+  Entry extends AnimatedEntry = AnimatedEntry
+> extends Store<number, 'number', Entry> {
   #maxFPS: number | undefined
   #order: number | undefined
   #culling: ElementOrSelector | undefined
@@ -90,7 +96,9 @@ export abstract class Animated<Entry extends AnimatedEntry = AnimatedEntry> exte
   }
 
   public get progress() {
-    return this.delta ? preciseNumber((this.current - this.min) / this.delta, 6) : 0
+    return this.delta
+      ? preciseNumber((this.current - this.min) / this.delta, 6)
+      : 0
   }
 
   public override get entry(): Entry {

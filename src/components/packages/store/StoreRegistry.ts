@@ -17,7 +17,8 @@ class StoreRegistry {
 
   constructor() {
     if (isBrowser) {
-      this.#projectName = document.documentElement.getAttribute('data-project') || undefined
+      this.#projectName =
+        document.documentElement.getAttribute('data-project') || undefined
       this.#localStoreRegistryName = this.#projectName
         ? this.#projectName + '-store-registry'
         : 'store-registry'
@@ -43,7 +44,9 @@ class StoreRegistry {
   }
 
   public loadState(
-    state: string | StoreRegistryState | null = localStorage.getItem(this.#localStoreRegistryName)
+    state: string | StoreRegistryState | null = localStorage.getItem(
+      this.#localStoreRegistryName
+    )
   ) {
     if (state) {
       if (typeof state === 'string') {
@@ -66,7 +69,7 @@ class StoreRegistry {
     this.saveState()
   }
 
-  public updateStore(store: Store<any, any>) {
+  public updateStore(store: Store<any, any, any>) {
     if (!Array.isArray(this.#loadedState?.stores)) {
       return store
     }
@@ -74,7 +77,9 @@ class StoreRegistry {
     const passport = store.passport
 
     if (passport) {
-      const match = this.#loadedState?.stores.find((s) => s.name === passport.name)
+      const match = this.#loadedState?.stores.find(
+        (s) => s.name === passport.name
+      )
 
       if (match) {
         store.current = match.value

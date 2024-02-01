@@ -1,31 +1,62 @@
 import { define } from '@packages/custom-element'
-import { stylesheet } from '@packages/element-constructor'
+import { createStylesheet } from '@packages/element-constructor'
+import { Animated } from '@packages/animation'
+import { Store, activeStores } from '@packages/store'
+import { debounce } from '@packages/utils'
 
-import { vars } from '../shared'
+import { studioTheme } from '../studioTheme'
 import { TweakerFolderElement } from './TweakerFolderElement'
 
-const style = stylesheet({
+const stylesheet = createStylesheet({
   ':host': {
     position: 'absolute',
     top: '20px',
     right: '20px',
 
-    width: vars.sizeTweakerWidth.var,
+    width: studioTheme.sizeTweakerWidth.var,
 
-    backgroundColor: vars.colorDark.var,
-    borderRadius: vars.sizeBorderRadius.var,
+    backgroundColor: studioTheme.colorDark.var,
+    borderRadius: studioTheme.sizeBorderRadius.var,
   },
 })
+
+export interface StoreBox {
+  store: Store
+  remainingFolders: Array<string>
+}
 
 @define('e-tweaker')
 export class TweakerElement extends TweakerFolderElement {
   constructor() {
     super({
-      key: 'tweaker',
+      key: '',
     })
 
-    this.shadowRoot!.adoptedStyleSheets.push(style)
+    this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
   }
+
+  protected override connectedCallback() {
+    super.connectedCallback()
+    activeStores.subscribe(this.#storesChangeListener)
+  }
+
+  protected override disconnectedCallback() {
+    super.disconnectedCallback()
+    activeStores.unsubscribe(this.#storesChangeListener)
+  }
+
+  #storesChangeListener = debounce(() => {
+    activeStores.current.forEach((store) => {
+      if (!(store instanceof Animated)) {
+        const sname = store.passport!.name.split('.')
+
+        this.handleStore({
+          store: store,
+          remainingFolders: sname.length > 1 ? sname.slice(0, -1) : [],
+        })
+      }
+    })
+  }, 10)
 }
 
 declare global {

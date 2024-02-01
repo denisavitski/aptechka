@@ -1,6 +1,6 @@
-import { cssvars } from '@packages/element-constructor'
+import { createTheme } from '@packages/element-constructor'
 
-export const vars = cssvars({
+export const studioTheme = createTheme({
   colorDark: '#1c1c1c',
   colorLight: '#ffffff',
   colorDarkAux: '#282828',

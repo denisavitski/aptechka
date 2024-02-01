@@ -1,63 +1,35 @@
 import '@packages/accordion'
 
+import { Store } from '@packages/store'
 import { CustomElement, define } from '@packages/custom-element'
-import { div, element, stylesheet } from '@packages/element-constructor'
+import { div, element, createStylesheet } from '@packages/element-constructor'
 
-import { vars } from '../shared'
+import { studioTheme } from '../studioTheme'
 
-const style = stylesheet({
-  '.wrapper': {
-    boxSizing: 'border-box',
-    padding: vars.sizePaddingMedium.var,
-    backgroundColor: `rgba(255, 255, 255, 0.1)`,
-    borderRadius: vars.sizeBorderRadius.var,
-  },
-
-  '.head': {
-    width: '100%',
-    height: '20px',
-    backgroundColor: vars.colorLight,
-    borderRadius: vars.sizeBorderRadius.var,
-  },
-
-  '.body': {
-    transitionProperty: 'height',
-    transitionDuration: vars.durationShort.var,
-  },
-
-  '.body-content': {
-    boxSizing: 'border-box',
-    padding: vars.sizePaddingLarge.var,
+const stylesheet = createStylesheet({
+  '.host': {
+    color: studioTheme.colorLight.var,
   },
 })
 
-export interface TweakerFolderParameters {
-  key: string
-  name?: string
+export interface TweakerFieldParameters {
+  store: Store<any>
 }
 
-@define('e-tweaker-folder')
+@define('e-tweaker-field')
 export class TweakerFieldElement extends CustomElement {
   #key: string
-  #name: string
 
-  constructor(parameters?: TweakerFolderParameters) {
+  constructor(parameters: TweakerFieldParameters) {
     super()
 
-    this.#key = parameters?.key || this.getAttribute('key') || 'unnamed'
+    this.#key = parameters.store.passport!.name
 
-    this.#name =
-      parameters?.name || this.getAttribute('name') || this.#key || 'unnamed'
-
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(style)
+    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
 
     element(this, {
-      shadowChildren: [div({})],
+      shadowChildren: [div({ class: 'name', children: this.#key })],
     })
-  }
-
-  public get name() {
-    return this.#name
   }
 
   public get key() {

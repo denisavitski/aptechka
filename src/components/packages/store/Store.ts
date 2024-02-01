@@ -5,7 +5,9 @@ export interface StoreEntry<StoreType> {
   previous: StoreType | undefined
 }
 
-export type StoreCallback<Entry extends StoreEntry<any>> = (entry: Entry) => void
+export type StoreCallback<Entry extends StoreEntry<any>> = (
+  entry: Entry
+) => void
 
 export type StoreEqualityCheckCallback<StoreType> = (
   currentValue: StoreType,
@@ -13,20 +15,78 @@ export type StoreEqualityCheckCallback<StoreType> = (
 ) => boolean
 export type StoreValidateCallback<StoreType> = (value: StoreType) => StoreType
 
-export interface StorePassport {
-  name: string
-  description?: string
+export interface StoreManager {
+  type: string
+  disabled?: boolean
 }
 
-export interface StoreOptions<StoreType> {
+export interface StoreStringManager extends StoreManager {
+  type: 'string'
+}
+
+export interface StoreNumberManager extends StoreManager {
+  type: 'number'
+  min?: number
+  max?: number
+  step?: number
+}
+
+export interface StoreRangeManager extends StoreManager {
+  type: 'range'
+  min?: number
+  max?: number
+  step?: number
+}
+
+export interface StoreColorManager extends StoreManager {
+  type: 'color'
+}
+
+export interface StoreBooleanManager extends StoreManager {
+  type: 'boolean'
+}
+
+export interface StoreLinkManager extends StoreManager {
+  type: 'link'
+  sameWindow?: boolean
+}
+
+export interface StoreSelectManager extends StoreManager {
+  type: 'select'
+  variants: Array<string>
+}
+
+export interface StoreManagers {
+  select: StoreSelectManager
+  link: StoreLinkManager
+  boolean: StoreBooleanManager
+  color: StoreColorManager
+  range: StoreRangeManager
+  number: StoreNumberManager
+  string: StoreStringManager
+}
+
+export type StoreManagerType = keyof StoreManagers
+
+export interface StorePassport<T extends StoreManagerType = StoreManagerType> {
+  name: string
+  description?: string
+  manager?: StoreManagers[T]
+}
+
+export interface StoreOptions<
+  StoreType,
+  StoreManager extends StoreManagerType = StoreManagerType
+> {
   equalityCheck?: StoreEqualityCheckCallback<StoreType>
-  passport?: StorePassport
+  passport?: StorePassport<StoreManager>
   validate?: StoreValidateCallback<StoreType>
   skipSubscribeNotification?: boolean
 }
 
 export class Store<
   StoreType = unknown,
+  StoreManager extends StoreManagerType = StoreManagerType,
   Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
 > {
   #passport: StorePassport | undefined
@@ -38,7 +98,10 @@ export class Store<
   #validate: StoreValidateCallback<StoreType>
   #skipSubscribeNotification: boolean
 
-  constructor(value: StoreType, options?: StoreOptions<StoreType>) {
+  constructor(
+    value: StoreType,
+    options?: StoreOptions<StoreType, StoreManager>
+  ) {
     this.#passport = options?.passport
     this.#initial = value
     this.#previous = undefined
@@ -46,11 +109,13 @@ export class Store<
     this.#current = value
 
     this.#equalityCheck =
-      options?.equalityCheck || ((currentValue, newValue) => currentValue === newValue)
+      options?.equalityCheck ||
+      ((currentValue, newValue) => currentValue === newValue)
 
     this.#validate = options?.validate || ((value) => value)
 
-    this.#skipSubscribeNotification = options?.skipSubscribeNotification || false
+    this.#skipSubscribeNotification =
+      options?.skipSubscribeNotification || false
 
     if (this.#passport) {
       storeRegistry.updateStore(this)
@@ -135,15 +200,17 @@ export class Store<
   }
 }
 
-export const activeStores = new Store<Array<Store<any, any>>>([])
+export const activeStores = new Store<Array<Store<any, any, any>>>([])
 
-function shareStore(store: Store<any, any>) {
-  if (!activeStores.current.find((s) => s.passport!.name === store.passport!.name)) {
+function shareStore(store: Store<any, any, any>) {
+  if (
+    !activeStores.current.find((s) => s.passport!.name === store.passport!.name)
+  ) {
     activeStores.current = [...activeStores.current, store]
   }
 }
 
-function unshareStore(store: Store<any, any>) {
+function unshareStore(store: Store<any, any, any>) {
   if (activeStores.current.includes(store)) {
     activeStores.current = activeStores.current.filter((s) => s !== store)
   }

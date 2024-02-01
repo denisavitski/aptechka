@@ -6,7 +6,14 @@ import {
   isBrowser,
 } from '@packages/utils'
 
-export interface AccordionItemOptions {}
+export interface AccordionItemToggleEventDetail {
+  opened: boolean
+}
+
+export interface AccordionToggleOptions {
+  skipTransition?: boolean
+  exclude?: HTMLElement
+}
 
 class AccordionItem {
   #accordionElement: AccordionElement = null!
@@ -48,15 +55,7 @@ class AccordionItem {
       )
 
       if (this.#element.hasAttribute('data-opened')) {
-        const duration = getElementTransitionDurationMS(this.#bodyElement)
-
-        this.#bodyElement.style.transition = 'all 0s'
-
-        this.open()
-
-        setTimeout(() => {
-          this.#bodyElement.style.transition = ''
-        }, duration)
+        this.open({ skipTransition: true })
       }
     } else {
       accordionElement.removeItem(this.#element)
@@ -86,9 +85,13 @@ class AccordionItem {
     }
   }
 
-  public open() {
+  public open(options?: Omit<AccordionToggleOptions, 'exclude'>) {
+    if (options?.skipTransition) {
+      this.#skipTransition()
+    }
+
     if (!this.#accordionElement.multipleAttribute.current) {
-      this.#accordionElement.closeAll()
+      this.#accordionElement.closeAll({ exclude: this.#element })
     }
 
     if (!this.#observed) {
@@ -105,9 +108,15 @@ class AccordionItem {
     setTimeout(() => {
       this.#element.classList.add('opened')
     }, 0)
+
+    this.#dispatchEvent('toggle')
   }
 
-  public close() {
+  public close(options?: Omit<AccordionToggleOptions, 'exclude'>) {
+    if (options?.skipTransition) {
+      this.#skipTransition()
+    }
+
     this.#opened = false
 
     this.#element.classList.remove('opened')
@@ -117,6 +126,12 @@ class AccordionItem {
     this.#activeTimeoutId = setTimeout(() => {
       this.#element.classList.remove('triggered')
     }, getElementTransitionDurationMS(this.#bodyElement))
+
+    this.#dispatchEvent('toggle')
+  }
+
+  get #root() {
+    return this.#element.parentElement || this.#element.getRootNode()
   }
 
   #headClickListener = () => {
@@ -135,12 +150,7 @@ class AccordionItem {
   }
 
   #bodyResizeListener = () => {
-    ;(this.#element.parentElement || this.#element.getRootNode()).dispatchEvent(
-      new CustomEvent('accordion-item-size-change', {
-        bubbles: true,
-        composed: true,
-      })
-    )
+    this.#dispatchEvent('size-change')
   }
 
   #childrenSizeChangeListener = () => {
@@ -162,6 +172,38 @@ class AccordionItem {
     } else {
       this.#bodyElement.style.height = ''
     }
+  }
+
+  #dispatchEvent(name: 'toggle' | 'size-change') {
+    if (name === 'toggle') {
+      this.#element.dispatchEvent(
+        new CustomEvent<AccordionItemToggleEventDetail>(
+          'accordion-item-toggle',
+          {
+            bubbles: true,
+            composed: true,
+            detail: {
+              opened: this.#opened,
+            },
+          }
+        )
+      )
+    } else if (name === 'size-change') {
+      this.#root.dispatchEvent(
+        new CustomEvent('accordion-item-size-change', {
+          bubbles: true,
+          composed: true,
+        })
+      )
+    }
+  }
+
+  #skipTransition() {
+    this.#bodyElement.style.transition = 'all 0s'
+
+    setTimeout(() => {
+      this.#bodyElement.style.transition = ''
+    }, 50)
   }
 }
 
@@ -219,15 +261,19 @@ export class AccordionElement extends CustomElement {
     })
   }
 
-  public closeAll() {
+  public closeAll(options?: AccordionToggleOptions) {
     this.#items.forEach((item) => {
-      item.close()
+      if (options?.exclude !== item.element) {
+        item.close(options)
+      }
     })
   }
 
-  public openAll() {
+  public openAll(options?: AccordionToggleOptions) {
     this.#items.forEach((item) => {
-      item.open()
+      if (options?.exclude !== item.element) {
+        item.open(options)
+      }
     })
   }
 
@@ -261,5 +307,6 @@ declare global {
 
   interface HTMLElementEventMap {
     'accordion-item-size-change': CustomEvent
+    'accordion-item-toggle': CustomEvent<AccordionItemToggleEventDetail>
   }
 }
