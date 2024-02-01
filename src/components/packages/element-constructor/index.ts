@@ -1,4 +1,4 @@
 export * from './ElementConstructor'
 export * from './htmlTags'
-export * from './specialObjects'
+export * from './stylesheet'
 export * from './svgTags'

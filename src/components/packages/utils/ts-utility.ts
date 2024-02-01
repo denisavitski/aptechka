@@ -1,12 +1,12 @@
 export type NestedKeys<T> = T extends Node
   ? ''
   : T extends object
-    ? {
-        [K in keyof T]: T[K] extends infer U
-          ? `${Extract<K, string>}${NestedKeys<U> extends '' ? '' : '.'}${NestedKeys<U>}`
-          : never
-      }[keyof T]
-    : ''
+  ? {
+      [K in keyof T]: T[K] extends infer U
+        ? `${Extract<K, string>}${NestedKeys<U> extends '' ? '' : '.'}${NestedKeys<U>}`
+        : never
+    }[keyof T]
+  : ''
 
 export type NestedValueOf<Obj, Key extends string> = Obj extends object
   ? Key extends `${infer Parent}.${infer Leaf}`
@@ -14,8 +14,8 @@ export type NestedValueOf<Obj, Key extends string> = Obj extends object
       ? NestedValueOf<Obj[Parent], Leaf>
       : never
     : Key extends keyof Obj
-      ? Obj[Key]
-      : never
+    ? Obj[Key]
+    : never
   : never
 
 type Tail<T extends any[]> = ((...t: T) => void) extends (h: any, ...r: infer R) => void ? R : never
@@ -41,7 +41,17 @@ export type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
 export type Split<S extends string, D extends string> = string extends S
   ? string[]
   : S extends ''
-    ? []
-    : S extends `${infer T}${D}${infer U}`
-      ? [T, ...Split<U, D>]
-      : [S]
+  ? []
+  : S extends `${infer T}${D}${infer U}`
+  ? [T, ...Split<U, D>]
+  : [S]
+
+export type KebabToCamel<S extends string> = S extends `${infer T}-${infer U}`
+  ? `${T}${Capitalize<KebabToCamel<U>>}`
+  : S
+
+export type CamelToKebab<S extends string> = S extends `${infer T}${infer U}`
+  ? U extends Uncapitalize<U>
+    ? `${Uncapitalize<T>}${CamelToKebab<U>}`
+    : `${Uncapitalize<T>}-${CamelToKebab<U>}`
+  : ''

@@ -66,4 +66,6 @@ export type {
   Requiredish,
   WithRequired,
   Split,
+  KebabToCamel,
+  CamelToKebab,
 } from './ts-utility'

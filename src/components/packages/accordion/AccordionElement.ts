@@ -1,6 +1,10 @@
 import { CustomElement, define } from '@packages/custom-element'
 import { Attribute } from '@packages/attribute'
-import { Axes2D, getElementTransitionDurationMS, isBrowser } from '@packages/utils'
+import {
+  Axes2D,
+  getElementTransitionDurationMS,
+  isBrowser,
+} from '@packages/utils'
 
 export interface AccordionItemOptions {}
 
@@ -38,7 +42,10 @@ class AccordionItem {
       addEventListener('resize', this.#windowResizeListener)
 
       this.#headElement.addEventListener('click', this.#headClickListener)
-      this.#element.addEventListener('accordion-item-size-change', this.#childrenSizeChangeListener)
+      this.#element.addEventListener(
+        'accordion-item-size-change',
+        this.#childrenSizeChangeListener
+      )
 
       if (this.#element.hasAttribute('data-opened')) {
         const duration = getElementTransitionDurationMS(this.#bodyElement)
@@ -128,9 +135,10 @@ class AccordionItem {
   }
 
   #bodyResizeListener = () => {
-    this.#element.parentElement!.dispatchEvent(
+    ;(this.#element.parentElement || this.#element.getRootNode()).dispatchEvent(
       new CustomEvent('accordion-item-size-change', {
         bubbles: true,
+        composed: true,
       })
     )
   }
@@ -224,11 +232,11 @@ export class AccordionElement extends CustomElement {
   }
 
   protected connectedCallback() {
-    this.#mutationObserver.observe(this, {
+    this.#mutationObserver.observe(this.#root, {
       childList: true,
     })
 
-    this.#items = [...this.children]
+    this.#items = [...this.#root.children]
       .map((element) => {
         if (element instanceof HTMLElement) {
           return new AccordionItem(this, element)
@@ -239,6 +247,10 @@ export class AccordionElement extends CustomElement {
 
   protected disconnectedCallback() {
     this.#mutationObserver.disconnect()
+  }
+
+  get #root(): HTMLElement | ShadowRoot {
+    return this.shadowRoot ? this.shadowRoot : this
   }
 }
 
