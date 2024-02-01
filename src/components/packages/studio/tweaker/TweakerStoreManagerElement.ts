@@ -1,6 +1,6 @@
 import { CustomElement } from '@packages/custom-element'
 import { Store } from '@packages/store'
-import { StoreManagerType } from '@packages/store/Store'
+import { StoreManagerType, activeStores } from '@packages/store/Store'
 
 export abstract class TweakerStoreManagerElement<
   T,
@@ -16,5 +16,19 @@ export abstract class TweakerStoreManagerElement<
 
   protected get store() {
     return this.#store
+  }
+
+  protected connectedCallback() {
+    activeStores.subscribe(this.#storesChangeListener)
+  }
+
+  protected disconnectedCallback() {
+    activeStores.unsubscribe(this.#storesChangeListener)
+  }
+
+  #storesChangeListener = () => {
+    if (!activeStores.current.includes(this.#store)) {
+      // TODO
+    }
   }
 }

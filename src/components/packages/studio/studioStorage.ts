@@ -1,34 +1,34 @@
 import { storeRegistry } from '@packages/store'
 
 export interface StudioStorageState {
-  openedFolders: Array<string>
+  openedPanels: Array<string>
 }
 
 class StudioStorage {
   #localStorageStudioName = ''
-  #openedFolders: Array<string> = new Array()
+  #openedPanels: Array<string> = []
 
   constructor() {
     this.#localStorageStudioName = storeRegistry.projectName + '-studio'
   }
 
-  public openFolder(folderKey: string) {
-    if (!this.#openedFolders.includes(folderKey)) {
-      this.#openedFolders.push(folderKey)
+  public openPanel(key: string) {
+    if (!this.#openedPanels.includes(key)) {
+      this.#openedPanels.push(key)
     }
   }
 
-  public closeFolder(folderKey: string) {
-    this.#openedFolders = this.#openedFolders.filter((f) => f !== folderKey)
+  public closePanel(key: string) {
+    this.#openedPanels = this.#openedPanels.filter((v) => v !== key)
   }
 
-  public isFolderOpened(folderKey: string) {
-    return this.#openedFolders.includes(folderKey)
+  public isPanelOpened(key: string) {
+    return this.#openedPanels.includes(key)
   }
 
   public save() {
     const state: StudioStorageState = {
-      openedFolders: this.#openedFolders,
+      openedPanels: this.#openedPanels,
     }
 
     localStorage.setItem(this.#localStorageStudioName, JSON.stringify(state))
@@ -40,7 +40,8 @@ class StudioStorage {
     if (stringState) {
       try {
         const state: StudioStorageState = JSON.parse(stringState)
-        this.#openedFolders = state.openedFolders
+
+        this.#openedPanels = state.openedPanels
       } catch (e) {
         console.error(e)
       }

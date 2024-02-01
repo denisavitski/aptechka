@@ -5,6 +5,7 @@ import { CustomElement, define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
 
 import { studioTheme } from '../studioTheme'
+import { TweakerNumberManagerElement } from './TweakerNumberManagerElement'
 
 const stylesheet = createStylesheet({
   '.host': {
@@ -28,7 +29,10 @@ export class TweakerFieldElement extends CustomElement {
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
 
     element(this, {
-      shadowChildren: [div({ class: 'name', children: this.#key })],
+      shadowChildren: [
+        div({ class: 'name', children: this.#key }),
+        new TweakerNumberManagerElement(parameters.store),
+      ],
     })
   }
 

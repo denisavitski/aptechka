@@ -4,7 +4,6 @@ import { AccordionElement } from '@packages/accordion'
 import { Store } from '@packages/store'
 
 import { studioTheme } from '../studioTheme'
-
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { studioStorage } from '../studioStorage'
 import { StoreBox } from './TweakerElement'
@@ -75,10 +74,11 @@ export class TweakerFolderElement extends AccordionElement {
       events: {
         'accordion-item-toggle': (e) => {
           e.stopPropagation()
+
           if (e.detail.opened) {
-            studioStorage.openFolder(this.#key)
+            studioStorage.openPanel(this.#key)
           } else {
-            studioStorage.closeFolder(this.#key)
+            studioStorage.closePanel(this.#key)
           }
         },
       },
@@ -131,7 +131,7 @@ export class TweakerFolderElement extends AccordionElement {
     super.connectedCallback()
 
     setTimeout(() => {
-      if (studioStorage.isFolderOpened(this.#key)) {
+      if (studioStorage.isPanelOpened(this.#key)) {
         this.openAll({ skipTransition: true })
       }
     }, 50)

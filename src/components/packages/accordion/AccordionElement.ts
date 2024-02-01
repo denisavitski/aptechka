@@ -154,8 +154,10 @@ class AccordionItem {
   }
 
   #childrenSizeChangeListener = () => {
-    this.#setScrollHeight(0, true)
-    this.#setScrollHeight(this.#bodyElement.scrollHeight)
+    if (this.#opened) {
+      this.#setScrollHeight(0, true)
+      this.#setScrollHeight(this.#bodyElement.scrollHeight)
+    }
   }
 
   #setScrollHeight(value: number | undefined, skipDuration = false) {
