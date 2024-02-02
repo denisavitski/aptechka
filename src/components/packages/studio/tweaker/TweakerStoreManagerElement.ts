@@ -1,8 +1,7 @@
 import { CustomElement } from '@packages/custom-element'
-import { Store } from '@packages/store'
-import { StoreManagerType, activeStores } from '@packages/store/Store'
+import { Store, StoreManagerType } from '@packages/store'
 
-export abstract class TweakerStoreManagerElement<
+export class TweakerStoreManagerElement<
   T,
   K extends StoreManagerType
 > extends CustomElement {

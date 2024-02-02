@@ -13,7 +13,6 @@ export type StoreEqualityCheckCallback<StoreType> = (
   currentValue: StoreType,
   newValue: StoreType
 ) => boolean
-export type StoreValidateCallback<StoreType> = (value: StoreType) => StoreType
 
 export interface StoreManager {
   type: string
@@ -74,13 +73,15 @@ export interface StorePassport<T extends StoreManagerType = StoreManagerType> {
   manager?: StoreManagers[T]
 }
 
+export type StoreMiddleware<T> = (value: T) => T
+
 export interface StoreOptions<
   StoreType,
   StoreManager extends StoreManagerType = StoreManagerType
 > {
   equalityCheck?: StoreEqualityCheckCallback<StoreType>
   passport?: StorePassport<StoreManager>
-  validate?: StoreValidateCallback<StoreType>
+  validate?: StoreMiddleware<StoreType>
   skipSubscribeNotification?: boolean
 }
 
@@ -89,14 +90,14 @@ export class Store<
   StoreManager extends StoreManagerType = StoreManagerType,
   Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
 > {
-  #passport: StorePassport | undefined
+  #passport: StorePassport<StoreManager> | undefined
   #initial: StoreType
   #previous: StoreType | undefined
   #current: StoreType
   #equalityCheck: StoreEqualityCheckCallback<StoreType>
   #callbacks = new Set<StoreCallback<Entry>>()
-  #validate: StoreValidateCallback<StoreType>
   #skipSubscribeNotification: boolean
+  #middlewares: Set<StoreMiddleware<StoreType>> | undefined
 
   constructor(
     value: StoreType,
@@ -112,7 +113,9 @@ export class Store<
       options?.equalityCheck ||
       ((currentValue, newValue) => currentValue === newValue)
 
-    this.#validate = options?.validate || ((value) => value)
+    if (options?.validate) {
+      this.addMiddleware(options.validate)
+    }
 
     this.#skipSubscribeNotification =
       options?.skipSubscribeNotification || false
@@ -141,7 +144,14 @@ export class Store<
   public set current(value: StoreType) {
     if (!this.#equalityCheck(this.#current, value)) {
       this.#previous = this.#current
-      this.#current = this.#validate(value)
+
+      if (this.#middlewares) {
+        for (const middleware of this.#middlewares) {
+          value = middleware(value)
+        }
+      }
+
+      this.#current = value
       this.#notify()
     }
   }
@@ -155,6 +165,22 @@ export class Store<
       current: this.#current,
       previous: this.#previous,
     } as Entry
+  }
+
+  public addMiddleware(middleware: StoreMiddleware<StoreType>) {
+    if (!this.#middlewares) {
+      this.#middlewares = new Set()
+    }
+
+    this.#middlewares.add(middleware)
+  }
+
+  public removeMiddleware(middleware: StoreMiddleware<StoreType>) {
+    this.#middlewares?.delete(middleware)
+
+    if (!this.#middlewares?.size) {
+      this.#middlewares = undefined
+    }
   }
 
   public subscribe(callback: StoreCallback<Entry>) {

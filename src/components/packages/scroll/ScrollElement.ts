@@ -1,6 +1,10 @@
 import { Damped } from '@packages/animation'
 import { Attribute } from '@packages/attribute'
-import { WheelControls, KeyboardControls, ControlsValue } from '@packages/controls'
+import {
+  WheelControls,
+  KeyboardControls,
+  ControlsValue,
+} from '@packages/controls'
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { resizer } from '@packages/resizer'
@@ -66,7 +70,11 @@ class Section {
       offset = this.#scrollElement.distance * -1
     }
 
-    scrollEnties.update(this.#element, this.#scrollElement.axisAttibute.current, offset)
+    scrollEnties.update(
+      this.#element,
+      this.#scrollElement.axisAttibute.current,
+      offset
+    )
 
     const value = clamp(
       this.#scrollElement.currentScrollValue + offset,
@@ -91,7 +99,11 @@ export class ScrollElement extends CustomElement {
     validate: (v) => Math.max(0, v - 1),
   })
   #sectionalAttribute = new Attribute<boolean>(this, 'sectional', false)
-  #wheelMaxDeltaAttribute = new Attribute<boolean>(this, 'wheel-max-delta', false)
+  #wheelMaxDeltaAttribute = new Attribute<boolean>(
+    this,
+    'wheel-max-delta',
+    false
+  )
   #infiniteAttribute = new Attribute<boolean>(this, 'infinite', false)
   #splitAttribute = new Attribute<boolean>(this, 'split', false)
   #dampingAttribute = new Attribute<number>(this, 'damping', 0.03)
@@ -117,7 +129,11 @@ export class ScrollElement extends CustomElement {
     super()
 
     if (isBrowser) {
-      this.#damped = new Damped({ damping: 0.01, min: 0, order: TICK_ORDER.SCROLL })
+      this.#damped = new Damped({
+        damping: 0.01,
+        min: 0,
+        order: TICK_ORDER.SCROLL,
+      })
 
       const shadowRoot = this.attachShadow({ mode: 'open' })
 
@@ -187,9 +203,12 @@ export class ScrollElement extends CustomElement {
       this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
 
       this.#axisAttribute.subscribe(({ current }) => {
-        this.#contentElement.style.flexDirection = current === 'x' ? 'row' : 'column'
+        this.#contentElement.style.flexDirection =
+          current === 'x' ? 'row' : 'column'
 
-        this.#wheelControls.axis = this.#wheelMaxDeltaAttribute.current ? 'max' : current
+        this.#wheelControls.axis = this.#wheelMaxDeltaAttribute.current
+          ? 'max'
+          : current
 
         if (this.isConnected) {
           this.#resizeListener()
@@ -197,7 +216,9 @@ export class ScrollElement extends CustomElement {
       })
 
       this.#wheelMaxDeltaAttribute.subscribe((e) => {
-        this.#wheelControls.axis = e.current ? 'max' : this.#axisAttribute.current
+        this.#wheelControls.axis = e.current
+          ? 'max'
+          : this.#axisAttribute.current
       })
 
       this.#pagesAttribute.subscribe(() => {
@@ -356,7 +377,10 @@ export class ScrollElement extends CustomElement {
   }
 
   // TODO: Поправить значение когда скролл не секционный ??
-  public scrollToSection(sectionIndex: number, behaviour: ScrollBehaviour = 'smooth') {
+  public scrollToSection(
+    sectionIndex: number,
+    behaviour: ScrollBehaviour = 'smooth'
+  ) {
     if (!this.#sections.length) {
       return
     }
@@ -374,9 +398,11 @@ export class ScrollElement extends CustomElement {
       const limit = this.#sections.length - 1
 
       if (this.#counter.current === 0 && previousCounter === limit) {
-        shiftValue = this.#scrollSize + this.#viewportSize - previousSection.position
+        shiftValue =
+          this.#scrollSize + this.#viewportSize - previousSection.position
       } else if (this.#counter.current === limit && previousCounter === 0) {
-        shiftValue = currentSection.position - (this.#scrollSize + this.#viewportSize)
+        shiftValue =
+          currentSection.position - (this.#scrollSize + this.#viewportSize)
       } else {
         shiftValue = currentSection.position - previousSection.position
       }
@@ -385,7 +411,10 @@ export class ScrollElement extends CustomElement {
     }
   }
 
-  public shiftSections(direction: number, behaviour: ScrollBehaviour = 'smooth') {
+  public shiftSections(
+    direction: number,
+    behaviour: ScrollBehaviour = 'smooth'
+  ) {
     if (!this.#sections.length) {
       return
     }
@@ -471,7 +500,9 @@ export class ScrollElement extends CustomElement {
   #resizeListener = () => {
     const prevProgress = this.currentScrollValue / this.#scrollSize
 
-    this.#position = this.vertical ? getCumulativeOffsetTop(this) : getCumulativeOffsetLeft(this)
+    this.#position = this.vertical
+      ? getCumulativeOffsetTop(this)
+      : getCumulativeOffsetLeft(this)
     this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
 
     if (this.#pagesAttribute.current) {
@@ -489,7 +520,8 @@ export class ScrollElement extends CustomElement {
       if (this.vertical) {
         this.#contentElement.style.width = '100%'
         this.#contentElement.style.height = 'max-content'
-        this.#scrollSize = this.#contentElement.offsetHeight - this.#viewportSize
+        this.#scrollSize =
+          this.#contentElement.offsetHeight - this.#viewportSize
       } else {
         this.#contentElement.style.width = 'max-content'
         this.#contentElement.style.height = '100%'
@@ -508,9 +540,11 @@ export class ScrollElement extends CustomElement {
 
     if (this.#infiniteAttribute.current && this.#sections.length) {
       const lastSection = this.#sections[this.#sections.length - 1]
-      const lastSectionMax = lastSection.position + lastSection.size - this.#viewportSize
+      const lastSectionMax =
+        lastSection.position + lastSection.size - this.#viewportSize
       const lastSectionMargin = this.#scrollSize - lastSectionMax
-      this.#distance = lastSection.position + lastSection.size + lastSectionMargin
+      this.#distance =
+        lastSection.position + lastSection.size + lastSectionMargin
     } else {
       this.#distance = this.#scrollSize
     }
@@ -550,7 +584,11 @@ export class ScrollElement extends CustomElement {
       }
     }
 
-    scrollEnties.update(this, this.#axisAttribute.current, this.currentScrollValue)
+    scrollEnties.update(
+      this,
+      this.#axisAttribute.current,
+      this.currentScrollValue
+    )
   }
 
   #setCounter(value: number) {

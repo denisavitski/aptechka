@@ -6,6 +6,7 @@ import { debounce } from '@packages/utils'
 
 import { studioTheme } from '../studioTheme'
 import { TweakerFolderElement } from './TweakerFolderElement'
+import { ViewportMediaRules } from '@packages/device'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -17,6 +18,25 @@ const stylesheet = createStylesheet({
 
     backgroundColor: studioTheme.colorDark.var,
     borderRadius: studioTheme.sizeBorderRadius.var,
+
+    transition: 'opacity 0.2s',
+  },
+
+  ':host(:hover)': {
+    opacity: '1 !important',
+  },
+
+  [`@media ${ViewportMediaRules['<=mobile']}`]: {
+    ':host': {
+      position: 'absolute',
+      top: '0',
+      right: '0',
+
+      width: '100%',
+
+      borderTopLeftRadius: '0',
+      borderTopRightRadius: '0',
+    },
   },
 })
 
@@ -33,10 +53,19 @@ export class TweakerElement extends TweakerFolderElement {
     })
 
     this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
+
+    this.addEventListener('accordion-item-toggle', (e) => {
+      if (e.detail.opened) {
+        this.style.opacity = '1'
+      } else {
+        this.style.opacity = '0.1'
+      }
+    })
   }
 
   protected override connectedCallback() {
     super.connectedCallback()
+
     activeStores.subscribe(this.#storesChangeListener)
   }
 

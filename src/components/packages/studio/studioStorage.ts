@@ -32,9 +32,11 @@ class StudioStorage {
     }
 
     localStorage.setItem(this.#localStorageStudioName, JSON.stringify(state))
+    storeRegistry.saveState()
   }
 
   public load() {
+    storeRegistry.loadState()
     const stringState = localStorage.getItem(this.#localStorageStudioName)
 
     if (stringState) {

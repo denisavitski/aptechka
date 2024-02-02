@@ -1,29 +1,39 @@
 import { Store } from '@packages/store'
 
-const store1 = new Store(0, {
+const stringStore = new Store(0, {
+  passport: {
+    name: 'a.a',
+    manager: {
+      type: 'string',
+    },
+  },
+})
+
+const numberStore = new Store(0, {
   passport: {
     name: 'a.b',
+    manager: {
+      type: 'number',
+      step: 0.01,
+      min: 0,
+      max: 100,
+    },
   },
 })
 
-const store2 = new Store(0, {
+const rangeStore = new Store(0, {
   passport: {
-    name: 'a.b.c.d.y',
+    name: 'a.c',
+    manager: {
+      type: 'range',
+    },
   },
 })
 
-const store3 = new Store(0, {
-  passport: {
-    name: 'a.b.c.d.z',
-  },
+stringStore.subscribe((e) => {})
+
+numberStore.subscribe((e) => {
+  console.log(e.current)
 })
 
-const sub = () => {}
-
-addEventListener('keydown', (e) => {
-  if (e.key === '1') {
-    store1.subscribe(sub)
-  } else if (e.key === '2') {
-    store1.unsubscribe(sub)
-  }
-})
+rangeStore.subscribe((e) => {})
