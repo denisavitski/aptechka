@@ -37,7 +37,8 @@ const stylesheet = createStylesheet({
     borderRadius: '3px',
 
     backgroundColor: studioTheme.colorLight.var,
-    transition: 'background-color 0.3s',
+    transitionProperty: 'background-color',
+    transitionDuration: studioTheme.durationShort.var,
   },
 
   '.range-input:focus::-webkit-slider-thumb': {

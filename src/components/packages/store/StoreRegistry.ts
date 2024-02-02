@@ -12,13 +12,13 @@ export type StoreRegistryState = {
 
 class StoreRegistry {
   #loadedState: StoreRegistryState | null = null
-  #projectName: string | undefined
+  #projectName: string = ''
   #localStoreRegistryName = ''
 
   constructor() {
     if (isBrowser) {
       this.#projectName =
-        document.documentElement.getAttribute('data-project') || undefined
+        document.documentElement.getAttribute('data-project') || 'unnamed'
       this.#localStoreRegistryName = this.#projectName
         ? this.#projectName + '-store-registry'
         : 'store-registry'

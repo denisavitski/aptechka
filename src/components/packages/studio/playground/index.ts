@@ -26,6 +26,7 @@ const rangeStore = new Store(0, {
     name: 'a.c',
     manager: {
       type: 'range',
+      disabled: true,
     },
   },
 })

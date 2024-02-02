@@ -19,6 +19,7 @@ const stylesheet = createStylesheet({
     fontFamily: 'inherit',
     color: 'inherit',
     border: 'none',
+    fontSize: studioTheme.sizePropertyValueFont.var,
   },
 
   '.text-input': {

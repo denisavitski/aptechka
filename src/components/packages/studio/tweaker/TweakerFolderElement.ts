@@ -1,11 +1,13 @@
 import { define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
 import { AccordionElement } from '@packages/accordion'
-import { Store } from '@packages/store'
+import { Derived, Store } from '@packages/store'
 
 import { studioTheme } from '../studioTheme'
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { studioStorage } from '../studioStorage'
+import arrowIcon from '../icons/arrow.svg?raw'
+
 import { StoreBox } from './TweakerElement'
 
 const stylesheet = createStylesheet({
@@ -26,6 +28,7 @@ const stylesheet = createStylesheet({
 
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
 
     backgroundColor: studioTheme.colorDarkAux.var,
     borderRadius: studioTheme.sizeBorderRadius.var,
@@ -49,6 +52,17 @@ const stylesheet = createStylesheet({
 
     display: 'grid',
     gap: studioTheme.sizePaddingMedium.var,
+  },
+
+  '.arrow': {
+    width: '20px',
+    height: '20px',
+    fill: studioTheme.colorLight.var,
+    transition: `transform ${studioTheme.durationShort.var}`,
+  },
+
+  '.opened .arrow': {
+    transform: 'scaleY(-1)',
   },
 })
 
@@ -99,6 +113,9 @@ export class TweakerFolderElement extends AccordionElement {
                     })
                   : null,
                 this.#head,
+                element(arrowIcon, {
+                  class: 'arrow',
+                }),
               ],
             }),
             div({

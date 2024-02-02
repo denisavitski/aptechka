@@ -1,12 +1,24 @@
 import { define } from '@packages/custom-element'
-import { createStylesheet } from '@packages/element-constructor'
+import {
+  button,
+  createStylesheet,
+  div,
+  input,
+  label,
+} from '@packages/element-constructor'
 import { Animated } from '@packages/animation'
-import { Store, activeStores } from '@packages/store'
-import { debounce } from '@packages/utils'
+import { Store, activeStores, storeRegistry } from '@packages/store'
+import { createJSONAndSave, debounce } from '@packages/utils'
+import { ViewportMediaRules } from '@packages/device'
 
 import { studioTheme } from '../studioTheme'
 import { TweakerFolderElement } from './TweakerFolderElement'
-import { ViewportMediaRules } from '@packages/device'
+
+import resetIcon from '../icons/reset.svg?raw'
+import copyIcon from '../icons/copy.svg?raw'
+import copiedIcon from '../icons/copied.svg?raw'
+import downloadIcon from '../icons/download.svg?raw'
+import uploadIcon from '../icons/upload.svg?raw'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -24,6 +36,35 @@ const stylesheet = createStylesheet({
 
   ':host(:hover)': {
     opacity: '1 !important',
+  },
+
+  '.tweaker-buttons': {
+    display: 'flex',
+    alignItems: 'center',
+    gap: studioTheme.sizePaddingExtraSmall.var,
+  },
+
+  '.tweaker-button': {
+    width: '18px',
+    height: '18px',
+
+    padding: '0',
+    margin: '0',
+
+    background: 'none',
+    border: 'none',
+
+    fill: studioTheme.colorLight.var,
+    transitionProperty: `fill`,
+  },
+
+  '.tweaker-button:hover': {
+    fill: studioTheme.colorActive.var,
+  },
+
+  '.tweaker-button svg': {
+    width: '100%',
+    height: '100%',
   },
 
   [`@media ${ViewportMediaRules['<=mobile']}`]: {
@@ -53,6 +94,94 @@ export class TweakerElement extends TweakerFolderElement {
     })
 
     this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
+
+    this.head.current = [
+      div({
+        class: 'tweaker-buttons',
+        events: {
+          click: (e) => {
+            e.stopPropagation()
+          },
+        },
+        children: [
+          button({
+            class: 'tweaker-button',
+            children: resetIcon,
+            events: {
+              click: () => {
+                storeRegistry.resetState()
+              },
+            },
+          }),
+          button({
+            class: ['tweaker-button'],
+            children: [copyIcon],
+            events: {
+              click: () => {
+                navigator.clipboard.writeText(
+                  JSON.stringify(storeRegistry.getState())
+                )
+              },
+            },
+          }),
+          button({
+            class: 'tweaker-button',
+            children: downloadIcon,
+            events: {
+              click: () => {
+                createJSONAndSave(
+                  storeRegistry.projectName,
+                  storeRegistry.getState()
+                )
+              },
+            },
+          }),
+          label({
+            class: 'tweaker-button',
+            children: [
+              uploadIcon,
+              input({
+                attributes: {
+                  type: 'file',
+                },
+                style: {
+                  display: 'none',
+                },
+                events: {
+                  change: (e) => {
+                    const input = e.currentTarget as HTMLInputElement
+
+                    input.onchange = () => {
+                      const file = input.files?.[0]
+
+                      if (file) {
+                        const reader = new FileReader()
+
+                        reader.onload = (e) => {
+                          const result = e.target?.result?.toString()
+
+                          if (result) {
+                            storeRegistry.loadState(result)
+                          }
+                        }
+                        reader.readAsText(file)
+                      }
+
+                      input.onchange = null
+                    }
+
+                    input.click()
+                  },
+                },
+              }),
+            ],
+            events: {
+              click: () => {},
+            },
+          }),
+        ],
+      }),
+    ]
 
     this.addEventListener('accordion-item-toggle', (e) => {
       if (e.detail.opened) {
