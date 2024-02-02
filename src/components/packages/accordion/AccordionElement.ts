@@ -66,10 +66,6 @@ class AccordionItem {
     return this.#element
   }
 
-  public get opened() {
-    return this.#opened
-  }
-
   public destroy() {
     if (this.#headElement) {
       this.#element.classList.remove('opened', 'triggered')

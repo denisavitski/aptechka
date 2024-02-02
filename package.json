@@ -18,6 +18,11 @@
   ],
   "type": "module",
   "exports": {
+    "./accordion": {
+      "require": "./lib/accordion/index.cjs",
+      "default": "./lib/accordion/index.js",
+      "types": "./lib/accordion/index.d.ts"
+    },
     "./animation": {
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js",
@@ -143,6 +148,11 @@
       "default": "./lib/store/index.js",
       "types": "./lib/store/index.d.ts"
     },
+    "./studio": {
+      "require": "./lib/studio/index.cjs",
+      "default": "./lib/studio/index.js",
+      "types": "./lib/studio/index.d.ts"
+    },
     "./ticker": {
       "require": "./lib/ticker/index.cjs",
       "default": "./lib/ticker/index.js",
@@ -161,6 +171,9 @@
   },
   "typesVersions": {
     "*": {
+      "accordion": [
+        "lib/accordion/index.d.ts"
+      ],
       "animation": [
         "lib/animation/index.d.ts"
       ],
@@ -235,6 +248,9 @@
       ],
       "store": [
         "lib/store/index.d.ts"
+      ],
+      "studio": [
+        "lib/studio/index.d.ts"
       ],
       "ticker": [
         "lib/ticker/index.d.ts"

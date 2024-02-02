@@ -7,7 +7,6 @@ import { studioTheme } from '../studioTheme'
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { studioStorage } from '../studioStorage'
 import { StoreBox } from './TweakerElement'
-import { ViewportMediaRules } from '@packages/device'
 
 const stylesheet = createStylesheet({
   '.wrapper': {

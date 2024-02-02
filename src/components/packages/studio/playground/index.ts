@@ -30,10 +30,10 @@ const rangeStore = new Store(0, {
   },
 })
 
-stringStore.subscribe((e) => {})
+stringStore.subscribe(() => {})
 
 numberStore.subscribe((e) => {
   console.log(e.current)
 })
 
-rangeStore.subscribe((e) => {})
+rangeStore.subscribe(() => {})
