@@ -62,13 +62,16 @@ export class TweakerFolderElement extends AccordionElement {
   #key: string
   #head = new Store<any>(null)
   #content = new Store<Array<TweakerFolderElement | TweakerFieldElement>>([])
+  #mutationObserver: MutationObserver
+  #contentWrapperElement: HTMLElement = null!
 
   constructor(parameters: TweakerFolderParameters) {
     super()
 
-    this.#key = parameters.key
-
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+
+    this.#key = parameters.key
+    this.#mutationObserver = new MutationObserver(this.#mutationListener)
 
     element(this, {
       events: {
@@ -103,6 +106,9 @@ export class TweakerFolderElement extends AccordionElement {
               children: div({
                 class: 'body-content',
                 children: this.#content,
+                created: (e) =>
+                  (this.#contentWrapperElement =
+                    e.firstElementChild as HTMLElement),
               }),
             }),
           ],
@@ -135,6 +141,10 @@ export class TweakerFolderElement extends AccordionElement {
         this.openAll({ skipTransition: true })
       }
     }, 50)
+
+    this.#mutationObserver.observe(this.#contentWrapperElement, {
+      childList: true,
+    })
   }
 
   protected handleStore(storeBox: StoreBox) {
@@ -171,6 +181,24 @@ export class TweakerFolderElement extends AccordionElement {
           store: storeBox.store,
         }),
       ]
+    }
+  }
+
+  #mutationListener: MutationCallback = (mutations) => {
+    let removedNodes: Array<Node> = []
+    let addedNodes: Array<Node> = []
+
+    mutations.forEach((m) => {
+      removedNodes = [...removedNodes, ...m.removedNodes]
+      addedNodes = [...addedNodes, ...m.addedNodes]
+    })
+
+    this.#content.current = this.#content.current.filter(
+      (v) => !removedNodes.includes(v)
+    )
+
+    if (this.#key && !this.#content.current.length && !addedNodes.length) {
+      this.remove()
     }
   }
 }

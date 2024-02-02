@@ -41,7 +41,9 @@ class StudioStorage {
       try {
         const state: StudioStorageState = JSON.parse(stringState)
 
-        this.#openedPanels = state.openedPanels
+        if (state.openedPanels) {
+          this.#openedPanels = state.openedPanels
+        }
       } catch (e) {
         console.error(e)
       }

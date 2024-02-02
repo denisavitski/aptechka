@@ -17,18 +17,4 @@ export abstract class TweakerStoreManagerElement<
   protected get store() {
     return this.#store
   }
-
-  protected connectedCallback() {
-    activeStores.subscribe(this.#storesChangeListener)
-  }
-
-  protected disconnectedCallback() {
-    activeStores.unsubscribe(this.#storesChangeListener)
-  }
-
-  #storesChangeListener = () => {
-    if (!activeStores.current.includes(this.#store)) {
-      // TODO
-    }
-  }
 }
