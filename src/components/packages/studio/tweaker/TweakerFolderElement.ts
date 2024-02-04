@@ -1,7 +1,7 @@
 import { define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
 import { AccordionElement } from '@packages/accordion'
-import { Derived, Store } from '@packages/store'
+import { Store } from '@packages/store'
 
 import { studioTheme } from '../studioTheme'
 import { TweakerFieldElement } from './TweakerFieldElement'
@@ -21,7 +21,7 @@ const stylesheet = createStylesheet({
     boxSizing: 'border-box',
 
     width: '100%',
-    height: '40px',
+    height: studioTheme.sizeFolderHeight.var,
 
     paddingLeft: studioTheme.sizePaddingMedium.var,
     paddingRight: studioTheme.sizePaddingMedium.var,

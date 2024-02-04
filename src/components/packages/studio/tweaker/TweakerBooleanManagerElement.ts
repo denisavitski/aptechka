@@ -39,12 +39,14 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
             type: 'checkbox',
           },
           events: {
-            input: (e) => {
+            change: (e) => {
               this.store.current = (e.currentTarget as HTMLInputElement).checked
             },
           },
           created: (e) => {
-            e.checked = this.store.current
+            this.store.subscribe((d) => {
+              e.checked = d.current
+            })
           },
         }),
       ],

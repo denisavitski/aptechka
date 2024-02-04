@@ -22,8 +22,8 @@ import uploadIcon from '../icons/upload.svg?raw'
 const stylesheet = createStylesheet({
   ':host': {
     position: 'absolute',
-    top: '20px',
-    right: '20px',
+    top: studioTheme.sizeTweakerOffset.var,
+    right: studioTheme.sizeTweakerOffset.var,
 
     width: studioTheme.sizeTweakerWidth.var,
 
@@ -66,6 +66,24 @@ const stylesheet = createStylesheet({
     height: '100%',
   },
 
+  ':host .body-content': {
+    maxHeight: `calc(
+      100dvh - 
+      (
+        ${studioTheme.sizeTweakerOffset.var} * 2 + 
+        ${studioTheme.sizeFolderHeight.var}
+      )
+    )`,
+    overflow: 'hidden auto',
+
+    '-ms-overflow-style': 'none',
+    'scrollbar-width': 'none',
+  },
+
+  ':host .body-content::-webkit-scrollbar': {
+    display: 'none',
+  },
+
   [`@media ${ViewportMediaRules['<=mobile']}`]: {
     ':host': {
       position: 'absolute',
@@ -76,6 +94,13 @@ const stylesheet = createStylesheet({
 
       borderTopLeftRadius: '0',
       borderTopRightRadius: '0',
+    },
+
+    ':host .body-content': {
+      maxHeight: `calc(
+        100dvh - 
+        ${studioTheme.sizeFolderHeight.var}
+      )`,
     },
   },
 })

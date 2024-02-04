@@ -10,6 +10,7 @@ export const studioTheme = createTheme({
   colorFieldController: '#ffffff',
   colorFieldName: '#c8c8c8',
   colorActive: '#00E5B0',
+  sizeFolderHeight: '40px',
   sizeTweakerWidth: '480px',
   sizeFolderFont: '20px',
   sizePropertyNameFont: '16px',
@@ -20,5 +21,6 @@ export const studioTheme = createTheme({
   sizePaddingSmall: '8px',
   sizePaddingExtraSmall: '4px',
   sizeInputHeight: '30px',
+  sizeTweakerOffset: '20px',
   durationShort: '0.2s',
 } as const)
