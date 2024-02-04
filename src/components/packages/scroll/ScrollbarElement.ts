@@ -105,7 +105,9 @@ export class ScrollbarElement extends ScrollUserElement {
     const barSize = this.#isHorisontal ? this.offsetWidth : this.offsetHeight
 
     this.#thumbSize =
-      barSize / ((this.scrollElement.scrollSize + this.scrollElement.viewportSize) / barSize)
+      barSize /
+      ((this.scrollElement.scrollSize + this.scrollElement.viewportSize) /
+        barSize)
 
     this.#thumbSize = Math.max(this.#thumbSize, 30)
 
@@ -128,9 +130,13 @@ export class ScrollbarElement extends ScrollUserElement {
     this.#position = this.scrollElement.currentProgress * this.#thumbScrollSize
 
     if (this.#isHorisontal) {
-      this.#thumbElement.style.transform = `translate3d(${this.#position}px, 0px, 0px)`
+      this.#thumbElement.style.transform = `translate3d(${
+        this.#position
+      }px, 0px, 0px)`
     } else {
-      this.#thumbElement.style.transform = `translate3d(0px, ${this.#position}px, 0px)`
+      this.#thumbElement.style.transform = `translate3d(0px, ${
+        this.#position
+      }px, 0px)`
     }
   }
 

@@ -36,9 +36,9 @@ export class Tweened extends Animated {
   }
 
   protected update() {
-    const normalized = (this.target - this.min) / (this.delta || 1)
+    const normalized = (this.target - this.min.current) / (this.delta || 1)
     const eased = this.easing(normalized)
-    this.current = this.min + eased * this.delta
+    this.current = this.min.current + eased * this.delta
   }
 
   protected handleAnimationFrame(e: TickerCallbackEntry) {

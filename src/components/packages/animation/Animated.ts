@@ -1,4 +1,10 @@
-import { StoreOptions, StoreEntry, Store, StoreCallback } from '@packages/store'
+import {
+  StoreOptions,
+  StoreEntry,
+  Store,
+  StoreCallback,
+  StorePassport,
+} from '@packages/store'
 import {
   ticker,
   TickerCallbackEntry,
@@ -10,12 +16,10 @@ import { ElementOrSelector, clamp, preciseNumber } from '@packages/utils'
 export interface AnimatedOptions
   extends StoreOptions<number, 'number'>,
     TickerAddOptions {
-  min?: number | AnimatedEdgeFunction
-  max?: number | AnimatedEdgeFunction
+  min?: number | Store<number>
+  max?: number | Store<number>
   default?: number
 }
-
-export type AnimatedEdgeFunction = () => number
 
 export interface AnimatedEntry extends StoreEntry<number> {
   min: number
@@ -33,8 +37,8 @@ export abstract class Animated<
   #order: number | undefined
   #culling: ElementOrSelector | undefined
   #target: number
-  #min: AnimatedEdgeFunction
-  #max: AnimatedEdgeFunction
+  #min: Store<number>
+  #max: Store<number>
   #setter: Animated | undefined
   #isRunning = new Store(false)
   #direction = 0
@@ -46,9 +50,34 @@ export abstract class Animated<
     this.#order = options?.order
     this.#maxFPS = options?.maxFPS
     this.#culling = options?.culling
-    this.#min = this.#getEdgeFunction(options?.min)
-    this.#max = this.#getEdgeFunction(options?.max)
     this.#target = this.current
+
+    let minPassport: StorePassport | undefined
+    let maxPassport: StorePassport | undefined
+
+    if (options?.passport) {
+      minPassport = {
+        name: `${options.passport.name + '-min'}`,
+      }
+
+      maxPassport = {
+        name: `${options.passport.name + '-max'}`,
+      }
+    }
+
+    this.#min =
+      options?.min instanceof Store
+        ? options.min
+        : new Store(0, { passport: minPassport })
+    this.#max =
+      options?.max instanceof Store
+        ? options.max
+        : new Store(0, { passport: maxPassport })
+
+    this.#min
+
+    this.#min.subscribe(this.#edgeChangeListener)
+    this.#max.subscribe(this.#edgeChangeListener)
   }
 
   public get target() {
@@ -71,41 +100,29 @@ export abstract class Animated<
     return this.#speed
   }
 
-  public get min(): number {
-    return this.#min()
+  public get min() {
+    return this.#min
   }
 
-  public set min(value: number | AnimatedEdgeFunction | undefined) {
-    this.#min = this.#getEdgeFunction(value)
-    this.set(this.#target)
-    this.current = this.#target
-  }
-
-  public get max(): number {
-    return this.#max()
-  }
-
-  public set max(value: number | AnimatedEdgeFunction | undefined) {
-    this.#max = this.#getEdgeFunction(value)
-    this.set(this.#target)
-    this.current = this.#target
+  public get max() {
+    return this.#max
   }
 
   public get delta() {
-    return this.max - this.min
+    return this.#max.current - this.#min.current
   }
 
   public get progress() {
     return this.delta
-      ? preciseNumber((this.current - this.min) / this.delta, 6)
+      ? preciseNumber((this.current - this.min.current) / this.delta, 6)
       : 0
   }
 
   public override get entry(): Entry {
     return {
       ...super.entry,
-      min: this.min,
-      max: this.max,
+      min: this.#min.current,
+      max: this.#max.current,
       delta: this.delta,
       direction: this.direction,
       progress: this.progress,
@@ -126,7 +143,7 @@ export abstract class Animated<
   public set(value: number, equalize = false) {
     const previous = this.#target
 
-    this.#target = clamp(value, this.min, this.max)
+    this.#target = clamp(value, this.#min.current, this.#max.current)
 
     if (equalize) {
       this.current = this.#target
@@ -191,8 +208,8 @@ export abstract class Animated<
     this.#speed = delta / e.elapsed
   }
 
-  #getEdgeFunction(value: number | AnimatedEdgeFunction | undefined) {
-    const v = value || 0
-    return typeof v === 'function' ? v : () => v
+  #edgeChangeListener = () => {
+    this.set(this.#target)
+    this.current = this.#target
   }
 }

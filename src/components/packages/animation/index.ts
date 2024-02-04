@@ -1,9 +1,4 @@
-export {
-  Animated,
-  type AnimatedOptions,
-  type AnimatedEdgeFunction,
-  type AnimatedEntry,
-} from './Animated'
+export { Animated, type AnimatedOptions, type AnimatedEntry } from './Animated'
 
 export { Tweened, type TweenedOptions } from './Tweened'
 

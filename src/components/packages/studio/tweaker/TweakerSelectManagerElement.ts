@@ -25,6 +25,15 @@ const stylesheet = createStylesheet({
     justifyContent: 'space-between',
   },
 
+  'e-select-option': {
+    transitionDuration: studioTheme.durationShort.var,
+    transitionProperty: 'color',
+  },
+
+  'e-select-option:hover': {
+    color: studioTheme.colorActive.var,
+  },
+
   svg: {
     width: '16px',
     height: '16px',

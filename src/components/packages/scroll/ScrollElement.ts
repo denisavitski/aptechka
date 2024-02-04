@@ -9,7 +9,7 @@ import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { resizer } from '@packages/resizer'
 import { scrollEnties } from '@packages/scroll-entries'
-import { Store } from '@packages/store'
+import { Store, StorePassport } from '@packages/store'
 import {
   getCumulativeOffsetTop,
   getCumulativeOffsetLeft,
@@ -125,14 +125,25 @@ export class ScrollElement extends CustomElement {
   #overscroll = 0
   #distance = 0
 
-  constructor() {
+  constructor(name?: string) {
     super()
 
     if (isBrowser) {
+      let passport: StorePassport<'number'> | undefined
+
+      let passportName = name || this.getAttribute('name')
+
+      if (passportName) {
+        passport = {
+          name: passportName,
+        }
+      }
+
       this.#damped = new Damped({
         damping: 0.01,
         min: 0,
         order: TICK_ORDER.SCROLL,
+        passport,
       })
 
       const shadowRoot = this.attachShadow({ mode: 'open' })
@@ -244,8 +255,8 @@ export class ScrollElement extends CustomElement {
       this.#infiniteAttribute.subscribe((e) => {
         if (!e.current) {
           this.#overscroll = 0
-          this.#damped.max = this.#scrollSize
-          this.#damped.min = 0
+          this.#damped.max.current = this.#scrollSize
+          this.#damped.min.current = 0
         } else {
           if (this.isConnected) {
             if (!this.#sections.length) {
@@ -254,8 +265,8 @@ export class ScrollElement extends CustomElement {
           }
 
           if (this.#sections.length) {
-            this.#damped.max = Infinity
-            this.#damped.min = -Infinity
+            this.#damped.max.current = Infinity
+            this.#damped.min.current = -Infinity
           }
         }
       })
@@ -530,7 +541,7 @@ export class ScrollElement extends CustomElement {
     }
 
     if (!this.#infiniteAttribute) {
-      this.#damped.max = this.#scrollSize
+      this.#damped.max.current = this.#scrollSize
     }
 
     this.#sections.forEach((section) => {
@@ -617,7 +628,7 @@ export class ScrollElement extends CustomElement {
         this.#damped.shift(value)
       }
     } else if (value === 'min') {
-      this.#damped.set(this.#damped.min)
+      this.#damped.set(this.#damped.min.current)
     } else if (value === 'max') {
       this.#damped.set(this.#damped.delta)
     }
