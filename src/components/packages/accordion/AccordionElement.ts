@@ -5,6 +5,7 @@ import {
   getElementTransitionDurationMS,
   isBrowser,
 } from '@packages/utils'
+import { dispatchSizeChangeEvent } from '@packages/utils/events'
 
 export interface AccordionItemToggleEventDetail {
   opened: boolean
@@ -50,7 +51,7 @@ class AccordionItem {
 
       this.#headElement.addEventListener('click', this.#headClickListener)
       this.#element.addEventListener(
-        'accordion-item-size-change',
+        'size-change',
         this.#childrenSizeChangeListener
       )
 
@@ -77,7 +78,7 @@ class AccordionItem {
 
       this.#headElement.removeEventListener('click', this.#headClickListener)
       this.#element.removeEventListener(
-        'accordion-item-size-change',
+        'size-change',
         this.#childrenSizeChangeListener
       )
 
@@ -191,12 +192,7 @@ class AccordionItem {
         )
       )
     } else if (name === 'size-change') {
-      this.#root.dispatchEvent(
-        new CustomEvent('accordion-item-size-change', {
-          bubbles: true,
-          composed: true,
-        })
-      )
+      dispatchSizeChangeEvent(this.#root)
     }
   }
 
@@ -308,7 +304,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    'accordion-item-size-change': CustomEvent
+    'size-change': CustomEvent
     'accordion-item-toggle': CustomEvent<AccordionItemToggleEventDetail>
   }
 }

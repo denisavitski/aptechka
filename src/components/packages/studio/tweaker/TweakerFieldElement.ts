@@ -17,7 +17,9 @@ import resetIcon from '../icons/reset.svg?raw'
 
 const stylesheet = createStylesheet({
   ':host': {
-    display: 'flex',
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridTemplateColumns: '0.3fr 1fr',
     alignItems: 'center',
     color: studioTheme.colorLight.var,
     gap: studioTheme.sizePaddingMedium.var,

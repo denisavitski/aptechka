@@ -23,7 +23,7 @@ const stylesheet = createStylesheet({
   },
 
   '.text-input': {
-    height: '30px',
+    height: studioTheme.sizeInputHeight.var,
     width: '100%',
 
     margin: '0',

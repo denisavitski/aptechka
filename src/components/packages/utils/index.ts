@@ -5,7 +5,6 @@ export { measureText, fixPosition, cover } from './canvas'
 export { dotRectCollision, dotCircleCollision } from './collisions'
 export { screenToCartesian, normalize, getPointerPosition } from './coordinates'
 export { encode, decode } from './decoding'
-export { resizeInterval } from './dev'
 export {
   findParentElement,
   getElement,
@@ -31,9 +30,14 @@ export {
   easeInOutExpo,
   type EasingFunction,
 } from './easings'
+export { dispatchSizeChangeEvent } from './events'
 export { createJSONAndSave } from './file'
 export { debounce, throttle } from './function'
-export { getCumulativePosition, getCumulativeOffsetLeft, getCumulativeOffsetTop } from './layout'
+export {
+  getCumulativePosition,
+  getCumulativeOffsetLeft,
+  getCumulativeOffsetTop,
+} from './layout'
 export {
   lerp,
   damp,
@@ -47,7 +51,15 @@ export {
   calculateDistanceWithRadius,
 } from './math'
 export { preciseNumber, roundNumberTo } from './number'
-export { isObject, cloneDeep, mergeDeep, isNullish, compareObjects, pick, omit } from './object'
+export {
+  isObject,
+  cloneDeep,
+  mergeDeep,
+  isNullish,
+  compareObjects,
+  pick,
+  omit,
+} from './object'
 export {
   kebabToCamel,
   camelToKebab,
@@ -56,8 +68,19 @@ export {
   capitalize,
   generateId,
 } from './string'
-export { getElementTransitionDurationMS, getElementTransitionDurationS } from './style'
-export type { Axes2D, Axes3D, Dot2D, Rect2D, Circle, Dot3D, Rect3D } from './ts-shape'
+export {
+  getElementTransitionDurationMS,
+  getElementTransitionDurationS,
+} from './style'
+export type {
+  Axes2D,
+  Axes3D,
+  Dot2D,
+  Rect2D,
+  Circle,
+  Dot3D,
+  Rect3D,
+} from './ts-shape'
 export type {
   NestedKeys,
   NestedValueOf,

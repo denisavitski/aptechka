@@ -1,17 +1,17 @@
 import { Store } from '@packages/store'
 
-const stringStore = new Store(0, {
+new Store(0, {
   passport: {
-    name: 'a.a',
+    name: 'a.string',
     manager: {
       type: 'string',
     },
   },
-})
+}).subscribe(() => {})
 
 const numberStore = new Store(0, {
   passport: {
-    name: 'a.b',
+    name: 'a.number',
     manager: {
       type: 'number',
       step: 0.01,
@@ -19,22 +19,51 @@ const numberStore = new Store(0, {
       max: 100,
     },
   },
-})
+}).subscribe(() => {})
 
 const rangeStore = new Store(0, {
   passport: {
-    name: 'a.c',
+    name: 'a.range',
     manager: {
       type: 'range',
-      disabled: true,
     },
   },
-})
+}).subscribe(() => {})
 
-stringStore.subscribe(() => {})
+const linkStore = new Store('/home', {
+  passport: {
+    name: 'a.link',
+    manager: {
+      type: 'link',
+      sameWindow: true,
+    },
+  },
+}).subscribe(() => {})
 
-numberStore.subscribe((e) => {
-  console.log(e.current)
-})
+const colorStore = new Store('#FF0000', {
+  passport: {
+    name: 'a.color',
+    manager: {
+      type: 'color',
+    },
+  },
+}).subscribe(() => {})
 
-rangeStore.subscribe(() => {})
+const selectStore = new Store('111', {
+  passport: {
+    name: 'a.select',
+    manager: {
+      type: 'select',
+      variants: ['111', '222', '333'],
+    },
+  },
+}).subscribe(() => {})
+
+const booleanStore = new Store(false, {
+  passport: {
+    name: 'a.boolean',
+    manager: {
+      type: 'boolean',
+    },
+  },
+}).subscribe(() => {})

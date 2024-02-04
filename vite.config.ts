@@ -57,6 +57,7 @@ export default defineConfig((e) => {
               'scroll/index': './src/components/packages/scroll/index.ts',
               'scroll-entries/index':
                 './src/components/packages/scroll-entries/index.ts',
+              'select/index': './src/components/packages/select/index.ts',
               'source/index': './src/components/packages/source/index.ts',
               'store/index': './src/components/packages/store/index.ts',
               'studio/index': './src/components/packages/studio/index.ts',

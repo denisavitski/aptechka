@@ -26,15 +26,15 @@ const stylesheet = createStylesheet({
     padding: '0',
 
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: '10px',
+    borderRadius: studioTheme.sizeBorderRadius.var,
   },
 
   '.range-input::-webkit-slider-thumb': {
     '-webkit-appearance': 'none',
 
-    height: '20px',
-    width: '10px',
-    borderRadius: '3px',
+    height: `calc(${studioTheme.sizeInputHeight.var} * 0.7)`,
+    width: studioTheme.sizeBorderRadius.var,
+    borderRadius: studioTheme.sizeBorderRadius.var,
 
     backgroundColor: studioTheme.colorLight.var,
     transitionProperty: 'background-color',

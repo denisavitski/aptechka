@@ -1,14 +1,37 @@
 import { Store } from '@packages/store'
 import { define } from '@packages/custom-element'
-import { TweakerStringManagerElement } from './TweakerStringManagerElement'
+import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
+import { a, createStylesheet, element } from '@packages/element-constructor'
+
+const stylesheet = createStylesheet({
+  a: {
+    color: 'inherit',
+  },
+})
 
 @define('e-tweaker-link-manager')
-export class TweakerLinkManagerElement extends TweakerStringManagerElement<
+export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
   string,
   'link'
 > {
   constructor(store: Store<string, 'link'>) {
     super(store)
+
+    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+
+    element(this, {
+      shadowChildren: [
+        a({
+          attributes: {
+            href: this.store,
+            target: this.store.passport?.manager?.sameWindow
+              ? '_self'
+              : '_blank',
+          },
+          children: this.store,
+        }),
+      ],
+    })
   }
 }
 

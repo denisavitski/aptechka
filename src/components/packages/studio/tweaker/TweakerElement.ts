@@ -16,7 +16,6 @@ import { TweakerFolderElement } from './TweakerFolderElement'
 
 import resetIcon from '../icons/reset.svg?raw'
 import copyIcon from '../icons/copy.svg?raw'
-import copiedIcon from '../icons/copied.svg?raw'
 import downloadIcon from '../icons/download.svg?raw'
 import uploadIcon from '../icons/upload.svg?raw'
 
