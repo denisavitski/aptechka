@@ -39,7 +39,7 @@ export abstract class Animated<
   #target: number
   #min: Store<number>
   #max: Store<number>
-  #setter: Animated | undefined
+  #updater = new Store<Animated | null>(null)
   #isRunning = new Store(false)
   #direction = 0
   #speed = 0
@@ -74,10 +74,13 @@ export abstract class Animated<
         ? options.max
         : new Store(0, { passport: maxPassport })
 
-    this.#min
-
     this.#min.subscribe(this.#edgeChangeListener)
     this.#max.subscribe(this.#edgeChangeListener)
+
+    this.#updater.subscribe((e) => {
+      e.previous?.unsubscribe(this.#updaterListener)
+      e.current?.subscribe(this.#updaterListener)
+    })
   }
 
   public get target() {
@@ -130,14 +133,8 @@ export abstract class Animated<
     }
   }
 
-  public get setter() {
-    return this.#setter
-  }
-
-  public set setter(animated: Animated | undefined) {
-    this.#setter?.unsubscribe(this.#setterListener)
-    this.#setter = animated
-    this.#setter?.subscribe(this.#setterListener)
+  public get updater() {
+    return this.#updater
   }
 
   public set(value: number, equalize = false) {
@@ -165,8 +162,7 @@ export abstract class Animated<
 
     this.unlistenAnimationFrame()
 
-    this.#setter?.unsubscribe(this.#setterListener)
-    this.#setter = undefined
+    this.#updater.current = null
   }
 
   public override reset() {
@@ -194,7 +190,7 @@ export abstract class Animated<
 
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void
 
-  #setterListener: StoreCallback<AnimatedEntry> = (e) => {
+  #updaterListener: StoreCallback<AnimatedEntry> = (e) => {
     this.set(e.current)
   }
 

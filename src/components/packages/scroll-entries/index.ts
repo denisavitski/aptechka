@@ -57,7 +57,9 @@ class ScrollEntries {
   }
 
   public getAll(element: HTMLElement) {
-    const elements = Array.from(this.#elements).filter((v) => v !== element && v.contains(element))
+    const elements = Array.from(this.#elements).filter(
+      (v) => v !== element && v.contains(element)
+    )
 
     const entries: Array<ScrollEntry> = []
 
@@ -71,4 +73,4 @@ class ScrollEntries {
   }
 }
 
-export const scrollEnties = new ScrollEntries()
+export const scrollEntries = new ScrollEntries()

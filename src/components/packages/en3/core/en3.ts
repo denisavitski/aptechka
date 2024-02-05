@@ -33,7 +33,10 @@ export interface En3Parameters {
   cameraFov?: 'auto' | number
 }
 
-export type En3AttachOptions = Omit<LayoutBoxOptions, 'containerElement' | 'cartesian'>
+export type En3AttachOptions = Omit<
+  LayoutBoxOptions,
+  'containerElement' | 'cartesian'
+>
 
 class En3 {
   #CDNVersion = `https://unpkg.com/three@0.${REVISION}.x`
@@ -191,7 +194,9 @@ class En3 {
     this.#containerElement = options?.containerElement || document.body
 
     this.#camera =
-      options?.cameraType === 'orthographic' ? new OrthographicCamera() : new PerspectiveCamera()
+      options?.cameraType === 'orthographic'
+        ? new OrthographicCamera()
+        : new PerspectiveCamera()
 
     this.#cameraPosition.bind(this.#camera.position)
     this.#cameraRotation.bind(this.#camera.rotation)
@@ -210,7 +215,8 @@ class En3 {
 
     this.#maxPixelRatio = options?.maxPixelRatio || 2
 
-    this.#isCameraAutoUpdate = options?.cameraAutoUpdate === false ? false : true
+    this.#isCameraAutoUpdate =
+      options?.cameraAutoUpdate === false ? false : true
 
     this.#webglRenderer = new WebGLRenderer(options?.webGLRendererParameters)
 
@@ -233,7 +239,9 @@ class En3 {
 
   public destroy() {
     if (!this.#isCreated) {
-      console.warn('[en3.setup]: You are trying to destory en3 but it has not been initialized.')
+      console.warn(
+        '[en3.setup]: You are trying to destory en3 but it has not been initialized.'
+      )
       return
     }
 
@@ -274,7 +282,9 @@ class En3 {
       this.camera.fov =
         this.#cameraFov === 'auto'
           ? 2 *
-            Math.atan(this.#height / 2 / this.#cameraPosition.getStepValue('_initial').z) *
+            Math.atan(
+              this.#height / 2 / this.#cameraPosition.getStepValue('_initial').z
+            ) *
             (180 / Math.PI)
           : this.#cameraFov
     } else if (this.camera instanceof OrthographicCamera) {

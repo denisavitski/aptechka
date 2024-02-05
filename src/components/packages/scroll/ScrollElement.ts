@@ -8,7 +8,7 @@ import {
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { resizer } from '@packages/resizer'
-import { scrollEnties } from '@packages/scroll-entries'
+import { scrollEntries } from '@packages/scroll-entries'
 import { Store, StorePassport } from '@packages/store'
 import {
   getCumulativeOffsetTop,
@@ -31,7 +31,7 @@ class Section {
     this.#element = element
     this.#scrollElement = scrollElement
 
-    scrollEnties.register(this.#element)
+    scrollEntries.register(this.#element)
   }
 
   public get size() {
@@ -43,7 +43,7 @@ class Section {
   }
 
   public destroy() {
-    scrollEnties.unregister(this.#element)
+    scrollEntries.unregister(this.#element)
     this.#element.style.transform = ''
   }
 
@@ -70,7 +70,7 @@ class Section {
       offset = this.#scrollElement.distance * -1
     }
 
-    scrollEnties.update(
+    scrollEntries.update(
       this.#element,
       this.#scrollElement.axisAttibute.current,
       offset
@@ -493,7 +493,7 @@ export class ScrollElement extends CustomElement {
       this.#unsplit()
     }
 
-    scrollEnties.unregister(this)
+    scrollEntries.unregister(this)
   }
 
   #awake() {
@@ -501,7 +501,7 @@ export class ScrollElement extends CustomElement {
       this.#split()
     }
 
-    scrollEnties.register(this)
+    scrollEntries.register(this)
 
     resizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
 
@@ -595,7 +595,7 @@ export class ScrollElement extends CustomElement {
       }
     }
 
-    scrollEnties.update(
+    scrollEntries.update(
       this,
       this.#axisAttribute.current,
       this.currentScrollValue

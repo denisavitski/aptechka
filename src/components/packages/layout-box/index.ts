@@ -2,7 +2,7 @@ import { cssUnitParser } from '@packages/css-unit-parser'
 import { Ladder } from '@packages/ladder'
 import { TICK_ORDER } from '@packages/order'
 import { resizer } from '@packages/resizer'
-import { scrollEnties } from '@packages/scroll-entries'
+import { scrollEntries } from '@packages/scroll-entries'
 import { StoreCallback, StoreEntry } from '@packages/store'
 import { ticker } from '@packages/ticker'
 import {
@@ -66,7 +66,8 @@ export interface LayoutBoxScrollStepCallbackReturn {
 
 export type LayoutBoxXYZ = { x: number; y: number; z: number }
 
-export type LayoutBoxScrollStepCallback = () => LayoutBoxScrollStepCallbackReturn
+export type LayoutBoxScrollStepCallback =
+  () => LayoutBoxScrollStepCallbackReturn
 export type LayoutBoxStepCallback = StoreCallback<StoreEntry<LayoutBoxXYZ>>
 
 export type LayoutBoxFrontSide = 'left' | 'top'
@@ -112,14 +113,17 @@ export class LayoutBox {
   constructor(element: ElementOrSelector, options?: LayoutBoxOptions) {
     if (isBrowser) {
       this.#element = this.#getElement(element) || document.body
-      this.#containerElement = this.#getElement(options?.containerElement) || document.body
+      this.#containerElement =
+        this.#getElement(options?.containerElement) || document.body
 
       this.#scrollAxis = options?.scrollAxis || 'auto'
       this.#frontSide = options?.frontSide || 'top'
 
       this.#isCartesian = options?.cartesian || false
-      this.#isSizeStep = options?.sizeStep !== undefined ? options.sizeStep : true
-      this.#isPositionStep = options?.positionStep !== undefined ? options.positionStep : true
+      this.#isSizeStep =
+        options?.sizeStep !== undefined ? options.sizeStep : true
+      this.#isPositionStep =
+        options?.positionStep !== undefined ? options.positionStep : true
 
       this.#scale.setStep('_size', '+', {
         x: 1,
@@ -152,9 +156,7 @@ export class LayoutBox {
       })
 
       addEventListener('DOMContentLoaded', () => {
-        const scrollEntries = scrollEnties.getAll(this.element)
-
-        scrollEntries.forEach((entry) => {
+        scrollEntries.getAll(this.element).forEach((entry) => {
           this.setScrollStep(() => {
             return entry
           })
@@ -235,7 +237,9 @@ export class LayoutBox {
   }
 
   public deleteScrollStep(callback: LayoutBoxScrollStepCallback) {
-    this.#scrollStepSetterCallbacks = this.#scrollStepSetterCallbacks.filter((s) => s !== callback)
+    this.#scrollStepSetterCallbacks = this.#scrollStepSetterCallbacks.filter(
+      (s) => s !== callback
+    )
   }
 
   public destroy() {
@@ -320,7 +324,10 @@ export class LayoutBox {
 
     this.#height = Math.max(this.#element.clientHeight, 1)
 
-    this.#depth = Math.max(cssUnitParser.parse(computed.getPropertyValue('--depth') || '0px'), 1)
+    this.#depth = Math.max(
+      cssUnitParser.parse(computed.getPropertyValue('--depth') || '0px'),
+      1
+    )
 
     const vl = getCumulativeOffsetLeft(this.#containerElement)
     const vt = getCumulativeOffsetTop(this.#containerElement)
@@ -385,7 +392,11 @@ export class LayoutBox {
   }
 
   #updateScrollPosition() {
-    for (let index = 0; index < this.#scrollStepSetterCallbacks.length; index++) {
+    for (
+      let index = 0;
+      index < this.#scrollStepSetterCallbacks.length;
+      index++
+    ) {
       const callbackReturn = this.#scrollStepSetterCallbacks[index]()
 
       let axis = callbackReturn.axis as Axes3D
@@ -395,13 +406,17 @@ export class LayoutBox {
       }
 
       this.#position.setStep(`_scroll_${index}`, '+', {
-        [axis]: callbackReturn.value * (axis === 'x' ? -1 : this.#isCartesian ? 1 : -1),
+        [axis]:
+          callbackReturn.value *
+          (axis === 'x' ? -1 : this.#isCartesian ? 1 : -1),
       })
     }
   }
 
   #getElement(element: string | HTMLElement | undefined) {
-    return typeof element === 'string' ? document.querySelector<HTMLElement>(element) : element
+    return typeof element === 'string'
+      ? document.querySelector<HTMLElement>(element)
+      : element
   }
 
   #resizeListener = () => {

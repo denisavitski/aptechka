@@ -1,21 +1,21 @@
+import { Plane, Vector3 } from 'three'
 import { LayoutBox } from '@packages/layout-box'
 import { TICK_ORDER } from '@packages/order'
 import { ticker } from '@packages/ticker'
 import { ElementOrSelector } from '@packages/utils'
-import { Plane, Vector3 } from 'three'
 
 export class En3Clip {
   #layoutBox: LayoutBox = null!
   #planes: Array<Plane> = []
 
-  constructor(elementOrSelector: ElementOrSelector) {
+  constructor(elementOrSelector: ElementOrSelector, scale = 1) {
     this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: false })
 
     this.#planes = [
-      new Plane(new Vector3(0, -1, 0)),
-      new Plane(new Vector3(0, 1, 0)),
-      new Plane(new Vector3(-1, 0, 0)),
-      new Plane(new Vector3(1, 0, 0)),
+      new Plane(new Vector3(0, -1 * scale, 0)),
+      new Plane(new Vector3(0, 1 * scale, 0)),
+      new Plane(new Vector3(-1 * scale, 0, 0)),
+      new Plane(new Vector3(1 * scale, 0, 0)),
     ]
 
     ticker.subscribe(this.#tickListener, { order: TICK_ORDER.LAYOUT_BOX })
@@ -35,8 +35,8 @@ export class En3Clip {
   }
 
   #tickListener = () => {
-    const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
-    const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
+    const scrollValueX = this.#layoutBox.position.x
+    const scrollValueY = this.#layoutBox.position.y
 
     // Top
     this.#planes[0].constant = this.#layoutBox.scale.y / 2 + scrollValueY * -1
