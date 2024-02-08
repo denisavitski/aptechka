@@ -1,10 +1,10 @@
 import { Resource, ResourceFetcher, ResourceOptions } from './Resource'
 
-export interface СumulativeResourceOptions<T> extends ResourceOptions<T> {
+export interface CumulativeResourceOptions<T> extends ResourceOptions<T> {
   interval?: number
 }
 
-export class СumulativeResource<T> extends Resource<T> {
+export class CumulativeResource<T> extends Resource<T> {
   #intervalId: ReturnType<typeof setInterval> | undefined
   #interval: number
 
