@@ -6,9 +6,11 @@ import {
   En3SourceManagerParameters,
 } from '../attachments/En3SourceManager'
 import { En3SourceConsumer } from './En3SourceConsumer'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 
-export type En3ImageLikeMaterial<TTexture extends Texture> = Material & { map: TTexture | null }
+export type En3ImageLikeMaterial<TTexture extends Texture> = Material & {
+  map: TTexture | null
+}
 
 export interface En3ImageLikeParameters<
   TTexture extends Texture,
@@ -52,11 +54,11 @@ export class En3ImageLike<
     this.#isCover = parameters.cover || false
 
     this.addEventListener('added', () => {
-      resizer.subscribe(this.#resizeListener)
+      windowResizer.subscribe(this.#resizeListener)
     })
 
     this.addEventListener('removed', () => {
-      resizer.unsubscribe(this.#resizeListener)
+      windowResizer.unsubscribe(this.#resizeListener)
     })
 
     this.#sourceManager.data.subscribe((detail) => {

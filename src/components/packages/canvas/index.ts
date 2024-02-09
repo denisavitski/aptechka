@@ -5,7 +5,10 @@ import {
   element,
 } from '@packages/element-constructor'
 import { Notifier } from '@packages/notifier'
-import { resizer } from '@packages/resizer'
+import {
+  ElementResizerCallback,
+  elementResizer,
+} from '@packages/element-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { clamp } from '@packages/utils'
 
@@ -97,7 +100,7 @@ export class CanvasElement extends CustomElement {
   }
 
   protected connectedCallback() {
-    resizer.subscribe(this.#resizeListener)
+    elementResizer.subscribe(this, this.#resizeListener)
 
     if (!this.hasAttribute('static')) {
       ticker.subscribe(this.#tickListener, {
@@ -110,20 +113,18 @@ export class CanvasElement extends CustomElement {
   }
 
   protected disconnectedCallback() {
-    resizer.unsubscribe(this.#resizeListener)
+    elementResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
 
     this.#renderEvent.close()
     this.#canvasElement.remove()
   }
 
-  #resizeListener = () => {
+  #resizeListener: ElementResizerCallback = (e) => {
     this.#pixelRatio = clamp(devicePixelRatio, 1, 2)
 
-    const rect = this.getBoundingClientRect()
-
-    this.#width = rect.width
-    this.#height = rect.height
+    this.#width = e.contentRect.width
+    this.#height = e.contentRect.height
 
     this.#canvasElement.width = this.#width * this.pixelRatio
     this.#canvasElement.height = this.#height * this.pixelRatio

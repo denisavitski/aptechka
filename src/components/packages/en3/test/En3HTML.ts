@@ -1,6 +1,9 @@
-import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
+import {
+  CSS3DObject,
+  CSS3DRenderer,
+} from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { ticker } from '@packages/ticker'
 import { en3 } from '../core/en3'
 
@@ -26,12 +29,12 @@ export class En3HTML extends CSS3DObject {
 
     en3.containerElement.prepend(En3HTML.#cssRenderer.domElement)
 
-    resizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3 + 1)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3 + 1)
     ticker.subscribe(this.#tickListener, { order: TICK_ORDER.EN3 + 1 })
   }
 
   public static destroy() {
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
 
     this.#cssRenderer = null!

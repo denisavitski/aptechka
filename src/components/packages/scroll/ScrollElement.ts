@@ -7,7 +7,7 @@ import {
 } from '@packages/controls'
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
 import { Store, StorePassport } from '@packages/store'
 import {
@@ -481,7 +481,7 @@ export class ScrollElement extends CustomElement {
   }
 
   #hibernate() {
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
 
     this.#damped.reset()
 
@@ -503,7 +503,7 @@ export class ScrollElement extends CustomElement {
 
     scrollEntries.register(this)
 
-    resizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
 
     this.#enable()
   }

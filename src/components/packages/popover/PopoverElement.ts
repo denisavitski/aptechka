@@ -31,8 +31,6 @@ export class PopoverElement extends CustomElement {
       return
     }
 
-    console.log('OPEN')
-
     this.#opened.current = true
 
     if (this.#single.current) {

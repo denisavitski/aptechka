@@ -1,28 +1,26 @@
 import { ElementOrSelector, getElement, isBrowser } from '@packages/utils'
 
-export type IntersectorCallback = (entry: IntersectionObserverEntry) => void
+export type ElementResizerCallback = (entry: ResizeObserverEntry) => void
 
-interface IntersectorSubscriber {
+interface ElementResizerSubscriber {
   element: Element
-  callback: IntersectorCallback
-  entry: IntersectionObserverEntry | null
+  callback: ElementResizerCallback
+  entry: ResizeObserverEntry | null
 }
 
-export class Intersector {
-  #subscribers: Array<IntersectorSubscriber> = []
-  #intersectionObserver: IntersectionObserver = null!
+export class ElementResizer {
+  #subscribers: Array<ElementResizerSubscriber> = []
+  #resizeObserver: ResizeObserver = null!
 
   constructor() {
     if (isBrowser) {
-      this.#intersectionObserver = new IntersectionObserver(
-        this.#intersectionListener
-      )
+      this.#resizeObserver = new ResizeObserver(this.#resizeListener)
     }
   }
 
   public subscribe(
     elementOrSelector: ElementOrSelector,
-    callback: IntersectorCallback
+    callback: ElementResizerCallback
   ) {
     const element = getElement(elementOrSelector)
 
@@ -35,14 +33,14 @@ export class Intersector {
     )
 
     if (!alreadyObserved) {
-      this.#intersectionObserver.observe(element)
+      this.#resizeObserver.observe(element)
     } else {
-      const alreadyIntersected = this.#subscribers.find(
+      const alreadyResized = this.#subscribers.find(
         (s) => s.element === element && s.entry
       )
 
-      if (alreadyIntersected?.entry!.isIntersecting) {
-        callback(alreadyIntersected.entry)
+      if (alreadyResized?.element.isConnected) {
+        callback(alreadyResized.entry!)
       }
     }
 
@@ -57,7 +55,7 @@ export class Intersector {
     }
   }
 
-  public unsubscribe(callback: IntersectorCallback) {
+  public unsubscribe(callback: ElementResizerCallback) {
     const subscriber = this.#subscribers.find(
       (sub) => sub.callback === callback
     )
@@ -70,12 +68,12 @@ export class Intersector {
       if (
         !this.#subscribers.find((sub) => sub.element === subscriber.element)
       ) {
-        this.#intersectionObserver.unobserve(subscriber.element)
+        this.#resizeObserver.unobserve(subscriber.element)
       }
     }
   }
 
-  #intersectionListener: IntersectionObserverCallback = (entries) => {
+  #resizeListener: ResizeObserverCallback = (entries) => {
     const matches = this.#subscribers.map((subscriber) => {
       return {
         subscriber,
@@ -92,4 +90,4 @@ export class Intersector {
   }
 }
 
-export const intersector = new Intersector()
+export const elementResizer = new ElementResizer()

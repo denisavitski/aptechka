@@ -1,7 +1,7 @@
 import { Ladder } from '@packages/ladder'
 import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector } from '@packages/utils'
 import {
@@ -233,7 +233,7 @@ class En3 {
 
     this.#isCreated = true
 
-    resizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3)
     ticker.subscribe(this.#tickListener, { order: TICK_ORDER.EN3 })
   }
 
@@ -249,7 +249,7 @@ class En3 {
       object.userData.box.destroy()
     })
 
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
 
     this.scene.clear()

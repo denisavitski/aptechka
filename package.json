@@ -63,6 +63,11 @@
       "default": "./lib/element-constructor/index.js",
       "types": "./lib/element-constructor/index.d.ts"
     },
+    "./element-resizer": {
+      "require": "./lib/element-resizer/index.cjs",
+      "default": "./lib/element-resizer/index.js",
+      "types": "./lib/element-resizer/index.d.ts"
+    },
     "./en3": {
       "require": "./lib/en3/index.cjs",
       "default": "./lib/en3/index.js",
@@ -118,11 +123,6 @@
       "default": "./lib/order/index.js",
       "types": "./lib/order/index.d.ts"
     },
-    "./resizer": {
-      "require": "./lib/resizer/index.cjs",
-      "default": "./lib/resizer/index.js",
-      "types": "./lib/resizer/index.d.ts"
-    },
     "./router": {
       "require": "./lib/router/index.cjs",
       "default": "./lib/router/index.js",
@@ -172,6 +172,11 @@
       "require": "./lib/video/index.cjs",
       "default": "./lib/video/index.js",
       "types": "./lib/video/index.d.ts"
+    },
+    "./window-resizer": {
+      "require": "./lib/window-resizer/index.cjs",
+      "default": "./lib/window-resizer/index.js",
+      "types": "./lib/window-resizer/index.d.ts"
     }
   },
   "typesVersions": {

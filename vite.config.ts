@@ -39,6 +39,8 @@ export default defineConfig((e) => {
               'device/index': './src/components/packages/device/index.ts',
               'element-constructor/index':
                 './src/components/packages/element-constructor/index.ts',
+              'element-resizer/index':
+                './src/components/packages/element-resizer/index.ts',
               'en3/index': './src/components/packages/en3/index.ts',
               'image/index': './src/components/packages/image/index.ts',
               'intersector/index':
@@ -64,6 +66,8 @@ export default defineConfig((e) => {
               'ticker/index': './src/components/packages/ticker/index.ts',
               'utils/index': './src/components/packages/utils/index.ts',
               'video/index': './src/components/packages/video/index.ts',
+              'window-resizer/index':
+                './src/components/packages/window-resizer/index.ts',
             },
             formats: ['es', 'cjs'],
             fileName: (format, entryName) =>

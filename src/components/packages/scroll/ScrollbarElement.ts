@@ -1,6 +1,6 @@
 import { define } from '@packages/custom-element'
 import { RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { isBrowser } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
@@ -82,7 +82,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
     this.#thumbElement.addEventListener('pointerdown', this.#grabListener)
 
-    resizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
 
     this.scrollElement.damped.subscribe(this.#scrollListener)
 
@@ -92,7 +92,7 @@ export class ScrollbarElement extends ScrollUserElement {
   protected disconnectedCallback() {
     this.#thumbElement.removeEventListener('pointerdown', this.#grabListener)
 
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
 
     this.scrollElement.damped.unsubscribe(this.#scrollListener)
 

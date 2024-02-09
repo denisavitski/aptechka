@@ -1,5 +1,5 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { Store } from '@packages/store'
 import type { Source } from './SourceClass'
 import { SourceSet, SourceSetMediaSources } from './SourceSet'
@@ -25,11 +25,11 @@ export class SourceManager extends Store<Source | undefined> {
   }
 
   public connect() {
-    resizer.subscribe(this.#resizeListener, RESIZE_ORDER.SOURCE_MANAGER)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SOURCE_MANAGER)
   }
 
   public disconnect() {
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
   }
 
   #resizeListener = () => {
@@ -46,7 +46,10 @@ export class SourceManager extends Store<Source | undefined> {
     let maxDensity = 0
 
     matchedSources?.forEach((s) => {
-      if (s.density > maxDensity && s.density <= Math.max(devicePixelRatio, 1)) {
+      if (
+        s.density > maxDensity &&
+        s.density <= Math.max(devicePixelRatio, 1)
+      ) {
         maxDensity = s.density
         matchedSouce = s
       }

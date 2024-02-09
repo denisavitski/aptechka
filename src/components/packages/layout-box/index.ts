@@ -1,7 +1,7 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { Ladder } from '@packages/ladder'
 import { TICK_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
 import { StoreCallback, StoreEntry } from '@packages/store'
 import { ticker } from '@packages/ticker'
@@ -168,7 +168,7 @@ export class LayoutBox {
         culling: options?.culling ? this.element : undefined,
       })
 
-      resizer.subscribe(this.#resizeListener, TICK_ORDER.LAYOUT_BOX)
+      windowResizer.subscribe(this.#resizeListener, TICK_ORDER.LAYOUT_BOX)
     }
   }
 
@@ -244,7 +244,7 @@ export class LayoutBox {
 
   public destroy() {
     ticker.unsubscribe(this.#tickListener)
-    resizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
 
     this.#position.close()
     this.#rotation.close()

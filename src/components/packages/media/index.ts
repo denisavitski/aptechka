@@ -1,5 +1,5 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { Store } from '@packages/store'
 
 export type MediaCallback = () => void
@@ -15,14 +15,14 @@ export type MediaQueries<T extends string = string> = Map<
 export class Media extends Store<boolean> {
   #query: string
 
-  #unsubscribeFromResizer: Function
+  #unsubscribeFromwindowResizer: Function
 
   constructor(query: string) {
     super(false)
 
     this.#query = query
 
-    this.#unsubscribeFromResizer = resizer.subscribe(() => {
+    this.#unsubscribeFromwindowResizer = windowResizer.subscribe(() => {
       if (matchMedia(this.#query).matches) {
         this.current = true
       } else {
@@ -33,6 +33,6 @@ export class Media extends Store<boolean> {
 
   public override close() {
     super.close()
-    this.#unsubscribeFromResizer()
+    this.#unsubscribeFromwindowResizer()
   }
 }

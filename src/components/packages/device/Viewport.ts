@@ -1,5 +1,5 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { Store } from '@packages/store'
 import { isBrowser } from '@packages/utils'
 
@@ -25,11 +25,13 @@ class Viewport {
   #width = 0
   #height = 0
   #pixelRatio = 0
-  #store_type = new Store<keyof typeof ViewportBreakpoints | undefined>(undefined)
+  #store_type = new Store<keyof typeof ViewportBreakpoints | undefined>(
+    undefined
+  )
 
   constructor() {
     if (isBrowser) {
-      resizer.subscribe(() => {
+      windowResizer.subscribe(() => {
         this.#width = document.documentElement.clientWidth
         this.#height = innerHeight
         this.#pixelRatio = devicePixelRatio

@@ -1,9 +1,9 @@
 import { Notifier } from '@packages/notifier'
 import { debounce, isBrowser } from '@packages/utils'
 
-export type ResizerCallback = () => void
+export type windowResizerCallback = () => void
 
-export const dispatchResizeEvent = debounce((cause?: any) => {
+export const dispatchWindowResizeEvent = debounce((cause?: any) => {
   if (cause) {
     window.dispatchEvent(
       new CustomEvent('resize', {
@@ -17,7 +17,7 @@ export const dispatchResizeEvent = debounce((cause?: any) => {
   }
 }, 0)
 
-class Resizer extends Notifier<ResizerCallback> {
+export class WindowResizer extends Notifier<windowResizerCallback> {
   #isResizeScheduled = false
 
   constructor() {
@@ -29,7 +29,7 @@ class Resizer extends Notifier<ResizerCallback> {
     }
   }
 
-  public override subscribe(callback: ResizerCallback, order?: number) {
+  public override subscribe(callback: windowResizerCallback, order?: number) {
     const unsub = super.subscribe(callback, order)
 
     if (!this.#isResizeScheduled) {
@@ -52,4 +52,4 @@ class Resizer extends Notifier<ResizerCallback> {
   }, 0)
 }
 
-export const resizer = new Resizer()
+export const windowResizer = new WindowResizer()

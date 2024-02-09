@@ -1,9 +1,15 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { resizer } from '@packages/resizer'
+import { windowResizer } from '@packages/window-resizer'
 import { isBrowser } from '@packages/utils'
 import { TierResult, getGPUTier } from 'detect-gpu'
 
-export type DeviceOS = 'macOS' | 'iOS' | 'Windows' | 'Android' | 'Linux' | 'unknown'
+export type DeviceOS =
+  | 'macOS'
+  | 'iOS'
+  | 'Windows'
+  | 'Android'
+  | 'Linux'
+  | 'unknown'
 
 class Device {
   #OS = 'unknown'
@@ -25,33 +31,43 @@ class Device {
         this.#gpuTier = v.tier
       })
 
-      resizer.subscribe(() => {
+      windowResizer.subscribe(() => {
         this.#isMobile = /Mobi|Android/i.test(navigator.userAgent)
 
         this.#isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
         setTimeout(() => {
-          this.#isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+          this.#isTouch =
+            'ontouchstart' in window || navigator.maxTouchPoints > 0
         }, 0)
       }, RESIZE_ORDER.DEVICE)
 
       {
         const canvas = document.createElement('canvas')
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
+        const gl =
+          canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
         this.#isWebgl = (gl && gl instanceof WebGLRenderingContext) || false
       }
 
       {
         const canvas = document.createElement('canvas')
         if (canvas.getContext('2d')) {
-          this.#isWebp = canvas.toDataURL('image/webp').indexOf('data:image/webp') == 0
+          this.#isWebp =
+            canvas.toDataURL('image/webp').indexOf('data:image/webp') == 0
         }
       }
 
       const userAgent = window.navigator.userAgent
       const platform =
-        (window.navigator as any)?.userAgentData?.platform || window.navigator.platform
-      const macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K', 'macOS']
+        (window.navigator as any)?.userAgentData?.platform ||
+        window.navigator.platform
+      const macosPlatforms = [
+        'Macintosh',
+        'MacIntel',
+        'MacPPC',
+        'Mac68K',
+        'macOS',
+      ]
       const windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE']
       const iosPlatforms = ['iPhone', 'iPad', 'iPod']
 
