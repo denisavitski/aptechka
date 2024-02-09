@@ -1,4 +1,5 @@
 import '@packages/select'
+
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'
@@ -8,14 +9,15 @@ import {
   element,
   span,
 } from '@packages/element-constructor'
-import arrowIcon from '../icons/arrow.svg?raw'
-import { studioTheme } from '../studioTheme'
+
 import { SelectElement } from '@packages/select'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   'e-select': {
     width: '100%',
-    '--gap': studioTheme.sizePaddingExtraSmall.var,
+    '--gap': aptechkaTheme.gapExtraSmall.var,
+    '--arrow-color': aptechkaTheme.colorLight.var,
   },
 
   'e-select-head': {
@@ -26,20 +28,20 @@ const stylesheet = createStylesheet({
   },
 
   'e-select-option': {
-    transitionDuration: studioTheme.durationShort.var,
+    transitionDuration: aptechkaTheme.durationShort.var,
     transitionProperty: 'color',
   },
 
   'e-select-option:hover': {
-    color: studioTheme.colorActive.var,
+    color: aptechkaTheme.colorActive.var,
   },
 
   svg: {
     width: '16px',
     height: '16px',
-    fill: studioTheme.colorLight.var,
+    fill: aptechkaTheme.colorLight.var,
     transitionProperty: 'transform',
-    transitionDuration: studioTheme.durationShort.var,
+    transitionDuration: aptechkaTheme.durationShort.var,
   },
 
   '.opened svg': {
@@ -77,7 +79,6 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
                   'data-value-holder': '',
                 },
               }),
-              arrowIcon,
             ],
           }),
           ...variants.map((v, i) =>

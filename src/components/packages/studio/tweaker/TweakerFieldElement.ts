@@ -1,7 +1,9 @@
 import '@packages/accordion'
 
 import { Store, activeStores } from '@packages/store'
+
 import { CustomElement, define } from '@packages/custom-element'
+
 import {
   div,
   element,
@@ -9,11 +11,13 @@ import {
   button,
 } from '@packages/element-constructor'
 
-import { studioTheme } from '../studioTheme'
 import { StoreManagerType } from '@packages/store/Store'
+
+import copyIcon from '@assets/icons/copy.svg?raw'
+import resetIcon from '@assets/icons/reset.svg?raw'
+
 import { tweakerManagerConstructors } from './tweakerManagerConstructors'
-import copyIcon from '../icons/copy.svg?raw'
-import resetIcon from '../icons/reset.svg?raw'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -21,8 +25,8 @@ const stylesheet = createStylesheet({
     gridAutoFlow: 'column',
     gridTemplateColumns: '0.3fr 1fr',
     alignItems: 'center',
-    color: studioTheme.colorLight.var,
-    gap: studioTheme.sizePaddingMedium.var,
+    color: aptechkaTheme.colorLight.var,
+    gap: aptechkaTheme.gapMedium.var,
   },
 
   ':host(.disabled)': {
@@ -31,10 +35,10 @@ const stylesheet = createStylesheet({
   },
 
   '.head': {
-    fontSize: studioTheme.sizePropertyNameFont.var,
+    fontSize: aptechkaTheme.fontSizeMedium.var,
     display: 'flex',
     alignItems: 'center',
-    gap: studioTheme.sizePaddingExtraSmall.var,
+    gap: aptechkaTheme.gapExtraSmall.var,
   },
 
   '.head-buttons': {
@@ -50,8 +54,8 @@ const stylesheet = createStylesheet({
     border: 'none',
     background: 'none',
 
-    fill: studioTheme.colorLight.var,
-    transitionDuration: studioTheme.durationShort.var,
+    fill: aptechkaTheme.colorLight.var,
+    transitionDuration: aptechkaTheme.durationShort.var,
     transitionProperty: `fill, opacity`,
     opacity: '0',
   },
@@ -61,7 +65,7 @@ const stylesheet = createStylesheet({
   },
 
   '.head-button:hover': {
-    fill: studioTheme.colorActive.var,
+    fill: aptechkaTheme.colorActive.var,
   },
 
   '.head-button svg': {

@@ -1,6 +1,4 @@
-import './PopoverButtonElement'
 import { define } from '@packages/custom-element'
-import { PopoverElement } from './PopoverElement'
 import {
   createStylesheet,
   element,
@@ -9,6 +7,10 @@ import {
   custom,
   span,
 } from '@packages/element-constructor'
+
+import { PopoverElement } from '@packages/popover'
+import { aptechkaTheme } from '@packages/theme'
+
 import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
@@ -22,7 +24,8 @@ const stylesheet = createStylesheet({
     width: '100%',
     height: '100%',
 
-    transition: 'opacity 0.3s',
+    transitionProperty: 'opacity',
+    transitionDuration: aptechkaTheme.durationShort.var,
   },
 
   ':host::before': {
@@ -68,14 +71,15 @@ const stylesheet = createStylesheet({
   },
 
   '.close-button-default': {
-    width: 'var(---close-button-size, 2em)',
-    height: 'var(---close-button-size, 2em)',
+    width: 'var(---close-button-size, 1.5em)',
+    height: 'var(---close-button-size, 1.5em)',
 
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
 
-    transition: 'transform 0.2s',
+    transitionProperty: 'transform',
+    transitionDuration: aptechkaTheme.durationShort.var,
     willChange: 'transform',
   },
 
@@ -95,7 +99,7 @@ const stylesheet = createStylesheet({
     width: 'var(---close-button-thickness, 0.1em)',
     height: '100%',
 
-    backgroundColor: 'var(--close-button-color, black)',
+    backgroundColor: `var(--close-button-color, ${aptechkaTheme.colorDark.var})`,
   },
 
   '.close-button-default::before': {

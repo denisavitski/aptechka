@@ -79,6 +79,7 @@ export default defineConfig((e) => {
     resolve: {
       alias: {
         '@packages': resolve(__dirname, 'src/components/packages'),
+        '@assets': resolve(__dirname, 'src/assets'),
       },
     },
   }

@@ -2,7 +2,7 @@ import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'
 import { createStylesheet, element, input } from '@packages/element-constructor'
-import { studioTheme } from '../studioTheme'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -14,11 +14,11 @@ const stylesheet = createStylesheet({
   input: {
     padding: '0',
     margin: '0',
-    width: `calc(${studioTheme.sizeInputHeight.var} * 0.5)`,
-    height: `calc(${studioTheme.sizeInputHeight.var} * 0.5)`,
-    borderRadius: studioTheme.sizeBorderRadius.var,
+    width: `calc(${aptechkaTheme.heightInput.var} * 0.5)`,
+    height: `calc(${aptechkaTheme.heightInput.var} * 0.5)`,
+    borderRadius: aptechkaTheme.borderRadius.var,
     overflow: 'hidden',
-    accentColor: studioTheme.colorLight.var,
+    accentColor: aptechkaTheme.colorLight.var,
   },
 })
 

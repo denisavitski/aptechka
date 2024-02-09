@@ -1,7 +1,6 @@
 import { CustomElement, define } from '@packages/custom-element'
 import { element, createStylesheet } from '@packages/element-constructor'
 import { TweakerElement } from './tweaker/TweakerElement'
-import { studioTheme } from './studioTheme'
 import { studioStorage } from './studioStorage'
 
 const stylesheet = createStylesheet({
@@ -18,8 +17,6 @@ const stylesheet = createStylesheet({
 
     width: '100%',
     height: '100%',
-
-    ...studioTheme.style,
   },
 })
 

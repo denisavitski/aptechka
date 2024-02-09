@@ -6,6 +6,7 @@ import {
   element,
   slot,
 } from '@packages/element-constructor'
+import { aptechkaTheme } from '@packages/theme'
 import {
   dispatchSizeChangeEvent,
   getElementTransitionDurationMS,
@@ -38,8 +39,10 @@ const stylesheet = createStylesheet({
     top: '100%',
     left: '0',
 
+    width: '100%',
+
     overflow: 'hidden',
-    transitionDuration: 'var(--duration, 0.2s)',
+    transitionDuration: `var(--duration, ${aptechkaTheme.durationShort.var})`,
     transitionProperty: 'height',
     cursor: 'default',
   },
@@ -47,9 +50,15 @@ const stylesheet = createStylesheet({
   '.body-inner': {
     display: 'grid',
     gap: 'var(--gap, 0px)',
+
+    width: '100%',
     paddingTop: 'var(--gap, 0px)',
   },
 })
+
+export interface SelectToggleDetail {
+  opened: boolean
+}
 
 @define('e-select')
 export class SelectElement extends CustomElement {
@@ -91,7 +100,10 @@ export class SelectElement extends CustomElement {
             style: {
               height: '0px',
             },
-            children: div({ class: 'body-inner', children: slot() }),
+            children: div({
+              class: 'body-inner',
+              children: slot(),
+            }),
             created: (e) => {
               this.#bodyElement = e
             },
@@ -133,7 +145,10 @@ export class SelectElement extends CustomElement {
 
     setTimeout(() => {
       this.classList.add('opened')
+
       this.#bodyElement.style.height = this.#bodyElement.scrollHeight + 'px'
+
+      this.#dispatchToggleEvent()
     }, 0)
   }
 
@@ -142,6 +157,8 @@ export class SelectElement extends CustomElement {
 
     this.#bodyElement.style.height = '0px'
     this.classList.remove('opened')
+
+    this.#dispatchToggleEvent()
 
     this.#timeoutId = setTimeout(() => {
       this.classList.remove('triggered')
@@ -161,10 +178,26 @@ export class SelectElement extends CustomElement {
   #resizeObserverListener = () => {
     dispatchSizeChangeEvent(this)
   }
+
+  #dispatchToggleEvent() {
+    this.dispatchEvent(
+      new CustomEvent<SelectToggleDetail>('e-select-toggle', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          opened: this.#opened,
+        },
+      })
+    )
+  }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
     'e-select': SelectElement
+  }
+
+  interface HTMLElementEventMap {
+    'e-select-toggle': CustomEvent<SelectToggleDetail>
   }
 }

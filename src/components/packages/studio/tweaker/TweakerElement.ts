@@ -11,24 +11,24 @@ import { Store, activeStores, storeRegistry } from '@packages/store'
 import { createJSONAndSave, debounce } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
 
-import { studioTheme } from '../studioTheme'
-import { TweakerFolderElement } from './TweakerFolderElement'
+import resetIcon from '@assets/icons/reset.svg?raw'
+import copyIcon from '@assets/icons/copy.svg?raw'
+import downloadIcon from '@assets/icons/download.svg?raw'
+import uploadIcon from '@assets/icons/upload.svg?raw'
 
-import resetIcon from '../icons/reset.svg?raw'
-import copyIcon from '../icons/copy.svg?raw'
-import downloadIcon from '../icons/download.svg?raw'
-import uploadIcon from '../icons/upload.svg?raw'
+import { TweakerFolderElement } from './TweakerFolderElement'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   ':host': {
     position: 'absolute',
-    top: studioTheme.sizeTweakerOffset.var,
-    right: studioTheme.sizeTweakerOffset.var,
+    top: aptechkaTheme.tweakerOffset.var,
+    right: aptechkaTheme.tweakerOffset.var,
 
-    width: studioTheme.sizeTweakerWidth.var,
+    width: aptechkaTheme.tweakerWidth.var,
 
-    backgroundColor: studioTheme.colorDark.var,
-    borderRadius: studioTheme.sizeBorderRadius.var,
+    backgroundColor: aptechkaTheme.colorDark.var,
+    borderRadius: aptechkaTheme.borderRadius.var,
 
     transition: 'opacity 0.2s',
   },
@@ -40,7 +40,7 @@ const stylesheet = createStylesheet({
   '.tweaker-buttons': {
     display: 'flex',
     alignItems: 'center',
-    gap: studioTheme.sizePaddingExtraSmall.var,
+    gap: aptechkaTheme.gapExtraSmall.var,
   },
 
   '.tweaker-button': {
@@ -53,12 +53,12 @@ const stylesheet = createStylesheet({
     background: 'none',
     border: 'none',
 
-    fill: studioTheme.colorLight.var,
+    fill: aptechkaTheme.colorLight.var,
     transitionProperty: `fill`,
   },
 
   '.tweaker-button:hover': {
-    fill: studioTheme.colorActive.var,
+    fill: aptechkaTheme.colorActive.var,
   },
 
   '.tweaker-button svg': {
@@ -70,8 +70,8 @@ const stylesheet = createStylesheet({
     maxHeight: `calc(
       100dvh - 
       (
-        ${studioTheme.sizeTweakerOffset.var} * 2 + 
-        ${studioTheme.sizeFolderHeight.var}
+        ${aptechkaTheme.tweakerOffset.var} * 2 + 
+        ${aptechkaTheme.tweakerFolderHeight.var}
       )
     )`,
     overflow: 'hidden auto',
@@ -99,7 +99,7 @@ const stylesheet = createStylesheet({
     ':host .body-content': {
       maxHeight: `calc(
         100dvh - 
-        ${studioTheme.sizeFolderHeight.var}
+        ${aptechkaTheme.tweakerFolderHeight.var}
       )`,
     },
   },
@@ -207,7 +207,7 @@ export class TweakerElement extends TweakerFolderElement {
       }),
     ]
 
-    this.addEventListener('accordion-item-toggle', (e) => {
+    this.addEventListener('e-accordion-item-toggle', (e) => {
       if (e.detail.opened) {
         this.style.opacity = '1'
       } else {

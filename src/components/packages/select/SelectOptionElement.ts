@@ -1,23 +1,14 @@
 import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
-import {
-  button,
-  createStylesheet,
-  element,
-  slot,
-} from '@packages/element-constructor'
+import { createStylesheet, element, slot } from '@packages/element-constructor'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
-  button: {
-    cursor: 'default',
-    background: 'none',
-    border: 'none',
-    color: 'inherit',
-    fontFamily: 'inherit',
-    fontSize: 'inherit',
-    fontWeight: 'inherit',
-    padding: '0',
-    margin: '0',
+  ':host': {
+    width: '100%',
+    height: aptechkaTheme.heightInput.var,
+    display: 'inline-flex',
+    alignItems: 'center',
   },
 })
 
@@ -29,15 +20,20 @@ export class SelectOptionElement extends SelectUserElement {
     this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
 
     element(this, {
-      shadowChildren: button({
-        children: slot(),
-        events: {
-          click: () => {
-            this.selectElement.value = this.value
-            this.selectElement.close()
-          },
+      attributes: {
+        tabIndex: '0',
+      },
+      events: {
+        click: () => {
+          this.#pick()
         },
-      }),
+        keydown: (e) => {
+          if (e.code === 'Space') {
+            this.#pick()
+          }
+        },
+      },
+      shadowChildren: [slot()],
     })
   }
 
@@ -75,6 +71,11 @@ export class SelectOptionElement extends SelectUserElement {
     } else {
       this.style.display = ''
     }
+  }
+
+  #pick() {
+    this.selectElement.value = this.value
+    this.selectElement.close()
   }
 }
 

@@ -3,62 +3,63 @@ import { div, element, createStylesheet } from '@packages/element-constructor'
 import { AccordionElement } from '@packages/accordion'
 import { Store } from '@packages/store'
 
-import { studioTheme } from '../studioTheme'
-import { TweakerFieldElement } from './TweakerFieldElement'
-import { studioStorage } from '../studioStorage'
-import arrowIcon from '../icons/arrow.svg?raw'
+import arrowIcon from '@assets/icons/arrow.svg?raw'
 
+import { studioStorage } from '../studioStorage'
+
+import { TweakerFieldElement } from './TweakerFieldElement'
 import { StoreBox } from './TweakerElement'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   '.wrapper': {
     boxSizing: 'border-box',
     backgroundColor: `rgba(255, 255, 255, 0.1)`,
-    borderRadius: studioTheme.sizeBorderRadius.var,
+    borderRadius: aptechkaTheme.borderRadius.var,
   },
 
   '.head': {
     boxSizing: 'border-box',
 
     width: '100%',
-    height: studioTheme.sizeFolderHeight.var,
+    height: aptechkaTheme.tweakerFolderHeight.var,
 
-    paddingLeft: studioTheme.sizePaddingMedium.var,
-    paddingRight: studioTheme.sizePaddingMedium.var,
+    paddingLeft: aptechkaTheme.gapMedium.var,
+    paddingRight: aptechkaTheme.gapMedium.var,
 
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
 
-    backgroundColor: studioTheme.colorDarkAux.var,
-    borderRadius: studioTheme.sizeBorderRadius.var,
+    backgroundColor: aptechkaTheme.colorDarkAux.var,
+    borderRadius: aptechkaTheme.borderRadius.var,
   },
 
   '.name': {
-    fontSize: studioTheme.sizeFolderFont.var,
-    color: studioTheme.colorLight.var,
+    fontSize: aptechkaTheme.fontSizeLarge.var,
+    color: aptechkaTheme.colorLight.var,
   },
 
   '.body': {
     transitionProperty: 'height',
-    transitionDuration: studioTheme.durationShort.var,
+    transitionDuration: aptechkaTheme.durationShort.var,
     overflow: 'hidden',
     height: '0px',
   },
 
   '.body-content': {
     boxSizing: 'border-box',
-    padding: studioTheme.sizePaddingLarge.var,
+    padding: aptechkaTheme.gapLarge.var,
 
     display: 'grid',
-    gap: studioTheme.sizePaddingMedium.var,
+    gap: aptechkaTheme.gapMedium.var,
   },
 
   '.arrow': {
     width: '20px',
     height: '20px',
-    fill: studioTheme.colorLight.var,
-    transition: `transform ${studioTheme.durationShort.var}`,
+    fill: aptechkaTheme.colorLight.var,
+    transition: `transform ${aptechkaTheme.durationShort.var}`,
   },
 
   '.opened .arrow': {
@@ -89,7 +90,7 @@ export class TweakerFolderElement extends AccordionElement {
 
     element(this, {
       events: {
-        'accordion-item-toggle': (e) => {
+        'e-accordion-item-toggle': (e) => {
           e.stopPropagation()
 
           if (e.detail.opened) {

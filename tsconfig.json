@@ -29,6 +29,7 @@
     "paths": {
       "@packages/*": ["src/components/packages/*"],
       "@components/*": ["src/components/*"],
+      "@assets/*": ["src/assets/*"],
     },
   },
   "include": ["src"]

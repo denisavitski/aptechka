@@ -1,16 +1,6 @@
-.y {
-  width: 50vw;
-  height: 50vh;
-
-  background-color: tomato;
+.parent {
+  font-size: 100px;
 }
 
-e-popover-button {
-  padding: 4vmin;
-  background-color: tomato;
-  box-sizing: border-box;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+e-popover {
 }

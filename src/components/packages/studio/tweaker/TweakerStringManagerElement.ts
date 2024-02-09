@@ -1,8 +1,9 @@
 import { Store, StoreManagerType } from '@packages/store/Store'
 import { define } from '@packages/custom-element'
-import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from '@packages/element-constructor'
-import { studioTheme } from '../studioTheme'
+
+import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -19,17 +20,17 @@ const stylesheet = createStylesheet({
     fontFamily: 'inherit',
     color: 'inherit',
     border: 'none',
-    fontSize: studioTheme.sizePropertyValueFont.var,
+    fontSize: aptechkaTheme.fontSizeSmall.var,
   },
 
   '.text-input': {
-    height: studioTheme.sizeInputHeight.var,
+    height: aptechkaTheme.heightInput.var,
     width: '100%',
 
     margin: '0',
-    padding: `0 ${studioTheme.sizePaddingSmall.var}`,
+    padding: `0 ${aptechkaTheme.gapSmall.var}`,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: studioTheme.sizeBorderRadius.var,
+    borderRadius: aptechkaTheme.borderRadius.var,
   },
 })
 

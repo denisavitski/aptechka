@@ -26,7 +26,7 @@ export class PopoverElement extends CustomElement {
     return this.#opened
   }
 
-  public open() {
+  public open = () => {
     if (this.#opened.current) {
       return
     }
@@ -59,7 +59,7 @@ export class PopoverElement extends CustomElement {
     })
   }
 
-  public close() {
+  public close = () => {
     if (!this.#opened.current) {
       return
     }
@@ -97,6 +97,7 @@ export class PopoverElement extends CustomElement {
 
   protected disconnectedCallback() {
     clearTimeout(this.#closeTimeoutId)
+
     removeEventListener('popstate', this.#popStateListener)
   }
 
