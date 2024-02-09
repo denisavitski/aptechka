@@ -16,7 +16,6 @@ import { aptechkaTheme } from '@packages/theme'
 const stylesheet = createStylesheet({
   'e-select': {
     width: '100%',
-    '--gap': aptechkaTheme.gapExtraSmall.var,
     '--arrow-color': aptechkaTheme.colorLight.var,
   },
 
@@ -57,7 +56,7 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
   constructor(store: Store<string, 'select'>) {
     super(store)
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     const variants = this.store.passport?.manager?.variants || []
 

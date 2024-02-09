@@ -17,7 +17,7 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
   constructor(store: Store<string, 'link'>) {
     super(store)
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     element(this, {
       shadowChildren: [

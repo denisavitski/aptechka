@@ -25,7 +25,7 @@ export class StudioElement extends CustomElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     studioStorage.load()
 

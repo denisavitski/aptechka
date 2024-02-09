@@ -59,7 +59,7 @@ export class TweakerRangeManagerElement extends TweakerNumberManagerElement<'ran
   constructor(store: Store<number, 'range'>) {
     super(store)
 
-    this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
+    this.addStylesheet(stylesheet)
 
     this.appendContent(
       input({

@@ -120,7 +120,7 @@ export class ModalElement extends PopoverElement {
     super()
 
     if (isBrowser) {
-      this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+      this.openShadow(stylesheet)
 
       element(this, {
         shadowChildren: div({

@@ -1,4 +1,5 @@
 import { CustomElement } from '@packages/custom-element'
+
 import { element } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
 

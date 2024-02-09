@@ -3,6 +3,41 @@ import { RESIZE_ORDER } from '@packages/order'
 import { resizer } from '@packages/resizer'
 import { isBrowser } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
+import { createStylesheet, element, slot } from '@packages/element-constructor'
+
+const stylesheet = createStylesheet({
+  ':host': {
+    display: 'inline-block',
+    zIndex: '1',
+    backgroundColor: '#efefef',
+  },
+
+  ':host([axis="y"])': {
+    position: 'absolute',
+    right: '0',
+    top: '0',
+    width: '1vmin',
+    height: '100%',
+  },
+
+  ':host([axis="x"])': {
+    position: 'absolute',
+    left: '0',
+    bottom: '0',
+    width: '100%',
+    height: '1vmin',
+  },
+
+  '.default-thumb': {
+    backgroundColor: '#181818',
+    borderRadius: '1vmin',
+    touchAction: 'none',
+  },
+
+  '::slotted(*)': {
+    touchAction: 'none',
+  },
+})
 
 @define('e-scrollbar')
 export class ScrollbarElement extends ScrollUserElement {
@@ -20,46 +55,11 @@ export class ScrollbarElement extends ScrollUserElement {
     super()
 
     if (isBrowser) {
-      const root = this.attachShadow({ mode: 'open' })
+      this.openShadow(stylesheet)
 
-      const styleElement = document.createElement('style')
-      styleElement.textContent = `
-        :host {
-          display: inline-block;
-          z-index: 1;
-          background-color: #efefef;
-        }
-
-        :host([axis="y"]) {
-          position: absolute;
-          right: 0;
-          top: 0;
-          width: 1vmin;
-          height: 100%;
-        }
-
-        :host([axis="x"]) {
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          height: 1vmin;
-        }
-
-        .default-thumb {
-          background-color: #181818;
-          border-radius: 1vmin;
-          touch-action: none;
-        }
-
-        ::slotted(*) {
-          touch-action: none;
-        }
-      `
-      root.appendChild(styleElement)
-
-      this.#slotElement = document.createElement('slot')
-      root.appendChild(this.#slotElement)
+      element(this, {
+        shadowChildren: [slot({ created: (e) => (this.#slotElement = e) })],
+      })
     }
   }
 

@@ -2,6 +2,7 @@ import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -17,24 +18,26 @@ export class SelectOptionElement extends SelectUserElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    if (isBrowser) {
+      this.openShadow(stylesheet)
 
-    element(this, {
-      attributes: {
-        tabIndex: '0',
-      },
-      events: {
-        click: () => {
-          this.#pick()
+      element(this, {
+        attributes: {
+          tabIndex: '0',
         },
-        keydown: (e) => {
-          if (e.code === 'Space') {
+        events: {
+          click: () => {
             this.#pick()
-          }
+          },
+          keydown: (e) => {
+            if (e.code === 'Space') {
+              this.#pick()
+            }
+          },
         },
-      },
-      shadowChildren: [slot()],
-    })
+        shadowChildren: [slot()],
+      })
+    }
   }
 
   public get value() {

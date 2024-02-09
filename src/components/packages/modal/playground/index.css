@@ -5,13 +5,3 @@
   background-color: var(--aptechka-color-light);
   border-radius: var(--aptechka-border-radius);
 }
-
-e-popover-button {
-  padding: 4vmin;
-  background-color: tomato;
-  box-sizing: border-box;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}

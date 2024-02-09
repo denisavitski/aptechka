@@ -39,7 +39,10 @@ export function findScrollParentElement(
   if (_initial !== node) {
     const computedStyle = getComputedStyle(node)
 
-    if (computedStyle.overflow.includes('auto') || computedStyle.overflow.includes('scroll')) {
+    if (
+      computedStyle.overflow.includes('auto') ||
+      computedStyle.overflow.includes('scroll')
+    ) {
       return node
     }
   }

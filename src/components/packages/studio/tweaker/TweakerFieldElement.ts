@@ -91,7 +91,7 @@ export class TweakerFieldElement extends CustomElement {
     this.#key = this.#store.passport!.name
     this.#name = this.#key.split('.').slice(-1).toString()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     const type = this.#store.passport?.manager?.type || 'string'
 

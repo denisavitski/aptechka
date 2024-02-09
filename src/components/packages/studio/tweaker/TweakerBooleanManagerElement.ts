@@ -30,7 +30,7 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
   constructor(store: Store<boolean, 'boolean'>) {
     super(store)
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     element(this, {
       shadowChildren: [

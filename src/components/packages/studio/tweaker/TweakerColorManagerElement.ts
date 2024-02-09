@@ -38,7 +38,7 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
   constructor(store: Store<string, 'color'>) {
     super(store)
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     element(this, {
       shadowChildren: [

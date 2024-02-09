@@ -47,7 +47,7 @@ export class TweakerStringManagerElement<
   constructor(store: Store<T, M>) {
     super(store)
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     element(this, {
       shadowChildren: [

@@ -83,7 +83,7 @@ export class TweakerFolderElement extends AccordionElement {
   constructor(parameters: TweakerFolderParameters) {
     super()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    this.openShadow(stylesheet)
 
     this.#key = parameters.key
     this.#mutationObserver = new MutationObserver(this.#mutationListener)

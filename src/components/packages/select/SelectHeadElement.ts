@@ -4,6 +4,7 @@ import { SelectOptionElement } from './SelectOptionElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
 import arrowIcon from '@assets/icons/arrow.svg?raw'
 import { aptechkaTheme } from '@packages/theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -35,19 +36,21 @@ export class SelectHeadElement extends SelectUserElement {
   constructor() {
     super()
 
-    this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+    if (isBrowser) {
+      this.openShadow(stylesheet)
 
-    element(this, {
-      shadowChildren: [
-        slot(),
-        slot({
-          attributes: { name: 'arrow' },
-          children: element(arrowIcon, { class: 'default-arrow' }),
-        }),
-      ],
-    })
+      element(this, {
+        shadowChildren: [
+          slot(),
+          slot({
+            attributes: { name: 'arrow' },
+            children: element(arrowIcon, { class: 'default-arrow' }),
+          }),
+        ],
+      })
 
-    this.slot = 'head'
+      this.slot = 'head'
+    }
   }
 
   protected override connectedCallback() {

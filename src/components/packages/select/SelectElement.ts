@@ -74,7 +74,7 @@ export class SelectElement extends CustomElement {
     super()
 
     if (isBrowser) {
-      this.attachShadow({ mode: 'open' }).adoptedStyleSheets.push(stylesheet)
+      this.openShadow(stylesheet)
 
       this.#internals = this.attachInternals()
 

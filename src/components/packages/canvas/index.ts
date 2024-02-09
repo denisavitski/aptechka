@@ -1,8 +1,21 @@
 import { define, CustomElement } from '@packages/custom-element'
+import {
+  canvas,
+  createStylesheet,
+  element,
+} from '@packages/element-constructor'
 import { Notifier } from '@packages/notifier'
 import { resizer } from '@packages/resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { clamp } from '@packages/utils'
+
+const stylesheet = createStylesheet({
+  ':host, canvas': {
+    display: 'block',
+    width: '100%',
+    height: '100%',
+  },
+})
 
 export interface Canvas2DRenderEntry {
   pixelRatio: number
@@ -17,8 +30,8 @@ export interface Canvas2DRenderEntry {
 
 export type Canvas2DRenderCallback = (entry: Canvas2DRenderEntry) => void
 
-@define('canvas-2d')
-export class Canvas2DElement extends CustomElement {
+@define('e-canvas')
+export class CanvasElement extends CustomElement {
   #renderEvent = new Notifier<Canvas2DRenderCallback>()
 
   #canvasElement: HTMLCanvasElement = null!
@@ -30,6 +43,21 @@ export class Canvas2DElement extends CustomElement {
 
   #timestamp = 0
   #elapsed = 1
+
+  constructor() {
+    super()
+
+    this.openShadow(stylesheet)
+
+    element(this, {
+      shadowChildren: canvas({
+        created: (e) => {
+          this.#canvasElement = e
+          this.#context = e.getContext('2d')!
+        },
+      }),
+    })
+  }
 
   public get renderEvent() {
     return this.#renderEvent
@@ -69,28 +97,14 @@ export class Canvas2DElement extends CustomElement {
   }
 
   protected connectedCallback() {
-    this.style.display = 'block'
-    this.style.width = '100%'
-    this.style.height = '100%'
-
-    this.#canvasElement = document.createElement('canvas')
-
-    this.#canvasElement.style.cssText = `
-      display: block;
-      width: 100%;
-      height: 100%;
-    `
-
-    this.#context = this.#canvasElement.getContext('2d')!
-
-    this.appendChild(this.#canvasElement)
-
     resizer.subscribe(this.#resizeListener)
 
     if (!this.hasAttribute('static')) {
       ticker.subscribe(this.#tickListener, {
         culling: this,
-        maxFPS: this.hasAttribute('fps') ? parseInt(this.getAttribute('fps')!) : undefined,
+        maxFPS: this.hasAttribute('fps')
+          ? parseInt(this.getAttribute('fps')!)
+          : undefined,
       })
     }
   }
@@ -101,9 +115,6 @@ export class Canvas2DElement extends CustomElement {
 
     this.#renderEvent.close()
     this.#canvasElement.remove()
-    this.style.display = ''
-    this.style.width = ''
-    this.style.height = ''
   }
 
   #resizeListener = () => {
@@ -132,6 +143,6 @@ export class Canvas2DElement extends CustomElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'canvas-2d': Canvas2DElement
+    'e-canvas': CanvasElement
   }
 }

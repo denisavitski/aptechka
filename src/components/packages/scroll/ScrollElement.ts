@@ -146,7 +146,7 @@ export class ScrollElement extends CustomElement {
         passport,
       })
 
-      const shadowRoot = this.attachShadow({ mode: 'open' })
+      const shadowRoot = this.openShadow()
 
       const styleElement = document.createElement('style')
       styleElement.textContent = `

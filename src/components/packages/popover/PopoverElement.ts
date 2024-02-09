@@ -1,5 +1,5 @@
 import { Attribute } from '@packages/attribute'
-import { CustomElement, define } from '@packages/custom-element'
+import { define, CustomElement } from '@packages/custom-element'
 import { Store } from '@packages/store'
 import { getElementTransitionDurationMS } from '@packages/utils'
 
@@ -31,6 +31,8 @@ export class PopoverElement extends CustomElement {
       return
     }
 
+    console.log('OPEN')
+
     this.#opened.current = true
 
     if (this.#single.current) {
@@ -50,10 +52,10 @@ export class PopoverElement extends CustomElement {
     this.classList.add('triggered')
     this.style.display = 'block'
 
-    addEventListener('click', this.#clickOutsideListener)
-    addEventListener('keydown', this.#keydownListener)
-
     setTimeout(() => {
+      addEventListener('click', this.#clickOutsideListener)
+      addEventListener('keydown', this.#keydownListener)
+
       this.style.opacity = '1'
       this.classList.add('opened')
     })

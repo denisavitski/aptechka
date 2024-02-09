@@ -117,7 +117,7 @@ export class TweakerElement extends TweakerFolderElement {
       key: '',
     })
 
-    this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
+    this.addStylesheet(stylesheet)
 
     this.head.current = [
       div({
