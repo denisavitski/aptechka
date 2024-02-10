@@ -1,3 +1,5 @@
+import '@packages/scroll'
+
 import { En3Clip, en3, en3GLTFLoader, traverseMaterials } from '@packages/en3'
 import { ticker } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'

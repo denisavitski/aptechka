@@ -30,10 +30,7 @@ export type ElementConstructorStyleToken = Exclude<
   'length' | 'parentRule'
 >
 
-export type ElementConstructorStyleValue =
-  | string
-  | Store<string | null | undefined>
-  | Store<string>
+export type ElementConstructorStyleValue = string | Store<any>
 
 export type ElementConstructorStyle = Partial<{
   [K in ElementConstructorStyleToken]: ElementConstructorStyleValue

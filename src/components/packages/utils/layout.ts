@@ -13,10 +13,16 @@ export const getCumulativePosition = (
   return acc
 }
 
-export const getCumulativeOffsetLeft = (target: HTMLElement, stopElement?: HTMLElement) => {
+export const getCumulativeOffsetLeft = (
+  target: HTMLElement,
+  stopElement?: HTMLElement
+) => {
   return getCumulativePosition(target, 'offsetLeft', stopElement)
 }
 
-export const getCumulativeOffsetTop = (target: HTMLElement, stopElement?: HTMLElement) => {
+export const getCumulativeOffsetTop = (
+  target: HTMLElement,
+  stopElement?: HTMLElement
+) => {
   return getCumulativePosition(target, 'offsetTop', stopElement)
 }

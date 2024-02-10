@@ -58,9 +58,15 @@ class Section {
       ? this.#element.offsetHeight
       : this.#element.offsetWidth
 
+    if (this.#scrollElement.axisAttibute.current === 'x') {
+      this.#size += parseFloat(getComputedStyle(this.#element).marginRight)
+    } else if (this.#scrollElement.axisAttibute.current === 'y') {
+      this.#size += parseFloat(getComputedStyle(this.#element).marginBottom)
+    }
+
     this.#position = this.#scrollElement.vertical
-      ? getCumulativeOffsetTop(this.#element)
-      : getCumulativeOffsetLeft(this.#element)
+      ? getCumulativeOffsetTop(this.#element, this.#scrollElement)
+      : getCumulativeOffsetLeft(this.#element, this.#scrollElement)
 
     this.#position -= this.#scrollElement.contentPosition
   }
@@ -82,12 +88,12 @@ class Section {
       offset
     )
 
-    const df = this.#scrollElement.viewportSize - this.#size
-
     const value = clamp(
       this.#scrollElement.currentScrollValue + offset,
-      this.#position - this.#scrollElement.viewportSize - df,
-      this.#position + this.#size + df
+      this.#position -
+        this.#scrollElement.contentViewportSize -
+        this.#scrollElement.viewportsDiff,
+      this.#position + this.#size + this.#scrollElement.viewportsDiff
     )
 
     if (this.#scrollElement.vertical) {
@@ -129,7 +135,6 @@ const stylesheet = createStylesheet({
     display: 'flex',
     width: '100%',
     height: '100%',
-    gap: 'var(--gap, 0px)',
   },
 
   ':host([hibernated="true"]) .content': {
@@ -167,7 +172,8 @@ export class ScrollElement extends CustomElement {
 
   #position = 0
   #contentPosition = 0
-  #viewportSize = 0
+  #scrollViewportSize = 0
+  #contentViewportSize = 0
   #scrollSize = 0
 
   #wheelControls: WheelControls = null!
@@ -201,6 +207,8 @@ export class ScrollElement extends CustomElement {
 
       this.openShadow(stylesheet)
 
+      this.tabIndex = 0
+
       element(this, {
         attributes: {
           tabIndex: 0,
@@ -230,9 +238,6 @@ export class ScrollElement extends CustomElement {
       this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
 
       this.#axisAttribute.subscribe(({ current }) => {
-        this.#contentElement.style.flexDirection =
-          current === 'x' ? 'row' : 'column'
-
         this.#wheelControls.axis = this.#wheelMaxDeltaAttribute.current
           ? 'max'
           : current
@@ -367,10 +372,6 @@ export class ScrollElement extends CustomElement {
     return this.#hibernatedAttribute
   }
 
-  public get contentElement() {
-    return this.#contentElement
-  }
-
   public get position() {
     return this.#position
   }
@@ -379,8 +380,12 @@ export class ScrollElement extends CustomElement {
     return this.#contentPosition
   }
 
-  public get viewportSize() {
-    return this.#viewportSize
+  public get scrollViewportSize() {
+    return this.#scrollViewportSize
+  }
+
+  public get contentViewportSize() {
+    return this.#contentViewportSize
   }
 
   public get scrollSize() {
@@ -411,6 +416,10 @@ export class ScrollElement extends CustomElement {
     return this.targetScrollValue / this.#distance
   }
 
+  public get viewportsDiff() {
+    return this.#scrollViewportSize - this.#contentViewportSize
+  }
+
   // TODO: Поправить значение когда скролл не секционный ??
   public scrollToSection(
     sectionIndex: number,
@@ -435,10 +444,13 @@ export class ScrollElement extends CustomElement {
       if (this.#infiniteAttribute.current) {
         if (this.#counter.current === 0 && previousCounter === limit) {
           shiftValue =
-            this.#scrollSize + this.#viewportSize - previousSection.position
+            this.#scrollSize +
+            this.#contentViewportSize -
+            previousSection.position
         } else if (this.#counter.current === limit && previousCounter === 0) {
           shiftValue =
-            currentSection.position - (this.#scrollSize + this.#viewportSize)
+            currentSection.position -
+            (this.#scrollSize + this.#contentViewportSize)
         } else {
           shiftValue = currentSection.position - previousSection.position
         }
@@ -535,49 +547,69 @@ export class ScrollElement extends CustomElement {
   }
 
   #resizeListener = () => {
-    const prevProgress = this.currentScrollValue / this.#scrollSize
+    const prevProgress = this.targetScrollValue / this.#scrollSize
 
     this.#position = this.vertical
       ? getCumulativeOffsetTop(this)
       : getCumulativeOffsetLeft(this)
 
     this.#contentPosition = this.vertical
-      ? getCumulativeOffsetTop(this.#contentElement)
-      : getCumulativeOffsetLeft(this.#contentElement)
+      ? getCumulativeOffsetTop(this.#contentElement, this)
+      : getCumulativeOffsetLeft(this.#contentElement, this)
 
-    this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
+    this.#scrollViewportSize = this.vertical
+      ? this.offsetHeight
+      : this.offsetWidth
+
+    this.#contentViewportSize = this.vertical
+      ? this.#contentElement.offsetHeight
+      : this.#contentElement.offsetWidth
 
     if (this.#pagesAttribute.current) {
-      this.#scrollSize = this.#viewportSize * this.#pagesAttribute.current
-      const contentSize = this.#scrollSize + this.#viewportSize
+      this.#scrollSize =
+        this.#contentViewportSize * this.#pagesAttribute.current
+      const contentViewportSize = this.#scrollSize + this.#contentViewportSize
 
       if (this.vertical) {
-        this.#contentElement.style.width = contentSize + 'px'
+        this.#contentElement.style.width = contentViewportSize + 'px'
         this.#contentElement.style.height = '100%'
       } else {
-        this.#contentElement.style.height = contentSize + 'px'
+        this.#contentElement.style.height = contentViewportSize + 'px'
         this.#contentElement.style.width = '100%'
       }
     } else {
-      if (this.vertical) {
-        this.#contentElement.style.width = '100%'
-        this.#contentElement.style.height = 'max-content'
-        this.#scrollSize =
-          this.#contentElement.offsetHeight - this.#viewportSize
+      this.#contentElement.style.height = '100%'
+      this.#contentElement.style.width = '100%'
+
+      const children =
+        this.#slotElement.assignedElements() as Array<HTMLElement>
+      const lastChild = children[children.length - 1]
+
+      if (lastChild) {
+        if (this.vertical) {
+          this.#distance =
+            getCumulativeOffsetTop(lastChild, this) +
+            lastChild.offsetHeight +
+            parseFloat(getComputedStyle(lastChild).marginBottom)
+        } else {
+          this.#distance =
+            getCumulativeOffsetLeft(lastChild, this) +
+            lastChild.offsetWidth +
+            parseFloat(getComputedStyle(lastChild).marginRight)
+        }
       } else {
-        this.#contentElement.style.width = 'max-content'
-        this.#contentElement.style.height = '100%'
-        this.#scrollSize = this.#contentElement.offsetWidth - this.#viewportSize
+        this.#scrollSize = 0
       }
     }
 
+    this.#scrollSize =
+      this.#distance - this.#contentViewportSize - this.#contentPosition
+
+    if (this.#infiniteAttribute.current) {
+      this.#distance -= this.#contentPosition
+    }
+
     if (!this.#infiniteAttribute.current) {
-      const cs = getComputedStyle(this)
-
-      this.#scrollSize += this.vertical
-        ? parseFloat(cs.paddingBlockStart) + parseFloat(cs.paddingBlockEnd)
-        : parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd)
-
       this.#damped.max.current = this.#scrollSize
     }
 
@@ -585,17 +617,6 @@ export class ScrollElement extends CustomElement {
       section.resize()
       section.transform()
     })
-
-    if (this.#infiniteAttribute.current && this.#sections.length) {
-      const lastSection = this.#sections[this.#sections.length - 1]
-      const lastSectionMax =
-        lastSection.position + lastSection.size - this.#viewportSize
-      const lastSectionMargin = this.#scrollSize - lastSectionMax
-      this.#distance =
-        lastSection.position + lastSection.size + lastSectionMargin
-    } else {
-      this.#distance = this.#scrollSize
-    }
 
     if (this.#sectionalAttribute.current && this.#sections.length) {
       const section = this.#sections[this.#counter.current]
@@ -606,10 +627,6 @@ export class ScrollElement extends CustomElement {
   }
 
   #animatedChangeListener = () => {
-    const currentScrollValue = this.currentScrollValue
-
-    this.#overscroll = Math.max(0, currentScrollValue - this.#scrollSize)
-
     if (this.#sections.length) {
       let counter = 0
 
@@ -618,10 +635,7 @@ export class ScrollElement extends CustomElement {
 
         section.transform()
 
-        if (
-          this.targetScrollValue + this.viewportSize / 2 >=
-          section.position
-        ) {
+        if (this.targetScrollValue >= section.position) {
           counter = index
         }
       }
@@ -630,16 +644,20 @@ export class ScrollElement extends CustomElement {
     } else {
       if (this.vertical) {
         this.#contentElement.style.transform = `translate3d(0px, ${
-          currentScrollValue * -1
+          this.currentScrollValue * -1
         }px, 0px)`
       } else {
         this.#contentElement.style.transform = `translate3d(${
-          currentScrollValue * -1
+          this.currentScrollValue * -1
         }px, 0px, 0px)`
       }
     }
 
-    scrollEntries.update(this, this.#axisAttribute.current, currentScrollValue)
+    scrollEntries.update(
+      this,
+      this.#axisAttribute.current,
+      this.currentScrollValue
+    )
   }
 
   #setCounter(value: number) {
@@ -662,7 +680,7 @@ export class ScrollElement extends CustomElement {
         if (this.#sections.length) {
           this.shiftSections(direction)
         } else {
-          this.#damped.shift(direction * this.#viewportSize)
+          this.#damped.shift(direction * this.#contentViewportSize)
         }
       } else {
         this.#damped.shift(value)
@@ -676,8 +694,16 @@ export class ScrollElement extends CustomElement {
 
   #getScrollValue(type: 'target' | 'current' = 'current') {
     if (this.#infiniteAttribute.current && this.#sections.length) {
-      const mod = this.#damped[type] % (this.#scrollSize + this.#viewportSize)
-      const value = mod < 0 ? this.#scrollSize + mod + this.#viewportSize : mod
+      const mod = this.#damped[type] % this.#distance
+
+      const value =
+        mod < 0
+          ? this.#scrollSize + mod + this.#contentViewportSize
+          : mod - 0.001
+
+      this.#overscroll = Math.max(0, value - this.#scrollSize)
+
+      console.log(this.#overscroll)
 
       return value
     } else {

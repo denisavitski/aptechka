@@ -283,20 +283,20 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/node": "^20.11.5",
-    "@types/three": "^0.160.0",
-    "vite": "^5.0.12",
+    "@types/node": "^20.11.17",
+    "@types/three": "^0.161.2",
+    "vite": "5.1.1",
     "vite-plugin-dts": "^3.7.2",
-    "vite-plugin-html-components": "^0.1.2"
+    "vite-plugin-html-components": "^0.1.3"
   },
   "dependencies": {
-    "detect-gpu": "^5.0.37",
-    "three": "^0.160.1",
+    "detect-gpu": "^5.0.38",
+    "three": "^0.161.0",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.37",
-    "three": "^0.160.1",
+    "three": "^0.161.0",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

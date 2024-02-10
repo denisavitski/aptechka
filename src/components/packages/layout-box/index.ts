@@ -57,6 +57,7 @@ export interface LayoutBoxOptions {
   sizeStep?: boolean
   positionStep?: boolean
   culling?: boolean
+  transformStep?: boolean
 }
 
 export interface LayoutBoxScrollStepCallbackReturn {
@@ -89,6 +90,7 @@ export class LayoutBox {
   #isCartesian = false
   #isSizeStep = true
   #isPositionStep = true
+  #isTransformStep = true
 
   #width = 0
   #height = 0
@@ -124,6 +126,8 @@ export class LayoutBox {
         options?.sizeStep !== undefined ? options.sizeStep : true
       this.#isPositionStep =
         options?.positionStep !== undefined ? options.positionStep : true
+      this.#isTransformStep =
+        options?.transformStep !== undefined ? options.transformStep : true
 
       this.#scale.setStep('_size', '+', {
         x: 1,
@@ -298,23 +302,43 @@ export class LayoutBox {
       z: zPosition,
     })
 
-    this.#scale.setStep('_scale', '*', {
-      x: this.#CSSScale.x,
-      y: this.#CSSScale.y,
-      z: this.#CSSScale.z,
-    })
+    if (this.#isTransformStep) {
+      this.#scale.setStep('_scale', '*', {
+        x: this.#CSSScale.x,
+        y: this.#CSSScale.y,
+        z: this.#CSSScale.z,
+      })
 
-    this.#position.setStep('_translation', '+', {
-      x: this.#CSSTranslation.x,
-      y: this.#CSSTranslation.y,
-      z: this.#CSSTranslation.z,
-    })
+      this.#position.setStep('_translation', '+', {
+        x: this.#CSSTranslation.x,
+        y: this.#CSSTranslation.y,
+        z: this.#CSSTranslation.z,
+      })
 
-    this.#rotation.setStep('_rotation', '+', {
-      x: this.#CSSRotation.x,
-      y: this.#CSSRotation.y,
-      z: this.#CSSRotation.z,
-    })
+      this.#rotation.setStep('_rotation', '+', {
+        x: this.#CSSRotation.x,
+        y: this.#CSSRotation.y,
+        z: this.#CSSRotation.z,
+      })
+    } else {
+      this.#scale.setStep('_scale', '*', {
+        x: 1,
+        y: 1,
+        z: 1,
+      })
+
+      this.#position.setStep('_translation', '+', {
+        x: 0,
+        y: 0,
+        z: 0,
+      })
+
+      this.#rotation.setStep('_rotation', '+', {
+        x: 0,
+        y: 0,
+        z: 0,
+      })
+    }
   }
 
   #updateDimensions() {
