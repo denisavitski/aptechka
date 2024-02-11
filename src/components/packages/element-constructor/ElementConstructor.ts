@@ -92,6 +92,9 @@ export type ElementConstructorCreatedCallback<
   TagName extends ElementConstructorTagNames
 > = (element: ElementConstructorTagNameMap[TagName]) => void
 
+export type ElementConstructorRef<TagName extends ElementConstructorTagNames> =
+  { current: ElementConstructorTagNameMap[TagName] }
+
 export type ElementConstructorTagObject<
   TagName extends ElementConstructorTagNames
 > = {
@@ -105,7 +108,9 @@ export type ElementConstructorTagObject<
   shadowChildren?: any
   parent?: ElementConstructorParent
   svg?: boolean
-  created?: ElementConstructorCreatedCallback<TagName>
+  created?:
+    | ElementConstructorCreatedCallback<TagName>
+    | ElementConstructorRef<TagName>
 }
 
 export type ElementConstructorObject =
@@ -210,7 +215,11 @@ export class ElementConstructor<
     }
 
     if (properties?.created) {
-      properties.created(element)
+      if (typeof properties?.created === 'function') {
+        properties.created(element)
+      } else {
+        properties.created.current = element
+      }
     }
   }
 

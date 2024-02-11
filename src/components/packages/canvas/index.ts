@@ -25,7 +25,7 @@ export interface Canvas2DRenderEntry {
   width: number
   height: number
   element: HTMLElement
-  canvasElement: HTMLElement
+  canvasElement: HTMLCanvasElement
   context: CanvasRenderingContext2D
   timestamp: number
   elapsed: number
