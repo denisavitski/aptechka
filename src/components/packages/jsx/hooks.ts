@@ -1,6 +1,7 @@
 import { windowResizer, WindowResizerCallback } from '@packages/window-resizer'
 import {
-  ConnectCallback,
+  ComponentCustomElementConnectCallback,
+  ComponentCustomElementCreateCallback,
   currentComponentElement,
 } from './ComponentCustomElement'
 import {
@@ -11,6 +12,7 @@ import {
   createStylesheet,
   ElementConstructorJSS,
   ElementConstructorRef,
+  style,
 } from '@packages/element-constructor'
 import { ElementOrSelector } from '@packages/utils'
 import { intersector, IntersectorCallback } from '@packages/intersector'
@@ -29,12 +31,16 @@ function getTargetElement(
     : componentElement
 }
 
-export function useConnect(callback: ConnectCallback) {
+export function useConnect(callback: ComponentCustomElementConnectCallback) {
   currentComponentElement.connectCallbacks.add(callback)
 }
 
-export function useDisconnect(callback: ConnectCallback) {
+export function useDisconnect(callback: ComponentCustomElementConnectCallback) {
   currentComponentElement.disconnectCallbacks.add(callback)
+}
+
+export function useCreate(callback: ComponentCustomElementCreateCallback) {
+  currentComponentElement.createCallbacks.add(callback)
 }
 
 export function useWindowResize(
@@ -84,9 +90,25 @@ export function useAnimationFrame(
 }
 
 export function useStylesheet(object?: ElementConstructorJSS | undefined) {
-  useConnect((e) => {
+  useCreate((e) => {
     if (e.shadowRoot) {
       e.shadowRoot.adoptedStyleSheets.push(createStylesheet(object))
+    }
+  })
+
+  useConnect((e) => {
+    if (!e.shadowRoot) {
+      const styleElement = style(object).rootElements[0]
+
+      const styleTags = [...document.head.querySelectorAll('style')]
+
+      if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
+        document.head.appendChild(styleElement)
+
+        return () => {
+          styleElement.remove()
+        }
+      }
     }
   })
 }

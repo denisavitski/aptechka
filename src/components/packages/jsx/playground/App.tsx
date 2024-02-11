@@ -1,8 +1,13 @@
 import { Store } from '@packages/store'
+import { useCreate, useStylesheet } from '../hooks'
 
 function Component() {
+  useCreate(() => {
+    console.log('A')
+  })
+
   return (
-    <component shadow>
+    <component>
       <h1>123</h1>
     </component>
   )
@@ -15,8 +20,26 @@ export function App() {
     store.current++
   })
 
+  useStylesheet({
+    'component-app': {
+      color: 'red',
+    },
+  })
+
+  useStylesheet({
+    'component-app': {
+      color: 'red',
+    },
+  })
+
+  useStylesheet({
+    'component-app': {
+      color: 'red',
+    },
+  })
+
   return (
-    <component shadow>
+    <component>
       <Component></Component>
     </component>
   )

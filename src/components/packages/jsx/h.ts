@@ -6,7 +6,7 @@ import {
 
 import {
   ComponentCustomElement,
-  ConnectCallback,
+  ComponentCustomElementCreateCallback,
 } from './ComponentCustomElement'
 
 type HConstructorObject =
@@ -34,7 +34,7 @@ export function h(
 
     if (!CustomElement) {
       CustomElement = class extends ComponentCustomElement {
-        constructor(callback: ConnectCallback) {
+        constructor(callback: ComponentCustomElementCreateCallback) {
           super(callback)
         }
       }
@@ -44,8 +44,6 @@ export function h(
 
     return new CustomElement((e) => {
       const res = tag({ ...attrs, children })
-
-      console.log(componentConstructorObject)
 
       if (!componentConstructorObject && res) {
         e.appendChild(res)
