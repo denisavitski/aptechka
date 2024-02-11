@@ -9,41 +9,47 @@ export type ComponentWrapperDisconnectCallback = (element: HTMLElement) => void
 export let currentComponentWrapper = null! as ComponentWrapper
 
 export class ComponentWrapper {
-  #element: HTMLElement
+  #elementOrFragment: HTMLElement | DocumentFragment
+  #firstElement: HTMLElement
+
   #createCallbacks: Set<ComponentWrapperCreateCallback> = new Set()
   #connectCallbacks: Set<ComponentWrapperConnectCallback> = new Set()
   #disconnectCallbacks: Set<ComponentWrapperDisconnectCallback> = new Set()
 
   #resizeObserver: ResizeObserver = null!
-
   #isConnected = false
 
-  constructor(element: () => HTMLElement) {
+  constructor(elementCallback: () => HTMLElement | DocumentFragment) {
     currentComponentWrapper = this
 
-    this.#element = element()
+    this.#elementOrFragment = elementCallback()
+
+    this.#firstElement =
+      this.#elementOrFragment instanceof DocumentFragment
+        ? (this.#elementOrFragment.firstElementChild as HTMLElement)
+        : this.#elementOrFragment
 
     this.#createCallbacks.forEach((callback) => {
-      callback(this.#element)
+      callback(this.#firstElement)
     })
 
     if (isBrowser) {
       this.#resizeObserver = new ResizeObserver(() => {
-        if (!this.#isConnected && this.#element.isConnected) {
+        if (!this.#isConnected && this.#firstElement.isConnected) {
           this.#isConnected = true
 
           this.#connectCallbacks.forEach((callback) => {
-            const disconnect = callback(this.#element)
+            const disconnect = callback(this.#firstElement)
 
             if (disconnect) {
               this.addDisconnectCallback(disconnect)
             }
           })
-        } else if (this.#isConnected && !this.#element.isConnected) {
+        } else if (this.#isConnected && !this.#firstElement.isConnected) {
           this.#isConnected = false
 
           this.#disconnectCallbacks.forEach((callback) => {
-            callback(this.#element)
+            callback(this.#firstElement)
           })
 
           this.#resizeObserver.disconnect()
@@ -55,12 +61,16 @@ export class ComponentWrapper {
         }
       })
 
-      this.#resizeObserver.observe(this.#element)
+      this.#resizeObserver.observe(this.#firstElement)
     }
   }
 
-  public get element() {
-    return this.#element
+  public get firstElement() {
+    return this.#firstElement
+  }
+
+  public get elementOrFragment() {
+    return this.#elementOrFragment
   }
 
   public addCreateCallback(callback: ComponentWrapperCreateCallback) {

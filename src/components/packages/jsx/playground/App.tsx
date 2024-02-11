@@ -1,10 +1,5 @@
 import { Store } from '@packages/store'
-import {
-  useConnect,
-  useCreate,
-  useDisconnect,
-  useElementResize,
-} from '../hooks'
+import { useConnect, useCreate, useDisconnect, useStyle } from '../hooks'
 
 function Component() {
   useCreate(() => {
@@ -23,11 +18,21 @@ function Component() {
     console.log('useDisconnect')
   })
 
-  useElementResize((e) => {
-    console.log(e)
+  useStyle({
+    div: {
+      width: '100px',
+      height: '100px',
+      backgroundColor: 'red',
+    },
   })
 
-  return <h1>123</h1>
+  return (
+    <>
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </>
+  )
 }
 
 export function App() {
@@ -41,5 +46,5 @@ export function App() {
     }
   })
 
-  return <div>{store}</div>
+  return <section>{store}</section>
 }

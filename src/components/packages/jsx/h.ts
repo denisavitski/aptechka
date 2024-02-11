@@ -20,7 +20,7 @@ export function h(
       (tag as Function)({ ...attrs, children })
     )
 
-    return wrapper.element
+    return wrapper.elementOrFragment
   }
 
   const constructorObject: ElementConstructorTagObject = {
