@@ -1,34 +1,23 @@
-import { useConnect } from '../hooks'
+import { Store } from '@packages/store'
 
-export const Component1: JSX.Component = () => {
-  useConnect((e) => {
-    console.log(e)
-  })
-
-  useConnect((e) => {
-    console.log(e)
-  })
-
-  useConnect((e) => {
-    console.log(e)
-  })
-
+function Component() {
   return (
-    <>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <div></div>
-      <div></div>
-      <div></div>
-    </>
+    <component shadow>
+      <h1>123</h1>
+    </component>
   )
 }
 
-Component1.shadow = true
-
 export function App() {
-  return <Component1></Component1>
-}
+  const store = new Store<any>(1)
 
-App.shadow = true
+  addEventListener('click', () => {
+    store.current++
+  })
+
+  return (
+    <component shadow>
+      <Component></Component>
+    </component>
+  )
+}

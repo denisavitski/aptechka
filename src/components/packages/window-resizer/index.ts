@@ -1,7 +1,7 @@
 import { Notifier } from '@packages/notifier'
 import { debounce, isBrowser } from '@packages/utils'
 
-export type windowResizerCallback = () => void
+export type WindowResizerCallback = () => void
 
 export const dispatchWindowResizeEvent = debounce((cause?: any) => {
   if (cause) {
@@ -17,7 +17,7 @@ export const dispatchWindowResizeEvent = debounce((cause?: any) => {
   }
 }, 0)
 
-export class WindowResizer extends Notifier<windowResizerCallback> {
+export class WindowResizer extends Notifier<WindowResizerCallback> {
   #isResizeScheduled = false
 
   constructor() {
@@ -29,7 +29,7 @@ export class WindowResizer extends Notifier<windowResizerCallback> {
     }
   }
 
-  public override subscribe(callback: windowResizerCallback, order?: number) {
+  public override subscribe(callback: WindowResizerCallback, order?: number) {
     const unsub = super.subscribe(callback, order)
 
     if (!this.#isResizeScheduled) {

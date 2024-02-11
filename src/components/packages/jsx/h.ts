@@ -1,16 +1,20 @@
 import {
   ElementConstructor,
-  ElementConstructorAttributes,
-  ElementConstructorClass,
-  ElementConstructorEvents,
-  ElementConstructorRef,
-  ElementConstructorStyle,
+  ElementConstructorTagNames,
+  ElementConstructorTagObject,
 } from '@packages/element-constructor'
 
 import {
   ComponentCustomElement,
   ConnectCallback,
 } from './ComponentCustomElement'
+
+type HConstructorObject =
+  ElementConstructorTagObject<ElementConstructorTagNames> & {
+    shadow?: boolean
+  }
+
+let componentConstructorObject: HConstructorObject | undefined
 
 export function h(
   tag: string | JSX.Component,
@@ -41,54 +45,63 @@ export function h(
     return new CustomElement((e) => {
       const res = tag({ ...attrs, children })
 
-      if (tag.shadow) {
-        e.attachShadow({ mode: 'open' })
+      console.log(componentConstructorObject)
+
+      if (!componentConstructorObject && res) {
+        e.appendChild(res)
+      } else if (componentConstructorObject) {
+        if (componentConstructorObject.shadow) {
+          e.attachShadow({ mode: 'open' })
+        }
+
+        new ElementConstructor(e, componentConstructorObject)
       }
 
-      if (res) {
-        if (tag.shadow) {
-          e.shadowRoot!.appendChild(res)
-        } else {
-          e.appendChild(res)
-        }
-      }
+      componentConstructorObject = undefined
     })
   }
 
-  const attributes: ElementConstructorAttributes<any> = {}
-  let style: ElementConstructorStyle = {}
-  let className: ElementConstructorClass | undefined
-  let ref: ElementConstructorRef<any> | undefined
-  const events: ElementConstructorEvents = {}
+  const constructorObject: HConstructorObject = {
+    shadowChildren: children,
+  }
 
   if (attrs) {
     for (const name of Object.keys(attrs)) {
       const value = attrs[name]
 
       if (name.startsWith('on')) {
-        events[name.split('on')[1].toLowerCase() as any] = value
+        if (!constructorObject.events) {
+          constructorObject.events = {}
+        }
+
+        constructorObject.events![name.split('on')[1].toLowerCase() as any] =
+          value
       } else if (name === 'class') {
-        className = value
+        constructorObject.class = value
       } else if (name === 'style') {
-        style = value
+        constructorObject.style = value
       } else if (name === 'ref') {
-        ref = value
+        constructorObject.created = value
+      } else if (name === 'shadow') {
+        constructorObject.shadow = true
       } else {
-        attributes[name] = value
+        if (!constructorObject.attributes) {
+          constructorObject.attributes = {}
+        }
+
+        ;(constructorObject.attributes as any)[name] = value
       }
     }
   }
 
-  return new ElementConstructor({
-    [tag as 'div']: {
-      style,
-      events,
-      attributes,
-      class: className,
-      shadowChildren: children,
-      created: ref,
-    },
-  }).rootElements[0]
+  if (tag === 'component') {
+    componentConstructorObject = constructorObject
+    return Fragment({ children })
+  } else {
+    return new ElementConstructor({
+      [tag as ElementConstructorTagNames]: constructorObject,
+    }).rootElements[0]
+  }
 }
 
 export function Fragment({ children }: { children: JSX.ComponentChild[] }) {

@@ -10,10 +10,6 @@ import type { Split } from '@packages/utils'
 type StoreOr<T> = T | Store<T | null | undefined>
 
 declare global {
-  interface Function {
-    shadow?: boolean
-  }
-
   namespace JSX {
     export type ComponentChild =
       | ComponentChild[]
@@ -37,7 +33,7 @@ declare global {
       props?: BaseProps & TProps
     ) => JSX.Element
 
-    type Element = HTMLElement | SVGElement | void | null | undefined
+    type Element = Node | void | null | undefined
 
     interface ElementAttributesProperty {
       props: any
@@ -209,6 +205,8 @@ declare global {
       itemType?: StoreOr<string>
       itemID?: StoreOr<string>
       itemRef?: StoreOr<string>
+
+      shadow?: boolean
     }
 
     type UnknownAttributes = {
@@ -216,7 +214,7 @@ declare global {
     }
 
     type IntrinsicElementsHTML = {
-      [TKey in ElementConstructorTagNames]?: UnknownAttributes &
+      [TKey in ElementConstructorTagNames | 'component']?: UnknownAttributes &
         HTMLAttributes &
         HTMLOrSVGEvents
     }
