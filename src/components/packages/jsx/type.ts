@@ -12,13 +12,14 @@ type StoreOr<T> = T | Store<T | null | undefined>
 declare global {
   namespace JSX {
     export type ComponentChild =
+      | Node
       | ComponentChild[]
-      | JSX.Element
       | string
       | number
       | boolean
       | undefined
       | null
+      | void
 
     export type ComponentChildren =
       | ComponentChild
@@ -33,7 +34,7 @@ declare global {
       props?: BaseProps & TProps
     ) => JSX.Element
 
-    type Element = Node | void | null | undefined
+    type Element = ComponentChildren
 
     interface ElementAttributesProperty {
       props: any

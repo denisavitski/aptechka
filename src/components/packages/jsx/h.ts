@@ -16,11 +16,11 @@ export function h(
       return tag({ ...attrs, children })
     }
 
-    const wrapper = new ComponentWrapper(() =>
+    const wrapper = new ComponentWrapper(tag.name, () =>
       (tag as Function)({ ...attrs, children })
     )
 
-    return wrapper.elementOrFragment
+    return wrapper.rootNode
   }
 
   const constructorObject: ElementConstructorTagObject = {

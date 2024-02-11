@@ -1,76 +1,85 @@
-import { isBrowser } from '@packages/utils'
+import { connector } from '@packages/connector'
+import { div } from '@packages/element-constructor'
+import { camelToKebab, isBrowser } from '@packages/utils'
 
-export type ComponentWrapperCreateCallback = (element: HTMLElement) => void
+export type ComponentWrapperCreateCallback = (rootNode: Node) => void
 export type ComponentWrapperConnectCallback = (
-  element: HTMLElement
+  rootNode: Node
 ) => (() => void) | void
-export type ComponentWrapperDisconnectCallback = (element: HTMLElement) => void
+export type ComponentWrapperDisconnectCallback = (rootNode: Node) => void
 
 export let currentComponentWrapper = null! as ComponentWrapper
 
 export class ComponentWrapper {
-  #elementOrFragment: HTMLElement | DocumentFragment
-  #firstElement: HTMLElement
+  #functionName: string
+  #rootNode: Node
 
   #createCallbacks: Set<ComponentWrapperCreateCallback> = new Set()
   #connectCallbacks: Set<ComponentWrapperConnectCallback> = new Set()
   #disconnectCallbacks: Set<ComponentWrapperDisconnectCallback> = new Set()
 
-  #resizeObserver: ResizeObserver = null!
-  #isConnected = false
-
-  constructor(elementCallback: () => HTMLElement | DocumentFragment) {
+  constructor(functionName: string, jsxElementCallback: () => JSX.Element) {
     currentComponentWrapper = this
 
-    this.#elementOrFragment = elementCallback()
+    this.#functionName = functionName
 
-    this.#firstElement =
-      this.#elementOrFragment instanceof DocumentFragment
-        ? (this.#elementOrFragment.firstElementChild as HTMLElement)
-        : this.#elementOrFragment
+    const jsxElement = jsxElementCallback()
+
+    if (
+      !(jsxElement instanceof Node) ||
+      jsxElement instanceof DocumentFragment
+    ) {
+      if (jsxElement == undefined) {
+        this.#rootNode = document.createComment(
+          camelToKebab(this.#functionName)
+        )
+      } else if (typeof jsxElement === 'object') {
+        this.#rootNode = div({
+          style: {
+            display: 'contents',
+          },
+          children: jsxElement,
+        }).rootElements[0]
+      } else {
+        this.#rootNode = document.createTextNode(jsxElement.toString())
+      }
+    } else {
+      this.#rootNode = jsxElement
+    }
 
     this.#createCallbacks.forEach((callback) => {
-      callback(this.#firstElement)
+      callback(this.#rootNode)
     })
 
     if (isBrowser) {
-      this.#resizeObserver = new ResizeObserver(() => {
-        if (!this.#isConnected && this.#firstElement.isConnected) {
-          this.#isConnected = true
-
+      const unsubscribe = connector.subscribe(this.#rootNode, {
+        connectCallback: () => {
           this.#connectCallbacks.forEach((callback) => {
-            const disconnect = callback(this.#firstElement)
+            const disconnect = callback(this.#rootNode)
 
             if (disconnect) {
               this.addDisconnectCallback(disconnect)
             }
           })
-        } else if (this.#isConnected && !this.#firstElement.isConnected) {
-          this.#isConnected = false
-
+        },
+        disconnectCallback: () => {
           this.#disconnectCallbacks.forEach((callback) => {
-            callback(this.#firstElement)
+            callback(this.#rootNode)
           })
 
-          this.#resizeObserver.disconnect()
           this.#connectCallbacks.clear()
           this.#disconnectCallbacks.clear()
           this.#createCallbacks.clear()
 
-          currentComponentWrapper = null!
-        }
+          unsubscribe()
+        },
+        maxWaitSec: 20,
       })
-
-      this.#resizeObserver.observe(this.#firstElement)
     }
   }
 
-  public get firstElement() {
-    return this.#firstElement
-  }
-
-  public get elementOrFragment() {
-    return this.#elementOrFragment
+  public get rootNode() {
+    return this.#rootNode
   }
 
   public addCreateCallback(callback: ComponentWrapperCreateCallback) {

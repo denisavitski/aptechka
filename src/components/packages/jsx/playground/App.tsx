@@ -25,7 +25,9 @@ function Component2() {
   )
 }
 
-function Component() {
+function Component1() {
+  const store = new Store(0)
+
   useCreate(() => {
     console.log('1 useCreate')
   })
@@ -42,26 +44,23 @@ function Component() {
     console.log('1 useDisconnect')
   })
 
-  return (
-    <>
-      <div>1</div>
-      <div>2</div>
-      <div>3</div>
-      <Component2></Component2>
-    </>
-  )
+  return 'RJV'
 }
 
 export function App() {
-  const store = new Store<any>(null)
-
-  addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-      store.current = <Component></Component>
-    } else if (e.key === '2') {
-      store.current = null
-    }
+  useConnect((e) => {
+    console.log('APP Connect')
   })
 
-  return <section>{store}</section>
+  useDisconnect(() => {
+    console.log('APP Disconnect')
+  })
+
+  return (
+    <>
+      <Component1></Component1>
+      <Component1></Component1>
+      <Component1></Component1>
+    </>
+  )
 }

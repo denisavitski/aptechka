@@ -5,9 +5,10 @@ export function render(
   App: JSX.Component
 ) {
   const element = getElement(elementOrSelector)
+
   const jsxElement = <App></App>
 
-  if (element && jsxElement) {
+  if (element && jsxElement instanceof Node) {
     element.appendChild(jsxElement)
   }
 }
