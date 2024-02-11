@@ -13,7 +13,7 @@ import {
   ElementConstructorRef,
   style,
 } from '@packages/element-constructor'
-import { ElementOrSelector } from '@packages/utils'
+import { ElementOrSelector, isBrowser } from '@packages/utils'
 import { intersector, IntersectorCallback } from '@packages/intersector'
 import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 
@@ -35,11 +35,15 @@ export function useCreate(callback: ComponentWrapperCreateCallback) {
 }
 
 export function useConnect(callback: ComponentWrapperConnectCallback) {
-  currentComponentWrapper.addConnectCallback(callback)
+  if (isBrowser) {
+    currentComponentWrapper.addConnectCallback(callback)
+  }
 }
 
 export function useDisconnect(callback: ComponentWrapperConnectCallback) {
-  currentComponentWrapper.addDisconnectCallback(callback)
+  if (isBrowser) {
+    currentComponentWrapper.addDisconnectCallback(callback)
+  }
 }
 
 export function useWindowResize(

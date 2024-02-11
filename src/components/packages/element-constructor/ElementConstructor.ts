@@ -88,7 +88,7 @@ export type ElementConstructorAttributes<T extends ElementConstructorTagNames> =
 
 export type ElementConstructorParent = Node | ElementConstructor
 
-export type ElementConstructorCreatedCallback<
+export type ElementConstructorRefCallback<
   TagName extends ElementConstructorTagNames
 > = (element: ElementConstructorTagNameMap[TagName]) => void
 
@@ -108,9 +108,7 @@ export type ElementConstructorTagObject<
   shadowChildren?: any
   parent?: ElementConstructorParent
   svg?: boolean
-  created?:
-    | ElementConstructorCreatedCallback<TagName>
-    | ElementConstructorRef<TagName>
+  ref?: ElementConstructorRefCallback<TagName> | ElementConstructorRef<TagName>
 }
 
 export type ElementConstructorObject =
@@ -214,11 +212,11 @@ export class ElementConstructor<
       }
     }
 
-    if (properties?.created) {
-      if (typeof properties?.created === 'function') {
-        properties.created(element)
+    if (properties?.ref) {
+      if (typeof properties?.ref === 'function') {
+        properties.ref(element)
       } else {
-        properties.created.current = element
+        properties.ref.current = element
       }
     }
   }

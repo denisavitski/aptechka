@@ -104,7 +104,7 @@ export class SelectElement extends CustomElement {
               class: 'body-inner',
               children: slot(),
             }),
-            created: (e) => {
+            ref: (e) => {
               this.#bodyElement = e
             },
           }),

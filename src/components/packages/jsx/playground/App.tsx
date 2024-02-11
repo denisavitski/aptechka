@@ -1,29 +1,45 @@
 import { Store } from '@packages/store'
-import { useConnect, useCreate, useDisconnect, useStyle } from '../hooks'
+import { useConnect, useCreate, useDisconnect } from '../hooks'
 
-function Component() {
+function Component2() {
   useCreate(() => {
-    console.log('useCreate')
+    console.log('2 useCreate')
   })
 
   useConnect(() => {
-    console.log('useConnect')
+    console.log('2 useConnect')
 
     return () => {
-      console.log('useConnect return')
+      console.log('2 useConnect return')
     }
   })
 
   useDisconnect(() => {
-    console.log('useDisconnect')
+    console.log('2 useDisconnect')
   })
 
-  useStyle({
-    div: {
-      width: '100px',
-      height: '100px',
-      backgroundColor: 'red',
-    },
+  return (
+    <>
+      <div>Component 2</div>
+    </>
+  )
+}
+
+function Component() {
+  useCreate(() => {
+    console.log('1 useCreate')
+  })
+
+  useConnect(() => {
+    console.log('1 useConnect')
+
+    return () => {
+      console.log('1 useConnect return')
+    }
+  })
+
+  useDisconnect(() => {
+    console.log('1 useDisconnect')
   })
 
   return (
@@ -31,6 +47,7 @@ function Component() {
       <div>1</div>
       <div>2</div>
       <div>3</div>
+      <Component2></Component2>
     </>
   )
 }

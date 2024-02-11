@@ -54,7 +54,7 @@ export class CanvasElement extends CustomElement {
 
     element(this, {
       shadowChildren: canvas({
-        created: (e) => {
+        ref: (e) => {
           this.#canvasElement = e
           this.#context = e.getContext('2d')!
         },

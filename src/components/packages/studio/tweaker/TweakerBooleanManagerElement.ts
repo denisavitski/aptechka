@@ -43,7 +43,7 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
               this.store.current = (e.currentTarget as HTMLInputElement).checked
             },
           },
-          created: (e) => {
+          ref: (e) => {
             this.store.subscribe((d) => {
               e.checked = d.current
             })

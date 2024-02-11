@@ -124,7 +124,7 @@ export class TweakerFolderElement extends AccordionElement {
               children: div({
                 class: 'body-content',
                 children: this.#content,
-                created: (e) =>
+                ref: (e) =>
                   (this.#contentWrapperElement =
                     e.firstElementChild as HTMLElement),
               }),

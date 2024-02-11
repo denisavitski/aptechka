@@ -149,7 +149,7 @@ export class ModalElement extends PopoverElement {
               slot(),
             ],
           }),
-          created: (e) => (this.#innerElement = e),
+          ref: (e) => (this.#innerElement = e),
         }),
       })
 

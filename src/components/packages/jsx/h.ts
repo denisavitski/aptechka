@@ -43,7 +43,7 @@ export function h(
       } else if (name === 'style') {
         constructorObject.style = value
       } else if (name === 'ref') {
-        constructorObject.created = value
+        constructorObject.ref = value
       } else {
         if (!constructorObject.attributes) {
           constructorObject.attributes = {}

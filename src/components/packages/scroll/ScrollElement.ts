@@ -212,13 +212,13 @@ export class ScrollElement extends CustomElement {
           }),
           div({
             class: 'content',
-            children: [slot({ created: (e) => (this.#slotElement = e) })],
+            children: [slot({ ref: (e) => (this.#slotElement = e) })],
             style: {
               flexDirection: new Derived(this.#axisAttribute, (e) =>
                 e === 'x' ? 'row' : 'column'
               ),
             },
-            created: (e) => (this.#contentElement = e),
+            ref: (e) => (this.#contentElement = e),
           }),
         ],
       })
