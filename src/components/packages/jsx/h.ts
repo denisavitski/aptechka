@@ -4,17 +4,7 @@ import {
   ElementConstructorTagObject,
 } from '@packages/element-constructor'
 
-import {
-  ComponentCustomElement,
-  ComponentCustomElementCreateCallback,
-} from './ComponentCustomElement'
-
-type HConstructorObject =
-  ElementConstructorTagObject<ElementConstructorTagNames> & {
-    shadow?: boolean
-  }
-
-let componentConstructorObject: HConstructorObject | undefined
+import { ComponentWrapper } from './ComponentWrapper'
 
 export function h(
   tag: string | JSX.Component,
@@ -26,40 +16,14 @@ export function h(
       return tag({ ...attrs, children })
     }
 
-    const customName = `component-${tag.name.toLowerCase()}`
+    const wrapper = new ComponentWrapper(() =>
+      (tag as Function)({ ...attrs, children })
+    )
 
-    let CustomElement = customElements.get(
-      customName
-    ) as typeof ComponentCustomElement
-
-    if (!CustomElement) {
-      CustomElement = class extends ComponentCustomElement {
-        constructor(callback: ComponentCustomElementCreateCallback) {
-          super(callback)
-        }
-      }
-
-      customElements.define(customName, CustomElement)
-    }
-
-    return new CustomElement((e) => {
-      const res = tag({ ...attrs, children })
-
-      if (!componentConstructorObject && res) {
-        e.appendChild(res)
-      } else if (componentConstructorObject) {
-        if (componentConstructorObject.shadow) {
-          e.attachShadow({ mode: 'open' })
-        }
-
-        new ElementConstructor(e, componentConstructorObject)
-      }
-
-      componentConstructorObject = undefined
-    })
+    return wrapper.element
   }
 
-  const constructorObject: HConstructorObject = {
+  const constructorObject: ElementConstructorTagObject = {
     shadowChildren: children,
   }
 
@@ -80,8 +44,6 @@ export function h(
         constructorObject.style = value
       } else if (name === 'ref') {
         constructorObject.created = value
-      } else if (name === 'shadow') {
-        constructorObject.shadow = true
       } else {
         if (!constructorObject.attributes) {
           constructorObject.attributes = {}
@@ -92,14 +54,9 @@ export function h(
     }
   }
 
-  if (tag === 'component') {
-    componentConstructorObject = constructorObject
-    return Fragment({ children })
-  } else {
-    return new ElementConstructor({
-      [tag as ElementConstructorTagNames]: constructorObject,
-    }).rootElements[0]
-  }
+  return new ElementConstructor({
+    [tag as ElementConstructorTagNames]: constructorObject,
+  }).rootElements[0]
 }
 
 export function Fragment({ children }: { children: JSX.ComponentChild[] }) {

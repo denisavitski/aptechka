@@ -1,15 +1,14 @@
 import { windowResizer, WindowResizerCallback } from '@packages/window-resizer'
 import {
-  ComponentCustomElementConnectCallback,
-  ComponentCustomElementCreateCallback,
-  currentComponentElement,
-} from './ComponentCustomElement'
+  ComponentWrapperConnectCallback,
+  ComponentWrapperCreateCallback,
+  currentComponentWrapper,
+} from './ComponentWrapper'
 import {
   elementResizer,
   ElementResizerCallback,
 } from '@packages/element-resizer'
 import {
-  createStylesheet,
   ElementConstructorJSS,
   ElementConstructorRef,
   style,
@@ -31,16 +30,16 @@ function getTargetElement(
     : componentElement
 }
 
-export function useConnect(callback: ComponentCustomElementConnectCallback) {
-  currentComponentElement.connectCallbacks.add(callback)
+export function useCreate(callback: ComponentWrapperCreateCallback) {
+  currentComponentWrapper.addCreateCallback(callback)
 }
 
-export function useDisconnect(callback: ComponentCustomElementConnectCallback) {
-  currentComponentElement.disconnectCallbacks.add(callback)
+export function useConnect(callback: ComponentWrapperConnectCallback) {
+  currentComponentWrapper.addConnectCallback(callback)
 }
 
-export function useCreate(callback: ComponentCustomElementCreateCallback) {
-  currentComponentElement.createCallbacks.add(callback)
+export function useDisconnect(callback: ComponentWrapperConnectCallback) {
+  currentComponentWrapper.addDisconnectCallback(callback)
 }
 
 export function useWindowResize(
@@ -89,25 +88,17 @@ export function useAnimationFrame(
   })
 }
 
-export function useStylesheet(object?: ElementConstructorJSS | undefined) {
-  useCreate((e) => {
-    if (e.shadowRoot) {
-      e.shadowRoot.adoptedStyleSheets.push(createStylesheet(object))
-    }
-  })
+export function useStyle(object?: ElementConstructorJSS | undefined) {
+  useConnect(() => {
+    const styleElement = style(object).rootElements[0]
 
-  useConnect((e) => {
-    if (!e.shadowRoot) {
-      const styleElement = style(object).rootElements[0]
+    const styleTags = [...document.head.querySelectorAll('style')]
 
-      const styleTags = [...document.head.querySelectorAll('style')]
+    if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
+      document.head.appendChild(styleElement)
 
-      if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
-        document.head.appendChild(styleElement)
-
-        return () => {
-          styleElement.remove()
-        }
+      return () => {
+        styleElement.remove()
       }
     }
   })

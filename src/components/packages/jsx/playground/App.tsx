@@ -1,46 +1,45 @@
 import { Store } from '@packages/store'
-import { useCreate, useStylesheet } from '../hooks'
+import {
+  useConnect,
+  useCreate,
+  useDisconnect,
+  useElementResize,
+} from '../hooks'
 
 function Component() {
   useCreate(() => {
-    console.log('A')
+    console.log('useCreate')
   })
 
-  return (
-    <component>
-      <h1>123</h1>
-    </component>
-  )
+  useConnect(() => {
+    console.log('useConnect')
+
+    return () => {
+      console.log('useConnect return')
+    }
+  })
+
+  useDisconnect(() => {
+    console.log('useDisconnect')
+  })
+
+  useElementResize((e) => {
+    console.log(e)
+  })
+
+  return <h1>123</h1>
 }
 
 export function App() {
-  const store = new Store<any>(1)
+  const store = new Store<any>(null)
 
-  addEventListener('click', () => {
-    store.current++
+  addEventListener('keydown', (e) => {
+    if (e.key === '1') {
+      store.current = <Component></Component>
+    } else if (e.key === '2') {
+      store.current = null
+    }
   })
 
-  useStylesheet({
-    'component-app': {
-      color: 'red',
-    },
-  })
-
-  useStylesheet({
-    'component-app': {
-      color: 'red',
-    },
-  })
-
-  useStylesheet({
-    'component-app': {
-      color: 'red',
-    },
-  })
-
-  return (
-    <component>
-      <Component></Component>
-    </component>
-  )
+  return <div>{store}</div>
 }

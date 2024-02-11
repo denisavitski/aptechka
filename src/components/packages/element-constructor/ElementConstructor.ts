@@ -96,7 +96,7 @@ export type ElementConstructorRef<TagName extends ElementConstructorTagNames> =
   { current: ElementConstructorTagNameMap[TagName] }
 
 export type ElementConstructorTagObject<
-  TagName extends ElementConstructorTagNames
+  TagName extends ElementConstructorTagNames = ElementConstructorTagNames
 > = {
   class?: ElementConstructorClass
   style?: TagName extends 'style'

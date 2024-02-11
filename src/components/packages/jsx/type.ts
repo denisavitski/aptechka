@@ -205,8 +205,6 @@ declare global {
       itemType?: StoreOr<string>
       itemID?: StoreOr<string>
       itemRef?: StoreOr<string>
-
-      shadow?: boolean
     }
 
     type UnknownAttributes = {
