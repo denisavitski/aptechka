@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -18,6 +18,11 @@
   ],
   "type": "module",
   "exports": {
+    "./abstract-elements": {
+      "require": "./lib/abstract-elements/index.cjs",
+      "default": "./lib/abstract-elements/index.js",
+      "types": "./lib/abstract-elements/index.d.ts"
+    },
     "./accordion": {
       "require": "./lib/accordion/index.cjs",
       "default": "./lib/accordion/index.js",
@@ -33,10 +38,15 @@
       "default": "./lib/attribute/index.js",
       "types": "./lib/attribute/index.d.ts"
     },
-    "./canvas-2d": {
-      "require": "./lib/canvas-2d/index.cjs",
-      "default": "./lib/canvas-2d/index.js",
-      "types": "./lib/canvas-2d/index.d.ts"
+    "./canvas": {
+      "require": "./lib/canvas/index.cjs",
+      "default": "./lib/canvas/index.js",
+      "types": "./lib/canvas/index.d.ts"
+    },
+    "./connector": {
+      "require": "./lib/connector/index.cjs",
+      "default": "./lib/connector/index.js",
+      "types": "./lib/connector/index.d.ts"
     },
     "./controls": {
       "require": "./lib/controls/index.cjs",
@@ -83,6 +93,11 @@
       "default": "./lib/intersector/index.js",
       "types": "./lib/intersector/index.d.ts"
     },
+    "./jsx": {
+      "require": "./lib/jsx/index.cjs",
+      "default": "./lib/jsx/index.js",
+      "types": "./lib/jsx/index.d.ts"
+    },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
       "default": "./lib/ladder/index.js",
@@ -98,15 +113,15 @@
       "default": "./lib/loading/index.js",
       "types": "./lib/loading/index.d.ts"
     },
-    "./measurer": {
-      "require": "./lib/measurer/index.cjs",
-      "default": "./lib/measurer/index.js",
-      "types": "./lib/measurer/index.d.ts"
-    },
     "./media": {
       "require": "./lib/media/index.cjs",
       "default": "./lib/media/index.js",
       "types": "./lib/media/index.d.ts"
+    },
+    "./modal": {
+      "require": "./lib/modal/index.cjs",
+      "default": "./lib/modal/index.js",
+      "types": "./lib/modal/index.d.ts"
     },
     "./morph": {
       "require": "./lib/morph/index.cjs",
@@ -122,6 +137,11 @@
       "require": "./lib/order/index.cjs",
       "default": "./lib/order/index.js",
       "types": "./lib/order/index.d.ts"
+    },
+    "./popover": {
+      "require": "./lib/popover/index.cjs",
+      "default": "./lib/popover/index.js",
+      "types": "./lib/popover/index.d.ts"
     },
     "./router": {
       "require": "./lib/router/index.cjs",
@@ -158,6 +178,11 @@
       "default": "./lib/studio/index.js",
       "types": "./lib/studio/index.d.ts"
     },
+    "./theme": {
+      "require": "./lib/theme/index.cjs",
+      "default": "./lib/theme/index.js",
+      "types": "./lib/theme/index.d.ts"
+    },
     "./ticker": {
       "require": "./lib/ticker/index.cjs",
       "default": "./lib/ticker/index.js",
@@ -190,8 +215,11 @@
       "attribute": [
         "lib/attribute/index.d.ts"
       ],
-      "canvas-2d": [
-        "lib/canvas-2d/index.d.ts"
+      "canvas": [
+        "lib/canvas/index.d.ts"
+      ],
+      "connector": [
+        "lib/connector/index.d.ts"
       ],
       "controls": [
         "lib/controls/index.d.ts"
@@ -217,6 +245,9 @@
       "intersector": [
         "lib/intersector/index.d.ts"
       ],
+      "jsx": [
+        "lib/jsx/index.d.ts"
+      ],
       "ladder": [
         "lib/ladder/index.d.ts"
       ],
@@ -226,11 +257,11 @@
       "loading": [
         "lib/loading/index.d.ts"
       ],
-      "measurer": [
-        "lib/measurer/index.d.ts"
-      ],
       "media": [
         "lib/media/index.d.ts"
+      ],
+      "modal": [
+        "lib/modal/index.d.ts"
       ],
       "morph": [
         "lib/morph/index.d.ts"
@@ -241,8 +272,8 @@
       "order": [
         "lib/order/index.d.ts"
       ],
-      "resizer": [
-        "lib/resizer/index.d.ts"
+      "popover": [
+        "lib/popover/index.d.ts"
       ],
       "router": [
         "lib/router/index.d.ts"
@@ -264,6 +295,9 @@
       ],
       "studio": [
         "lib/studio/index.d.ts"
+      ],
+      "theme": [
+        "lib/theme/index.d.ts"
       ],
       "ticker": [
         "lib/ticker/index.d.ts"
@@ -287,7 +321,7 @@
     "@types/three": "^0.161.2",
     "vite": "5.1.1",
     "vite-plugin-dts": "^3.7.2",
-    "vite-plugin-html-components": "^0.1.3"
+    "vite-plugin-htmc": "^0.1.1"
   },
   "dependencies": {
     "detect-gpu": "^5.0.38",

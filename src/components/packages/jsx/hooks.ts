@@ -20,7 +20,7 @@ import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 type HookElementTarget = ElementOrSelector | ElementConstructorRef<any>
 
 function getTargetElement(
-  componentElement?: Element,
+  componentElement?: Node,
   element?: HookElementTarget
 ) {
   return element

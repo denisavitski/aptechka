@@ -55,12 +55,4 @@ export function App() {
   useDisconnect(() => {
     console.log('APP Disconnect')
   })
-
-  return (
-    <>
-      <Component1></Component1>
-      <Component1></Component1>
-      <Component1></Component1>
-    </>
-  )
 }
