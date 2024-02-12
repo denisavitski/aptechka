@@ -1,32 +1,16 @@
+import '@packages/studio'
 import { Store } from '@packages/store'
 import { useConnect, useCreate, useDisconnect } from '../hooks'
 
-function Component2() {
-  useCreate(() => {
-    console.log('2 useCreate')
+const Component1: JSX.Component = () => {
+  const store = new Store(0, {
+    passport: {
+      name: 'x',
+      manager: {
+        type: 'range',
+      },
+    },
   })
-
-  useConnect(() => {
-    console.log('2 useConnect')
-
-    return () => {
-      console.log('2 useConnect return')
-    }
-  })
-
-  useDisconnect(() => {
-    console.log('2 useDisconnect')
-  })
-
-  return (
-    <>
-      <div>Component 2</div>
-    </>
-  )
-}
-
-function Component1() {
-  const store = new Store(0)
 
   useCreate(() => {
     console.log('1 useCreate')
@@ -44,15 +28,9 @@ function Component1() {
     console.log('1 useDisconnect')
   })
 
-  return 'RJV'
+  return <div>{store}</div>
 }
 
-export function App() {
-  useConnect((e) => {
-    console.log('APP Connect')
-  })
-
-  useDisconnect(() => {
-    console.log('APP Disconnect')
-  })
+export const App: JSX.Component = () => {
+  return <Component1></Component1>
 }

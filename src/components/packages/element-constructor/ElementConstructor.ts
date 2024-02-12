@@ -1,3 +1,4 @@
+import { connector } from '@packages/connector'
 import { Store } from '@packages/store'
 import { isBrowser, camelToKebab } from '@packages/utils'
 
@@ -125,6 +126,7 @@ export class ElementConstructor<
   T extends ElementConstructorTagNames = ElementConstructorTagNames
 > {
   #rootElements: Array<ElementConstructorType> = []
+  #stores: Array<Store<any>> = []
 
   constructor(object: ElementConstructorObject)
   constructor(value: string, object: ElementConstructorTagObject<T>)
@@ -145,6 +147,20 @@ export class ElementConstructor<
         this.#applyProperties(p1, p2)
       } else {
         this.#rootElements = this.#createElements(p1)
+      }
+
+      if (this.#stores.length) {
+        connector.subscribe(this.#rootElements[0], {
+          disconnectCallback: () => {
+            this.#stores.forEach((store) => {
+              store.close()
+            })
+
+            this.#stores = []
+          },
+          unsubscribeAfterDisconnect: true,
+          maxWaitSec: 20,
+        })
       }
     }
   }
@@ -263,6 +279,8 @@ export class ElementConstructor<
       | ElementConstructorStringStoreClass
       | ElementConstructorStringArrayStoreClass
   ) {
+    this.#stores.push(store)
+
     store.subscribe(({ current, previous }) => {
       if (previous) {
         ;[previous].flat().forEach((v) => {
@@ -287,6 +305,8 @@ export class ElementConstructor<
     className: string,
     store: Store<boolean>
   ) {
+    this.#stores.push(store)
+
     store.subscribe(({ current }) => {
       if (current) {
         element.classList.add(className)
@@ -322,6 +342,8 @@ export class ElementConstructor<
       const value = object[token]
 
       if (value instanceof Store) {
+        this.#stores.push(value)
+
         value.subscribe(({ current }) => {
           this.#setStyleProperty(element, token, current)
         })
@@ -344,6 +366,8 @@ export class ElementConstructor<
         element.appendChild(new Text(`}`))
       } else {
         if (value instanceof Store) {
+          this.#stores.push(value)
+
           const text = new Text()
 
           value.subscribe((e) => {
@@ -414,6 +438,8 @@ export class ElementConstructor<
       const value = attributes[attributeName]
 
       if (value instanceof Store) {
+        this.#stores.push(value)
+
         value.subscribe(({ current }) => {
           this.#setAttribute(element, attributeName, current)
         })
@@ -451,6 +477,8 @@ export class ElementConstructor<
 
     children.forEach((child: any) => {
       if (child instanceof Store) {
+        this.#stores.push(child)
+
         const storeRootElement = document.createElement('div')
         storeRootElement.style.display = 'contents'
         root.appendChild(storeRootElement)

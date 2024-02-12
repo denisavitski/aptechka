@@ -9,12 +9,14 @@ interface ConnectorSubscriber {
   isConnected: boolean
   timer: number
   maxWaitSec: number
+  unsubscribeAfterDisconnect: boolean
 }
 
 export interface ConnectorOptions {
   connectCallback?: ConnectorCallback
   disconnectCallback?: ConnectorCallback
   maxWaitSec?: number
+  unsubscribeAfterDisconnect?: boolean
 }
 
 export class Connector {
@@ -35,6 +37,7 @@ export class Connector {
       isConnected: false,
       maxWaitSec: options.maxWaitSec || Infinity,
       timer: 0,
+      unsubscribeAfterDisconnect: options.unsubscribeAfterDisconnect || false,
     })
 
     return () => {
@@ -73,6 +76,9 @@ export class Connector {
       } else if (!subscriber.node.isConnected && subscriber.isConnected) {
         subscriber.disconnectCallback?.()
         subscriber.isConnected = false
+        if (subscriber.unsubscribeAfterDisconnect) {
+          this.unsubscribe(subscriber)
+        }
       }
 
       subscriber.timer += 100

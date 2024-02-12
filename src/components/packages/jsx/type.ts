@@ -13,7 +13,6 @@ declare global {
   namespace JSX {
     export type ComponentChild =
       | Node
-      | ComponentChild[]
       | string
       | number
       | boolean
@@ -32,9 +31,9 @@ declare global {
 
     type Component<TProps extends object = object> = (
       props?: BaseProps & TProps
-    ) => JSX.Element
+    ) => Element
 
-    type Element = ComponentChildren
+    type Element = ComponentChild
 
     interface ElementAttributesProperty {
       props: any

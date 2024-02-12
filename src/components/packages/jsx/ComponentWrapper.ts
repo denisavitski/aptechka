@@ -52,7 +52,7 @@ export class ComponentWrapper {
     })
 
     if (isBrowser) {
-      const unsubscribe = connector.subscribe(this.#rootNode, {
+      connector.subscribe(this.#rootNode, {
         connectCallback: () => {
           this.#connectCallbacks.forEach((callback) => {
             const disconnect = callback(this.#rootNode)
@@ -70,10 +70,9 @@ export class ComponentWrapper {
           this.#connectCallbacks.clear()
           this.#disconnectCallbacks.clear()
           this.#createCallbacks.clear()
-
-          unsubscribe()
         },
         maxWaitSec: 20,
+        unsubscribeAfterDisconnect: true,
       })
     }
   }

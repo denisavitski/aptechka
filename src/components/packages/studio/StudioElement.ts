@@ -6,17 +6,6 @@ import { studioStorage } from './studioStorage'
 const stylesheet = createStylesheet({
   ':host': {
     fontFamily: 'sans-serif',
-
-    position: 'fixed',
-    top: '0',
-    left: '0',
-
-    zIndex: '1000',
-
-    display: 'block',
-
-    width: '100%',
-    height: '100%',
   },
 })
 
