@@ -1,14 +1,15 @@
 import { windowResizer, WindowResizerCallback } from '@packages/window-resizer'
 import {
-  ComponentWrapperConnectCallback,
-  ComponentWrapperCreateCallback,
-  currentComponentWrapper,
-} from './ComponentWrapper'
+  ComponentElementConnectCallback,
+  ComponentElementCreateCallback,
+  currentComponentElement,
+} from './ComponentElement'
 import {
   elementResizer,
   ElementResizerCallback,
 } from '@packages/element-resizer'
 import {
+  createStylesheet,
   ElementConstructorJSS,
   ElementConstructorRef,
   style,
@@ -16,33 +17,42 @@ import {
 import { ElementOrSelector, isBrowser } from '@packages/utils'
 import { intersector, IntersectorCallback } from '@packages/intersector'
 import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
+import {
+  Composed,
+  Derived,
+  DerivedArray,
+  Resource,
+  Store,
+  StoreEntry,
+  StoreManagerType,
+} from '@packages/store'
 
 type HookElementTarget = ElementOrSelector | ElementConstructorRef<any>
 
 function getTargetElement(
-  componentElement?: Node,
+  componentElement?: HTMLElement,
   element?: HookElementTarget
 ) {
   return element
-    ? typeof element === 'string' || element instanceof Node
+    ? typeof element === 'string' || element instanceof HTMLElement
       ? element
       : element.current
     : componentElement
 }
 
-export function useCreate(callback: ComponentWrapperCreateCallback) {
-  currentComponentWrapper.addCreateCallback(callback)
+export function useCreate(callback: ComponentElementCreateCallback) {
+  currentComponentElement.createCallbacks.add(callback)
 }
 
-export function useConnect(callback: ComponentWrapperConnectCallback) {
+export function useConnect(callback: ComponentElementConnectCallback) {
   if (isBrowser) {
-    currentComponentWrapper.addConnectCallback(callback)
+    currentComponentElement.connectCallbacks.add(callback)
   }
 }
 
-export function useDisconnect(callback: ComponentWrapperConnectCallback) {
+export function useDisconnect(callback: ComponentElementConnectCallback) {
   if (isBrowser) {
-    currentComponentWrapper.addDisconnectCallback(callback)
+    currentComponentElement.disconnectCallbacks.add(callback)
   }
 }
 
@@ -93,17 +103,86 @@ export function useAnimationFrame(
 }
 
 export function useStyle(object?: ElementConstructorJSS | undefined) {
-  useConnect(() => {
-    const styleElement = style(object).rootElements[0]
+  useCreate((e) => {
+    if (e.shadowRoot) {
+      e.shadowRoot.adoptedStyleSheets.push(createStylesheet(object))
+    }
+  })
 
-    const styleTags = [...document.head.querySelectorAll('style')]
+  useConnect((e) => {
+    if (!e.shadowRoot) {
+      const styleElement = style(object).rootElements[0] as HTMLStyleElement
 
-    if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
-      document.head.appendChild(styleElement)
+      const styleTags = [...document.head.querySelectorAll('style')]
 
-      return () => {
-        styleElement.remove()
+      if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
+        document.head.appendChild(styleElement)
+
+        return () => {
+          styleElement.remove()
+        }
       }
     }
   })
+}
+
+export function useStore<
+  StoreType = unknown,
+  StoreManager extends StoreManagerType = StoreManagerType,
+  Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
+>(
+  ...parameters: ConstructorParameters<
+    typeof Store<StoreType, StoreManager, Entry>
+  >
+) {
+  const store = new Store<StoreType, StoreManager, Entry>(...parameters)
+
+  currentComponentElement.stores.add(store)
+
+  return store
+}
+
+export function useDerived<DerivedType, StoreType>(
+  ...parameters: ConstructorParameters<typeof Derived<DerivedType, StoreType>>
+) {
+  const store = new Derived<DerivedType, StoreType>(...parameters)
+
+  currentComponentElement.stores.add(store)
+
+  return store
+}
+
+export function useDerivedArray<
+  DerivedType,
+  StoreType extends Array<any> = Array<any>
+>(
+  ...parameters: ConstructorParameters<
+    typeof DerivedArray<DerivedType, StoreType>
+  >
+) {
+  const store = new DerivedArray<DerivedType, StoreType>(...parameters)
+
+  currentComponentElement.stores.add(store)
+
+  return store
+}
+
+export function useResource<StoreType>(
+  ...parameters: ConstructorParameters<typeof Resource<StoreType>>
+) {
+  const store = new Resource<StoreType>(...parameters)
+
+  currentComponentElement.stores.add(store)
+
+  return store
+}
+
+export function useComposed<StoreType>(
+  ...parameters: ConstructorParameters<typeof Composed<StoreType>>
+) {
+  const store = new Composed<StoreType>(...parameters)
+
+  currentComponentElement.stores.add(store)
+
+  return store
 }

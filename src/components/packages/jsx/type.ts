@@ -1,4 +1,5 @@
 import type {
+  ElementConstructor,
   ElementConstructorClass,
   ElementConstructorEventMap,
   ElementConstructorStyle,
@@ -19,11 +20,10 @@ declare global {
       | undefined
       | null
       | void
-
-    export type ComponentChildren =
-      | ComponentChild
-      | ComponentChild[]
       | Store<any>
+      | ElementConstructor
+
+    export type ComponentChildren = ComponentChild | ComponentChild[]
 
     interface BaseProps {
       children?: ComponentChildren
@@ -205,6 +205,8 @@ declare global {
       itemType?: StoreOr<string>
       itemID?: StoreOr<string>
       itemRef?: StoreOr<string>
+
+      shadow?: boolean
     }
 
     type UnknownAttributes = {

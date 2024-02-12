@@ -4,32 +4,77 @@ import {
   ElementConstructorTagObject,
 } from '@packages/element-constructor'
 
-import { ComponentWrapper } from './ComponentWrapper'
+import {
+  ComponentElement,
+  ComponentElementConstructorCallback,
+} from './ComponentElement'
+
+type HConstructorObject =
+  ElementConstructorTagObject<ElementConstructorTagNames> & {
+    shadow?: boolean
+  }
+
+let componentConstructorObject: HConstructorObject | undefined
 
 export function h(
   tag: string | JSX.Component,
-  attrs: any,
-  ...children: JSX.ComponentChild[]
-): JSX.Element {
+  attrs: JSX.HTMLAttributes | JSX.UnknownAttributes | null,
+  ...children: Array<JSX.ComponentChild | ElementConstructor>
+): JSX.Element | ElementConstructor {
   if (typeof tag === 'function') {
     if ((tag as any).isFragment) {
-      return tag({ ...attrs, children })
+      return (tag as any)({ ...attrs, children })
     }
 
-    const wrapper = new ComponentWrapper(tag.name, () =>
-      (tag as Function)({ ...attrs, children })
-    )
+    const customName = `component-${tag.name.toLowerCase()}`
 
-    return wrapper.rootNode
+    let CustomElement = customElements.get(
+      customName
+    ) as typeof ComponentElement
+
+    if (!CustomElement) {
+      CustomElement = class extends ComponentElement {
+        constructor(callback: ComponentElementConstructorCallback) {
+          super(callback)
+        }
+      }
+
+      customElements.define(customName, CustomElement)
+    }
+
+    return new CustomElement((e) => {
+      const res = tag({ ...attrs, children })
+
+      let elementConstructor: ElementConstructor = null!
+
+      if (!componentConstructorObject && res) {
+        elementConstructor = new ElementConstructor(e, {
+          children: res,
+        })
+      } else if (componentConstructorObject) {
+        if (componentConstructorObject.shadow) {
+          e.attachShadow({ mode: 'open' })
+        }
+
+        elementConstructor = new ElementConstructor(
+          e,
+          componentConstructorObject
+        )
+      }
+
+      componentConstructorObject = undefined
+
+      return elementConstructor
+    })
   }
 
-  const constructorObject: ElementConstructorTagObject = {
+  const constructorObject: HConstructorObject = {
     shadowChildren: children,
   }
 
   if (attrs) {
     for (const name of Object.keys(attrs)) {
-      const value = attrs[name]
+      const value = attrs[name as keyof JSX.HTMLAttributes]
 
       if (name.startsWith('on')) {
         if (!constructorObject.events) {
@@ -44,6 +89,8 @@ export function h(
         constructorObject.style = value
       } else if (name === 'ref') {
         constructorObject.ref = value
+      } else if (name === 'shadow') {
+        constructorObject.shadow = true
       } else {
         if (!constructorObject.attributes) {
           constructorObject.attributes = {}
@@ -54,27 +101,26 @@ export function h(
     }
   }
 
-  return new ElementConstructor({
-    [tag as ElementConstructorTagNames]: constructorObject,
-  }).rootElements[0]
+  if (tag === 'component') {
+    componentConstructorObject = constructorObject
+    return Fragment({ children })
+  } else {
+    const elementConstructor = new ElementConstructor({
+      [tag as ElementConstructorTagNames]: constructorObject,
+    })
+
+    return elementConstructor
+  }
 }
 
-export function Fragment({ children }: { children: JSX.ComponentChild[] }) {
-  const element = document.createDocumentFragment()
-
-  if (children) {
-    children = Array.isArray(children) ? children : [children]
-
-    children.forEach((child) => {
-      if (child instanceof Node) {
-        element.append(child)
-      } else if (child) {
-        element.append(document.createTextNode(child.toString()))
-      }
-    })
-  }
-
-  return element
+export function Fragment({
+  children,
+}: {
+  children: Array<JSX.ComponentChild | ElementConstructor>
+}) {
+  return new ElementConstructor(document.createDocumentFragment(), {
+    children: children,
+  })
 }
 
 Fragment.isFragment = true

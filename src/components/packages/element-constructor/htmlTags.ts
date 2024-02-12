@@ -5,10 +5,8 @@ import {
   ElementConstructorTagNames,
 } from './ElementConstructor'
 
-export type HTMLConstructorTagObject<T extends ElementConstructorTagNames> = Omit<
-  ElementConstructorTagObject<T>,
-  'svg'
->
+export type HTMLConstructorTagObject<T extends ElementConstructorTagNames> =
+  Omit<ElementConstructorTagObject<T>, 'svg'>
 
 export function a(object?: HTMLConstructorTagObject<'a'>) {
   return new ElementConstructor({
@@ -557,7 +555,7 @@ export function strong(object?: HTMLConstructorTagObject<'strong'>) {
 }
 
 export function style(object?: ElementConstructorJSS) {
-  return new ElementConstructor({
+  return new ElementConstructor<'style'>({
     style: {
       style: object,
     },
@@ -684,10 +682,9 @@ export function wbr(object?: HTMLConstructorTagObject<'wbr'>) {
   })
 }
 
-export function custom<T extends Extract<ElementConstructorTagNames, `e-${string}`>>(
-  tag: T,
-  object?: HTMLConstructorTagObject<T>
-) {
+export function custom<
+  T extends Extract<ElementConstructorTagNames, `e-${string}`>
+>(tag: T, object?: HTMLConstructorTagObject<T>) {
   return new ElementConstructor({
     [tag]: object,
   })

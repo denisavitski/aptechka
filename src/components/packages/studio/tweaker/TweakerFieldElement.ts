@@ -18,6 +18,7 @@ import resetIcon from '@assets/icons/reset.svg?raw'
 
 import { tweakerManagerConstructors } from './tweakerManagerConstructors'
 import { aptechkaTheme } from '@packages/theme'
+import { dispatchSizeChangeEvent } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -158,6 +159,7 @@ export class TweakerFieldElement extends CustomElement {
   protected connectedCallback() {
     activeStores.subscribe(this.#storesChangeListener)
     addEventListener('keydown', this.#keydownListener)
+    dispatchSizeChangeEvent(this)
   }
 
   protected disconnectedCallback() {

@@ -1,4 +1,3 @@
-import { connector } from '@packages/connector'
 import { Store } from '@packages/store'
 import { isBrowser, camelToKebab } from '@packages/utils'
 
@@ -125,12 +124,12 @@ export type ElementConstructorType = HTMLElement | SVGElement
 export class ElementConstructor<
   T extends ElementConstructorTagNames = ElementConstructorTagNames
 > {
-  #rootElements: Array<ElementConstructorType> = []
-  #stores: Array<Store<any>> = []
+  #rootElements: Array<Node> = []
+  #unsubscribeCallbacks: Array<Function> = []
 
   constructor(object: ElementConstructorObject)
   constructor(value: string, object: ElementConstructorTagObject<T>)
-  constructor(element: HTMLElement, object: ElementConstructorTagObject<T>)
+  constructor(element: Node, object: ElementConstructorTagObject<T>)
   constructor(...args: any[]) {
     const p1 = args[0]
     const p2 = args[1]
@@ -142,31 +141,29 @@ export class ElementConstructor<
         const element = wrapper.firstElementChild as HTMLElement
         this.#rootElements = [element]
         this.#applyProperties(element, p2)
-      } else if (p1 instanceof HTMLElement) {
+      } else if (p1 instanceof Node) {
         this.#rootElements = [p1]
         this.#applyProperties(p1, p2)
       } else {
         this.#rootElements = this.#createElements(p1)
       }
-
-      if (this.#stores.length) {
-        connector.subscribe(this.#rootElements[0], {
-          disconnectCallback: () => {
-            this.#stores.forEach((store) => {
-              store.close()
-            })
-
-            this.#stores = []
-          },
-          unsubscribeAfterDisconnect: true,
-          maxWaitSec: 20,
-        })
-      }
     }
+  }
+
+  public get unsubscribeCallbacks() {
+    return this.#unsubscribeCallbacks
   }
 
   public get rootElements() {
     return this.#rootElements
+  }
+
+  public destroy = () => {
+    this.#unsubscribeCallbacks.forEach((unsubscribe) => {
+      unsubscribe()
+    })
+
+    this.#unsubscribeCallbacks = []
   }
 
   #createElements(object: ElementConstructorObject) {
@@ -201,46 +198,58 @@ export class ElementConstructor<
     return element
   }
 
-  #applyProperties(
-    element: ElementConstructorType,
-    properties?: ElementConstructorTagObject<any>
-  ) {
+  #isSvgOrHtmlElement(node: Node) {
+    return node instanceof HTMLElement || node instanceof SVGElement
+  }
+
+  #applyProperties(node: Node, properties?: ElementConstructorTagObject<any>) {
+    const isSvgOrHtml = this.#isSvgOrHtmlElement(node)
+
     for (const k in properties) {
       const propertyName = k as keyof ElementConstructorTagObject<any>
 
-      if (propertyName === 'class') {
-        this.#createClassList(element, properties[propertyName])
-      } else if (propertyName === 'style') {
-        this.#createStyle(element, properties[propertyName])
-      } else if (propertyName === 'events') {
-        this.#createEvents(element, properties[propertyName])
-      } else if (propertyName === 'attributes') {
-        this.#createAttributes(element, properties[propertyName])
+      if (propertyName === 'class' && isSvgOrHtml) {
+        this.#createClassList(
+          node as ElementConstructorType,
+          properties[propertyName]
+        )
+      } else if (propertyName === 'style' && isSvgOrHtml) {
+        this.#createStyle(
+          node as ElementConstructorType,
+          properties[propertyName]
+        )
+      } else if (propertyName === 'events' && isSvgOrHtml) {
+        this.#createEvents(
+          node as ElementConstructorType,
+          properties[propertyName]
+        )
+      } else if (propertyName === 'attributes' && isSvgOrHtml) {
+        this.#createAttributes(
+          node as ElementConstructorType,
+          properties[propertyName]
+        )
       } else if (propertyName === 'children') {
-        this.#createChildren(element, properties[propertyName])
+        this.#createChildren(node, properties[propertyName])
       } else if (propertyName === 'shadowChildren') {
         this.#createChildren(
-          element.shadowRoot || element,
+          node instanceof Element ? node.shadowRoot || node : node,
           properties[propertyName]
         )
       } else if (propertyName === 'parent') {
-        this.#createParent(element, properties[propertyName])
+        this.#createParent(node, properties[propertyName])
       }
     }
 
     if (properties?.ref) {
       if (typeof properties?.ref === 'function') {
-        properties.ref(element)
+        properties.ref(node)
       } else {
-        properties.ref.current = element
+        properties.ref.current = node
       }
     }
   }
 
-  #createClassList(
-    element: ElementConstructorType,
-    classObject?: ElementConstructorClass
-  ) {
+  #createClassList(element: Element, classObject?: ElementConstructorClass) {
     if (!classObject) {
       return
     } else if (typeof classObject === 'string') {
@@ -274,46 +283,46 @@ export class ElementConstructor<
   }
 
   #manageStringStoreClass(
-    element: ElementConstructorType,
+    element: Element,
     store:
       | ElementConstructorStringStoreClass
       | ElementConstructorStringArrayStoreClass
   ) {
-    this.#stores.push(store)
+    this.#unsubscribeCallbacks.push(
+      store.subscribe(({ current, previous }) => {
+        if (previous) {
+          ;[previous].flat().forEach((v) => {
+            if (v) {
+              element.classList.remove(v)
+            }
+          })
+        }
 
-    store.subscribe(({ current, previous }) => {
-      if (previous) {
-        ;[previous].flat().forEach((v) => {
-          if (v) {
-            element.classList.remove(v)
-          }
-        })
-      }
-
-      if (current) {
-        ;[current].flat().forEach((v) => {
-          if (v) {
-            element.classList.add(v)
-          }
-        })
-      }
-    })
+        if (current) {
+          ;[current].flat().forEach((v) => {
+            if (v) {
+              element.classList.add(v)
+            }
+          })
+        }
+      })
+    )
   }
 
   #manageBooleanStoreClass(
-    element: ElementConstructorType,
+    element: Element,
     className: string,
     store: Store<boolean>
   ) {
-    this.#stores.push(store)
-
-    store.subscribe(({ current }) => {
-      if (current) {
-        element.classList.add(className)
-      } else {
-        element.classList.remove(className)
-      }
-    })
+    this.#unsubscribeCallbacks.push(
+      store.subscribe(({ current }) => {
+        if (current) {
+          element.classList.add(className)
+        } else {
+          element.classList.remove(className)
+        }
+      })
+    )
   }
 
   #createStyle(
@@ -342,11 +351,11 @@ export class ElementConstructor<
       const value = object[token]
 
       if (value instanceof Store) {
-        this.#stores.push(value)
-
-        value.subscribe(({ current }) => {
-          this.#setStyleProperty(element, token, current)
-        })
+        this.#unsubscribeCallbacks.push(
+          value.subscribe(({ current }) => {
+            this.#setStyleProperty(element, token, current)
+          })
+        )
       } else {
         this.#setStyleProperty(element, token, value)
       }
@@ -366,17 +375,17 @@ export class ElementConstructor<
         element.appendChild(new Text(`}`))
       } else {
         if (value instanceof Store) {
-          this.#stores.push(value)
-
           const text = new Text()
 
-          value.subscribe((e) => {
-            if (e.current) {
-              text.nodeValue = `${camelToKebab(key)}: ${e.current};`
-            } else {
-              text.nodeValue = ''
-            }
-          })
+          this.#unsubscribeCallbacks.push(
+            value.subscribe((e) => {
+              if (e.current) {
+                text.nodeValue = `${camelToKebab(key)}: ${e.current};`
+              } else {
+                text.nodeValue = ''
+              }
+            })
+          )
 
           element.appendChild(text)
         } else {
@@ -406,10 +415,7 @@ export class ElementConstructor<
     }
   }
 
-  #createEvents(
-    element: ElementConstructorType,
-    events?: ElementConstructorEvents
-  ) {
+  #createEvents(element: Element, events?: ElementConstructorEvents) {
     if (!events) {
       return
     }
@@ -438,11 +444,11 @@ export class ElementConstructor<
       const value = attributes[attributeName]
 
       if (value instanceof Store) {
-        this.#stores.push(value)
-
-        value.subscribe(({ current }) => {
-          this.#setAttribute(element, attributeName, current)
-        })
+        this.#unsubscribeCallbacks.push(
+          value.subscribe(({ current }) => {
+            this.#setAttribute(element, attributeName, current)
+          })
+        )
       } else {
         this.#setAttribute(element, attributeName, value)
       }
@@ -468,7 +474,7 @@ export class ElementConstructor<
     }
   }
 
-  #createChildren(root: ElementConstructorType | ShadowRoot, children?: any) {
+  #createChildren(root: Node | ShadowRoot, children?: any) {
     if (!children) {
       return
     }
@@ -477,26 +483,29 @@ export class ElementConstructor<
 
     children.forEach((child: any) => {
       if (child instanceof Store) {
-        this.#stores.push(child)
-
         const storeRootElement = document.createElement('div')
         storeRootElement.style.display = 'contents'
         root.appendChild(storeRootElement)
 
-        child.subscribe(({ current }) => {
-          this.#replaceChildren(
-            storeRootElement,
-            this.#getChildrenArray(current),
-            Array.from(storeRootElement.childNodes)
-          )
-        })
+        this.#unsubscribeCallbacks.push(
+          child.subscribe(({ current }) => {
+            this.#replaceChildren(
+              storeRootElement,
+              this.#getChildrenArray(current),
+              Array.from(storeRootElement.childNodes)
+            )
+          })
+        )
       } else if (child instanceof ElementConstructor) {
-        root.append(...child.rootElements)
+        this.#unsubscribeCallbacks.push(child.destroy)
+        child.rootElements.forEach((e) => {
+          root.appendChild(e)
+        })
       } else {
         const childNodeOrUndefined = this.#getOrCreateNode(child)
 
         if (childNodeOrUndefined instanceof Node) {
-          root.append(childNodeOrUndefined)
+          root.appendChild(childNodeOrUndefined)
         }
       }
     })
@@ -570,10 +579,7 @@ export class ElementConstructor<
     }
   }
 
-  #createParent(
-    element: ElementConstructorType,
-    parent?: ElementConstructorParent
-  ) {
+  #createParent(element: Node, parent?: ElementConstructorParent) {
     if (!parent) {
       return
     }
