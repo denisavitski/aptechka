@@ -68,11 +68,12 @@ export abstract class Animated<
     this.#min =
       options?.min instanceof Store
         ? options.min
-        : new Store(0, { passport: minPassport })
+        : new Store(options?.min ?? 0, { passport: minPassport })
+
     this.#max =
       options?.max instanceof Store
         ? options.max
-        : new Store(0, { passport: maxPassport })
+        : new Store(options?.max ?? 1, { passport: maxPassport })
 
     this.#min.subscribe(this.#edgeChangeListener)
     this.#max.subscribe(this.#edgeChangeListener)

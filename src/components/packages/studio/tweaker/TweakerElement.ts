@@ -31,6 +31,8 @@ const stylesheet = createStylesheet({
     borderRadius: aptechkaTheme.borderRadius.var,
 
     transition: 'opacity 0.2s',
+
+    zIndex: '100',
   },
 
   ':host(:hover)': {

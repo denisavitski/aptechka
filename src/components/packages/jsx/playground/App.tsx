@@ -1,65 +1,32 @@
 import '@packages/studio'
 import { Store } from '@packages/store'
-import {
-  useConnect,
-  useCreate,
-  useDerived,
-  useDisconnect,
-  useStore,
-} from '../hooks'
+import { useConnect, useDamped, useDerived, useDisconnect, useStyle } from '..'
 
 const Component1: JSX.Component = () => {
-  const store = useStore(0, {
-    passport: {
-      name: 'xxxx',
-      manager: {
-        type: 'range',
-      },
+  const damped = useDamped({ default: 0, damping: 0.01 })
+  const derived = useDerived(damped, (v) => {
+    return `translateX(${v}px)`
+  })
+
+  useStyle({
+    '#kek': {
+      display: 'block',
+      width: '100px',
+      height: '100px',
+      backgroundColor: 'red',
     },
-  })
-
-  const store2 = useStore(0, {
-    passport: {
-      name: 'xxxx',
-      manager: {
-        type: 'range',
-      },
-    },
-  })
-
-  const store3 = useStore(0, {
-    passport: {
-      name: 'xxxx',
-      manager: {
-        type: 'range',
-      },
-    },
-  })
-
-  const derived = useDerived(store, (v) => v * 2)
-
-  useCreate(() => {
-    console.log('1 useCreate')
-  })
-
-  useConnect(() => {
-    console.log('1 useConnect')
-
-    return () => {
-      console.log('1 useConnect return')
-    }
-  })
-
-  useDisconnect(() => {
-    console.log('1 useDisconnect')
   })
 
   return (
-    <div>
-      {store}
-      {store2}
-      {store3}
-    </div>
+    <component
+      id="kek"
+      style={{
+        transform: derived,
+      }}
+      onClick={() => {
+        damped.shift(100)
+      }}
+    ></component>
   )
 }
 

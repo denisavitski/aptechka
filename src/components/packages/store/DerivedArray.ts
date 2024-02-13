@@ -1,10 +1,13 @@
 import { Store, StoreOptions } from './Store'
 
-export type DerivedArrayCallback<StoreType, DerivedType> = (value: StoreType) => DerivedType
+export type DerivedArrayCallback<StoreType, DerivedType> = (
+  value: StoreType
+) => DerivedType
 
-export class DerivedArray<DerivedType, StoreType extends Array<any> = Array<any>> extends Store<
-  DerivedType[]
-> {
+export class DerivedArray<
+  DerivedType,
+  StoreType extends Array<any> = Array<any>
+> extends Store<DerivedType[]> {
   #unsubscriber: Function
 
   constructor(
