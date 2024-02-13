@@ -35,8 +35,8 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
   string,
   'color'
 > {
-  constructor(store: Store<string, 'color'>) {
-    super(store)
+  constructor(...stores: Array<Store<string, 'color'>>) {
+    super(...stores)
 
     this.openShadow(stylesheet)
 
@@ -45,11 +45,11 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
         input({
           attributes: {
             type: 'color',
-            value: this.store,
+            value: this.firstStore,
           },
           events: {
             input: (e) => {
-              this.store.current = (e.currentTarget as HTMLInputElement).value
+              this.updateStores((e.currentTarget as HTMLInputElement).value)
             },
           },
         }),

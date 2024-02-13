@@ -14,8 +14,8 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
   string,
   'link'
 > {
-  constructor(store: Store<string, 'link'>) {
-    super(store)
+  constructor(...stores: Array<Store<string, 'link'>>) {
+    super(...stores)
 
     this.openShadow(stylesheet)
 
@@ -23,12 +23,12 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
       shadowChildren: [
         a({
           attributes: {
-            href: this.store,
-            target: this.store.passport?.manager?.sameWindow
+            href: this.firstStore,
+            target: this.firstStore.passport?.manager?.sameWindow
               ? '_self'
               : '_blank',
           },
-          children: this.store,
+          children: this.firstStore,
         }),
       ],
     })

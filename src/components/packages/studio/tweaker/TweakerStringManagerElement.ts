@@ -44,8 +44,8 @@ export class TweakerStringManagerElement<
 > extends TweakerStoreManagerElement<T, M> {
   #content = new Store<Array<any>>([])
 
-  constructor(store: Store<T, M>) {
-    super(store)
+  constructor(...stores: Array<Store<T, M>>) {
+    super(...stores)
 
     this.openShadow(stylesheet)
 
@@ -55,12 +55,13 @@ export class TweakerStringManagerElement<
           class: 'text-input',
           attributes: {
             type: 'string',
-            value: this.store,
+            value: this.firstStore,
           },
           events: {
             change: (e) => {
-              this.store.current = (e.currentTarget as HTMLInputElement)
-                .value as any
+              this.updateStores(
+                (e.currentTarget as HTMLInputElement).value as any
+              )
             },
           },
         }),

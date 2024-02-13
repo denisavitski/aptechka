@@ -18,6 +18,24 @@ const Component1: JSX.Component = () => {
     },
   })
 
+  const store2 = useStore(0, {
+    passport: {
+      name: 'xxxx',
+      manager: {
+        type: 'range',
+      },
+    },
+  })
+
+  const store3 = useStore(0, {
+    passport: {
+      name: 'xxxx',
+      manager: {
+        type: 'range',
+      },
+    },
+  })
+
   const derived = useDerived(store, (v) => v * 2)
 
   useCreate(() => {
@@ -39,7 +57,8 @@ const Component1: JSX.Component = () => {
   return (
     <div>
       {store}
-      {derived}
+      {store2}
+      {store3}
     </div>
   )
 }

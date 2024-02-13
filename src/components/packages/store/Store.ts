@@ -229,9 +229,7 @@ export class Store<
 export const activeStores = new Store<Array<Store<any, any, any>>>([])
 
 function shareStore(store: Store<any, any, any>) {
-  if (
-    !activeStores.current.find((s) => s.passport!.name === store.passport!.name)
-  ) {
+  if (!activeStores.current.includes(store)) {
     activeStores.current = [...activeStores.current, store]
   }
 }

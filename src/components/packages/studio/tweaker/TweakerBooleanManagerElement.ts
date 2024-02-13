@@ -27,8 +27,8 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
   boolean,
   'boolean'
 > {
-  constructor(store: Store<boolean, 'boolean'>) {
-    super(store)
+  constructor(...stores: Array<Store<boolean, 'boolean'>>) {
+    super(...stores)
 
     this.openShadow(stylesheet)
 
@@ -40,11 +40,11 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
           },
           events: {
             change: (e) => {
-              this.store.current = (e.currentTarget as HTMLInputElement).checked
+              this.updateStores((e.currentTarget as HTMLInputElement).checked)
             },
           },
           ref: (e) => {
-            this.store.subscribe((d) => {
+            this.firstStore.subscribe((d) => {
               e.checked = d.current
             })
           },

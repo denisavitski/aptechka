@@ -5,15 +5,29 @@ export class TweakerStoreManagerElement<
   T,
   K extends StoreManagerType
 > extends CustomElement {
-  #store: Store<T, K>
+  #stores: Array<Store<T, K>>
 
-  constructor(store: Store<T, K>) {
+  constructor(...stores: Array<Store<T, K>>) {
     super()
 
-    this.#store = store
+    this.#stores = stores
   }
 
-  protected get store() {
-    return this.#store
+  public addStore(store: Store<T, K>) {
+    this.#stores.push(store)
+  }
+
+  protected get firstStore() {
+    return this.#stores[0]
+  }
+
+  protected get stores() {
+    return this.#stores
+  }
+
+  protected updateStores(value: T) {
+    this.#stores.forEach((store) => {
+      store.current = value
+    })
   }
 }

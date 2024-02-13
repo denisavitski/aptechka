@@ -193,12 +193,20 @@ export class TweakerFolderElement extends AccordionElement {
         ]
       }
     } else {
-      this.#content.current = [
-        ...this.#content.current,
-        new TweakerFieldElement({
-          store: storeBox.store,
-        }),
-      ]
+      const found = this.#content.current.find(
+        (v) => v.key === storeBox.store.passport!.name
+      )
+
+      if (found instanceof TweakerFieldElement) {
+        found.addStore(storeBox.store)
+      } else {
+        this.#content.current = [
+          ...this.#content.current,
+          new TweakerFieldElement({
+            store: storeBox.store,
+          }),
+        ]
+      }
     }
   }
 

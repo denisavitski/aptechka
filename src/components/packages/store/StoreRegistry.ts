@@ -96,10 +96,12 @@ class StoreRegistry {
 
     activeStores.current.forEach((store) => {
       if (store.passport) {
-        state.stores.push({
-          value: store.current as any,
-          name: store.passport.name,
-        })
+        if (!state.stores.find((s) => s.name === store.passport!.name)) {
+          state.stores.push({
+            value: store.current as any,
+            name: store.passport.name,
+          })
+        }
       }
     })
 

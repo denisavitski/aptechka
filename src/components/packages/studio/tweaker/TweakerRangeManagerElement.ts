@@ -56,8 +56,8 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-range-manager')
 export class TweakerRangeManagerElement extends TweakerNumberManagerElement<'range'> {
-  constructor(store: Store<number, 'range'>) {
-    super(store)
+  constructor(...stores: Array<Store<number, 'range'>>) {
+    super(...stores)
 
     this.addStylesheet(stylesheet)
 
@@ -69,12 +69,12 @@ export class TweakerRangeManagerElement extends TweakerNumberManagerElement<'ran
           min: this.min,
           max: this.max,
           step: this.step,
-          value: this.store,
+          value: this.firstStore,
         },
         events: {
           input: (e) => {
-            this.store.current = parseFloat(
-              (e.currentTarget as HTMLInputElement).value
+            this.updateStores(
+              parseFloat((e.currentTarget as HTMLInputElement).value)
             )
           },
         },

@@ -11,12 +11,12 @@ export class TweakerNumberManagerElement<
   #min: number
   #max: number
 
-  constructor(store: Store<number, M>) {
-    super(store)
+  constructor(...stores: Array<Store<number, M>>) {
+    super(...stores)
 
-    this.#min = this.store.passport?.manager?.min || 0
-    this.#max = this.store.passport?.manager?.max || 1
-    this.#step = this.store.passport?.manager?.step || 0.01
+    this.#min = this.firstStore.passport?.manager?.min || 0
+    this.#max = this.firstStore.passport?.manager?.max || 1
+    this.#step = this.firstStore.passport?.manager?.step || 0.01
   }
 
   protected get min() {
@@ -42,11 +42,11 @@ export class TweakerNumberManagerElement<
   }
 
   protected connectedCallback() {
-    this.store.addMiddleware(this.#storeMiddleware)
+    this.firstStore.addMiddleware(this.#storeMiddleware)
   }
 
   protected disconnectedCallback() {
-    this.store.removeMiddleware(this.#storeMiddleware)
+    this.firstStore.removeMiddleware(this.#storeMiddleware)
   }
 
   #storeMiddleware: StoreMiddleware<number> = (v) => {

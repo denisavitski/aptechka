@@ -19,6 +19,7 @@ import resetIcon from '@assets/icons/reset.svg?raw'
 import { tweakerManagerConstructors } from './tweakerManagerConstructors'
 import { aptechkaTheme } from '@packages/theme'
 import { dispatchSizeChangeEvent } from '@packages/utils'
+import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -81,24 +82,28 @@ export interface TweakerFieldParameters {
 
 @define('e-tweaker-field')
 export class TweakerFieldElement extends CustomElement {
-  #store: Store<any, StoreManagerType, any> = null!
+  #stores: Array<Store<any, StoreManagerType, any>> = []
   #key: string
   #name: string
   #pointerEnter = false
+  #storeManager: TweakerStoreManagerElement<any, any>
 
   constructor(parameters: TweakerFieldParameters) {
     super()
-    this.#store = parameters.store
-    this.#key = this.#store.passport!.name
+
+    this.#stores = [parameters.store]
+    this.#key = parameters.store.passport!.name
     this.#name = this.#key.split('.').slice(-1).toString()
+
+    const type = parameters.store.passport?.manager?.type || 'string'
+
+    this.#storeManager = new tweakerManagerConstructors[type](this.#stores[0])
 
     this.openShadow(stylesheet)
 
-    const type = this.#store.passport?.manager?.type || 'string'
-
     element(this, {
       class: {
-        disabled: this.#store.passport?.manager?.disabled || false,
+        disabled: parameters.store.passport?.manager?.disabled || false,
       },
       events: {
         pointerleave: () => {
@@ -122,7 +127,7 @@ export class TweakerFieldElement extends CustomElement {
                   children: copyIcon,
                   events: {
                     click: () => {
-                      navigator.clipboard.writeText(this.#store.current)
+                      navigator.clipboard.writeText(this.#stores[0].current)
                     },
                   },
                 }),
@@ -131,7 +136,9 @@ export class TweakerFieldElement extends CustomElement {
                   children: resetIcon,
                   events: {
                     click: () => {
-                      this.#store.reset()
+                      this.#stores.forEach((store) => {
+                        store.reset()
+                      })
                     },
                   },
                 }),
@@ -139,7 +146,7 @@ export class TweakerFieldElement extends CustomElement {
             }),
           ],
         }),
-        new tweakerManagerConstructors[type](this.#store),
+        this.#storeManager,
       ],
     })
   }
@@ -152,8 +159,12 @@ export class TweakerFieldElement extends CustomElement {
     return this.#name
   }
 
-  public get store() {
-    return this.#store
+  public get stores() {
+    return this.#stores
+  }
+
+  public addStore(store: Store<any, any, any>) {
+    this.#storeManager.addStore(store)
   }
 
   protected connectedCallback() {
@@ -168,7 +179,7 @@ export class TweakerFieldElement extends CustomElement {
   }
 
   #storesChangeListener = () => {
-    if (!activeStores.current.includes(this.#store)) {
+    if (!activeStores.current.find((s) => this.#stores.includes(s))) {
       this.remove()
     }
   }
@@ -176,9 +187,11 @@ export class TweakerFieldElement extends CustomElement {
   #keydownListener = (e: KeyboardEvent) => {
     if (this.#pointerEnter) {
       if ((e.metaKey || e.ctrlKey) && e.code === 'KeyC') {
-        navigator.clipboard.writeText(this.#store.current)
+        navigator.clipboard.writeText(this.#stores[0].current)
       } else if ((e.metaKey || e.ctrlKey) && e.code === 'KeyR') {
-        this.#store.reset()
+        this.#stores.forEach((store) => {
+          store.reset()
+        })
         e.preventDefault()
       }
     }

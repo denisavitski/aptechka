@@ -53,21 +53,21 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
   string,
   'select'
 > {
-  constructor(store: Store<string, 'select'>) {
-    super(store)
+  constructor(...stores: Array<Store<string, 'select'>>) {
+    super(...stores)
 
     this.openShadow(stylesheet)
 
-    const variants = this.store.passport?.manager?.variants || []
+    const variants = this.firstStore.passport?.manager?.variants || []
 
     element(this, {
       shadowChildren: custom('e-select', {
         attributes: {
-          value: this.store,
+          value: this.firstStore,
         },
         events: {
           change: (e) => {
-            this.store.current = (e.currentTarget as SelectElement).value
+            this.updateStores((e.currentTarget as SelectElement).value)
           },
         },
         children: [
