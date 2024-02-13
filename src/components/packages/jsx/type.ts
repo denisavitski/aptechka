@@ -207,6 +207,7 @@ declare global {
       itemRef?: StoreOr<string>
 
       shadow?: boolean
+      forceSvg?: boolean
     }
 
     type UnknownAttributes = {

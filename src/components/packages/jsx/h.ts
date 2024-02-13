@@ -19,8 +19,8 @@ let componentConstructorObject: HConstructorObject | undefined
 export function h(
   tag: string | JSX.Component,
   attrs: JSX.HTMLAttributes | JSX.UnknownAttributes | null,
-  ...children: Array<JSX.ComponentChild | ElementConstructor>
-): JSX.Element | ElementConstructor {
+  ...children: Array<JSX.ComponentChild | ElementConstructor<any>>
+): JSX.Element | ElementConstructor<any> {
   if (typeof tag === 'function') {
     if ((tag as any).isFragment) {
       return (tag as any)({ ...attrs, children })
@@ -45,7 +45,7 @@ export function h(
     return new CustomElement((e) => {
       const res = tag({ ...attrs, children })
 
-      let elementConstructor: ElementConstructor = null!
+      let elementConstructor: ElementConstructor<any> = null!
 
       if (!componentConstructorObject && res) {
         elementConstructor = new ElementConstructor(e, {
@@ -90,7 +90,9 @@ export function h(
       } else if (name === 'ref') {
         constructorObject.ref = value
       } else if (name === 'shadow') {
-        constructorObject.shadow = true
+        constructorObject.shadow = value !== 'false' ? true : false
+      } else if (name === 'forceSvg') {
+        constructorObject.forceSvg = value !== 'false' ? true : false
       } else {
         if (!constructorObject.attributes) {
           constructorObject.attributes = {}
@@ -105,9 +107,7 @@ export function h(
     componentConstructorObject = constructorObject
     return Fragment({ children })
   } else {
-    const elementConstructor = new ElementConstructor({
-      [tag as ElementConstructorTagNames]: constructorObject,
-    })
+    const elementConstructor = new ElementConstructor(tag, constructorObject)
 
     return elementConstructor
   }

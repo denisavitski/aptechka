@@ -1,13 +1,8 @@
 import '@packages/studio'
-import { Store } from '@packages/store'
-import { useConnect, useDamped, useDerived, useDisconnect, useStyle } from '..'
+import { useStyle } from '..'
+import classes from './styles.module.css'
 
 const Component1: JSX.Component = () => {
-  const damped = useDamped({ default: 0, damping: 0.01 })
-  const derived = useDerived(damped, (v) => {
-    return `translateX(${v}px)`
-  })
-
   useStyle({
     '#kek': {
       display: 'block',
@@ -17,37 +12,20 @@ const Component1: JSX.Component = () => {
     },
   })
 
-  return (
-    <component
-      id="kek"
-      style={{
-        transform: derived,
-      }}
-      onClick={() => {
-        damped.shift(100)
-      }}
-    ></component>
-  )
+  return <component id="kek"></component>
 }
 
 export const App: JSX.Component = () => {
-  const store = new Store<any>(null!)
-
-  useConnect(() => {
-    console.log('APP connect')
+  useStyle({
+    h1: {
+      color: 'red',
+    },
   })
 
-  useDisconnect(() => {
-    console.log('APP disconnect')
-  })
-
-  addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-      store.current = <Component1></Component1>
-    } else if (e.key === '2') {
-      store.current = null
-    }
-  })
-
-  return <component>{store}</component>
+  return (
+    <component shadow>
+      <h1 class={classes.redColor}>HEH</h1>
+      <svg></svg>
+    </component>
+  )
 }

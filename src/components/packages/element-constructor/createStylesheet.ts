@@ -1,10 +1,8 @@
 import { ElementConstructorJSS } from './ElementConstructor'
-import { style } from './htmlTags'
+import { style } from './tags'
 
 export function createStylesheet<T extends ElementConstructorJSS>(object?: T) {
   const sheet = new CSSStyleSheet()
-  sheet.replaceSync(
-    (style(object).rootElements[0] as HTMLStyleElement).innerHTML
-  )
+  sheet.replaceSync(style(object).node.innerHTML)
   return sheet
 }

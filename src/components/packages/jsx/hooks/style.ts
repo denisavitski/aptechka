@@ -14,7 +14,7 @@ export function useStyle(object?: ElementConstructorJSS | undefined) {
 
   useConnect((e) => {
     if (!e.shadowRoot) {
-      const styleElement = style(object).rootElements[0] as HTMLStyleElement
+      const styleElement = style(object).node
 
       const styleTags = [...document.head.querySelectorAll('style')]
 

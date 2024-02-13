@@ -34,6 +34,6 @@ if (isBrowser) {
   document.head.appendChild(
     style({
       ':root': aptechkaTheme.style,
-    }).rootElements[0]
+    }).node
   )
 }

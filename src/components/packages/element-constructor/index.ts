@@ -1,5 +1,4 @@
 export * from './ElementConstructor'
-export * from './htmlTags'
+export * from './tags'
 export * from './createStylesheet'
 export * from './createTheme'
-export * from './svgTags'

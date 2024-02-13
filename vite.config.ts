@@ -96,5 +96,10 @@ export default defineConfig((e) => {
       jsxFragment: 'Fragment',
       jsxInject: `import { h, Fragment } from '@packages/jsx'`,
     },
+    css: {
+      modules: {
+        localsConvention: 'camelCaseOnly',
+      },
+    },
   }
 })
