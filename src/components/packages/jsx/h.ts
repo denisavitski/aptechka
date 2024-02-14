@@ -21,6 +21,8 @@ export function h(
   attrs: JSX.HTMLAttributes | JSX.UnknownAttributes | null,
   ...children: Array<JSX.ComponentChild | ElementConstructor<any>>
 ): JSX.Element | ElementConstructor<any> {
+  children = children.flat()
+
   if (typeof tag === 'function') {
     if ((tag as any).isFragment) {
       return (tag as any)({ ...attrs, children })

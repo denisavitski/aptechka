@@ -1,6 +1,6 @@
 export function dispatchSizeChangeEvent(node: Node) {
   node.dispatchEvent(
-    new CustomEvent('e-size-change', {
+    new CustomEvent('sizeChange', {
       bubbles: true,
       composed: true,
     })
@@ -9,6 +9,6 @@ export function dispatchSizeChangeEvent(node: Node) {
 
 declare global {
   interface HTMLElementEventMap {
-    'e-size-change': CustomEvent
+    sizeChange: CustomEvent
   }
 }

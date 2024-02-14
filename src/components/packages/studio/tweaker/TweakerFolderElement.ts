@@ -90,7 +90,7 @@ export class TweakerFolderElement extends AccordionElement {
 
     element(this, {
       events: {
-        'e-accordion-item-toggle': (e) => {
+        accordionItemToggle: (e) => {
           e.stopPropagation()
 
           if (e.detail.opened) {

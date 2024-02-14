@@ -62,15 +62,12 @@ export class SelectHeadElement extends SelectUserElement {
     this.selectElement.addEventListener('change', this.#changeListener)
     this.#changeListener()
 
-    this.selectElement.addEventListener('e-select-toggle', this.#toggleListener)
+    this.selectElement.addEventListener('selectToggle', this.#toggleListener)
   }
 
   protected disconnectedCallback() {
     this.selectElement.removeEventListener('change', this.#changeListener)
-    this.selectElement.removeEventListener(
-      'e-select-toggle',
-      this.#toggleListener
-    )
+    this.selectElement.removeEventListener('selectToggle', this.#toggleListener)
   }
 
   #changeListener = () => {

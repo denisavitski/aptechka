@@ -181,7 +181,7 @@ export class SelectElement extends CustomElement {
 
   #dispatchToggleEvent() {
     this.dispatchEvent(
-      new CustomEvent<SelectToggleDetail>('e-select-toggle', {
+      new CustomEvent<SelectToggleDetail>('selectToggle', {
         bubbles: true,
         composed: true,
         detail: {
@@ -198,6 +198,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    'e-select-toggle': CustomEvent<SelectToggleDetail>
+    selectToggle: CustomEvent<SelectToggleDetail>
   }
 }

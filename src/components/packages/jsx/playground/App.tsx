@@ -1,31 +1,46 @@
 import '@packages/studio'
-import { useStyle } from '..'
-import classes from './styles.module.css'
+import { createContext, useContext } from '..'
 
-const Component1: JSX.Component = () => {
-  useStyle({
-    '#kek': {
-      display: 'block',
-      width: '100px',
-      height: '100px',
-      backgroundColor: 'red',
-    },
-  })
+const DepNested: JSX.Component = () => {
+  console.log('DepNested', useContext('xx'))
+  return <div>Deep Nested 2</div>
+}
 
-  return <component id="kek"></component>
+const Nested: JSX.Component = () => {
+  console.log('Nested', useContext('xx'))
+  return <div>Nested 2</div>
+}
+
+const Component2: JSX.Component = () => {
+  console.log('Component2', useContext('xx'))
+
+  return <div>Component 2</div>
+}
+
+const Component1: JSX.Component = (e) => {
+  const contextValue = 'a'
+
+  createContext('xx', contextValue)
+
+  return (
+    <component>
+      {e?.children}
+      <div></div>
+      <div></div>
+      <div></div>
+    </component>
+  )
 }
 
 export const App: JSX.Component = () => {
-  useStyle({
-    h1: {
-      color: 'red',
-    },
-  })
+  console.log('App', useContext('xx'))
 
   return (
-    <component shadow>
-      <h1 class={classes.redColor}>HEH</h1>
-      <svg></svg>
+    <component>
+      <Component1>
+        <div>123</div>
+        <div>456</div>
+      </Component1>
     </component>
   )
 }

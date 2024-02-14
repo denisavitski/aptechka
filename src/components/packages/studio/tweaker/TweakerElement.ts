@@ -57,6 +57,7 @@ const stylesheet = createStylesheet({
 
     fill: aptechkaTheme.colorLight.var,
     transitionProperty: `fill`,
+    transitionDuration: aptechkaTheme.durationShort.var,
   },
 
   '.tweaker-button:hover': {
@@ -209,7 +210,7 @@ export class TweakerElement extends TweakerFolderElement {
       }),
     ]
 
-    this.addEventListener('e-accordion-item-toggle', (e) => {
+    this.addEventListener('accordionItemToggle', (e) => {
       if (e.detail.opened) {
         this.style.opacity = '1'
       } else {

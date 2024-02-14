@@ -15,3 +15,4 @@ export {
 } from './hooks/store'
 export { useStyle } from './hooks/style'
 export { useWindowResize } from './hooks/window-resize'
+export { createContext, useContext } from './hooks/context'

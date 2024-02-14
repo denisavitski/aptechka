@@ -20,18 +20,18 @@ declare global {
       | undefined
       | null
       | void
-      | Store<any>
+      | Store<any, any, any>
       | ElementConstructor
 
-    export type ComponentChildren = ComponentChild | ComponentChild[]
+    export type ComponentChildren = ComponentChild | Array<ComponentChild>
 
     interface BaseProps {
-      children?: ComponentChildren
+      children?: Array<ComponentChild>
     }
 
     type Component<TProps extends object = object> = (
       props?: BaseProps & TProps
-    ) => Element
+    ) => ComponentChild
 
     type Element = ComponentChild
 
@@ -53,7 +53,7 @@ declare global {
     }>
 
     interface DOMAttributes {
-      children?: ComponentChildren
+      children?: ComponentChildren | Array<ComponentChildren>
       ref?: { current: any }
     }
 
@@ -214,8 +214,12 @@ declare global {
       [key: string]: any
     }
 
+    type SpecialTagNames = 'component'
+
     type IntrinsicElementsHTML = {
-      [TKey in ElementConstructorTagNames | 'component']?: UnknownAttributes &
+      [TKey in
+        | ElementConstructorTagNames
+        | SpecialTagNames]?: UnknownAttributes &
         HTMLAttributes &
         HTMLOrSVGEvents
     }

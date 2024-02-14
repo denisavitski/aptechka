@@ -51,7 +51,7 @@ class AccordionItem {
 
       this.#headElement.addEventListener('click', this.#headClickListener)
       this.#element.addEventListener(
-        'e-size-change',
+        'sizeChange',
         this.#childrenSizeChangeListener
       )
 
@@ -78,7 +78,7 @@ class AccordionItem {
 
       this.#headElement.removeEventListener('click', this.#headClickListener)
       this.#element.removeEventListener(
-        'e-size-change',
+        'sizeChange',
         this.#childrenSizeChangeListener
       )
 
@@ -180,16 +180,13 @@ class AccordionItem {
   #dispatchEvent(name: 'toggle' | 'size-change') {
     if (name === 'toggle') {
       this.#element.dispatchEvent(
-        new CustomEvent<AccordionItemToggleEventDetail>(
-          'e-accordion-item-toggle',
-          {
-            bubbles: true,
-            composed: true,
-            detail: {
-              opened: this.#opened,
-            },
-          }
-        )
+        new CustomEvent<AccordionItemToggleEventDetail>('accordionItemToggle', {
+          bubbles: true,
+          composed: true,
+          detail: {
+            opened: this.#opened,
+          },
+        })
       )
     } else if (name === 'size-change') {
       dispatchSizeChangeEvent(this.#root)
@@ -304,6 +301,6 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    'e-accordion-item-toggle': CustomEvent<AccordionItemToggleEventDetail>
+    accordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
   }
 }

@@ -20,7 +20,7 @@ export function useStore<
 ) {
   const store = new Store<StoreType, StoreManager, Entry>(...parameters)
 
-  currentComponentElement.stores.add(store)
+  currentComponentElement.attachStore(store)
 
   return store
 }
@@ -30,7 +30,7 @@ export function useDerived<DerivedType, StoreType>(
 ) {
   const store = new Derived<DerivedType, StoreType>(...parameters)
 
-  currentComponentElement.stores.add(store)
+  currentComponentElement.attachStore(store)
 
   return store
 }
@@ -45,7 +45,7 @@ export function useDerivedArray<
 ) {
   const store = new DerivedArray<DerivedType, StoreType>(...parameters)
 
-  currentComponentElement.stores.add(store)
+  currentComponentElement.attachStore(store)
 
   return store
 }
@@ -55,7 +55,7 @@ export function useResource<StoreType>(
 ) {
   const store = new Resource<StoreType>(...parameters)
 
-  currentComponentElement.stores.add(store)
+  currentComponentElement.attachStore(store)
 
   return store
 }
@@ -65,7 +65,7 @@ export function useComposed<StoreType>(
 ) {
   const store = new Composed<StoreType>(...parameters)
 
-  currentComponentElement.stores.add(store)
+  currentComponentElement.attachStore(store)
 
   return store
 }

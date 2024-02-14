@@ -6,17 +6,17 @@ import {
 } from '../ComponentElement'
 
 export function useCreate(callback: ComponentElementCreateCallback) {
-  currentComponentElement.createCallbacks.add(callback)
+  currentComponentElement.addCreateCallback(callback)
 }
 
 export function useConnect(callback: ComponentElementConnectCallback) {
   if (isBrowser) {
-    currentComponentElement.connectCallbacks.add(callback)
+    currentComponentElement.addConnectCallback(callback)
   }
 }
 
 export function useDisconnect(callback: ComponentElementConnectCallback) {
   if (isBrowser) {
-    currentComponentElement.disconnectCallbacks.add(callback)
+    currentComponentElement.addDisconnectCallback(callback)
   }
 }

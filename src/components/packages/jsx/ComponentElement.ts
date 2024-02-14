@@ -14,13 +14,20 @@ export type ComponentElementConstructorCallback = (
 
 export let currentComponentElement = null! as ComponentElement
 
-export class ComponentElement extends HTMLElement {
-  public createCallbacks: Set<ComponentElementCreateCallback> = new Set()
-  public connectCallbacks: Set<ComponentElementConnectCallback> = new Set()
-  public disconnectCallbacks: Set<ComponentElementDisconnectCallback> =
-    new Set()
+export let contexts: Map<
+  string,
+  {
+    componentElement: ComponentElement
+    value: any
+  }
+> = new Map()
 
-  public stores: Set<Store<any, any, any>> = new Set()
+export class ComponentElement extends HTMLElement {
+  #createCallbacks: Set<ComponentElementCreateCallback> = new Set()
+  #connectCallbacks: Set<ComponentElementConnectCallback> = new Set()
+  #disconnectCallbacks: Set<ComponentElementDisconnectCallback> = new Set()
+
+  #stores: Set<Store<any, any, any>> = new Set()
 
   #elementConstructor: ElementConstructor
 
@@ -31,31 +38,53 @@ export class ComponentElement extends HTMLElement {
 
     this.#elementConstructor = callback(this)
 
-    this.createCallbacks.forEach((callback) => {
+    contexts.forEach((context, key) => {
+      if (context.componentElement === this) {
+        contexts.delete(key)
+      }
+    })
+
+    this.#createCallbacks.forEach((callback) => {
       callback(this)
     })
   }
 
+  public addCreateCallback(callback: ComponentElementCreateCallback) {
+    this.#createCallbacks.add(callback)
+  }
+
+  public addConnectCallback(callback: ComponentElementConnectCallback) {
+    this.#connectCallbacks.add(callback)
+  }
+
+  public addDisconnectCallback(callback: ComponentElementDisconnectCallback) {
+    this.#createCallbacks.add(callback)
+  }
+
+  public attachStore(store: Store<any, any, any>) {
+    this.#stores.add(store)
+  }
+
   protected connectedCallback() {
-    this.connectCallbacks.forEach((callback) => {
+    this.#connectCallbacks.forEach((callback) => {
       const disconnect = callback(this)
 
       if (disconnect) {
-        this.disconnectCallbacks.add(callback)
+        this.#disconnectCallbacks.add(callback)
       }
     })
   }
 
   protected disconnectedCallback() {
-    this.disconnectCallbacks.forEach((callback) => {
+    this.#disconnectCallbacks.forEach((callback) => {
       callback(this)
     })
 
     this.#elementConstructor.destroy()
 
-    this.disconnectCallbacks.clear()
-    this.connectCallbacks.clear()
-    this.stores.forEach((store) => store.close())
-    this.stores.clear()
+    this.#disconnectCallbacks.clear()
+    this.#connectCallbacks.clear()
+    this.#stores.forEach((store) => store.close())
+    this.#stores.clear()
   }
 }
