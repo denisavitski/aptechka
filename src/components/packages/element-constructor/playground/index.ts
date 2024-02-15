@@ -1,17 +1,19 @@
-import { ElementConstructor } from '..'
-
-console.log('Playground')
+import { ElementConstructor, style } from '..'
 
 const v = new ElementConstructor('div', {
-  style: {
-    fontSize: '100px',
-  },
-  children: [123],
+  class: 'xxx',
+  children: [
+    style({
+      '.xxx': {
+        fontSize: '100px',
+      },
+    }),
+    123,
+  ],
   onClick: {
     callback: (e) => {
       console.log(e)
     },
   },
 })
-
 document.body.appendChild(v.node)

@@ -87,7 +87,10 @@ export class Ticker {
 
   constructor() {
     if (isBrowser) {
-      document.addEventListener('visibilitychange', this.#documentVisibilityChangeListener)
+      document.addEventListener(
+        'visibilitychange',
+        this.#documentVisibilityChangeListener
+      )
     }
   }
 
@@ -111,12 +114,16 @@ export class Ticker {
       return
     }
 
-    const matches = this.#subscribers.filter((subscriber) => subscriber.callback === callback)
+    const matches = this.#subscribers.filter(
+      (subscriber) => subscriber.callback === callback
+    )
 
     if (matches.length) {
       matches.forEach((m) => m.destroy())
 
-      this.#subscribers = this.#subscribers.filter((subscriber) => subscriber.callback !== callback)
+      this.#subscribers = this.#subscribers.filter(
+        (subscriber) => subscriber.callback !== callback
+      )
 
       if (!this.#subscribers.length) {
         this.#cancelAnimationFrame()
@@ -127,7 +134,10 @@ export class Ticker {
   public destroy() {
     if (isBrowser) {
       this.#cancelAnimationFrame()
-      document.removeEventListener('visibilitychange', this.#documentVisibilityChangeListener)
+      document.removeEventListener(
+        'visibilitychange',
+        this.#documentVisibilityChangeListener
+      )
     }
   }
 
