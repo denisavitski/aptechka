@@ -81,18 +81,16 @@ export class SelectElement extends CustomElement {
       this.#resizeObserver = new ResizeObserver(this.#resizeObserverListener)
 
       element(this, {
-        shadowChildren: [
+        children: [
           button({
             class: 'head',
-            children: slot({ attributes: { name: 'head' } }),
-            events: {
-              click: () => {
-                if (this.opened) {
-                  this.close()
-                } else {
-                  this.open()
-                }
-              },
+            children: slot({ name: 'head' }),
+            onClick: () => {
+              if (this.opened) {
+                this.close()
+              } else {
+                this.open()
+              }
             },
           }),
           div({

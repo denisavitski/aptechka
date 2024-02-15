@@ -40,10 +40,10 @@ export class SelectHeadElement extends SelectUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        shadowChildren: [
+        children: [
           slot(),
           slot({
-            attributes: { name: 'arrow' },
+            name: 'arrow',
             children: element(arrowIcon, { class: 'default-arrow' }),
           }),
         ],

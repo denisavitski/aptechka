@@ -105,16 +105,13 @@ export class TweakerFieldElement extends CustomElement {
       class: {
         disabled: parameters.store.passport?.manager?.disabled || false,
       },
-      events: {
-        pointerleave: () => {
-          this.#pointerEnter = false
-        },
-
-        pointerenter: () => {
-          this.#pointerEnter = true
-        },
+      onPointerleave: () => {
+        this.#pointerEnter = false
       },
-      shadowChildren: [
+      onPointerenter: () => {
+        this.#pointerEnter = true
+      },
+      children: [
         div({
           class: 'head',
           children: [
@@ -125,21 +122,17 @@ export class TweakerFieldElement extends CustomElement {
                 button({
                   class: 'head-button',
                   children: copyIcon,
-                  events: {
-                    click: () => {
-                      navigator.clipboard.writeText(this.#stores[0].current)
-                    },
+                  onClick: () => {
+                    navigator.clipboard.writeText(this.#stores[0].current)
                   },
                 }),
                 button({
                   class: 'head-button',
                   children: resetIcon,
-                  events: {
-                    click: () => {
-                      this.#stores.forEach((store) => {
-                        store.reset()
-                      })
-                    },
+                  onClick: () => {
+                    this.#stores.forEach((store) => {
+                      store.reset()
+                    })
                   },
                 }),
               ],

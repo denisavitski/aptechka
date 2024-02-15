@@ -20,14 +20,12 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
     this.openShadow(stylesheet)
 
     element(this, {
-      shadowChildren: [
+      children: [
         a({
-          attributes: {
-            href: this.firstStore,
-            target: this.firstStore.passport?.manager?.sameWindow
-              ? '_self'
-              : '_blank',
-          },
+          href: this.firstStore,
+          target: this.firstStore.passport?.manager?.sameWindow
+            ? '_self'
+            : '_blank',
           children: this.firstStore,
         }),
       ],

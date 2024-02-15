@@ -2,10 +2,16 @@ import { ElementConstructor } from '..'
 
 console.log('Playground')
 
-new ElementConstructor('a', {
-  children: [123],
-  attributes: {
-    href: '/',
+const v = new ElementConstructor('div', {
+  style: {
+    fontSize: '100px',
   },
-  parent: document.body,
+  children: [123],
+  onClick: {
+    callback: (e) => {
+      console.log(e)
+    },
+  },
 })
+
+document.body.appendChild(v.node)

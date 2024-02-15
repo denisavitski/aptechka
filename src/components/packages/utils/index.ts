@@ -89,6 +89,8 @@ export type {
   Requiredish,
   WithRequired,
   Split,
+  SplitFirst,
+  Tail,
   KebabToCamel,
   CamelToKebab,
 } from './ts-utility'

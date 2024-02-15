@@ -125,42 +125,34 @@ export class TweakerElement extends TweakerFolderElement {
     this.head.current = [
       div({
         class: 'tweaker-buttons',
-        events: {
-          click: (e) => {
-            e.stopPropagation()
-          },
+        onClick: (e) => {
+          e.stopPropagation()
         },
         children: [
           button({
             class: 'tweaker-button',
             children: resetIcon,
-            events: {
-              click: () => {
-                storeRegistry.resetState()
-              },
+            onClick: () => {
+              storeRegistry.resetState()
             },
           }),
           button({
             class: ['tweaker-button'],
             children: [copyIcon],
-            events: {
-              click: () => {
-                navigator.clipboard.writeText(
-                  JSON.stringify(storeRegistry.getState())
-                )
-              },
+            onClick: () => {
+              navigator.clipboard.writeText(
+                JSON.stringify(storeRegistry.getState())
+              )
             },
           }),
           button({
             class: 'tweaker-button',
             children: downloadIcon,
-            events: {
-              click: () => {
-                createJSONAndSave(
-                  storeRegistry.projectName,
-                  storeRegistry.getState()
-                )
-              },
+            onClick: () => {
+              createJSONAndSave(
+                storeRegistry.projectName,
+                storeRegistry.getState()
+              )
             },
           }),
           label({
@@ -168,43 +160,37 @@ export class TweakerElement extends TweakerFolderElement {
             children: [
               uploadIcon,
               input({
-                attributes: {
-                  type: 'file',
-                },
+                type: 'file',
                 style: {
                   display: 'none',
                 },
-                events: {
-                  change: (e) => {
-                    const input = e.currentTarget as HTMLInputElement
+                onChange: (e) => {
+                  const input = e.currentTarget as HTMLInputElement
 
-                    input.onchange = () => {
-                      const file = input.files?.[0]
+                  input.onchange = () => {
+                    const file = input.files?.[0]
 
-                      if (file) {
-                        const reader = new FileReader()
+                    if (file) {
+                      const reader = new FileReader()
 
-                        reader.onload = (e) => {
-                          const result = e.target?.result?.toString()
+                      reader.onload = (e) => {
+                        const result = e.target?.result?.toString()
 
-                          if (result) {
-                            storeRegistry.loadState(result)
-                          }
+                        if (result) {
+                          storeRegistry.loadState(result)
                         }
-                        reader.readAsText(file)
                       }
-
-                      input.onchange = null
+                      reader.readAsText(file)
                     }
 
-                    input.click()
-                  },
+                    input.onchange = null
+                  }
+
+                  input.click()
                 },
               }),
             ],
-            events: {
-              click: () => {},
-            },
+            onClick: () => {},
           }),
         ],
       }),

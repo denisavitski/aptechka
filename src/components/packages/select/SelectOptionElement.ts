@@ -22,20 +22,16 @@ export class SelectOptionElement extends SelectUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        attributes: {
-          tabIndex: '0',
+        tabIndex: '0',
+        onClick: () => {
+          this.#pick()
         },
-        events: {
-          click: () => {
+        onKeydown: (e) => {
+          if (e.code === 'Space') {
             this.#pick()
-          },
-          keydown: (e) => {
-            if (e.code === 'Space') {
-              this.#pick()
-            }
-          },
+          }
         },
-        shadowChildren: [slot()],
+        children: [slot()],
       })
     }
   }

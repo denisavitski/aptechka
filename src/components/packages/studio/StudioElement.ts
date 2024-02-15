@@ -19,7 +19,7 @@ export class StudioElement extends CustomElement {
     studioStorage.load()
 
     element(this, {
-      shadowChildren: [new TweakerElement()],
+      children: [new TweakerElement()],
     })
   }
 

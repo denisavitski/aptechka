@@ -3,12 +3,7 @@ import '@packages/select'
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'
-import {
-  createStylesheet,
-  custom,
-  element,
-  span,
-} from '@packages/element-constructor'
+import { createStylesheet, element, span } from '@packages/element-constructor'
 
 import { SelectElement } from '@packages/select'
 import { aptechkaTheme } from '@packages/theme'
@@ -61,31 +56,23 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
     const variants = this.firstStore.passport?.manager?.variants || []
 
     element(this, {
-      shadowChildren: custom('e-select', {
-        attributes: {
-          value: this.firstStore,
+      children: element('e-select', {
+        value: this.firstStore,
+        onChange: (e) => {
+          this.updateStores((e.currentTarget as SelectElement).value)
         },
-        events: {
-          change: (e) => {
-            this.updateStores((e.currentTarget as SelectElement).value)
-          },
-        },
-        children: [
-          custom('e-select-head', {
-            children: [
+        lightChildren: [
+          element('e-select-head', {
+            lightChildren: [
               span({
-                attributes: {
-                  'data-value-holder': '',
-                },
+                'data-value-holder': '',
               }),
             ],
           }),
           ...variants.map((v, i) =>
-            custom('e-select-option', {
-              children: v,
-              attributes: {
-                default: i === 0 ? true : null,
-              },
+            element('e-select-option', {
+              lightChildren: v,
+              default: i === 0 ? true : null,
             })
           ),
         ],

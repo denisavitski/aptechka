@@ -64,19 +64,15 @@ export class TweakerRangeManagerElement extends TweakerNumberManagerElement<'ran
     this.appendContent(
       input({
         class: 'range-input',
-        attributes: {
-          type: 'range',
-          min: this.min,
-          max: this.max,
-          step: this.step,
-          value: this.firstStore,
-        },
-        events: {
-          input: (e) => {
-            this.updateStores(
-              parseFloat((e.currentTarget as HTMLInputElement).value)
-            )
-          },
+        type: 'range',
+        min: this.min,
+        max: this.max,
+        step: this.step,
+        value: this.firstStore,
+        onInput: (e) => {
+          this.updateStores(
+            parseFloat((e.currentTarget as HTMLInputElement).value)
+          )
         },
       })
     )

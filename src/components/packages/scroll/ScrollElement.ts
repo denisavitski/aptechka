@@ -202,13 +202,11 @@ export class ScrollElement extends CustomElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        attributes: {
-          tabIndex: 0,
-        },
-        shadowChildren: [
+        tabIndex: 0,
+        children: [
           div({
             class: 'static',
-            children: [slot({ attributes: { name: 'static' } })],
+            children: [slot({ name: 'static' })],
           }),
           div({
             class: 'content',

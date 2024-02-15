@@ -33,15 +33,11 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
     this.openShadow(stylesheet)
 
     element(this, {
-      shadowChildren: [
+      children: [
         input({
-          attributes: {
-            type: 'checkbox',
-          },
-          events: {
-            change: (e) => {
-              this.updateStores((e.currentTarget as HTMLInputElement).checked)
-            },
+          type: 'checkbox',
+          onChange: (e) => {
+            this.updateStores((e.currentTarget as HTMLInputElement).checked)
           },
           ref: (e) => {
             this.firstStore.subscribe((d) => {

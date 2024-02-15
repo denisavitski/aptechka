@@ -472,8 +472,16 @@ export function wbr(object?: ElementConstructorTagObject<'wbr'>) {
   return new ElementConstructor('wbr', object)
 }
 
-export function custom<
-  T extends Extract<ElementConstructorTagNames, `e-${string}`>
->(tag: T, object?: ElementConstructorTagObject<T>) {
-  return new ElementConstructor(tag, object)
+export function fragment(object?: ElementConstructorTagObject<Node>) {
+  return new ElementConstructor(document.createDocumentFragment(), object)
+}
+
+export function contents(object?: ElementConstructorTagObject<'div'>) {
+  return new ElementConstructor('div', {
+    ...object,
+    style: {
+      display: 'contents',
+      ...object?.style,
+    },
+  })
 }

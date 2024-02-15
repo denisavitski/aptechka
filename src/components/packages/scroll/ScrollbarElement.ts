@@ -58,7 +58,7 @@ export class ScrollbarElement extends ScrollUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        shadowChildren: [slot({ ref: (e) => (this.#slotElement = e) })],
+        children: [slot({ ref: (e) => (this.#slotElement = e) })],
       })
     }
   }

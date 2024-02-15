@@ -3,7 +3,9 @@ export type NestedKeys<T> = T extends Node
   : T extends object
   ? {
       [K in keyof T]: T[K] extends infer U
-        ? `${Extract<K, string>}${NestedKeys<U> extends '' ? '' : '.'}${NestedKeys<U>}`
+        ? `${Extract<K, string>}${NestedKeys<U> extends ''
+            ? ''
+            : '.'}${NestedKeys<U>}`
         : never
     }[keyof T]
   : ''
@@ -18,7 +20,12 @@ export type NestedValueOf<Obj, Key extends string> = Obj extends object
     : never
   : never
 
-type Tail<T extends any[]> = ((...t: T) => void) extends (h: any, ...r: infer R) => void ? R : never
+export type Tail<T extends any[]> = ((...t: T) => void) extends (
+  h: any,
+  ...r: infer R
+) => void
+  ? R
+  : never
 
 export type DeepOmit<T, Path extends string[]> = T extends object
   ? Path['length'] extends 1
@@ -44,6 +51,14 @@ export type Split<S extends string, D extends string> = string extends S
   ? []
   : S extends `${infer T}${D}${infer U}`
   ? [T, ...Split<U, D>]
+  : [S]
+
+export type SplitFirst<S extends string, D extends string> = string extends S
+  ? string[]
+  : S extends ''
+  ? []
+  : S extends `${infer T}${D}${infer U}`
+  ? [T, U] // Change here to include only the first match
   : [S]
 
 export type KebabToCamel<S extends string> = S extends `${infer T}-${infer U}`

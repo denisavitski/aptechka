@@ -4,7 +4,6 @@ import {
   element,
   div,
   slot,
-  custom,
   span,
 } from '@packages/element-constructor'
 
@@ -123,25 +122,19 @@ export class ModalElement extends PopoverElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        shadowChildren: div({
+        children: div({
           class: 'inner',
-          attributes: {
-            outside: true,
-          },
+          outside: true,
           children: div({
             class: 'content',
             children: [
-              custom('e-popover-button', {
-                attributes: {
-                  type: 'close',
-                  target: this.id,
-                },
+              element('e-popover-button', {
+                type: 'close',
+                target: this.id,
                 class: 'close-button',
                 children: [
                   slot({
-                    attributes: {
-                      name: 'close-button',
-                    },
+                    name: 'close-button',
                     children: span({ class: 'close-button-default' }),
                   }),
                 ],

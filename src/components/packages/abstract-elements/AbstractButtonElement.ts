@@ -8,22 +8,18 @@ export abstract class AbstractButtonElement extends CustomElement {
 
     if (isBrowser) {
       element(this, {
-        attributes: {
-          tabIndex: this.getAttribute('tabindex') || '0',
-          role: 'button',
-        },
         style: {
           cursor: 'default',
         },
-        events: {
-          keydown: (e) => {
-            if (e.code === 'Space') {
-              this.click()
-            }
-          },
-          click: () => {
+        tabIndex: this.getAttribute('tabindex') || '0',
+        role: 'button',
+        onKeydown: (e) => {
+          if (e.code === 'Space') {
             this.click()
-          },
+          }
+        },
+        onClick: () => {
+          this.click()
         },
       })
     }

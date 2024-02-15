@@ -41,16 +41,12 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
     this.openShadow(stylesheet)
 
     element(this, {
-      shadowChildren: [
+      children: [
         input({
-          attributes: {
-            type: 'color',
-            value: this.firstStore,
-          },
-          events: {
-            input: (e) => {
-              this.updateStores((e.currentTarget as HTMLInputElement).value)
-            },
+          type: 'color',
+          value: this.firstStore,
+          onInput: (e) => {
+            this.updateStores((e.currentTarget as HTMLInputElement).value)
           },
         }),
       ],

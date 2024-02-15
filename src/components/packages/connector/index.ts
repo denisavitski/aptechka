@@ -1,5 +1,3 @@
-import { isBrowser } from '@packages/utils'
-
 export type ConnectorCallback = () => void
 
 interface ConnectorSubscriber {
@@ -23,13 +21,9 @@ export class Connector {
   #subscribers: Array<ConnectorSubscriber> = []
   #intervalId: ReturnType<typeof setInterval> | undefined
 
-  constructor() {
-    if (isBrowser) {
-      this.#intervalId = setInterval(this.#intervalListener, 100)
-    }
-  }
-
   public subscribe(node: Node, options: ConnectorOptions) {
+    const l = this.#subscribers.length
+
     this.#subscribers.push({
       node,
       connectCallback: options.connectCallback,
@@ -39,6 +33,11 @@ export class Connector {
       timer: 0,
       unsubscribeAfterDisconnect: options.unsubscribeAfterDisconnect || false,
     })
+
+    if (!l) {
+      this.#intervalId = setInterval(this.#intervalListener, 100)
+      this.#intervalListener()
+    }
 
     return () => {
       this.unsubscribe(options)
@@ -57,8 +56,12 @@ export class Connector {
     })
 
     this.#subscribers = this.#subscribers.filter(
-      (sub) => sub.connectCallback && sub.disconnectCallback
+      (sub) => sub.connectCallback || sub.disconnectCallback
     )
+
+    if (!this.#subscribers.length) {
+      clearInterval(this.#intervalId)
+    }
   }
 
   public destroy() {
@@ -67,8 +70,8 @@ export class Connector {
   }
 
   #intervalListener = () => {
-    for (let index = 0; index < this.#subscribers.length; index++) {
-      const subscriber = this.#subscribers[index]
+    for (let index = this.#subscribers.length - 1; index >= 0; index--) {
+      const subscriber = this.#subscribers[this.#subscribers.length - 1 - index]
 
       if (subscriber.node.isConnected && !subscriber.isConnected) {
         subscriber.connectCallback?.()

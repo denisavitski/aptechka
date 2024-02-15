@@ -50,19 +50,15 @@ export class TweakerStringManagerElement<
     this.openShadow(stylesheet)
 
     element(this, {
-      shadowChildren: [
+      children: [
         input({
           class: 'text-input',
-          attributes: {
-            type: 'string',
-            value: this.firstStore,
-          },
-          events: {
-            change: (e) => {
-              this.updateStores(
-                (e.currentTarget as HTMLInputElement).value as any
-              )
-            },
+          type: 'string',
+          value: this.firstStore,
+          onChange: (e) => {
+            this.updateStores(
+              (e.currentTarget as HTMLInputElement).value as any
+            )
           },
         }),
         this.#content,

@@ -48,7 +48,6 @@ export default defineConfig((e) => {
               'image/index': './src/components/packages/image/index.ts',
               'intersector/index':
                 './src/components/packages/intersector/index.ts',
-              'jsx/index': './src/components/packages/jsx/index.ts',
               'ladder/index': './src/components/packages/ladder/index.ts',
               'layout-box/index':
                 './src/components/packages/layout-box/index.ts',
@@ -90,11 +89,6 @@ export default defineConfig((e) => {
         '@packages': resolve(__dirname, 'src/components/packages'),
         '@assets': resolve(__dirname, 'src/assets'),
       },
-    },
-    esbuild: {
-      jsxFactory: 'h',
-      jsxFragment: 'Fragment',
-      jsxInject: `import { h, Fragment } from '@packages/jsx'`,
     },
     css: {
       modules: {

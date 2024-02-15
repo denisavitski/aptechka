@@ -53,7 +53,7 @@ export class CanvasElement extends CustomElement {
     this.openShadow(stylesheet)
 
     element(this, {
-      shadowChildren: canvas({
+      children: canvas({
         ref: (e) => {
           this.#canvasElement = e
           this.#context = e.getContext('2d')!

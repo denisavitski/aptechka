@@ -93,11 +93,6 @@
       "default": "./lib/intersector/index.js",
       "types": "./lib/intersector/index.d.ts"
     },
-    "./jsx": {
-      "require": "./lib/jsx/index.cjs",
-      "default": "./lib/jsx/index.js",
-      "types": "./lib/jsx/index.d.ts"
-    },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
       "default": "./lib/ladder/index.js",
@@ -244,9 +239,6 @@
       ],
       "intersector": [
         "lib/intersector/index.d.ts"
-      ],
-      "jsx": [
-        "lib/jsx/index.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"

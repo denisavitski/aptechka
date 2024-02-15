@@ -89,18 +89,16 @@ export class TweakerFolderElement extends AccordionElement {
     this.#mutationObserver = new MutationObserver(this.#mutationListener)
 
     element(this, {
-      events: {
-        accordionItemToggle: (e) => {
-          e.stopPropagation()
+      onAccordionItemToggle: (e) => {
+        e.stopPropagation()
 
-          if (e.detail.opened) {
-            studioStorage.openPanel(this.#key)
-          } else {
-            studioStorage.closePanel(this.#key)
-          }
-        },
+        if (e.detail.opened) {
+          studioStorage.openPanel(this.#key)
+        } else {
+          studioStorage.closePanel(this.#key)
+        }
       },
-      shadowChildren: [
+      children: [
         div({
           class: 'wrapper',
           children: [

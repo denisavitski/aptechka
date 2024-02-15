@@ -1,11 +1,23 @@
-const acc = document.querySelector('e-select')!
+import { element, span } from '@packages/element-constructor'
 
-const el = document.createElement('div')
-
-addEventListener('keydown', (e) => {
-  if (e.key === '1') {
-    acc.appendChild(el)
-  } else if (e.key === '2') {
-    el.appendChild(document.createElement('div'))
-  }
+const node = element('div', {
+  children: element('e-select', {
+    lightChildren: [
+      element('e-select-head', {
+        children: [
+          span({
+            'data-value-holder': '',
+          }),
+        ],
+      }),
+      ...[1, 2, 3].map((v, i) =>
+        element('e-select-option', {
+          lightChildren: v,
+          default: i === 0 ? true : null,
+        })
+      ),
+    ],
+  }),
 })
+
+document.body.appendChild(node.node)

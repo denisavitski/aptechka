@@ -304,3 +304,5 @@ declare global {
     accordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
   }
 }
+
+addEventListener('click', (e) => {})

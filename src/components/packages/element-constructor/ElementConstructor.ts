@@ -1,6 +1,7 @@
 import { Store } from '@packages/store'
-import { camelToKebab } from '@packages/utils'
+import { SplitFirst, camelToKebab, isBrowser } from '@packages/utils'
 import { knownSvgTags } from './knownSvgTags'
+import { connector } from '@packages/connector'
 
 export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
   SVGElementTagNameMap
@@ -50,23 +51,6 @@ export type ElementConstructorJSS =
 export type ElementConstructorEventMap = HTMLElementEventMap &
   SVGElementEventMap
 
-export type ElementConstructorEventNames = keyof ElementConstructorEventMap
-
-export type ElementConstructorEventValue<E extends Event> =
-  | {
-      callback: (event: E) => void
-      options?: AddEventListenerOptions
-    }
-  | ((event: E) => void)
-
-export type ElementConstructorEvents = Partial<{
-  [EventName in
-    | ElementConstructorEventNames
-    | `custom:${string}`]: EventName extends ElementConstructorEventNames
-    ? ElementConstructorEventValue<HTMLElementEventMap[EventName]>
-    : ElementConstructorEventValue<CustomEvent>
-}>
-
 export type ElementConstructorNativeAttribute<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
   E = T extends ElementConstructorTagNames
@@ -108,19 +92,36 @@ export type ElementConstructorRef<
     : Node
 }
 
+export type ElementConstructorEventValue<E extends Event> =
+  | {
+      callback: (event: E) => void
+      options?: AddEventListenerOptions
+    }
+  | ((event: E) => void)
+
+export type ElementConstructorEvents = Partial<{
+  [K in `on${Capitalize<
+    keyof ElementConstructorEventMap
+  >}`]: ElementConstructorEventValue<
+    ElementConstructorEventMap[Extract<
+      Uncapitalize<SplitFirst<K, 'on'>[1]>,
+      keyof ElementConstructorEventMap
+    >]
+  >
+}>
+
 export type ElementConstructorTagObject<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
 > = {
   class?: ElementConstructorClass
   style?: T extends 'style' ? ElementConstructorJSS : ElementConstructorStyle
-  events?: ElementConstructorEvents
-  attributes?: ElementConstructorAttributes<T>
   children?: any
-  shadowChildren?: any
-  parent?: ElementConstructorParent
   ref?: ElementConstructorRefCallback<T> | ElementConstructorRef<T>
   forceSvg?: boolean
-}
+  lightChildren?: any
+  onDestroy?: () => void
+} & ElementConstructorAttributes<T> &
+  ElementConstructorEvents
 
 export class ElementConstructor<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
@@ -139,23 +140,12 @@ export class ElementConstructor<
     const p2 = args[1] as ElementConstructorTagObject<T> | undefined
 
     this.#node = this.#createNode(p1, p2?.forceSvg)
-    this.#applyProperties(p2)
-  }
 
-  public get unsubscribeCallbacks() {
-    return this.#unsubscribeCallbacks
+    this.#applyProperties(p2)
   }
 
   public get node() {
     return this.#node
-  }
-
-  public destroy = () => {
-    this.#unsubscribeCallbacks.forEach((unsubscribe) => {
-      unsubscribe()
-    })
-
-    this.#unsubscribeCallbacks = []
   }
 
   #createNode(value: any, forceSvg?: boolean) {
@@ -189,40 +179,75 @@ export class ElementConstructor<
     return node instanceof HTMLElement || node instanceof SVGElement
   }
 
-  #applyProperties(properties?: ElementConstructorTagObject<T>) {
+  #applyProperties(properties?: any) {
     const isSvgOrHtml = this.#isSvgOrHtmlElement(this.#node)
 
-    for (const k in properties) {
-      const propertyName = k as keyof ElementConstructorTagObject<T>
+    const ref = properties.ref
+    const onDestroy = properties.onDestroy
+
+    delete properties.ref
+    delete properties.onDestroy
+
+    let attributes: any
+    let events: any
+
+    for (const propertyName in properties) {
+      const value = properties[propertyName]
 
       if (propertyName === 'class' && isSvgOrHtml) {
-        this.#createClassList(properties[propertyName])
+        this.#createClassList(value)
       } else if (propertyName === 'style' && isSvgOrHtml) {
-        this.#createStyle(properties[propertyName])
-      } else if (propertyName === 'events' && isSvgOrHtml) {
-        this.#createEvents(properties[propertyName])
-      } else if (propertyName === 'attributes' && isSvgOrHtml) {
-        this.#createAttributes(properties[propertyName])
+        this.#createStyle(value)
+      } else if (propertyName === 'lightChildren') {
+        this.#createChildren(this.#node as any, value)
       } else if (propertyName === 'children') {
-        this.#createChildren(this.#node as any, properties[propertyName])
-      } else if (propertyName === 'shadowChildren') {
         this.#createChildren(
           this.#node instanceof Element
             ? this.#node.shadowRoot || this.#node
             : (this.#node as any),
-          properties[propertyName]
+          value
         )
-      } else if (propertyName === 'parent') {
-        this.#createParent(properties[propertyName])
+      } else if (propertyName.startsWith('on')) {
+        if (!events) {
+          events = {}
+        }
+
+        events[propertyName] = value
+      } else {
+        if (!attributes) {
+          attributes = {}
+        }
+
+        attributes[propertyName] = value
       }
     }
 
-    if (properties?.ref) {
+    this.#createAttributes(attributes)
+    this.#createEvents(events)
+
+    if (ref) {
       if (typeof properties?.ref === 'function') {
         properties.ref(this.#node as any)
       } else {
         properties.ref.current = this.#node as any
       }
+    }
+
+    if (onDestroy) {
+      this.#unsubscribeCallbacks.push(onDestroy)
+    }
+
+    if (isBrowser && this.#unsubscribeCallbacks.length) {
+      const watchNode =
+        this.#node instanceof DocumentFragment
+          ? this.#node.firstChild
+          : this.#node
+
+      connector.subscribe(watchNode as Node, {
+        disconnectCallback: this.#destroy,
+        unsubscribeAfterDisconnect: true,
+        maxWaitSec: 20,
+      })
     }
   }
 
@@ -397,16 +422,24 @@ export class ElementConstructor<
 
     for (const k in events) {
       const eventName = k as keyof ElementConstructorEvents
+      const readyEventName = eventName
+        .split('on')
+        .slice(1)
+        .map((v, i) => {
+          return i === 0 ? v.toLocaleLowerCase() : v
+        })
+        .join('on')
+
       const listener = events[eventName]
 
       if (typeof listener === 'object') {
         element.addEventListener(
-          eventName,
+          readyEventName,
           listener.callback as EventListener,
           listener.options
         )
       } else if (typeof listener === 'function') {
-        element.addEventListener(eventName, listener as EventListener)
+        element.addEventListener(readyEventName, listener as EventListener)
       }
     }
   }
@@ -470,8 +503,10 @@ export class ElementConstructor<
           })
         )
       } else if (child instanceof ElementConstructor) {
-        this.#unsubscribeCallbacks.push(child.destroy)
+        this.#unsubscribeCallbacks.push(child.#destroy)
         root.appendChild(child.node)
+      } else if (child instanceof Function) {
+        this.#createChildren(root, child())
       } else {
         const childNodeOrUndefined = this.#getOrCreateNode(child)
 
@@ -550,14 +585,11 @@ export class ElementConstructor<
     }
   }
 
-  #createParent(parent?: ElementConstructorParent) {
-    if (!parent) {
-      return
-    }
+  #destroy = () => {
+    this.#unsubscribeCallbacks.forEach((callback) => {
+      callback()
+    })
 
-    const parentNode =
-      parent instanceof ElementConstructor ? parent.node : parent
-
-    parentNode.appendChild(this.#node as Node)
+    this.#unsubscribeCallbacks = []
   }
 }
