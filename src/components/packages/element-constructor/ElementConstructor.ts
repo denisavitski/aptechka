@@ -1,7 +1,7 @@
 import { Store } from '@packages/store'
 import { SplitFirst, camelToKebab, isBrowser } from '@packages/utils'
 import { knownSvgTags } from './knownSvgTags'
-import { connector } from '@packages/connector'
+import { ConnectorCallback, connector } from '@packages/connector'
 
 export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
   SVGElementTagNameMap
@@ -119,7 +119,7 @@ export type ElementConstructorTagObject<
   ref?: ElementConstructorRefCallback<T> | ElementConstructorRef<T>
   forceSvg?: boolean
   lightChildren?: any
-  onDestroy?: () => void
+  onDisconnect?: ConnectorCallback
 } & ElementConstructorAttributes<T> &
   ElementConstructorEvents
 
@@ -130,7 +130,7 @@ export class ElementConstructor<
     : Node
 > {
   #node: N
-  #unsubscribeCallbacks: Array<Function> = []
+  #unsubscribeCallbacks: Set<Function> = new Set()
 
   constructor(value: T, object?: ElementConstructorTagObject<T>)
   constructor(value: string, object?: ElementConstructorTagObject<T>)
@@ -180,13 +180,17 @@ export class ElementConstructor<
   }
 
   #applyProperties(properties?: any) {
+    if (!properties) return
+
     const isSvgOrHtml = this.#isSvgOrHtmlElement(this.#node)
 
     const ref = properties.ref
-    const onDestroy = properties.onDestroy
-
     delete properties.ref
-    delete properties.onDestroy
+
+    if (properties?.onDisconnect) {
+      this.#unsubscribeCallbacks.add(properties.onDisconnect)
+      delete properties.onDisconnect
+    }
 
     let attributes: any
     let events: any
@@ -226,18 +230,14 @@ export class ElementConstructor<
     this.#createEvents(events)
 
     if (ref) {
-      if (typeof properties?.ref === 'function') {
-        properties.ref(this.#node as any)
+      if (typeof ref === 'function') {
+        ref(this.#node as any)
       } else {
-        properties.ref.current = this.#node as any
+        ref.current = this.#node as any
       }
     }
 
-    if (onDestroy) {
-      this.#unsubscribeCallbacks.push(onDestroy)
-    }
-
-    if (isBrowser && this.#unsubscribeCallbacks.length) {
+    if (isBrowser && this.#unsubscribeCallbacks.size) {
       const watchNode =
         this.#node instanceof DocumentFragment
           ? this.#node.firstChild
@@ -246,7 +246,7 @@ export class ElementConstructor<
       connector.subscribe(watchNode as Node, {
         disconnectCallback: this.#destroy,
         unsubscribeAfterDisconnect: true,
-        maxWaitSec: 20,
+        maxWaitSec: 1,
       })
     }
   }
@@ -292,7 +292,7 @@ export class ElementConstructor<
   ) {
     const element = this.#node as HTMLElement
 
-    this.#unsubscribeCallbacks.push(
+    this.#unsubscribeCallbacks.add(
       store.subscribe(({ current, previous }) => {
         if (previous) {
           ;[previous].flat().forEach((v) => {
@@ -316,7 +316,7 @@ export class ElementConstructor<
   #manageBooleanStoreClass(className: string, store: Store<boolean>) {
     const element = this.#node as HTMLElement
 
-    this.#unsubscribeCallbacks.push(
+    this.#unsubscribeCallbacks.add(
       store.subscribe(({ current }) => {
         if (current) {
           element.classList.add(className)
@@ -349,7 +349,7 @@ export class ElementConstructor<
       const value = object[token]
 
       if (value instanceof Store) {
-        this.#unsubscribeCallbacks.push(
+        this.#unsubscribeCallbacks.add(
           value.subscribe(({ current }) => {
             this.#setStyleProperty(token, current)
           })
@@ -374,7 +374,7 @@ export class ElementConstructor<
         if (value instanceof Store) {
           const text = new Text()
 
-          this.#unsubscribeCallbacks.push(
+          this.#unsubscribeCallbacks.add(
             value.subscribe((e) => {
               if (e.current) {
                 text.nodeValue = `${camelToKebab(key)}: ${e.current};`
@@ -449,7 +449,7 @@ export class ElementConstructor<
       const value = attributes[attributeName]
 
       if (value instanceof Store) {
-        this.#unsubscribeCallbacks.push(
+        this.#unsubscribeCallbacks.add(
           value.subscribe(({ current }) => {
             this.#setAttribute(attributeName, current)
           })
@@ -493,7 +493,7 @@ export class ElementConstructor<
         storeRootElement.style.display = 'contents'
         root.appendChild(storeRootElement)
 
-        this.#unsubscribeCallbacks.push(
+        this.#unsubscribeCallbacks.add(
           child.subscribe(({ current }) => {
             this.#replaceChildren(
               storeRootElement,
@@ -503,7 +503,6 @@ export class ElementConstructor<
           })
         )
       } else if (child instanceof ElementConstructor) {
-        this.#unsubscribeCallbacks.push(child.#destroy)
         root.appendChild(child.node)
       } else if (child instanceof Function) {
         this.#createChildren(root, child())
@@ -538,6 +537,15 @@ export class ElementConstructor<
     newChildren: Array<Node>,
     currentChildren: Array<Node>
   ) {
+    if (currentChildren.length > newChildren.length) {
+      currentChildren.forEach((cc) => {
+        if (!newChildren.find((nc) => this.#areNodesEqual(cc, nc))) {
+          rootElement.removeChild(cc)
+          currentChildren = currentChildren.filter((c) => c !== cc)
+        }
+      })
+    }
+
     currentChildren.forEach((currentChild, index) => {
       if (index < newChildren.length) {
         const newChild = newChildren[index]
@@ -585,11 +593,11 @@ export class ElementConstructor<
     }
   }
 
-  #destroy = () => {
+  #destroy: ConnectorCallback = (expired) => {
     this.#unsubscribeCallbacks.forEach((callback) => {
-      callback()
+      callback(expired)
     })
 
-    this.#unsubscribeCallbacks = []
+    this.#unsubscribeCallbacks.clear()
   }
 }

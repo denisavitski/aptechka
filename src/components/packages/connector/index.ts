@@ -1,4 +1,4 @@
-export type ConnectorCallback = () => void
+export type ConnectorCallback = (expired?: boolean) => void
 
 interface ConnectorSubscriber {
   node: Node
@@ -20,6 +20,7 @@ export interface ConnectorOptions {
 export class Connector {
   #subscribers: Array<ConnectorSubscriber> = []
   #intervalId: ReturnType<typeof setInterval> | undefined
+  #interval = 100
 
   public subscribe(node: Node, options: ConnectorOptions) {
     const l = this.#subscribers.length
@@ -29,7 +30,12 @@ export class Connector {
       connectCallback: options.connectCallback,
       disconnectCallback: options.disconnectCallback,
       isConnected: false,
-      maxWaitSec: options.maxWaitSec || Infinity,
+      maxWaitSec:
+        typeof options.maxWaitSec === 'number'
+          ? options.maxWaitSec === 0
+            ? this.#interval / 1000
+            : options.maxWaitSec
+          : Infinity,
       timer: 0,
       unsubscribeAfterDisconnect: options.unsubscribeAfterDisconnect || false,
     })
@@ -79,17 +85,19 @@ export class Connector {
       } else if (!subscriber.node.isConnected && subscriber.isConnected) {
         subscriber.disconnectCallback?.()
         subscriber.isConnected = false
+
         if (subscriber.unsubscribeAfterDisconnect) {
           this.unsubscribe(subscriber)
         }
       }
 
-      subscriber.timer += 100
+      subscriber.timer += this.#interval
 
       if (
         !subscriber.isConnected &&
         subscriber.timer > subscriber.maxWaitSec * 1000
       ) {
+        subscriber.disconnectCallback?.(true)
         this.unsubscribe(subscriber)
       }
     }

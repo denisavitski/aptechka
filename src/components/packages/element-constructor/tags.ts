@@ -476,6 +476,10 @@ export function fragment(object?: ElementConstructorTagObject<Node>) {
   return new ElementConstructor(document.createDocumentFragment(), object)
 }
 
+export function empty(object?: ElementConstructorTagObject<Node>) {
+  return new ElementConstructor(document.createTextNode(''), object)
+}
+
 export function contents(object?: ElementConstructorTagObject<'div'>) {
   return new ElementConstructor('div', {
     ...object,
