@@ -95,10 +95,6 @@ export class Ticker {
   }
 
   public subscribe(callback: TickerCallback, options?: TickerAddOptions) {
-    if (!isBrowser) {
-      return
-    }
-
     if (!this.#subscribers.find((s) => s.callback === callback)) {
       const subscriber = new TickerSubscriber(callback, options)
       subscriber.sync(performance.now())
@@ -107,13 +103,11 @@ export class Ticker {
     }
 
     this.#requestAnimationFrame()
+
+    return () => this.unsubscribe(callback)
   }
 
   public unsubscribe(callback: TickerCallback) {
-    if (!isBrowser) {
-      return
-    }
-
     const matches = this.#subscribers.filter(
       (subscriber) => subscriber.callback === callback
     )

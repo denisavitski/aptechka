@@ -25,7 +25,7 @@ export class ElementResizer {
     const element = getElement(elementOrSelector)
 
     if (!element) {
-      return
+      return () => {}
     }
 
     const alreadyObserved = this.#subscribers.find(

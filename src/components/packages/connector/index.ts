@@ -81,7 +81,7 @@ export class Connector {
 
   #intervalListener = () => {
     for (let index = this.#subscribers.length - 1; index >= 0; index--) {
-      const subscriber = this.#subscribers[this.#subscribers.length - 1 - index]
+      const subscriber = this.#subscribers[index]
 
       if (subscriber.node.isConnected && !subscriber.isConnected) {
         subscriber.connectCallback?.()

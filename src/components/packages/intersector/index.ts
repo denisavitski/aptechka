@@ -27,7 +27,7 @@ export class Intersector {
     const element = getElement(elementOrSelector)
 
     if (!element) {
-      return
+      return () => {}
     }
 
     const alreadyObserved = this.#subscribers.find(

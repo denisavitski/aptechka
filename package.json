@@ -43,6 +43,11 @@
       "default": "./lib/canvas/index.js",
       "types": "./lib/canvas/index.d.ts"
     },
+    "./component": {
+      "require": "./lib/component/index.cjs",
+      "default": "./lib/component/index.js",
+      "types": "./lib/component/index.d.ts"
+    },
     "./connector": {
       "require": "./lib/connector/index.cjs",
       "default": "./lib/connector/index.js",
@@ -212,6 +217,9 @@
       ],
       "canvas": [
         "lib/canvas/index.d.ts"
+      ],
+      "component": [
+        "lib/component/index.d.ts"
       ],
       "connector": [
         "lib/connector/index.d.ts"

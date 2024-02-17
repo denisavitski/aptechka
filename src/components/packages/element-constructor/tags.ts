@@ -13,10 +13,10 @@ export function element<
   T extends ElementConstructorTagNames = ElementConstructorTagNames
 >(tag: T, object?: ElementConstructorTagObject<T>): ElementConstructor<T>
 
-export function element(
-  node: Node,
-  object: ElementConstructorTagObject<Node>
-): ElementConstructor<Node>
+export function element<T extends Node = Node>(
+  node: T,
+  object: ElementConstructorTagObject<T>
+): ElementConstructor<T>
 
 export function element(...args: any[]) {
   return new (ElementConstructor as any)(...args)

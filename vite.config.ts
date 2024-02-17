@@ -33,6 +33,7 @@ export default defineConfig((e) => {
               'animation/index': './src/components/packages/animation/index.ts',
               'attribute/index': './src/components/packages/attribute/index.ts',
               'canvas/index': './src/components/packages/canvas/index.ts',
+              'component/index': './src/components/packages/component/index.ts',
               'connector/index': './src/components/packages/connector/index.ts',
               'controls/index': './src/components/packages/controls/index.ts',
               'css-unit-parser/index':

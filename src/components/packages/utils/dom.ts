@@ -15,9 +15,9 @@ export function findParentElement<T extends typeof Element>(
   return parent as T
 }
 
-export type ElementOrSelector<T extends HTMLElement = HTMLElement> = string | T
+export type ElementOrSelector<T extends Element = Element> = string | T
 
-export function getElement<T extends HTMLElement>(
+export function getElement<T extends Element>(
   elementOrSelector: ElementOrSelector<T>,
   from = document
 ) {
