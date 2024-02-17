@@ -26,7 +26,11 @@ export function cloneDeep<T>(obj: T): T {
   return clonedObj
 }
 
-export function mergeDeep(target: object, source: object, isObjectFunction = isObject): object {
+export function mergeDeep(
+  target: object,
+  source: object,
+  isObjectFunction = isObject
+): object {
   for (const key in source) {
     if (isObjectFunction((source as any)[key])) {
       if (!(target as any)[key]) Object.assign(target, { [key]: {} })
@@ -55,13 +59,16 @@ export function compareObjects(obj1: any, obj2: any): boolean {
   if (Array.isArray(obj1)) {
     const maxArray = (obj1.length > obj2.length ? obj1 : obj2) as Array<any>
     const minArray = (obj1.length > obj2.length ? obj2 : obj1) as Array<any>
-    return maxArray.every((item, index) => compareObjects(item, minArray[index]))
+    return maxArray.every((item, index) =>
+      compareObjects(item, minArray[index])
+    )
   }
 
   if (
     typeof obj1 !== 'object' ||
     obj1 instanceof Node ||
-    (typeof obj1 === 'object' && obj1.constructor.toString().startsWith('class'))
+    (typeof obj1 === 'object' &&
+      obj1.constructor.toString().startsWith('class'))
   ) {
     return obj1 === obj2
   }
@@ -83,7 +90,10 @@ export function compareObjects(obj1: any, obj2: any): boolean {
   return true
 }
 
-export function pick<T extends object, R extends keyof T>(object: T, keys: Array<R>): Pick<T, R> {
+export function pick<T extends object, R extends keyof T>(
+  object: T,
+  keys: Array<R>
+): Pick<T, R> {
   const result = {} as Pick<T, R>
 
   for (const key in object) {
@@ -95,7 +105,10 @@ export function pick<T extends object, R extends keyof T>(object: T, keys: Array
   return result
 }
 
-export function omit<T extends object, R extends keyof T>(object: T, keys: Array<R>): Omit<T, R> {
+export function omit<T extends object, R extends keyof T>(
+  object: T,
+  keys: Array<R>
+): Omit<T, R> {
   const result = {} as Omit<T, R>
 
   for (const key in object) {
@@ -105,4 +118,12 @@ export function omit<T extends object, R extends keyof T>(object: T, keys: Array
   }
 
   return result
+}
+
+// https://stackoverflow.com/a/75567955
+export function isESClass(fn: Function) {
+  return (
+    typeof fn === 'function' &&
+    Object.getOwnPropertyDescriptor(fn, 'prototype')?.writable === false
+  )
 }

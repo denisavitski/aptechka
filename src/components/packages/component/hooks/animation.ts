@@ -1,8 +1,9 @@
 import { Damped, Tweened } from '@packages/animation'
-import { onConnect, onDisconnect } from '../Component'
 import { TickerAddOptions, TickerCallback, ticker } from '@packages/ticker'
 import { ElementOrSelector } from '@packages/utils'
 import { ElementConstructorRef } from '@packages/element-constructor'
+
+import { onConnect, onDisconnect } from '../Component'
 
 export function createDamped(
   ...parameters: ConstructorParameters<typeof Damped>

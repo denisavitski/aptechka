@@ -1,4 +1,4 @@
-import { contexts, onAfterCreate, onBeforeCreate } from '../Component'
+import { contexts, onBeforeCreate } from '../Component'
 
 export function createContext<Context>(name: string, value: Context) {
   onBeforeCreate((e) => {

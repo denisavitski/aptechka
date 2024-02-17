@@ -1,14 +1,25 @@
-import { isBrowser } from '@packages/utils'
-import { RouteElement, RouteParameters } from './RouteElement'
+import { isBrowser, isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<any>
+
+export type RouteURLParams<T extends string = string> = Partial<{
+  [key in T]: string
+}>
+
+export type RouteParameters<
+  PathnameParams extends string = string,
+  SearchParams extends string = string
+> = {
+  pathnameParams: RouteURLParams<PathnameParams>
+  searchParams: RouteURLParams<SearchParams>
+}
 
 export class Route {
   #pattern: string
   #module: RouteModule
   #urlPattern: URLPattern
-  #elementConstructor: typeof RouteElement | null
-  #element: RouteElement | null
+  #elementConstructor: typeof HTMLElement | (() => HTMLElement) | null
+  #element: HTMLElement | null
   #isActive: boolean
   #outlet: HTMLElement | ShadowRoot | null
   #mutationObserver: MutationObserver = null!
@@ -63,8 +74,14 @@ export class Route {
     return this.urlPattern.test({ pathname: pathname })
   }
 
-  public async render(containerElement: HTMLElement | ShadowRoot, pathname: string) {
-    this.#mutationObserver.observe(document.head, { childList: true, subtree: true })
+  public async render(
+    containerElement: HTMLElement | ShadowRoot,
+    pathname: string
+  ) {
+    this.#mutationObserver.observe(document.head, {
+      childList: true,
+      subtree: true,
+    })
 
     if (!this.#elementConstructor) {
       const content = await this.#module()
@@ -73,7 +90,14 @@ export class Route {
 
       if (typeof content.default === 'function') {
         this.#elementConstructor = content.default
-        customElements.define('e-' + this.#elementConstructor?.name.toLowerCase(), content.default)
+
+        if (isESClass(content.default)) {
+          const name = 'e-' + this.#elementConstructor?.name.toLowerCase()
+
+          if (!customElements.get(name)) {
+            customElements.define(name, content.default)
+          }
+        }
       }
     } else {
       this.#permanentHeadNodes.forEach((node) => {
@@ -86,14 +110,24 @@ export class Route {
     if (this.#elementConstructor) {
       const v = this.#urlPattern.exec({ pathname })
       const pathnameParams = v?.pathname.groups || {}
-      const searchParams = Object.fromEntries(new URLSearchParams(location.search))
+      const searchParams = Object.fromEntries(
+        new URLSearchParams(location.search)
+      )
 
       const routeParameters: RouteParameters<any, any> = {
         pathnameParams,
         searchParams,
       }
 
-      this.#element = new this.#elementConstructor(routeParameters)
+      if (isESClass(this.#elementConstructor)) {
+        this.#element = new (this.#elementConstructor as any)(
+          routeParameters
+        ) as HTMLElement
+      } else {
+        this.#element = (this.#elementConstructor as any)(
+          routeParameters
+        ) as HTMLElement
+      }
 
       containerElement.appendChild(this.#element)
 
@@ -126,7 +160,10 @@ export class Route {
     }
 
     if (this.#element?.shadowRoot) {
-      links = [...links, ...this.#element.shadowRoot.querySelectorAll<HTMLAnchorElement>('a')]
+      links = [
+        ...links,
+        ...this.#element.shadowRoot.querySelectorAll<HTMLAnchorElement>('a'),
+      ]
     }
 
     return links
@@ -135,7 +172,11 @@ export class Route {
   async #waitHeadNodesLoad() {
     const nodes = this.#permanentHeadNodes.filter((node) => {
       if (node instanceof HTMLElement) {
-        return node.tagName === 'STYLE' || node.tagName === 'SCRIPT' || node.tagName === 'LINK'
+        return (
+          node.tagName === 'STYLE' ||
+          node.tagName === 'SCRIPT' ||
+          node.tagName === 'LINK'
+        )
       }
 
       return false

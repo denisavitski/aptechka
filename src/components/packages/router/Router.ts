@@ -25,7 +25,9 @@ export interface RouterAfterNavigationEntry {
   pathname: string
 }
 
-export type RouterAfterNavigationCallback = (entry: RouterAfterNavigationEntry) => void
+export type RouterAfterNavigationCallback = (
+  entry: RouterAfterNavigationEntry
+) => void
 
 export type RouterHistoryAction = 'push' | 'replace' | 'none'
 
@@ -83,8 +85,14 @@ export class Router {
     this.#start()
   }
 
-  public async navigate(pathname: string, action: RouterHistoryAction = 'push') {
-    if (this.#candidatePathname === pathname || this.#currentPathname === pathname) {
+  public async navigate(
+    pathname: string,
+    action: RouterHistoryAction = 'push'
+  ) {
+    if (
+      this.#candidatePathname === pathname ||
+      this.#currentPathname === pathname
+    ) {
       return
     }
 
@@ -128,7 +136,10 @@ export class Router {
       this.#currentPathname = pathname
 
       for await (const route of newRoutes) {
-        await route.render(this.#lastRoute?.outlet || this.#rootElement, pathname)
+        await route.render(
+          this.#lastRoute?.outlet || this.#rootElement,
+          pathname
+        )
         this.#lastRoute = route
       }
 

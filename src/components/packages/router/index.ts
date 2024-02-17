@@ -8,6 +8,8 @@ export {
   type RouterParameters,
 } from './Router'
 
-export { RouteElement, type RouteParameters, type RouteURLParams } from './RouteElement'
-
-export { type RouteModule } from './Route'
+export {
+  type RouteModule,
+  type RouteParameters,
+  type RouteURLParams,
+} from './Route'

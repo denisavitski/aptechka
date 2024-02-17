@@ -1,4 +1,3 @@
-import { CustomElement } from '@packages/custom-element'
 import {
   ElementConstructorTagObject,
   element,
@@ -48,7 +47,7 @@ export function onAfterCreate(callback: ComponentElementCallback) {
   currentComponentElement.addAfterCreateCallback(callback)
 }
 
-class ComponentElement<Props extends object = {}> extends CustomElement {
+export class ComponentElement<Props extends object = {}> extends HTMLElement {
   #connectCallbacks = new Set<ComponentConnectCallback>()
   #disconnectCallbacks = new Set<ComponentElementCallback>()
   #afterCreateCallbacks = new Set<ComponentElementCallback>()
@@ -117,18 +116,18 @@ export function Component<Props extends object = {}>(
   name: string,
   callback: ComponentConstructorCallback<Props>
 ): ComponentReturn<Props> {
+  const elementName = `e-${name}`
+
+  let ComponentElementConstructor = customElements.get(
+    elementName
+  ) as typeof ComponentElement<Props>
+
+  if (!ComponentElementConstructor) {
+    ComponentElementConstructor = class extends ComponentElement<Props> {}
+    customElements.define(elementName, ComponentElementConstructor)
+  }
+
   return (props?: Props) => {
-    const elementName = `e-${name}`
-
-    let ComponentElementConstructor = customElements.get(
-      elementName
-    ) as typeof ComponentElement<Props>
-
-    if (!ComponentElementConstructor) {
-      ComponentElementConstructor = class extends ComponentElement<Props> {}
-      customElements.define(elementName, ComponentElementConstructor)
-    }
-
     const element = new ComponentElementConstructor(
       callback,
       props || ({} as Props)

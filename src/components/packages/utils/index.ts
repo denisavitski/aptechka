@@ -59,6 +59,7 @@ export {
   compareObjects,
   pick,
   omit,
+  isESClass,
 } from './object'
 export {
   kebabToCamel,

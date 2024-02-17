@@ -1,7 +1,8 @@
 import { IntersectorCallback, intersector } from '@packages/intersector'
 import { ElementOrSelector } from '@packages/utils'
-import { onConnect } from '../Component'
 import { ElementConstructorRef } from '@packages/element-constructor'
+
+import { onConnect } from '../Component'
 
 export function onIntersection(
   callback: IntersectorCallback,
