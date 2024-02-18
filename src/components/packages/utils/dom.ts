@@ -18,7 +18,7 @@ export function findParentElement<T extends typeof Element>(
 export type ElementOrSelector<T extends Element = Element> = string | T
 
 export function getElement<T extends Element>(
-  elementOrSelector: ElementOrSelector<T>,
+  elementOrSelector: ElementOrSelector<T> | undefined,
   from = document
 ) {
   return typeof elementOrSelector === 'string'

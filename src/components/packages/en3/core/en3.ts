@@ -132,7 +132,7 @@ class En3 {
   }
 
   public attachToHTMLElement<T extends Object3D>(
-    element: ElementOrSelector,
+    element: ElementOrSelector<HTMLElement>,
     object: T,
     options?: En3AttachOptions
   ) {
@@ -167,7 +167,7 @@ class En3 {
 
   public add<T extends Object3D<any>>(
     object: T,
-    element?: ElementOrSelector,
+    element?: ElementOrSelector<HTMLElement>,
     options?: En3AttachOptions
   ) {
     this.scene.add(object)

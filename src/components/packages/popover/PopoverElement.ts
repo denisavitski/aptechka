@@ -69,7 +69,11 @@ export class PopoverElement extends CustomElement {
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
     if (this.#history.current) {
-      history.replaceState('', '', location.pathname.replace(this.id, ''))
+      history.replaceState(
+        '',
+        '',
+        location.href.replace(new RegExp(`[&?]${this.#searchName}`, 'g'), '')
+      )
     }
 
     this.classList.remove('opened')
@@ -102,9 +106,13 @@ export class PopoverElement extends CustomElement {
   }
 
   get #path() {
-    return `${location.pathname}${location.pathname.endsWith('/') ? '' : '/'}${
-      this.id
-    }`
+    return `${location.pathname}${
+      location.search ? location.search + '&' : '?'
+    }${this.#searchName}`
+  }
+
+  get #searchName() {
+    return `modal-${this.id}`
   }
 
   #clickOutsideListener = (event: MouseEvent) => {
@@ -146,13 +154,13 @@ export class PopoverElement extends CustomElement {
     if (
       this.#opened.current &&
       this.#history.current &&
-      !location.pathname.includes(this.id)
+      !location.search.includes(this.#searchName)
     ) {
       this.close()
     } else if (
       !this.#opened.current &&
       this.#history.current &&
-      location.pathname.includes(this.id)
+      location.search.includes(this.#searchName)
     ) {
       this.open()
     }

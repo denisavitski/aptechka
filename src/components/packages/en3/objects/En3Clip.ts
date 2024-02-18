@@ -8,7 +8,7 @@ export class En3Clip {
   #layoutBox: LayoutBox = null!
   #planes: Array<Plane> = []
 
-  constructor(elementOrSelector: ElementOrSelector, scale = 1) {
+  constructor(elementOrSelector: ElementOrSelector<HTMLElement>, scale = 1) {
     this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: false })
 
     this.#planes = [

@@ -1,12 +1,17 @@
 import { Store, StoreCallback, StoreEntry, StoreOptions } from '@packages/store'
-import { ElementOrSelector, isBrowser, getElement, parseAttributeValue } from '@packages/utils'
+import {
+  ElementOrSelector,
+  isBrowser,
+  getElement,
+  parseAttributeValue,
+} from '@packages/utils'
 
 export interface AttributeOptions<T> extends StoreOptions<T> {
   sync?: boolean
 }
 
 export class Attribute<T extends string | number | boolean> extends Store<T> {
-  #element: HTMLElement = null!
+  #element: Element = null!
   #name: string
   #mutationObserver: MutationObserver = null!
   #resizeObserver: ResizeObserver = null!
@@ -33,7 +38,10 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
 
       this.#mutationObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-          if (mutation.type === 'attributes' && mutation.attributeName === this.#name) {
+          if (
+            mutation.type === 'attributes' &&
+            mutation.attributeName === this.#name
+          ) {
             this.#tryUpdate()
           }
         })

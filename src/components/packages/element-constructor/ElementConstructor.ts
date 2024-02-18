@@ -61,7 +61,7 @@ export type ElementConstructorNativeAttribute<
     ? ElementConstructorTagNameMap[T]
     : Node
 > = {
-  [K in keyof E]: E[K] extends string ? K : never
+  [K in keyof E]: E[K] extends string | null ? K : never
 }[keyof E]
 
 export type ElementConstructorNativeAttributes<

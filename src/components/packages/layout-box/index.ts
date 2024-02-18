@@ -12,6 +12,7 @@ import {
   isBrowser,
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
+  getElement,
 } from '@packages/utils'
 
 export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
@@ -50,7 +51,7 @@ export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
 }
 
 export interface LayoutBoxOptions {
-  containerElement?: ElementOrSelector
+  containerElement?: ElementOrSelector<HTMLElement>
   cartesian?: boolean
   scrollAxis?: Axes3D | 'auto'
   frontSide?: LayoutBoxFrontSide
@@ -112,11 +113,14 @@ export class LayoutBox {
   #position = new Ladder({ x: 0, y: 0, z: 0 })
   #scale = new Ladder({ x: 0, y: 0, z: 0 })
 
-  constructor(element: ElementOrSelector, options?: LayoutBoxOptions) {
+  constructor(
+    element: ElementOrSelector<HTMLElement>,
+    options?: LayoutBoxOptions
+  ) {
     if (isBrowser) {
-      this.#element = this.#getElement(element) || document.body
+      this.#element = getElement(element) || document.body
       this.#containerElement =
-        this.#getElement(options?.containerElement) || document.body
+        getElement(options?.containerElement) || document.body
 
       this.#scrollAxis = options?.scrollAxis || 'auto'
       this.#frontSide = options?.frontSide || 'top'
@@ -435,12 +439,6 @@ export class LayoutBox {
           (axis === 'x' ? -1 : this.#isCartesian ? 1 : -1),
       })
     }
-  }
-
-  #getElement(element: string | HTMLElement | undefined) {
-    return typeof element === 'string'
-      ? document.querySelector<HTMLElement>(element)
-      : element
   }
 
   #resizeListener = () => {

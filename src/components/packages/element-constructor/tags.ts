@@ -6,17 +6,12 @@ import {
 } from './ElementConstructor'
 
 export function element<
-  T extends ElementConstructorTagNames = ElementConstructorTagNames
->(string: string, object: ElementConstructorTagObject<T>): ElementConstructor<T>
-
-export function element<
-  T extends ElementConstructorTagNames = ElementConstructorTagNames
->(tag: T, object?: ElementConstructorTagObject<T>): ElementConstructor<T>
-
-export function element<T extends Node = Node>(
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+>(node: T, object: ElementConstructorTagObject<T>): ElementConstructor<T>
+export function element<T extends string = string>(
   node: T,
-  object: ElementConstructorTagObject<T>
-): ElementConstructor<T>
+  object: ElementConstructorTagObject<Element>
+): ElementConstructor<Element>
 
 export function element(...args: any[]) {
   return new (ElementConstructor as any)(...args)

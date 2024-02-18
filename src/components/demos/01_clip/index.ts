@@ -103,7 +103,7 @@ class Particles {
 }
 
 export interface WorldParameters {
-  containerElement: ElementOrSelector
+  containerElement: ElementOrSelector<HTMLElement>
   particles: Array<ParticlesParameters>
 }
 
