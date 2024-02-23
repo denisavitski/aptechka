@@ -1,5 +1,11 @@
 import { Store } from '@packages/store'
-import { SplitFirst, camelToKebab, isBrowser } from '@packages/utils'
+import {
+  SplitFirst,
+  camelToKebab,
+  capitalize,
+  isBrowser,
+  uncapitalize,
+} from '@packages/utils'
 import { knownSvgTags } from './knownSvgTags'
 import {
   ConnectorConnectCallback,
@@ -437,13 +443,9 @@ export class ElementConstructor<
 
     for (const k in events) {
       const eventName = k as keyof ElementConstructorEvents
-      const readyEventName = eventName
-        .split('on')
-        .slice(1)
-        .map((v, i) => {
-          return i === 0 ? v.toLocaleLowerCase() : v
-        })
-        .join('on')
+      const readyEventName = uncapitalize(
+        eventName.split('on').slice(1).join('on')
+      )
 
       const listener = events[eventName]
 

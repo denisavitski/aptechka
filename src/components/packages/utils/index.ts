@@ -67,6 +67,7 @@ export {
   snakeToDotted,
   toPascalCase,
   capitalize,
+  uncapitalize,
   generateId,
 } from './string'
 export {

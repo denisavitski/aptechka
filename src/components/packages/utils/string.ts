@@ -29,23 +29,41 @@ export function toPascalCase(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1)
   }
   return str
-    .replace(/([a-z\d])([a-z\d]*)/gi, (_, g1, g2) => g1.toUpperCase() + g2.toLowerCase())
+    .replace(
+      /([a-z\d])([a-z\d]*)/gi,
+      (_, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+    )
     .replace(/[^a-z\d]/gi, '')
 }
 
-export function capitalize(string: string, everyWord = false) {
-  const cfl = (string: string) => {
-    return string.slice(0, 1).toUpperCase() + string.slice(1)
-  }
+function sliceAndModifyFirst(
+  string: string,
+  method: 'toUpperCase' | 'toLowerCase'
+) {
+  return string.slice(0, 1)[method]() + string.slice(1)
+}
 
+function sliceAndModify(
+  string: string,
+  everyWord = false,
+  method: 'toUpperCase' | 'toLowerCase'
+) {
   if (everyWord) {
     return string
       .split(' ')
-      .map((v) => cfl(v))
+      .map((v) => sliceAndModifyFirst(v, method))
       .join(' ')
   } else {
-    return cfl(string)
+    return sliceAndModifyFirst(string, method)
   }
+}
+
+export function capitalize(string: string, everyWord = false) {
+  return sliceAndModify(string, everyWord, 'toUpperCase')
+}
+
+export function uncapitalize(string: string, everyWord = false) {
+  return sliceAndModify(string, everyWord, 'toLowerCase')
 }
 
 export function generateId(

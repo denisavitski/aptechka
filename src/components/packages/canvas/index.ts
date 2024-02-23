@@ -4,7 +4,6 @@ import {
   createStylesheet,
   element,
 } from '@packages/element-constructor'
-import { Notifier } from '@packages/notifier'
 import {
   ElementResizerCallback,
   elementResizer,
@@ -20,7 +19,7 @@ const stylesheet = createStylesheet({
   },
 })
 
-export interface Canvas2DRenderEntry {
+export interface Canvas2DRenderDetail {
   pixelRatio: number
   width: number
   height: number
@@ -31,12 +30,10 @@ export interface Canvas2DRenderEntry {
   elapsed: number
 }
 
-export type Canvas2DRenderCallback = (entry: Canvas2DRenderEntry) => void
+export type Canvas2DRenderCallback = (entry: Canvas2DRenderDetail) => void
 
 @define('e-canvas')
 export class CanvasElement extends CustomElement {
-  #renderEvent = new Notifier<Canvas2DRenderCallback>()
-
   #canvasElement: HTMLCanvasElement = null!
   #context: CanvasRenderingContext2D = null!
 
@@ -62,10 +59,6 @@ export class CanvasElement extends CustomElement {
     })
   }
 
-  public get renderEvent() {
-    return this.#renderEvent
-  }
-
   public get canvasElement() {
     return this.#canvasElement
   }
@@ -86,7 +79,7 @@ export class CanvasElement extends CustomElement {
     return this.#height
   }
 
-  public get detail(): Canvas2DRenderEntry {
+  public get detail(): Canvas2DRenderDetail {
     return {
       width: this.#width,
       height: this.#height,
@@ -116,7 +109,6 @@ export class CanvasElement extends CustomElement {
     elementResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
 
-    this.#renderEvent.close()
     this.#canvasElement.remove()
   }
 
@@ -131,19 +123,32 @@ export class CanvasElement extends CustomElement {
 
     this.context.scale(this.pixelRatio, this.pixelRatio)
 
-    this.renderEvent.notify(this.detail)
+    this.#dispatchRenderEvent()
   }
 
   #tickListener: TickerCallback = (e) => {
     this.#timestamp = e.timestamp
     this.#elapsed = e.elapsed
 
-    this.#renderEvent.notify(this.detail)
+    this.#dispatchRenderEvent()
+  }
+
+  #dispatchRenderEvent() {
+    this.dispatchEvent(
+      new CustomEvent('canvasRender', {
+        composed: true,
+        detail: this.detail,
+      })
+    )
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
     'e-canvas': CanvasElement
+  }
+
+  interface HTMLElementEventMap {
+    canvasRender: CustomEvent<Canvas2DRenderDetail>
   }
 }
