@@ -4,6 +4,7 @@ export { isBrowser } from './browser'
 export { measureText, fixPosition, cover } from './canvas'
 export { dotRectCollision, dotCircleCollision } from './collisions'
 export { screenToCartesian, normalize, getPointerPosition } from './coordinates'
+export { getRootVariables } from './cssom'
 export { encode, decode } from './decoding'
 export {
   findParentElement,

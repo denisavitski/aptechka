@@ -10,3 +10,8 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+:root {
+  --color-red: red;
+  --color-blue: blue;
+}
