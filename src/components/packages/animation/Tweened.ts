@@ -31,10 +31,6 @@ export class Tweened extends Animated {
     this.reset()
   }
 
-  public override get max() {
-    return super.max
-  }
-
   protected update() {
     const normalized = (this.target - this.min.current) / (this.delta || 1)
     const eased = this.easing(normalized)

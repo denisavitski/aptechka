@@ -57,7 +57,8 @@ export class Morph {
         this.#base = '/'
       }
 
-      this.#waitForHeadToLoad = parameters?.waitForHeadToLoad === false ? false : true
+      this.#waitForHeadToLoad =
+        parameters?.waitForHeadToLoad === false ? false : true
       this.#cachePages = parameters?.cachePages === false ? false : true
 
       this.#morphElements = this.#getMorphElements(document)
@@ -78,10 +79,20 @@ export class Morph {
     return this.#afterNavigationEvent.subscribe(callback)
   }
 
-  public async navigate(pathname: string, historyAction: MorphHistoryAction = 'push') {
+  public async prefetch(pathname: string) {
+    return this.#fetchDocument(pathname)
+  }
+
+  public async navigate(
+    pathname: string,
+    historyAction: MorphHistoryAction = 'push'
+  ) {
     pathname = this.#preparePathname(pathname)
 
-    if (this.#candidatePathname === pathname || this.#currentPathname === pathname) {
+    if (
+      this.#candidatePathname === pathname ||
+      this.#currentPathname === pathname
+    ) {
       return
     }
 
@@ -116,29 +127,39 @@ export class Morph {
         return
       }
 
-      const newDocument = await this.#fetchDocument(pathname)
-
-      if (this.#cachePages) {
-        this.#cache.set(pathname, newDocument)
-      }
+      const newDocument =
+        this.#cache.get(pathname) || (await this.#fetchDocument(pathname))
 
       if (this.#candidatePathname !== pathname) {
         return
       }
 
       const currentHeadChildren = Array.from(document.head.children)
-      const newHeadChildren = Array.from((newDocument.head.cloneNode(true) as HTMLElement).children)
+      const newHeadChildren = Array.from(
+        (newDocument.head.cloneNode(true) as HTMLElement).children
+      )
 
-      const identicalHeadChildren = this.#intersectElements(currentHeadChildren, newHeadChildren)
-      const removeHeadChildren = this.#excludeElements(currentHeadChildren, identicalHeadChildren)
-      const addHeadChildren = this.#excludeElements(newHeadChildren, identicalHeadChildren)
+      const identicalHeadChildren = this.#intersectElements(
+        currentHeadChildren,
+        newHeadChildren
+      )
+      const removeHeadChildren = this.#excludeElements(
+        currentHeadChildren,
+        identicalHeadChildren
+      )
+      const addHeadChildren = this.#excludeElements(
+        newHeadChildren,
+        identicalHeadChildren
+      )
 
       removeHeadChildren.forEach((child) => child.remove())
       addHeadChildren.forEach((child) => document.head.appendChild(child))
 
       const elementsWithLoad = addHeadChildren.filter(
         (child) =>
-          child.tagName === 'STYLE' || child.tagName === 'SCRIPT' || child.tagName === 'LINK'
+          child.tagName === 'STYLE' ||
+          child.tagName === 'SCRIPT' ||
+          child.tagName === 'LINK'
       ) as Array<HTMLLinkElement>
 
       if (this.#waitForHeadToLoad && elementsWithLoad.length) {
@@ -193,6 +214,11 @@ export class Morph {
     const fetchResult = await fetch(pathname)
     const text = await fetchResult.text()
     const document = this.#domParser.parseFromString(text, 'text/html')
+
+    if (this.#cachePages) {
+      this.#cache.set(pathname, document)
+    }
+
     return document
   }
 
@@ -207,9 +233,9 @@ export class Morph {
   }
 
   #findLinks() {
-    const linkElements = [...document.documentElement.querySelectorAll('a')].filter((a) =>
-      a.getAttribute('href')?.startsWith('/')
-    )
+    const linkElements = [
+      ...document.documentElement.querySelectorAll('a'),
+    ].filter((a) => a.getAttribute('href')?.startsWith('/'))
 
     this.#links.forEach((link) => link.destroy())
 
@@ -221,15 +247,22 @@ export class Morph {
     return elements.length ? [...elements] : [document.body]
   }
 
-  #intersectElements(elements: Array<Element>, elementsToIntersect: Array<Element>) {
+  #intersectElements(
+    elements: Array<Element>,
+    elementsToIntersect: Array<Element>
+  ) {
     return elements.filter((element) =>
       elementsToIntersect.find(
-        (elementToIntersect) => elementToIntersect.outerHTML === element.outerHTML
+        (elementToIntersect) =>
+          elementToIntersect.outerHTML === element.outerHTML
       )
     )
   }
 
-  #excludeElements(elements: Array<Element>, elementsToExclude: Array<Element>) {
+  #excludeElements(
+    elements: Array<Element>,
+    elementsToExclude: Array<Element>
+  ) {
     return elements.filter(
       (element) =>
         !elementsToExclude.find(
