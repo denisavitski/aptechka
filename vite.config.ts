@@ -59,6 +59,7 @@ export default defineConfig((e) => {
               'notifier/index': './src/components/packages/notifier/index.ts',
               'order/index': './src/components/packages/order/index.ts',
               'popover/index': './src/components/packages/popover/index.ts',
+              'resized/index': './src/components/packages/resized/index.ts',
               'router/index': './src/components/packages/router/index.ts',
               'scroll/index': './src/components/packages/scroll/index.ts',
               'scroll-entries/index':

@@ -63,6 +63,7 @@ export interface SelectToggleDetail {
 @define('e-select')
 export class SelectElement extends CustomElement {
   static formAssociated = true
+
   #internals: ElementInternals = null!
   #value: string = ''
   #bodyElement: HTMLElement = null!
