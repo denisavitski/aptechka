@@ -18,7 +18,8 @@ export {
   createTweened,
   onAnimationFrame,
 } from './hooks/animation'
+export { getContext, createContext } from './hooks/context'
 export { onIntersection } from './hooks/intersection'
 export { onElementResize, onWindowResize } from './hooks/resize'
 export { attachStyle } from './hooks/style'
-export { attachShadow } from './hooks/shadow'
+export { attachShadow, attachInternals } from './hooks/custom-element'

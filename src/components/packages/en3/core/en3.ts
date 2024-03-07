@@ -14,6 +14,7 @@ import {
   WebGLRendererParameters,
 } from 'three'
 import { dispose } from '../utils/dispose'
+import { En3Raycaster } from '..'
 
 export type En3AttachedObject3D<T extends Object3D> = T & {
   userData: {
@@ -47,6 +48,8 @@ class En3 {
 
   #camera: PerspectiveCamera | OrthographicCamera = null!
   #scene: Scene = null!
+
+  #raycaster: En3Raycaster = null!
 
   #attachedObjects: Array<En3AttachedObject3D<Object3D>> = []
 
@@ -91,6 +94,10 @@ class En3 {
 
   public get scene() {
     return this.#scene
+  }
+
+  public get raycaster() {
+    return this.#raycaster
   }
 
   public get attachedObjects() {
@@ -231,6 +238,8 @@ class En3 {
 
     this.#containerElement.prepend(this.#webglRenderer.domElement)
 
+    this.#raycaster = new En3Raycaster()
+
     this.#isCreated = true
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3)
@@ -259,6 +268,8 @@ class En3 {
     this.#webglRenderer.dispose()
     this.#webglRenderer.domElement.remove()
     this.#webglRenderer = null!
+
+    this.#raycaster.destroy()
 
     this.#isCreated = false
   }

@@ -1,13 +1,13 @@
 import { Intersection, Object3D, Raycaster, Vector2 } from 'three'
-import { en3 } from '../core/en3'
+import { en3 } from './en3'
 
 export type En3RaycasterEventType =
-  | 'en3-pointerdown'
-  | 'en3-pointerup'
-  | 'en3-pointermove'
-  | 'en3-pointerleave'
-  | 'en3-pointerenter'
-  | 'en3-pointermove'
+  | 'en3PointerDown'
+  | 'en3PointerUp'
+  | 'en3PointerMove'
+  | 'en3PointerLeave'
+  | 'en3PointerEnter'
+  | 'en3PointerMove'
 
 export type En3RaycasterEvent = {
   type: En3RaycasterEventType
@@ -43,7 +43,8 @@ class En3RaycasterTarget {
 
     this.#target = !this.#targetName
       ? () => this.#object3D
-      : () => this.#object3D.getObjectByName(this.#targetName!) || this.#object3D
+      : () =>
+          this.#object3D.getObjectByName(this.#targetName!) || this.#object3D
   }
 
   public get object3D() {
@@ -72,8 +73,6 @@ class En3RaycasterTarget {
 }
 
 export class En3Raycaster {
-  static #instance: En3Raycaster | undefined
-
   #targets: Array<En3RaycasterTarget> = []
   #hits: Array<En3RaycasterTarget> = []
 
@@ -81,22 +80,30 @@ export class En3Raycaster {
   #raycaster = new Raycaster()
 
   constructor() {
-    if (En3Raycaster.#instance) {
-      return En3Raycaster.#instance
-    }
-
-    En3Raycaster.#instance = this
-
-    en3.containerElement.addEventListener('pointerdown', this.#pointerdownListener)
+    en3.containerElement.addEventListener(
+      'pointerdown',
+      this.#pointerdownListener
+    )
     en3.containerElement.addEventListener('pointerup', this.#pointerupListener)
-    en3.containerElement.addEventListener('pointermove', this.#pointermoveListener)
+    en3.containerElement.addEventListener(
+      'pointermove',
+      this.#pointermoveListener
+    )
   }
 
   public destroy() {
-    en3.containerElement.removeEventListener('pointerdown', this.#pointerdownListener)
-    en3.containerElement.removeEventListener('pointerup', this.#pointerupListener)
-    en3.containerElement.removeEventListener('pointermove', this.#pointermoveListener)
-    En3Raycaster.#instance = undefined
+    en3.containerElement.removeEventListener(
+      'pointerdown',
+      this.#pointerdownListener
+    )
+    en3.containerElement.removeEventListener(
+      'pointerup',
+      this.#pointerupListener
+    )
+    en3.containerElement.removeEventListener(
+      'pointermove',
+      this.#pointermoveListener
+    )
   }
 
   public add(object3D: Object3D, options?: En3RaycasterOptions) {
@@ -113,19 +120,21 @@ export class En3Raycaster {
   }
 
   public remove(object3D: Object3D) {
-    this.#targets = this.#targets.filter((t) => t.object3D.uuid !== object3D.uuid)
+    this.#targets = this.#targets.filter(
+      (t) => t.object3D.uuid !== object3D.uuid
+    )
     this.#hits = this.#hits.filter((h) => h.object3D.uuid !== object3D.uuid)
   }
 
   #pointerdownListener = (event: PointerEvent) => {
     for (let index = 0; index < this.#hits.length; index++) {
-      this.#hits[index].dispatch('en3-pointerdown', event)
+      this.#hits[index].dispatch('en3PointerDown', event)
     }
   }
 
   #pointerupListener = (event: PointerEvent) => {
     for (let index = 0; index < this.#hits.length; index++) {
-      this.#hits[index].dispatch('en3-pointerup', event)
+      this.#hits[index].dispatch('en3PointerUp', event)
     }
   }
 
@@ -171,17 +180,17 @@ export class En3Raycaster {
     )
 
     for (let index = 0; index < leaveHits.length; index++) {
-      leaveHits[index].dispatch('en3-pointerleave', event)
+      leaveHits[index].dispatch('en3PointerLeave', event)
     }
 
     for (let index = 0; index < enterHits.length; index++) {
-      enterHits[index].dispatch('en3-pointerenter', event)
+      enterHits[index].dispatch('en3PointerEnter', event)
     }
 
     this.#hits = finalHits
 
     for (let index = 0; index < this.#hits.length; index++) {
-      this.#hits[index].dispatch('en3-pointermove', event)
+      this.#hits[index].dispatch('en3PointerMove', event)
     }
   }
 }

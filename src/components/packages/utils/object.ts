@@ -127,3 +127,17 @@ export function isESClass(fn: Function) {
     Object.getOwnPropertyDescriptor(fn, 'prototype')?.writable === false
   )
 }
+
+export function mixin(baseClass: any, ...mixins: any[]) {
+  mixins.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+      console.log(name)
+      Object.defineProperty(
+        baseClass.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
+          Object.create(null)
+      )
+    })
+  })
+}

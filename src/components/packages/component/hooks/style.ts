@@ -12,17 +12,42 @@ export function attachStyle(object?: ElementConstructorJSS | undefined) {
     }
   })
 
-  onConnect(() => {
-    const styleElement = style(object).node
+  onConnect((e) => {
+    if (e.shadowRoot) {
+      return
+    }
 
-    const styleTags = [...document.head.querySelectorAll('style')]
+    const rootNode = e.getRootNode()
 
-    if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
-      document.head.appendChild(styleElement)
+    if (rootNode === document) {
+      const styleElement = style(object).node
+      const styleTags = [...document.head.querySelectorAll('style')]
 
-      return () => {
-        styleElement.remove()
+      if (!styleTags.find((s) => s.outerHTML === styleElement.outerHTML)) {
+        document.head.appendChild(styleElement)
+
+        return () => {
+          styleElement.remove()
+        }
       }
+    } else if (rootNode instanceof ShadowRoot) {
+      const newStylesheet = createStylesheet(object)
+
+      rootNode.adoptedStyleSheets.filter((currentStylesheet) => {
+        const currentRules = Array.from(currentStylesheet.cssRules)
+
+        const newRules = Array.from(newStylesheet.cssRules).filter(
+          (newRule) => {
+            return !currentRules.find(
+              (currentRule) => currentRule.cssText === newRule.cssText
+            )
+          }
+        )
+
+        newRules.forEach((newRule) => {
+          currentStylesheet.insertRule(newRule.cssText)
+        })
+      })
     }
   })
 }

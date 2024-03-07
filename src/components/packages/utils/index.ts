@@ -61,6 +61,7 @@ export {
   pick,
   omit,
   isESClass,
+  mixin,
 } from './object'
 export {
   kebabToCamel,

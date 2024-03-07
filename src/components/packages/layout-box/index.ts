@@ -263,12 +263,24 @@ export class LayoutBox {
     this.#position.setStep(...args)
   }
 
+  public getPositionStep(...args: Parameters<Ladder['getStepValue']>) {
+    return this.#position.getStepValue(...args)
+  }
+
   public setRotationStep(...args: Parameters<Ladder['setStep']>) {
     this.#rotation.setStep(...args)
   }
 
+  public getRotationStep(...args: Parameters<Ladder['getStepValue']>) {
+    return this.#rotation.getStepValue(...args)
+  }
+
   public setScaleStep(...args: Parameters<Ladder['setStep']>) {
     this.#scale.setStep(...args)
+  }
+
+  public getScaleStep(...args: Parameters<Ladder['getStepValue']>) {
+    return this.#scale.getStepValue(...args)
   }
 
   public deletePositionStep(...args: Parameters<Ladder['deleteStep']>) {

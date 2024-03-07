@@ -42,7 +42,7 @@ export {
   type En3RaycasterEvent,
   type En3RaycasterOptions,
   type En3RaycasterCallback,
-} from './test/En3Raycaster'
+} from './core/En3Raycaster'
 
 export {
   En3ModifiedMaterial,
