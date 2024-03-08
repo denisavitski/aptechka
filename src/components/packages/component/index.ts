@@ -18,7 +18,7 @@ export {
   createTweened,
   onAnimationFrame,
 } from './hooks/animation'
-export { getContext, createContext } from './hooks/context'
+export { watchAttribute } from './hooks/attributes'
 export { onIntersection } from './hooks/intersection'
 export { onElementResize, onWindowResize } from './hooks/resize'
 export { attachStyle } from './hooks/style'

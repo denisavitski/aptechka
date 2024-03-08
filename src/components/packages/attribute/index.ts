@@ -53,8 +53,7 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
             attributes: true,
           })
         } else if (!this.#element.isConnected && this.#isConnected) {
-          this.#mutationObserver.disconnect()
-          this.#resizeObserver.disconnect()
+          this.#sleep()
         }
 
         this.#isConnected = this.#element.isConnected
@@ -76,6 +75,19 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     return super.subscribe(callback)
   }
 
+  public override unsubscribe(callback: StoreCallback<StoreEntry<T>>) {
+    super.unsubscribe(callback)
+
+    if (!this.subscribers.size) {
+      this.#sleep()
+    }
+  }
+
+  public override close() {
+    super.close()
+    this.#sleep()
+  }
+
   #tryUpdate() {
     const value = this.#element.getAttribute(this.#name)
 
@@ -88,6 +100,13 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     if (!this.#isConnected) {
       this.#tryUpdate()
       this.#resizeObserver.observe(this.#element)
+    }
+  }
+
+  #sleep() {
+    if (this.#isConnected) {
+      this.#mutationObserver.disconnect()
+      this.#resizeObserver.disconnect()
     }
   }
 }

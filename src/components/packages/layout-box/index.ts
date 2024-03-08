@@ -34,7 +34,7 @@ export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
   const rotationZ = Math.atan2(matrix.m21, matrix.m11)
 
   const translationX = matrix.m41
-  const translationY = matrix.m42
+  const translationY = matrix.m42 * -1
   const translationZ = matrix.m43
 
   return {

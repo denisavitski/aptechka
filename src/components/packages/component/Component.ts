@@ -41,14 +41,6 @@ export interface ComponentOptions {
 
 let currentComponentElement: ComponentElement = null!
 
-export const contexts = new Map<
-  string,
-  {
-    element: HTMLElement
-    value: any
-  }
->()
-
 export function onConnect(callback: ComponentConnectCallback) {
   currentComponentElement.addConnectCallback(callback)
 }
@@ -74,7 +66,7 @@ export function Component<
   Props extends object = {},
   BaseElementConstructor extends typeof HTMLElement = typeof HTMLElement
 >(
-  Constructor: BaseElementConstructor,
+  Constructor: BaseElementConstructor | Function,
   name: string,
   callback: ComponentConstructorCallback<
     Props,
@@ -88,7 +80,7 @@ export function Component<Props extends object = {}>(
   const Constructor =
     typeof args[0] === 'string'
       ? HTMLElement
-      : (args[0] as CustomElementConstructor)
+      : ((args[0].componentConstructor || args[0]) as CustomElementConstructor)
 
   const name = typeof args[0] === 'string' ? args[0] : (args[1] as string)
 
@@ -108,74 +100,85 @@ export function Component<Props extends object = {}>(
   ) as CustomElementConstructor
 
   if (!ComponentElementConstructor) {
-    ComponentElementConstructor = class extends Constructor {
-      #connectCallbacks = new Set<ComponentConnectCallback>()
-      #disconnectCallbacks = new Set<ComponentElementCallback>()
-      #afterCreateCallbacks = new Set<ComponentElementCallback>()
+    if (!args[0].componentConstructor) {
+      ComponentElementConstructor = class extends Constructor {
+        #connectCallbacks = new Set<ComponentConnectCallback>()
+        #disconnectCallbacks = new Set<ComponentElementCallback>()
+        #afterCreateCallbacks = new Set<ComponentElementCallback>()
 
-      constructor(props: Props) {
-        super()
+        constructor(props: Props) {
+          super()
 
-        currentComponentElement = this
+          currentComponentElement = this
 
-        const object = callback({
-          element: this,
-          ...props,
-        })
+          const object = callback({
+            element: this,
+            ...props,
+          })
 
-        if (object) {
-          element(this, object)
+          if (object) {
+            element(this, object)
+          }
+
+          this.#afterCreateCallbacks.forEach((callback) => {
+            callback(this)
+          })
+
+          this.#afterCreateCallbacks.clear()
         }
 
-        this.#afterCreateCallbacks.forEach((callback) => {
-          callback(this)
-        })
+        public addConnectCallback(callback: ComponentConnectCallback) {
+          this.#connectCallbacks.add(callback)
+        }
 
-        this.#afterCreateCallbacks.clear()
+        public addDisconnectCallback(callback: ComponentElementCallback) {
+          this.#disconnectCallbacks.add(callback)
+        }
 
-        contexts.forEach((context, name) => {
-          if (context.element === this) {
-            contexts.delete(name)
+        public addAfterCreateCallback(callback: ComponentElementCallback) {
+          this.#afterCreateCallbacks.add(callback)
+        }
+
+        protected connectedCallback() {
+          // @ts-ignore
+          super.connectedCallback?.()
+
+          this.#connectCallbacks.forEach((connectCallback) => {
+            const disconnect = connectCallback(this)
+
+            if (disconnect) {
+              this.#disconnectCallbacks.add(disconnect)
+            }
+          })
+
+          this.#connectCallbacks.clear()
+        }
+
+        protected disconnectedCallback() {
+          // @ts-ignore
+          super.disconnectedCallback?.()
+
+          this.#disconnectCallbacks.forEach((disconnectCallback) => {
+            disconnectCallback(this)
+          })
+
+          this.#disconnectCallbacks.clear()
+        }
+      }
+    } else {
+      ComponentElementConstructor = class extends Constructor {
+        constructor(props: Props) {
+          super()
+
+          const object = callback({
+            element: this,
+            ...props,
+          })
+
+          if (object) {
+            element(this, object)
           }
-        })
-      }
-
-      public addConnectCallback(callback: ComponentConnectCallback) {
-        this.#connectCallbacks.add(callback)
-      }
-
-      public addDisconnectCallback(callback: ComponentElementCallback) {
-        this.#disconnectCallbacks.add(callback)
-      }
-
-      public addAfterCreateCallback(callback: ComponentElementCallback) {
-        this.#afterCreateCallbacks.add(callback)
-      }
-
-      protected connectedCallback() {
-        //@ts-ignore
-        super.connectedCallback?.()
-
-        this.#connectCallbacks.forEach((connectCallback) => {
-          const disconnect = connectCallback(this)
-
-          if (disconnect) {
-            this.#disconnectCallbacks.add(disconnect)
-          }
-        })
-
-        this.#connectCallbacks.clear()
-      }
-
-      protected disconnectedCallback() {
-        //@ts-ignore
-        super.disconnectedCallback?.()
-
-        this.#disconnectCallbacks.forEach((disconnectCallback) => {
-          disconnectCallback(this)
-        })
-
-        this.#disconnectCallbacks.clear()
+        }
       }
     }
 
@@ -186,7 +189,11 @@ export function Component<Props extends object = {}>(
     customElements.define(elementName, ComponentElementConstructor)
   }
 
-  return (props?: Props) => {
+  function createComponent(props?: Props) {
     return new ComponentElementConstructor(props || ({} as Props))
   }
+
+  ;(createComponent as any).componentConstructor = ComponentElementConstructor
+
+  return createComponent
 }
