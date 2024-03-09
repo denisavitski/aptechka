@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -244,6 +244,9 @@
       "element-constructor": [
         "lib/element-constructor/index.d.ts"
       ],
+      "element-resizer": [
+        "lib/element-resizer/index.d.ts"
+      ],
       "en3": [
         "lib/en3/index.d.ts"
       ],
@@ -315,6 +318,9 @@
       ],
       "video": [
         "lib/video/index.d.ts"
+      ],
+      "window-resizer": [
+        "lib/window-resizer/index.d.ts"
       ]
     }
   },

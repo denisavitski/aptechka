@@ -2,6 +2,8 @@ export {
   Component,
   onConnect,
   onDisconnect,
+  onBeforeCreate,
+  onAfterCreate,
   type ComponentConstructorCallback,
   type ComponentConnectCallback,
   type ComponentElementCallback,
