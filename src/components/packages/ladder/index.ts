@@ -149,8 +149,8 @@ export class Ladder<
       this.steps.set(stepName, step)
     }
 
-    step.value = value
     step.damping = damping || 0
+    step.value = value
 
     this.#checkSteps()
   }
