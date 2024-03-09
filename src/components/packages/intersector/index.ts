@@ -13,7 +13,7 @@ export class Intersector {
   #intersectionObserver: IntersectionObserver = null!
 
   constructor() {
-    if (isBrowser) {
+    if (isBrowser && window.IntersectionObserver) {
       this.#intersectionObserver = new IntersectionObserver(
         this.#intersectionListener
       )

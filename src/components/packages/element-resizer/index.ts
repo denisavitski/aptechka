@@ -13,7 +13,7 @@ export class ElementResizer {
   #resizeObserver: ResizeObserver = null!
 
   constructor() {
-    if (isBrowser) {
+    if (isBrowser && window.ResizeObserver) {
       this.#resizeObserver = new ResizeObserver(this.#resizeListener)
     }
   }

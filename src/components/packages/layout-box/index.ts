@@ -1,7 +1,6 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { Ladder } from '@packages/ladder'
 import { TICK_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
 import { StoreCallback, StoreEntry } from '@packages/store'
 import { ticker } from '@packages/ticker'
@@ -14,6 +13,7 @@ import {
   getCumulativeOffsetTop,
   getElement,
 } from '@packages/utils'
+import { elementResizer } from '@packages/element-resizer'
 
 export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
   const scaleX = Math.sqrt(
@@ -176,7 +176,7 @@ export class LayoutBox {
         culling: options?.culling ? this.element : undefined,
       })
 
-      windowResizer.subscribe(this.#resizeListener, TICK_ORDER.LAYOUT_BOX)
+      elementResizer.subscribe(this.element, this.#resizeListener)
     }
   }
 
@@ -252,7 +252,7 @@ export class LayoutBox {
 
   public destroy() {
     ticker.unsubscribe(this.#tickListener)
-    windowResizer.unsubscribe(this.#resizeListener)
+    elementResizer.unsubscribe(this.#resizeListener)
 
     this.#position.close()
     this.#rotation.close()

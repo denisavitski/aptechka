@@ -1,7 +1,8 @@
 import { Store, StoreOptions } from './Store'
 
 export type DerivedArrayCallback<StoreType, DerivedType> = (
-  value: StoreType
+  value: StoreType,
+  index: number
 ) => DerivedType
 
 export class DerivedArray<
@@ -24,7 +25,7 @@ export class DerivedArray<
         if (e.current[i] === e.previous?.[i] && this.current[i]) {
           res.push(this.current[i])
         } else {
-          res.push(callback(v))
+          res.push(callback(v, i))
         }
       })
 

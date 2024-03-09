@@ -1,14 +1,85 @@
 import { Store } from '@packages/store'
+import { TickerCallback, ticker } from '@packages/ticker'
+import { damp, preciseNumber } from '@packages/utils'
 
 export type LadderDefaultStepName = number | string
 
 export type LadderOperation = '+' | '*' | '/' | '-'
 
-export type LadderStep<T> = [LadderOperation, T]
-
-export type LadderSteps<K, T> = Map<K, LadderStep<T>>
+export type LadderSteps<
+  K,
+  T extends LadderDefaultValueType = LadderDefaultValueType
+> = Map<K, LadderStep<T>>
 
 export type LadderDefaultValueType = { [key: string]: number }
+
+interface LadderStepParameters<
+  T extends LadderDefaultValueType = LadderDefaultValueType
+> {
+  operation: LadderOperation
+  value: T
+  damping?: number
+}
+
+class LadderStep<T extends LadderDefaultValueType = LadderDefaultValueType> {
+  #operation: LadderOperation
+  #value: T
+  #targetValue: T
+  #damping: number
+
+  constructor(parameters: LadderStepParameters<T>) {
+    this.#operation = parameters.operation
+    this.#value = parameters.value
+    this.#targetValue = this.#value
+    this.#damping = parameters.damping || 0
+  }
+
+  public get operation() {
+    return this.#operation
+  }
+
+  public get value() {
+    return this.#value
+  }
+
+  public set value(value: T) {
+    this.#targetValue = value
+
+    if (!this.#damping) {
+      this.#value = value
+    }
+  }
+
+  public get damping() {
+    return this.#damping
+  }
+
+  public set damping(value: number) {
+    this.#damping = value
+  }
+
+  public update(elapsed: number) {
+    let needUpdate = 0
+
+    for (const key in this.#value) {
+      this.#value[key] = damp(
+        this.#value[key],
+        this.#targetValue[key],
+        this.damping,
+        elapsed
+      ) as any
+
+      if (
+        preciseNumber(this.#value[key], 4) !==
+        preciseNumber(this.#targetValue[key], 4)
+      ) {
+        needUpdate++
+      }
+    }
+
+    return needUpdate === 0
+  }
+}
 
 export class Ladder<
   V extends LadderDefaultValueType = LadderDefaultValueType,
@@ -40,6 +111,7 @@ export class Ladder<
     super.close()
     this.#bindings.clear()
     this.#steps.clear()
+    ticker.unsubscribe(this.#tickListener)
   }
 
   public bind(sub: V) {
@@ -55,17 +127,32 @@ export class Ladder<
   }
 
   public getStepValue(stepName: K) {
-    return this.steps.get(stepName)![1]
+    return this.steps.get(stepName)!.value
   }
 
-  public setStep(stepName: K, action: LadderOperation, value: Partial<V>) {
-    const readyValue = {} as V
+  public setStep(
+    stepName: K,
+    operation: LadderOperation,
+    setValue: Partial<V>,
+    damping?: number
+  ) {
+    const value = {} as V
 
     for (const key in this.current) {
-      ;(readyValue[key] as any) = value[key] || 0
+      ;(value[key] as any) = setValue[key] || 0
     }
 
-    this.steps.set(stepName, [action, readyValue])
+    let step = this.steps.get(stepName)
+
+    if (!step) {
+      step = new LadderStep({ operation, value: { ...this.#base }, damping })
+      this.steps.set(stepName, step)
+    }
+
+    step.value = value
+    step.damping = damping || 0
+
+    this.#checkSteps()
   }
 
   public calculate() {
@@ -78,24 +165,24 @@ export class Ladder<
     for (const item of this.steps) {
       const step = item[1]
 
-      if (step[0] === '+') {
+      if (step.operation === '+') {
         for (const key in this.base) {
-          const value = step[1][key] as number
+          const value = step.value[key] as number
           ;(calculated[key] as any) += value
         }
-      } else if (step[0] === '*') {
+      } else if (step.operation === '*') {
         for (const key in this.base) {
-          const value = step[1][key] as number
+          const value = step.value[key] as number
           ;(calculated[key] as any) *= value
         }
-      } else if (step[0] === '/') {
+      } else if (step.operation === '/') {
         for (const key in this.base) {
-          const value = step[1][key] as number
+          const value = step.value[key] as number
           ;(calculated[key] as any) /= value
         }
-      } else if (step[0] === '-') {
+      } else if (step.operation === '-') {
         for (const key in this.base) {
-          const value = step[1][key] as number
+          const value = step.value[key] as number
           ;(calculated[key] as any) -= value
         }
       }
@@ -108,5 +195,37 @@ export class Ladder<
     }
 
     this.current = calculated
+  }
+
+  #checkSteps() {
+    let dampedSteps = false
+
+    this.#steps.forEach((step) => {
+      if (step.damping) {
+        dampedSteps = true
+      }
+    })
+
+    if (dampedSteps) {
+      ticker.subscribe(this.#tickListener)
+    } else {
+      ticker.unsubscribe(this.#tickListener)
+    }
+  }
+
+  #tickListener: TickerCallback = (e) => {
+    let needUpdate = 0
+
+    for (const item of this.steps) {
+      const step = item[1]
+      const done = step.update(e.elapsed)
+      needUpdate += done ? 0 : 1
+    }
+
+    this.calculate()
+
+    if (!needUpdate) {
+      ticker.unsubscribe(this.#tickListener)
+    }
   }
 }

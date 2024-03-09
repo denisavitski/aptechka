@@ -163,19 +163,22 @@ export class En3Raycaster {
       (s) => !hits.find((h) => h.object3D.uuid === s.object3D.uuid)
     )
 
-    const finalHits = hits
-      .sort((a, b) => b.object3D.position.z - a.object3D.position.z)
-      .filter((h) => {
-        if (isStopPropagation) {
-          return false
-        }
+    const sortedHits = hits.sort(
+      (a, b) => b.object3D.position.z - a.object3D.position.z
+    )
 
-        isStopPropagation = !h.propagation
+    const filteredHits = sortedHits.filter((h, i) => {
+      if (isStopPropagation) {
+        leaveHits.push(h)
+        return false
+      }
 
-        return true
-      })
+      isStopPropagation = !h.propagation
 
-    const enterHits = finalHits.filter(
+      return true
+    })
+
+    const enterHits = filteredHits.filter(
       (s) => !this.#hits.find((h) => h.object3D.uuid === s.object3D.uuid)
     )
 
@@ -187,7 +190,7 @@ export class En3Raycaster {
       enterHits[index].dispatch('en3PointerEnter', event)
     }
 
-    this.#hits = finalHits
+    this.#hits = filteredHits
 
     for (let index = 0; index < this.#hits.length; index++) {
       this.#hits[index].dispatch('en3PointerMove', event)

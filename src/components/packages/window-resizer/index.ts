@@ -24,7 +24,7 @@ export class WindowResizer extends Notifier<WindowResizerCallback> {
     super()
 
     if (isBrowser) {
-      addEventListener('resize', this.#resizeListener)
+      window.addEventListener('resize', this.#resizeListener)
       this.#resizeListener()
     }
   }
