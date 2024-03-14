@@ -2,19 +2,19 @@ import { isESClass } from '@packages/utils'
 import { ComponentElement } from './ComponentElement'
 import { h } from './h'
 
-export function getComponentElement(
+export function instantiate(
   Component: any,
   attributes: JSX.AllAttributes | null = null,
   ...children: JSX.ComponentChildren
 ) {
-  let instance: ComponentElement = null!
+  let element: ComponentElement = null!
 
   if (isESClass(Component)) {
-    instance = new Component()
+    element = new Component()
   } else {
-    const ComponentElement = h(Component, attributes, ...children)
-    instance = new ComponentElement()
+    const ElementConstructor = h(Component, attributes, ...children)
+    element = new ElementConstructor()
   }
 
-  return instance
+  return element
 }

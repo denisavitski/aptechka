@@ -19,7 +19,7 @@ export function useStore<
   >
 ) {
   const store = new Store(...parameters)
-  useDisconnect(store.close)
+  useDisconnect(() => store.close())
   return store
 }
 
@@ -27,7 +27,7 @@ export function useDerived<DerivedType, StoreType>(
   ...parameters: ConstructorParameters<typeof Derived<DerivedType, StoreType>>
 ) {
   const store = new Derived(...parameters)
-  useDisconnect(store.close)
+  useDisconnect(() => store.close())
   return store
 }
 
@@ -40,7 +40,7 @@ export function useDerivedArray<
   >
 ) {
   const store = new DerivedArray(...parameters)
-  useDisconnect(store.close)
+  useDisconnect(() => store.close())
   return store
 }
 
@@ -48,7 +48,7 @@ export function useComposed<ComposedType>(
   ...parameters: ConstructorParameters<typeof Composed<ComposedType>>
 ) {
   const store = new Composed(...parameters)
-  useDisconnect(store.close)
+  useDisconnect(() => store.close())
   return store
 }
 
@@ -56,6 +56,6 @@ export function useResource<StoreType>(
   ...parameters: ConstructorParameters<typeof Resource<StoreType>>
 ) {
   const store = new Resource(...parameters)
-  useDisconnect(store.close)
+  useDisconnect(() => store.close())
   return store
 }

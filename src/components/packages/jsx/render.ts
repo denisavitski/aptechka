@@ -1,5 +1,5 @@
-import { getComponentElement } from './getComponentElement'
+import { instantiate } from './instantiate'
 
 export function render(Component: any, containerElement = document.body) {
-  containerElement.appendChild(getComponentElement(Component))
+  containerElement.appendChild(instantiate(Component))
 }

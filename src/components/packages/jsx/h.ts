@@ -2,8 +2,6 @@ import { ElementConstructor } from '@packages/element-constructor'
 import { camelToKebab } from '@packages/utils'
 import { ComponentElement, nextComponentAttributes } from './ComponentElement'
 
-let rarc: { [key: string]: any } = {}
-
 function getChildren(child: any) {
   const unpreparedChildren = Array.isArray(child) ? child : [child]
   let children: Array<any> = []

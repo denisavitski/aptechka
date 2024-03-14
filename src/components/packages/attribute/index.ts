@@ -14,8 +14,6 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
   #element: Element = null!
   #name: string
   #mutationObserver: MutationObserver = null!
-  #resizeObserver: ResizeObserver = null!
-  #isConnected = false
 
   constructor(
     elementOrSelector: ElementOrSelector,
@@ -30,12 +28,6 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     if (isBrowser) {
       this.#element = getElement(elementOrSelector)!
 
-      if (options?.sync) {
-        this.subscribe((e) => {
-          this.#element.setAttribute(this.#name, e.current.toString())
-        })
-      }
-
       this.#mutationObserver = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
           if (
@@ -47,45 +39,41 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
         })
       })
 
-      this.#resizeObserver = new ResizeObserver(() => {
-        if (this.#element.isConnected && !this.#isConnected) {
-          this.#mutationObserver.observe(this.#element, {
-            attributes: true,
-          })
-        } else if (!this.#element.isConnected && this.#isConnected) {
-          this.#sleep()
-        }
-
-        this.#isConnected = this.#element.isConnected
-      })
+      if (options?.sync) {
+        this.subscribe((e) => {
+          this.#element.setAttribute(this.#name, e.current.toString())
+        })
+      }
     }
   }
 
-  public override get current() {
-    this.#awake()
-    return super.current
-  }
-
-  public override set current(value: T) {
-    super.current = value
-  }
-
   public override subscribe(callback: StoreCallback<StoreEntry<T>>) {
-    this.#awake()
-    return super.subscribe(callback)
+    const observe = !this.subscribers.size
+
+    const unsub = super.subscribe(callback)
+
+    if (observe) {
+      this.#mutationObserver.observe(this.#element, {
+        attributes: true,
+      })
+
+      this.#tryUpdate()
+    }
+
+    return unsub
   }
 
   public override unsubscribe(callback: StoreCallback<StoreEntry<T>>) {
     super.unsubscribe(callback)
 
     if (!this.subscribers.size) {
-      this.#sleep()
+      this.#mutationObserver.disconnect()
     }
   }
 
   public override close() {
     super.close()
-    this.#sleep()
+    this.#mutationObserver.disconnect()
   }
 
   #tryUpdate() {
@@ -93,20 +81,6 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
 
     if (value != undefined) {
       this.current = parseAttributeValue(value) as T
-    }
-  }
-
-  #awake() {
-    if (!this.#isConnected) {
-      this.#tryUpdate()
-      this.#resizeObserver.observe(this.#element)
-    }
-  }
-
-  #sleep() {
-    if (this.#isConnected) {
-      this.#mutationObserver.disconnect()
-      this.#resizeObserver.disconnect()
     }
   }
 }
