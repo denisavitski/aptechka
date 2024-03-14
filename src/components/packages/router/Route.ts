@@ -1,3 +1,4 @@
+import { getComponentElement } from '@packages/jsx'
 import { isBrowser, isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<any>
@@ -21,7 +22,7 @@ export class Route {
   #elementConstructor: typeof HTMLElement | (() => HTMLElement) | null
   #element: HTMLElement | null
   #isActive: boolean
-  #outlet: HTMLElement | ShadowRoot | null
+  #nest: HTMLElement | ShadowRoot | null
   #mutationObserver: MutationObserver = null!
   #permanentHeadNodes: Array<Node> = []
   #temporalHeadNodes: Array<Node> = []
@@ -33,7 +34,7 @@ export class Route {
     this.#elementConstructor = null
     this.#element = null
     this.#isActive = false
-    this.#outlet = null
+    this.#nest = null
 
     if (isBrowser) {
       this.#mutationObserver = new MutationObserver((mutations) => {
@@ -66,8 +67,8 @@ export class Route {
     return this.#element
   }
 
-  public get outlet() {
-    return this.#outlet
+  public get nest() {
+    return this.#nest
   }
 
   public testPathname(pathname: string) {
@@ -124,16 +125,17 @@ export class Route {
           routeParameters
         ) as HTMLElement
       } else {
-        this.#element = (this.#elementConstructor as any)(
+        this.#element = getComponentElement(
+          this.#elementConstructor as any,
           routeParameters
-        ) as HTMLElement
+        )
       }
 
       containerElement.appendChild(this.#element)
 
-      this.#outlet =
-        this.#element.querySelector<HTMLElement>('[data-outlet]') ||
-        this.#element.shadowRoot?.querySelector<HTMLElement>('[data-outlet]') ||
+      this.#nest =
+        this.#element.querySelector<HTMLElement>('[data-nest]') ||
+        this.#element.shadowRoot?.querySelector<HTMLElement>('[data-nest]') ||
         this.#element.shadowRoot ||
         this.#element
 

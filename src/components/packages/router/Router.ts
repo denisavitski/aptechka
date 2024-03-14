@@ -136,10 +136,7 @@ export class Router {
       this.#currentPathname = pathname
 
       for await (const route of newRoutes) {
-        await route.render(
-          this.#lastRoute?.outlet || this.#rootElement,
-          pathname
-        )
+        await route.render(this.#lastRoute?.nest || this.#rootElement, pathname)
         this.#lastRoute = route
       }
 

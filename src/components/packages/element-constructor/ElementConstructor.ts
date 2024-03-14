@@ -2,8 +2,8 @@ import { Store } from '@packages/store'
 import {
   SplitFirst,
   camelToKebab,
-  capitalize,
   isBrowser,
+  isESClass,
   uncapitalize,
 } from '@packages/utils'
 import { knownSvgTags } from './knownSvgTags'
@@ -522,7 +522,7 @@ export class ElementConstructor<
       } else if (child instanceof ElementConstructor) {
         this.#appendChild(root, child.node)
       } else if (child instanceof Function) {
-        this.#createChildren(root, child())
+        this.#createChildren(root, isESClass(child) ? new child() : child())
       } else {
         const childNodeOrUndefined = this.#getOrCreateNode(child)
 
@@ -561,6 +561,8 @@ export class ElementConstructor<
       .map((v) => {
         if (v instanceof ElementConstructor) {
           return v.node
+        } else if (typeof v === 'function') {
+          return isESClass(v) ? new v() : v()
         } else {
           return this.#getOrCreateNode(v)
         }

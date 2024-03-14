@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.1.20",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -42,11 +42,6 @@
       "require": "./lib/canvas/index.cjs",
       "default": "./lib/canvas/index.js",
       "types": "./lib/canvas/index.d.ts"
-    },
-    "./component": {
-      "require": "./lib/component/index.cjs",
-      "default": "./lib/component/index.js",
-      "types": "./lib/component/index.d.ts"
     },
     "./connector": {
       "require": "./lib/connector/index.cjs",
@@ -97,6 +92,11 @@
       "require": "./lib/intersector/index.cjs",
       "default": "./lib/intersector/index.js",
       "types": "./lib/intersector/index.d.ts"
+    },
+    "./jsx": {
+      "require": "./lib/jsx/index.cjs",
+      "default": "./lib/jsx/index.js",
+      "types": "./lib/jsx/index.d.ts"
     },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
@@ -255,6 +255,9 @@
       ],
       "intersector": [
         "lib/intersector/index.d.ts"
+      ],
+      "jsx": [
+        "lib/jsx/index.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"

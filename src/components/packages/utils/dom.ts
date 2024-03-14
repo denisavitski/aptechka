@@ -1,18 +1,18 @@
-export function findParentElement<T extends typeof Element>(
+export function findParentElement<T extends CustomElementConstructor>(
   element: Element | null,
   Constructor: T
-): T | null {
+): InstanceType<T> | null {
   if (!element) {
     return null
   }
 
-  let parent = element.parentElement as T | null
+  let parent = element.parentElement as InstanceType<T> | null
 
   if (!(element.parentElement instanceof Constructor)) {
     parent = findParentElement(element.parentElement, Constructor)
   }
 
-  return parent as T
+  return parent as InstanceType<T>
 }
 
 export type ElementOrSelector<T extends Element = Element> = string | T

@@ -7,9 +7,9 @@ import {
   Composed,
   Resource,
 } from '@packages/store'
-import { onDisconnect } from '../Component'
+import { useDisconnect } from './useDisconnect'
 
-export function createStore<
+export function useStore<
   StoreType = unknown,
   StoreManager extends StoreManagerType = StoreManagerType,
   Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
@@ -19,19 +19,19 @@ export function createStore<
   >
 ) {
   const store = new Store(...parameters)
-  onDisconnect(store.close)
+  useDisconnect(store.close)
   return store
 }
 
-export function createDerived<DerivedType, StoreType>(
+export function useDerived<DerivedType, StoreType>(
   ...parameters: ConstructorParameters<typeof Derived<DerivedType, StoreType>>
 ) {
   const store = new Derived(...parameters)
-  onDisconnect(store.close)
+  useDisconnect(store.close)
   return store
 }
 
-export function createDerivedArray<
+export function useDerivedArray<
   DerivedType,
   StoreType extends Array<any> = Array<any>
 >(
@@ -40,22 +40,22 @@ export function createDerivedArray<
   >
 ) {
   const store = new DerivedArray(...parameters)
-  onDisconnect(store.close)
+  useDisconnect(store.close)
   return store
 }
 
-export function createComposed<ComposedType>(
+export function useComposed<ComposedType>(
   ...parameters: ConstructorParameters<typeof Composed<ComposedType>>
 ) {
   const store = new Composed(...parameters)
-  onDisconnect(store.close)
+  useDisconnect(store.close)
   return store
 }
 
-export function createResource<StoreType>(
+export function useResource<StoreType>(
   ...parameters: ConstructorParameters<typeof Resource<StoreType>>
 ) {
   const store = new Resource(...parameters)
-  onDisconnect(store.close)
+  useDisconnect(store.close)
   return store
 }
