@@ -1,5 +1,5 @@
 export { useConnect } from './useConnect'
-export { useContext, createContext } from './useContext'
+export { useContext, createContext, type ContextCallback } from './useContext'
 export { useCreate } from './useCreate'
 export { useDisconnect } from './useDisconnect'
 export { useInternals } from './useInternals'
