@@ -31,6 +31,8 @@ export default defineConfig((e) => {
                 './src/components/packages/abstract-elements/index.ts',
               'accordion/index': './src/components/packages/accordion/index.ts',
               'animation/index': './src/components/packages/animation/index.ts',
+              'animation/hooks/index':
+                './src/components/packages/animation/hooks/index.ts',
               'attribute/index': './src/components/packages/attribute/index.ts',
               'canvas/index': './src/components/packages/canvas/index.ts',
               'connector/index': './src/components/packages/connector/index.ts',
@@ -44,11 +46,16 @@ export default defineConfig((e) => {
                 './src/components/packages/element-constructor/index.ts',
               'element-resizer/index':
                 './src/components/packages/element-resizer/index.ts',
+              'element-resizer/hooks/index':
+                './src/components/packages/element-resizer/hooks/index.ts',
               'en3/index': './src/components/packages/en3/index.ts',
               'image/index': './src/components/packages/image/index.ts',
               'intersector/index':
                 './src/components/packages/intersector/index.ts',
+              'intersector/hooks/index':
+                './src/components/packages/intersector/hooks/index.ts',
               'jsx/index': './src/components/packages/jsx/index.ts',
+              'jsx/hooks/index': './src/components/packages/jsx/hooks/index.ts',
               'ladder/index': './src/components/packages/ladder/index.ts',
               'layout-box/index':
                 './src/components/packages/layout-box/index.ts',
@@ -65,15 +72,22 @@ export default defineConfig((e) => {
               'scroll-entries/index':
                 './src/components/packages/scroll-entries/index.ts',
               'select/index': './src/components/packages/select/index.ts',
+              'slicer/index': './src/components/packages/slicer/index.ts',
               'source/index': './src/components/packages/source/index.ts',
               'store/index': './src/components/packages/store/index.ts',
+              'store/hooks/index':
+                './src/components/packages/store/hooks/index.ts',
               'studio/index': './src/components/packages/studio/index.ts',
               'theme/index': './src/components/packages/theme/index.ts',
               'ticker/index': './src/components/packages/ticker/index.ts',
+              'ticker/hooks/index':
+                './src/components/packages/ticker/hooks/index.ts',
               'utils/index': './src/components/packages/utils/index.ts',
               'video/index': './src/components/packages/video/index.ts',
               'window-resizer/index':
                 './src/components/packages/window-resizer/index.ts',
+              'window-resizer/hooks/index':
+                './src/components/packages/window-resizer/hooks/index.ts',
             },
             formats: ['es', 'cjs'],
             fileName: (format, entryName) =>

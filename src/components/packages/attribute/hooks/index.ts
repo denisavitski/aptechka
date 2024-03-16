@@ -1,6 +1,5 @@
-import { Attribute, AttributeOptions } from '@packages/attribute'
-import { useCreate } from './useCreate'
-import { useDisconnect } from './useDisconnect'
+import { useCreate, useDisconnect } from '@packages/jsx/hooks'
+import { Attribute, AttributeOptions } from '..'
 
 export function useAttribute<T extends number | string | boolean>(
   name: string,

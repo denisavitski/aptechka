@@ -35,7 +35,7 @@ export abstract class Animated<
 > extends Store<number, 'number', Entry> {
   #maxFPS: number | undefined
   #order: number | undefined
-  #culling: ElementOrSelector | undefined
+  #culling: ElementOrSelector | undefined | false
   #target: number
   #min: Store<number>
   #max: Store<number>

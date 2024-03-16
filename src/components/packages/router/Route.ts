@@ -131,13 +131,13 @@ export class Route {
         )
       }
 
-      containerElement.appendChild(this.#element)
+      containerElement.appendChild(this.#element!)
 
       this.#nest =
-        this.#element.querySelector<HTMLElement>('[data-nest]') ||
-        this.#element.shadowRoot?.querySelector<HTMLElement>('[data-nest]') ||
-        this.#element.shadowRoot ||
-        this.#element
+        this.#element!.querySelector<HTMLElement>('[data-nest]') ||
+        this.#element!.shadowRoot?.querySelector<HTMLElement>('[data-nest]') ||
+        this.#element!.shadowRoot ||
+        this.#element!
 
       this.#isActive = true
     }

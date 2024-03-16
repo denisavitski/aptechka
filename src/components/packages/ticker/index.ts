@@ -11,7 +11,7 @@ export type TickerCallback = (entry: TickerCallbackEntry) => void
 export interface TickerAddOptions {
   maxFPS?: number
   order?: number
-  culling?: ElementOrSelector
+  culling?: ElementOrSelector | false
 }
 
 class TickerSubscriber {

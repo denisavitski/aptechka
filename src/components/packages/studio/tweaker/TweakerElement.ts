@@ -33,6 +33,8 @@ const stylesheet = createStylesheet({
     transition: 'opacity 0.2s',
 
     zIndex: '100',
+
+    opacity: '0.1',
   },
 
   ':host(:hover)': {

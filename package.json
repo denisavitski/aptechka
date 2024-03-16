@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -32,6 +32,11 @@
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js",
       "types": "./lib/animation/index.d.ts"
+    },
+    "./animation/hooks": {
+      "require": "./lib/animation/hooks/index.cjs",
+      "default": "./lib/animation/hooks/index.js",
+      "types": "./lib/animation/hooks/index.d.ts"
     },
     "./attribute": {
       "require": "./lib/attribute/index.cjs",
@@ -78,6 +83,11 @@
       "default": "./lib/element-resizer/index.js",
       "types": "./lib/element-resizer/index.d.ts"
     },
+    "./element-resizer/hooks": {
+      "require": "./lib/element-resizer/hooks/index.cjs",
+      "default": "./lib/element-resizer/hooks/index.js",
+      "types": "./lib/element-resizer/hooks/index.d.ts"
+    },
     "./en3": {
       "require": "./lib/en3/index.cjs",
       "default": "./lib/en3/index.js",
@@ -93,10 +103,20 @@
       "default": "./lib/intersector/index.js",
       "types": "./lib/intersector/index.d.ts"
     },
+    "./intersector/hooks": {
+      "require": "./lib/intersector/hooks/index.cjs",
+      "default": "./lib/intersector/hooks/index.js",
+      "types": "./lib/intersector/hooks/index.d.ts"
+    },
     "./jsx": {
       "require": "./lib/jsx/index.cjs",
       "default": "./lib/jsx/index.js",
       "types": "./lib/jsx/index.d.ts"
+    },
+    "./jsx/hooks": {
+      "require": "./lib/jsx/hooks/index.cjs",
+      "default": "./lib/jsx/hooks/index.js",
+      "types": "./lib/jsx/hooks/index.d.ts"
     },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
@@ -168,6 +188,11 @@
       "default": "./lib/select/index.js",
       "types": "./lib/select/index.d.ts"
     },
+    "./slicer": {
+      "require": "./lib/slicer/index.cjs",
+      "default": "./lib/slicer/index.js",
+      "types": "./lib/slicer/index.d.ts"
+    },
     "./source": {
       "require": "./lib/source/index.cjs",
       "default": "./lib/source/index.js",
@@ -177,6 +202,11 @@
       "require": "./lib/store/index.cjs",
       "default": "./lib/store/index.js",
       "types": "./lib/store/index.d.ts"
+    },
+    "./store/hooks": {
+      "require": "./lib/store/hooks/index.cjs",
+      "default": "./lib/store/hooks/index.js",
+      "types": "./lib/store/hooks/index.d.ts"
     },
     "./studio": {
       "require": "./lib/studio/index.cjs",
@@ -193,6 +223,11 @@
       "default": "./lib/ticker/index.js",
       "types": "./lib/ticker/index.d.ts"
     },
+    "./ticker/hooks": {
+      "require": "./lib/ticker/hooks/index.cjs",
+      "default": "./lib/ticker/hooks/index.js",
+      "types": "./lib/ticker/hooks/index.d.ts"
+    },
     "./utils": {
       "require": "./lib/utils/index.cjs",
       "default": "./lib/utils/index.js",
@@ -207,6 +242,11 @@
       "require": "./lib/window-resizer/index.cjs",
       "default": "./lib/window-resizer/index.js",
       "types": "./lib/window-resizer/index.d.ts"
+    },
+    "./window-resizer/hooks": {
+      "require": "./lib/window-resizer/hooks/index.cjs",
+      "default": "./lib/window-resizer/hooks/index.js",
+      "types": "./lib/window-resizer/hooks/index.d.ts"
     }
   },
   "typesVersions": {
@@ -216,6 +256,9 @@
       ],
       "animation": [
         "lib/animation/index.d.ts"
+      ],
+      "animation/hooks": [
+        "lib/animation/hooks/index.d.ts"
       ],
       "attribute": [
         "lib/attribute/index.d.ts"
@@ -247,6 +290,9 @@
       "element-resizer": [
         "lib/element-resizer/index.d.ts"
       ],
+      "element-resizer/hooks": [
+        "lib/element-resizer/hooks/index.d.ts"
+      ],
       "en3": [
         "lib/en3/index.d.ts"
       ],
@@ -256,8 +302,14 @@
       "intersector": [
         "lib/intersector/index.d.ts"
       ],
+      "intersector/hooks": [
+        "lib/intersector/hooks/index.d.ts"
+      ],
       "jsx": [
         "lib/jsx/index.d.ts"
+      ],
+      "jsx/hooks": [
+        "lib/jsx/hooks/index.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"
@@ -301,11 +353,17 @@
       "select": [
         "lib/select/index.d.ts"
       ],
+      "slicer": [
+        "lib/slicer/index.d.ts"
+      ],
       "source": [
         "lib/source/index.d.ts"
       ],
       "store": [
         "lib/store/index.d.ts"
+      ],
+      "store/hooks": [
+        "lib/store/hooks/index.d.ts"
       ],
       "studio": [
         "lib/studio/index.d.ts"
@@ -316,6 +374,9 @@
       "ticker": [
         "lib/ticker/index.d.ts"
       ],
+      "ticker/hooks": [
+        "lib/ticker/hooks/index.d.ts"
+      ],
       "utils": [
         "lib/utils/index.d.ts"
       ],
@@ -324,6 +385,9 @@
       ],
       "window-resizer": [
         "lib/window-resizer/index.d.ts"
+      ],
+      "window-resizer/hooks": [
+        "lib/window-resizer/hooks/index.d.ts"
       ]
     }
   },
@@ -341,7 +405,8 @@
     "vite-plugin-htmc": "^0.1.5"
   },
   "dependencies": {
-    "detect-gpu": "^5.0.38",
+    "detect-gpu": "^5.0.37",
+    "postprocessing": "^6.35.2",
     "three": "^0.161.0",
     "urlpattern-polyfill": "^10.0.0"
   },

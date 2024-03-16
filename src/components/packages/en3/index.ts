@@ -33,6 +33,7 @@ export { dispose } from './utils/dispose'
 export { traverseMeshes } from './utils/traverseMeshes'
 export { traverseMaterials } from './utils/traverseMaterials'
 export { coverTexture } from './utils/coverTexture'
+export { getCurrentViewport } from './utils/getCurrentViewport'
 
 export { En3HTML, type En3HTMLParameters } from './test/En3HTML'
 

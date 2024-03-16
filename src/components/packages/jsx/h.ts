@@ -8,10 +8,7 @@ function getChildren(child: any) {
 
   unpreparedChildren.forEach((child) => {
     if (typeof child === 'function') {
-      const res = new child({
-        ...child.attributes,
-        children: child.children,
-      })
+      const res = child()
 
       children = [...children, ...getChildren(res)]
     } else {
@@ -39,20 +36,14 @@ export function h(
     if (!Constructor) {
       Constructor = class extends ComponentElement {
         static formAssociated = (tag as JSX.Component).formAssociated
-
-        constructor() {
-          super({
-            tag: tag as Function,
-            attributes,
-            children,
-          })
-        }
       }
 
       customElements.define(name, Constructor)
     }
 
-    return Constructor
+    return () => {
+      return new Constructor({ tag, attributes, children })
+    }
   }
 
   const readyChildren = children

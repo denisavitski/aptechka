@@ -8,7 +8,7 @@ export const aptechkaTheme = createTheme(
     colorLight: '#ffffff',
     colorActive: '#00E5B0',
 
-    tweakerWidth: '480px',
+    tweakerWidth: '500px',
     tweakerOffset: '20px',
     tweakerFolderHeight: '40px',
 

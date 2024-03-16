@@ -1,24 +1,19 @@
-import { Store } from '@packages/store'
 import { useConnect } from './useConnect'
 import { useCreate } from './useCreate'
 
-export function useContext<T>(name: string) {
-  const store = new Store<T>(null!)
+export type ContextCallback<T> = (context: T) => void | (() => void)
 
+export function useContext<T>(name: string, callback: ContextCallback<T>) {
   useConnect((e) => {
     const context = e.findContext(name)
-    if (context) {
-      store.current = context
-    } else {
+
+    if (!context) {
       console.warn(e, `Context "${name}" not found`)
+      return
     }
 
-    return () => {
-      store.close()
-    }
+    return callback(context)
   })
-
-  return store
 }
 
 export function createContext(name: string, value: any) {

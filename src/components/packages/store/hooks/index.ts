@@ -1,3 +1,4 @@
+import { useDisconnect } from '@packages/jsx/hooks'
 import {
   StoreManagerType,
   StoreEntry,
@@ -6,8 +7,7 @@ import {
   DerivedArray,
   Composed,
   Resource,
-} from '@packages/store'
-import { useDisconnect } from './useDisconnect'
+} from '..'
 
 export function useStore<
   StoreType = unknown,
