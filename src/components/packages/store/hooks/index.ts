@@ -1,4 +1,4 @@
-import { useDisconnect } from '@packages/jsx/hooks'
+import { _createStore } from '@packages/jsx/hooks'
 import {
   StoreManagerType,
   StoreEntry,
@@ -9,7 +9,7 @@ import {
   Resource,
 } from '..'
 
-export function useStore<
+export function createStore<
   StoreType = unknown,
   StoreManager extends StoreManagerType = StoreManagerType,
   Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
@@ -18,20 +18,16 @@ export function useStore<
     typeof Store<StoreType, StoreManager, Entry>
   >
 ) {
-  const store = new Store(...parameters)
-  useDisconnect(() => store.close())
-  return store
+  return _createStore(new Store(...parameters))
 }
 
-export function useDerived<DerivedType, StoreType>(
+export function createDerived<DerivedType, StoreType>(
   ...parameters: ConstructorParameters<typeof Derived<DerivedType, StoreType>>
 ) {
-  const store = new Derived(...parameters)
-  useDisconnect(() => store.close())
-  return store
+  return _createStore(new Derived(...parameters))
 }
 
-export function useDerivedArray<
+export function createDerivedArray<
   DerivedType,
   StoreType extends Array<any> = Array<any>
 >(
@@ -39,23 +35,17 @@ export function useDerivedArray<
     typeof DerivedArray<DerivedType, StoreType>
   >
 ) {
-  const store = new DerivedArray(...parameters)
-  useDisconnect(() => store.close())
-  return store
+  return _createStore(new DerivedArray(...parameters))
 }
 
-export function useComposed<ComposedType>(
+export function createComposed<ComposedType>(
   ...parameters: ConstructorParameters<typeof Composed<ComposedType>>
 ) {
-  const store = new Composed(...parameters)
-  useDisconnect(() => store.close())
-  return store
+  return _createStore(new Composed(...parameters))
 }
 
-export function useResource<StoreType>(
+export function createResource<StoreType>(
   ...parameters: ConstructorParameters<typeof Resource<StoreType>>
 ) {
-  const store = new Resource(...parameters)
-  useDisconnect(() => store.close())
-  return store
+  return _createStore(new Resource(...parameters))
 }

@@ -62,7 +62,7 @@ export class ElementResizer {
 
     if (subscriber) {
       this.#subscribers = this.#subscribers.filter(
-        (sub) => sub.callback === callback
+        (sub) => sub.callback !== subscriber.callback
       )
 
       if (

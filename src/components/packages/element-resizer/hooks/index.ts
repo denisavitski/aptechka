@@ -1,17 +1,14 @@
-import { useConnect } from '@packages/jsx/hooks'
+import { onConnect } from '@packages/jsx/hooks'
 import { ElementResizerCallback, elementResizer } from '..'
 import { ElementOrSelector } from '@packages/utils'
 
-export function useElementResize(
+export function onElementResize(
   elementOrSelector: ElementOrSelector,
   callback: ElementResizerCallback
 ): void
-export function useElementResize(
-  elementOrSelector: ElementOrSelector,
-  callback: ElementResizerCallback
-): void
-export function useElementResize(...args: any[]): void {
-  useConnect((e) => {
+export function onElementResize(callback: ElementResizerCallback): void
+export function onElementResize(...args: any[]): void {
+  onConnect((e) => {
     const element = args.length > 1 ? args[0] : e
     const callback = args.length > 1 ? args[1] : args[0]
 

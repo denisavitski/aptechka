@@ -1,9 +1,9 @@
 import { en3 } from '@packages/en3'
-import { useConnect, useDisconnect, useStylesheet } from '@packages/jsx/hooks'
+import { onConnect, onDisconnect, attachStylesheet } from '@packages/jsx/hooks'
 import { BoxGeometry, Mesh } from 'three'
 
 const Box: JSX.Component = (e) => {
-  useStylesheet({
+  attachStylesheet({
     'e-box': {
       width: '10vmin',
       height: '10vmin',
@@ -13,11 +13,11 @@ const Box: JSX.Component = (e) => {
 
   const mesh = new Mesh(new BoxGeometry())
 
-  useConnect((e) => {
+  onConnect((e) => {
     en3.add(mesh, e)
   })
 
-  useDisconnect(() => {
+  onDisconnect(() => {
     en3.remove(mesh)
   })
 }
@@ -25,7 +25,7 @@ const Box: JSX.Component = (e) => {
 export const App: JSX.Component = (e) => {
   en3.setup()
 
-  useStylesheet({
+  attachStylesheet({
     'e-app': {
       width: '100%',
       height: '100%',

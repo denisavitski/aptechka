@@ -1,15 +1,15 @@
-// import '@packages/studio'
+import '@packages/studio'
 import '@packages/slicer'
 import { dispose, en3, en3GLTFLoader, getCurrentViewport } from '@packages/en3'
 import {
   createContext,
-  useConnect,
-  useContext,
-  useShadow,
-  useStylesheet,
+  onConnect,
+  onContext,
+  attachShadow,
+  attachStylesheet,
 } from '@packages/jsx/hooks'
-import { useStore } from '@packages/store/hooks'
-import { useAnimationFrame } from '@packages/ticker/hooks'
+import { createStore } from '@packages/store/hooks'
+import { onAnimationFrame } from '@packages/ticker/hooks'
 import {
   DepthOfFieldEffect,
   EdgeDetectionMode,
@@ -22,24 +22,25 @@ import {
   ToneMappingMode,
 } from 'postprocessing'
 import {
-  AmbientLight,
   BufferGeometry,
   Color,
-  DirectionalLight,
   DynamicDrawUsage,
+  EquirectangularReflectionMapping,
   Group,
   InstancedMesh,
   Mesh,
   MeshStandardMaterial,
   Object3D,
   PlaneGeometry,
+  SRGBColorSpace,
+  TextureLoader,
 } from 'three'
-import { useWindowResize } from '@packages/window-resizer/hooks'
+import { onWindowResize } from '@packages/window-resizer/hooks'
 import { RESIZE_ORDER } from '@packages/order'
 import { Derived, Store } from '@packages/store'
-import { useDamped } from '@packages/animation/hooks'
+import { createDamped } from '@packages/animation/hooks'
 import { Animated } from '@packages/animation'
-import { ContextCallback } from '@packages/jsx/hooks/useContext'
+import { ContextCallback } from '@packages/jsx/hooks'
 
 export interface ParticlesParameters {
   amount?: number
@@ -54,7 +55,7 @@ export const Particles: JSX.Component<ParticlesParameters> = (props) => {
 
   let instancedMesh: InstancedMesh = null!
 
-  useConnect(() => {
+  onConnect(() => {
     en3GLTFLoader.load(props.url, (d) => {
       const mesh = d.scene.children[0] as Mesh<
         BufferGeometry,
@@ -79,7 +80,7 @@ export const Particles: JSX.Component<ParticlesParameters> = (props) => {
     }
   })
 
-  useAnimationFrame((e) => {
+  onAnimationFrame((e) => {
     if (!instancedMesh || !props.visibility.current) {
       return
     }
@@ -103,8 +104,10 @@ export const Particles: JSX.Component<ParticlesParameters> = (props) => {
       const indexPositionX =
         (Math.cos(index * 10 + rand) * (width - indexScale)) / 2
 
-      let indexPositionY = (height / 2 + en3.height / 2) * 1
-      indexPositionY -= (t + 10000) % (height + en3.height)
+      const offset = en3.height * 0.8
+
+      let indexPositionY = (height / 2 + offset) * 1
+      indexPositionY -= (t + 10000) % (height + offset * 2)
 
       dummy.rotation.z = t * 0.001 + index
       dummy.rotation.x = t * 0.001 + index
@@ -134,9 +137,9 @@ export interface SlideParameters {
 }
 
 export const Slide: JSX.Component<SlideParameters> = (props) => {
-  useShadow()
+  attachShadow()
 
-  useStylesheet({
+  attachStylesheet({
     ':host': {
       display: 'block',
       width: '100%',
@@ -183,14 +186,14 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
     },
   })
 
-  const visibility = useDamped({
+  const visibility = createDamped({
     default: 0,
     min: 0,
     max: 1,
     damping: 0.006,
   })
 
-  const visibilityType = useStore<'show' | 'hide'>('show')
+  const visibilityType = createStore<'show' | 'hide'>('show')
 
   useSlider((context) => {
     context.activeSlide.subscribe((e) => {
@@ -207,11 +210,11 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
   let packageGroup: Group = null!
   let icecreamGroup: Group = null!
 
-  useConnect(() => {
-    en3GLTFLoader.load('/models/package-opt.glb', (data) => {
+  onConnect(() => {
+    en3GLTFLoader.load('/models/package2-opt.glb', (data) => {
       packageGroup = data.scene
 
-      const mesh = packageGroup.getObjectByName('Object_4') as Mesh<
+      const mesh = packageGroup.getObjectByName('package') as Mesh<
         BufferGeometry,
         MeshStandardMaterial
       >
@@ -225,7 +228,7 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
       en3.add(packageGroup)
     })
 
-    en3GLTFLoader.load('/models/icecream-opt.glb', (data) => {
+    en3GLTFLoader.load('/models/icecream2-opt.glb', (data) => {
       icecreamGroup = data.scene
 
       const mesh = icecreamGroup.getObjectByName('food') as Mesh<
@@ -248,7 +251,7 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
     }
   })
 
-  useAnimationFrame((e) => {
+  onAnimationFrame((e) => {
     if (!packageGroup || !icecreamGroup || !visibility.current) {
       return
     }
@@ -259,8 +262,8 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
 
     let packageX = isShow ? (en3.width / 2) * -1 * rv : 0
     let icecreamX = isShow ? (en3.width / 2) * rv : 0
-    packageX += (en3.width / 3.5) * -1
-    icecreamX += en3.width / 3.5
+    packageX += (en3.width / 3.2) * -1
+    icecreamX += en3.width / 3.2
 
     let packageY = isShow ? 0 : en3.height * rv * -1.1
     let icecreamY = isShow ? 0 : en3.height * rv * -1.1
@@ -271,8 +274,8 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
     packageGroup.position.y = packageY
     icecreamGroup.position.y = icecreamY
 
-    packageGroup.rotation.y = visibility.current * Math.PI * (isShow ? 2 : 1)
-    icecreamGroup.rotation.y = visibility.current * Math.PI * (isShow ? 2 : 1)
+    packageGroup.rotation.y = visibility.current * Math.PI * (isShow ? 2 : 0)
+    icecreamGroup.rotation.y = visibility.current * Math.PI * (isShow ? 2 : 0)
 
     packageGroup.rotation.z = visibility.current * 0.2
     icecreamGroup.rotation.z = visibility.current * 0.2 * -1
@@ -281,7 +284,7 @@ export const Slide: JSX.Component<SlideParameters> = (props) => {
     icecreamGroup.rotation.y += e.timestamp * 0.0005
 
     const max = Math.max(en3.width, en3.height)
-    const scale = max * 0.2
+    const scale = max * 0.25
 
     packageGroup.scale.setScalar(scale)
     icecreamGroup.scale.setScalar(scale)
@@ -317,7 +320,7 @@ export const Background: JSX.Component = () => {
 
   mesh.position.z = en3.camera.far * -0.9
 
-  useConnect(() => {
+  onConnect(() => {
     en3.add(mesh)
 
     return () => {
@@ -325,7 +328,7 @@ export const Background: JSX.Component = () => {
     }
   })
 
-  useWindowResize(() => {
+  onWindowResize(() => {
     const { width, height } = getCurrentViewport([0, 0, mesh.position.z])
 
     mesh.scale.x = width
@@ -337,7 +340,7 @@ export const Background: JSX.Component = () => {
 
   let color = bananaColor
 
-  const bananaColorValue = useStore('#fac000', {
+  const bananaColorValue = createStore('#fac000', {
     passport: {
       name: 'Фон.Банановый',
       manager: {
@@ -354,7 +357,7 @@ export const Background: JSX.Component = () => {
     }
   })
 
-  const strawberryColorValue = useStore('#960a08', {
+  const strawberryColorValue = createStore('#c5100d', {
     passport: {
       name: 'Фон.Клюбничный',
       manager: {
@@ -371,7 +374,7 @@ export const Background: JSX.Component = () => {
     }
   })
 
-  const damped = useDamped({ min: 0, max: 1, damping: 0.006 })
+  const damped = createDamped({ min: 0, max: 1, damping: 0.006 })
 
   damped.subscribe((e) => {
     mesh.material.color.lerp(color, e.current)
@@ -392,18 +395,61 @@ export const Background: JSX.Component = () => {
   })
 }
 
+export const SliderButton: JSX.Component<{
+  color: string
+  slide: SlideName
+  activeSlide: Store<SlideName>
+}> = (props) => {
+  attachStylesheet({
+    button: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      width: '4vmin',
+      height: '4vmin',
+
+      border: '0.4vmin solid white',
+      background: 'none',
+      backgroundColor: 'var(--color)',
+      borderRadius: '50%',
+      cursor: 'pointer',
+
+      transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+    },
+
+    'button.current': {
+      transform: 'translateY(-25%)',
+    },
+  })
+
+  return (
+    <button
+      style={{ '--color': props.color }}
+      class={
+        new Derived(props.activeSlide, (e) =>
+          e === props.slide ? 'current' : null!
+        )
+      }
+      onClick={() => {
+        props.activeSlide.current = props.slide
+      }}
+    ></button>
+  )
+}
+
 export interface SliderContext {
   activeSlide: Store<SlideName>
 }
 
 export function useSlider(callback: ContextCallback<SliderContext>) {
-  return useContext('intro-slider', callback)
+  return onContext('intro-slider', callback)
 }
 
 export const Slider: JSX.Component = () => {
-  useShadow()
+  attachShadow()
 
-  useStylesheet({
+  attachStylesheet({
     ':host': {
       width: '100%',
       height: '100%',
@@ -425,34 +471,35 @@ export const Slider: JSX.Component = () => {
       display: 'inline-flex',
     },
 
-    'span:first-child': {
+    'h1 span:first-child': {
       transform: 'rotate(-5deg)',
     },
 
-    'span:nth-child(2)': {
+    'h1 span:nth-child(2)': {
       transform: 'translateY(-2.5%)',
     },
 
-    'span:last-child': {
+    'h1 span:last-child': {
       transform: 'rotate(5deg)',
+    },
+
+    '.buttons': {
+      position: 'absolute',
+      bottom: '2vmin',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      display: 'flex',
+      gap: '1vmin',
     },
   })
 
-  const activeSlide = useStore<SlideName>('banana')
+  const activeSlide = createStore<SlideName>('strawberry')
 
   const context: SliderContext = {
     activeSlide: activeSlide,
   }
 
   createContext('intro-slider', context)
-
-  addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-      context.activeSlide.current = 'banana'
-    } else if (e.key === '2') {
-      context.activeSlide.current = 'strawberry'
-    }
-  })
 
   return (
     <component>
@@ -461,28 +508,40 @@ export const Slider: JSX.Component = () => {
         <span>О</span>
         <span>П</span>
       </h1>
+      <div class="buttons">
+        <SliderButton
+          slide="strawberry"
+          activeSlide={activeSlide}
+          color="#c5100d"
+        ></SliderButton>
+        <SliderButton
+          slide="banana"
+          activeSlide={activeSlide}
+          color="#fac000"
+        ></SliderButton>
+      </div>
       <Background></Background>
-      <Slide
-        name="banana"
-        description="Банан c шоколадом"
-        models={[
-          {
-            url: '/models/banana-opt.glb',
-            amount: 100,
-          },
-          {
-            url: '/models/chocolate-opt.glb',
-            amount: 30,
-          },
-        ]}
-      ></Slide>
       <Slide
         name="strawberry"
         description="Клубника"
         models={[
           {
             url: '/models/strawberry-opt.glb',
-            amount: 100,
+            amount: 70,
+          },
+        ]}
+      ></Slide>
+      <Slide
+        name="banana"
+        description="Банан c шоколадом"
+        models={[
+          {
+            url: '/models/banana-opt.glb',
+            amount: 50,
+          },
+          {
+            url: '/models/chocolate-opt.glb',
+            amount: 20,
           },
         ]}
       ></Slide>
@@ -502,6 +561,7 @@ export const App: JSX.Component = () => {
 
   const toneMapping = new ToneMappingEffect({
     mode: ToneMappingMode.ACES_FILMIC,
+    resolution: 720,
   })
 
   const smaaEffect = new SMAAEffect({
@@ -520,7 +580,7 @@ export const App: JSX.Component = () => {
 
   const cocMaterial = depthOfFieldEffect.cocMaterial
 
-  const scaleValue = useStore(5, {
+  const scaleValue = createStore(5.1, {
     passport: {
       name: 'Глубина резкости.Размер',
       manager: {
@@ -536,7 +596,7 @@ export const App: JSX.Component = () => {
     depthOfFieldEffect.bokehScale = e.current
   })
 
-  const focusValue = useStore(0.07, {
+  const focusValue = createStore(0.12, {
     passport: {
       name: 'Глубина резкости.Позиция',
       manager: {
@@ -552,7 +612,7 @@ export const App: JSX.Component = () => {
     cocMaterial.uniforms.focusDistance.value = e.current
   })
 
-  const focalLengthValue = useStore(0.48, {
+  const focalLengthValue = createStore(0.76, {
     passport: {
       name: 'Глубина резкости.Длина',
       manager: {
@@ -573,6 +633,13 @@ export const App: JSX.Component = () => {
   composer.addPass(new EffectPass(en3.camera, depthOfFieldEffect, toneMapping))
   composer.addPass(new EffectPass(en3.camera, smaaEffect))
 
+  new TextureLoader().load('/images/env.png', function (texture) {
+    texture.mapping = EquirectangularReflectionMapping
+    texture.colorSpace = SRGBColorSpace
+
+    en3.scene.environment = texture
+  })
+
   en3.onResize = () => {
     composer.setSize(en3.width, en3.height)
   }
@@ -581,16 +648,7 @@ export const App: JSX.Component = () => {
     composer.render()
   }
 
-  en3.webglRenderer.toneMappingExposure = 1.3
-
-  const dl = new DirectionalLight()
-  dl.intensity = 2
-  dl.position.z = en3.cameraDistance
-  en3.add(dl)
-
-  const al = new AmbientLight()
-  al.intensity = 1
-  en3.add(al)
+  en3.webglRenderer.toneMappingExposure = 9
 
   return (
     <component>

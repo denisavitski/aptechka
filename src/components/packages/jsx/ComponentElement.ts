@@ -64,6 +64,8 @@ export class ComponentElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    currentComponentElement = this
+
     this.#connectCallbacks.forEach((callback) => {
       const disconnectCallback = callback(this)
 
@@ -71,6 +73,8 @@ export class ComponentElement extends HTMLElement {
         this.#disconnectCallbacks.add(disconnectCallback)
       }
     })
+
+    currentComponentElement = null!
   }
 
   protected disconnectedCallback() {

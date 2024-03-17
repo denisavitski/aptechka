@@ -63,6 +63,7 @@ export {
   isESClass,
   mixin,
 } from './object'
+export { nullishCoalescing } from './polyfills'
 export {
   kebabToCamel,
   camelToKebab,

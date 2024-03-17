@@ -3,17 +3,17 @@ import {
   createStylesheet,
   style,
 } from '@packages/element-constructor'
-import { useCreate } from './useCreate'
-import { useConnect } from './useConnect'
+import { withCurrentComponent } from './withCurrentComponent'
+import { onConnect } from './onConnect'
 
-export function useStylesheet(object?: ElementConstructorJSS | undefined) {
-  useCreate((e) => {
+export function attachStylesheet(object?: ElementConstructorJSS | undefined) {
+  withCurrentComponent((e) => {
     if (e.shadowRoot) {
       e.shadowRoot.adoptedStyleSheets.push(createStylesheet(object))
     }
   })
 
-  useConnect((e) => {
+  onConnect((e) => {
     if (e.shadowRoot) {
       return
     }

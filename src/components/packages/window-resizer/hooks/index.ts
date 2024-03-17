@@ -1,10 +1,10 @@
-import { useConnect } from '@packages/jsx/hooks'
+import { onConnect } from '@packages/jsx/hooks'
 import { WindowResizer, windowResizer } from '..'
 
-export function useWindowResize(
+export function onWindowResize(
   ...parameters: Parameters<WindowResizer['subscribe']>
 ) {
-  useConnect(() => {
+  onConnect(() => {
     return windowResizer.subscribe(...parameters)
   })
 }

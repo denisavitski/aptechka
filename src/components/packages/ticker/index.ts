@@ -4,6 +4,7 @@ import { ElementOrSelector, isBrowser } from '@packages/utils'
 export interface TickerCallbackEntry {
   timestamp: number
   elapsed: number
+  startTimestamp: number
 }
 
 export type TickerCallback = (entry: TickerCallbackEntry) => void
@@ -11,7 +12,7 @@ export type TickerCallback = (entry: TickerCallbackEntry) => void
 export interface TickerAddOptions {
   maxFPS?: number
   order?: number
-  culling?: ElementOrSelector | false
+  culling?: ElementOrSelector | false | undefined | null
 }
 
 class TickerSubscriber {
@@ -19,6 +20,7 @@ class TickerSubscriber {
   #maxFPS: number | undefined
   #order: number
   #lastTimestamp = 0
+  #startTimestamp = 0
   #elapsed = 0
   #isVisible = false
 
@@ -49,6 +51,10 @@ class TickerSubscriber {
   public tick(timestamp: number) {
     this.#elapsed = Math.max(0, timestamp - this.#lastTimestamp)
 
+    if (!this.#startTimestamp) {
+      this.#startTimestamp = timestamp
+    }
+
     if (this.#maxFPS) {
       if (this.#elapsed >= 1000 / this.#maxFPS) {
         this.#lastTimestamp = timestamp - (this.#elapsed % this.#maxFPS)
@@ -63,6 +69,7 @@ class TickerSubscriber {
       this.#callback({
         elapsed: this.#elapsed,
         timestamp: timestamp,
+        startTimestamp: this.#startTimestamp,
       })
     }
   }
