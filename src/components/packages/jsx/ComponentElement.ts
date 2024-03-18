@@ -24,12 +24,12 @@ export class ComponentElement extends HTMLElement {
   #disconnectCallbacks: Set<ComponentDisconnectCallback> = new Set()
   #contexts: Map<string, any> = new Map()
 
-  constructor(parameters: ComponentElementParameters) {
+  constructor(parameters?: ComponentElementParameters) {
     super()
 
     currentComponentElement = this
 
-    const res = parameters.tag({
+    const res = parameters?.tag({
       ...parameters.attributes,
       children: parameters.children,
     })
