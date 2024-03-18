@@ -1,13 +1,8 @@
-import { onElementResize } from '@packages/element-resizer/hooks'
-import { attachShadow, attachStylesheet } from '../hooks'
+import { attachStylesheet } from '../hooks'
+import { createStore } from '@packages/store/hooks'
+import { DerivedArray } from '@packages/store'
 
 const Item: JSX.Component<{ index: number }> = (props) => {
-  onElementResize((e) => {
-    console.log(props.index, e.contentRect.width)
-  })
-
-  attachShadow()
-
   attachStylesheet({
     ':host': {
       width: '5vw',
@@ -21,11 +16,19 @@ const Item: JSX.Component<{ index: number }> = (props) => {
 }
 
 export const App: JSX.Component = () => {
+  const arr = createStore<Array<number>>([])
+
+  let index = 0
+
+  addEventListener('keydown', (e) => {
+    if (e.key === '1') {
+      arr.current = [...arr.current, index++]
+    }
+  })
+
   return (
     <component>
-      {new Array(10).fill(0).map((_, index) => (
-        <Item index={index}></Item>
-      ))}
+      {new DerivedArray(arr, (e) => <Item index={e}></Item>)}
     </component>
   )
 }

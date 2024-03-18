@@ -1,4 +1,4 @@
-import { render } from '..'
+import { register, render } from '..'
 import { App } from './App'
 
-render(App)
+register(App)

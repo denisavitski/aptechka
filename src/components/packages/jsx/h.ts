@@ -1,6 +1,10 @@
 import { ElementConstructor } from '@packages/element-constructor'
 import { camelToKebab } from '@packages/utils'
-import { ComponentElement, nextComponentAttributes } from './ComponentElement'
+import {
+  ComponentElement,
+  ComponentElementParameters,
+  nextComponentAttributes,
+} from './ComponentElement'
 
 function getChildren(child: any) {
   const unpreparedChildren = Array.isArray(child) ? child : [child]
@@ -29,6 +33,10 @@ export function h(
       return Fragment(children)
     }
 
+    const onlyRegister = attributes?.register
+
+    delete attributes?.register
+
     const name = `e-${camelToKebab(tag.name)}`
 
     let Constructor = customElements.get(name) as typeof ComponentElement
@@ -36,14 +44,28 @@ export function h(
     if (!Constructor) {
       Constructor = class extends ComponentElement {
         static formAssociated = (tag as JSX.Component).formAssociated
+
+        constructor(parameters?: ComponentElementParameters) {
+          super(
+            onlyRegister
+              ? ({
+                  tag,
+                  attributes,
+                  children,
+                } as ComponentElementParameters)
+              : parameters
+          )
+        }
       }
 
       customElements.define(name, Constructor)
     }
 
-    return () => {
-      return new Constructor({ tag, attributes, children })
-    }
+    return onlyRegister
+      ? Constructor
+      : () => {
+          return new Constructor({ tag, attributes, children })
+        }
   }
 
   const readyChildren = children
