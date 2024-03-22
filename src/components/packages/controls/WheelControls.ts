@@ -30,21 +30,30 @@ export class WheelControls extends Controls {
     this.#prevEventDate = Date.now()
 
     if (isBrowser) {
-      this.#element = options?.element ? getElement(options.element) || window : window
+      this.#element = options?.element
+        ? getElement(options.element) || window
+        : window
     }
   }
 
   public connect() {
     if (isBrowser) {
-      this.#element.addEventListener('wheel', this.#wheelListener as EventListener, {
-        passive: false,
-      })
+      this.#element.addEventListener(
+        'wheel',
+        this.#wheelListener as EventListener,
+        {
+          passive: false,
+        }
+      )
     }
   }
 
   public disconnect() {
     if (isBrowser) {
-      this.#element.removeEventListener('wheel', this.#wheelListener as EventListener)
+      this.#element.removeEventListener(
+        'wheel',
+        this.#wheelListener as EventListener
+      )
     }
   }
 

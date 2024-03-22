@@ -9,7 +9,7 @@ import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
-import { Derived, Store, StorePassport } from '@packages/store'
+import { Derived, Store } from '@packages/store'
 import {
   getCumulativeOffsetTop,
   getCumulativeOffsetLeft,
@@ -23,6 +23,7 @@ import {
   element,
   slot,
 } from '@packages/element-constructor'
+import { cssUnitParser } from '@packages/css-unit-parser'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
@@ -68,12 +69,14 @@ class Section {
   public transform() {
     let offset = 0
 
+    const df = this.#scrollElement.viewportSize - this.#size
+
     if (
       this.#scrollElement.infiniteAttribute.current &&
       this.#scrollElement.overscroll &&
       this.#position + this.#size < this.#scrollElement.currentScrollValue
     ) {
-      offset = this.#scrollElement.distance * -1
+      offset = this.#scrollElement.distance * -1 - this.#scrollElement.gap
     }
 
     scrollEntries.update(
@@ -82,13 +85,10 @@ class Section {
       offset
     )
 
-    const df = this.#scrollElement.viewportSize - this.#size
-
-    const value = clamp(
-      this.#scrollElement.currentScrollValue + offset,
-      this.#position - this.#scrollElement.viewportSize - df,
-      this.#position + this.#size + df
-    )
+    const valueToClamp = this.#scrollElement.currentScrollValue + offset
+    const min = this.#position - this.#scrollElement.viewportSize - df
+    const max = this.#position + this.#size + df
+    const value = clamp(valueToClamp, min, max)
 
     if (this.#scrollElement.vertical) {
       this.#element.style.transform = `translate3d(0px, ${value * -1}px, 0px)`
@@ -117,8 +117,6 @@ const stylesheet = createStylesheet({
     position: 'absolute',
     top: '0',
     left: '0',
-
-    zIndex: '1',
 
     width: '100%',
     height: '100%',
@@ -169,6 +167,7 @@ export class ScrollElement extends CustomElement {
   #contentPosition = 0
   #viewportSize = 0
   #scrollSize = 0
+  #gap = 0
 
   #wheelControls: WheelControls = null!
   #keyboardControls: KeyboardControls = null!
@@ -178,25 +177,14 @@ export class ScrollElement extends CustomElement {
   #overscroll = 0
   #distance = 0
 
-  constructor(name?: string) {
+  constructor() {
     super()
 
     if (isBrowser) {
-      let passport: StorePassport<'number'> | undefined
-
-      let passportName = name || this.getAttribute('name')
-
-      if (passportName) {
-        passport = {
-          name: passportName,
-        }
-      }
-
-      this.#damped = new Damped({
+      this.#damped = new Damped(0, {
         damping: 0.01,
         min: 0,
         order: TICK_ORDER.SCROLL,
-        passport,
       })
 
       this.openShadow(stylesheet)
@@ -279,8 +267,8 @@ export class ScrollElement extends CustomElement {
       this.#infiniteAttribute.subscribe((e) => {
         if (!e.current) {
           this.#overscroll = 0
-          this.#damped.max.current = this.#scrollSize
-          this.#damped.min.current = 0
+          this.#damped.max = this.#scrollSize
+          this.#damped.min = 0
         } else {
           if (this.isConnected) {
             if (!this.#sections.length) {
@@ -289,8 +277,8 @@ export class ScrollElement extends CustomElement {
           }
 
           if (this.#sections.length) {
-            this.#damped.max.current = Infinity
-            this.#damped.min.current = -Infinity
+            this.#damped.max = Infinity
+            this.#damped.min = -Infinity
           }
         }
       })
@@ -385,6 +373,10 @@ export class ScrollElement extends CustomElement {
     return this.#scrollSize
   }
 
+  public get gap() {
+    return this.#gap
+  }
+
   public get counter() {
     return this.#counter
   }
@@ -433,10 +425,14 @@ export class ScrollElement extends CustomElement {
       if (this.#infiniteAttribute.current) {
         if (this.#counter.current === 0 && previousCounter === limit) {
           shiftValue =
-            this.#scrollSize + this.#viewportSize - previousSection.position
+            this.#scrollSize +
+            this.#viewportSize -
+            previousSection.position +
+            this.#gap
         } else if (this.#counter.current === limit && previousCounter === 0) {
           shiftValue =
-            currentSection.position - (this.#scrollSize + this.#viewportSize)
+            currentSection.position -
+            (this.#scrollSize + this.#viewportSize + this.#gap)
         } else {
           shiftValue = currentSection.position - previousSection.position
         }
@@ -491,7 +487,7 @@ export class ScrollElement extends CustomElement {
 
   #disable() {
     this.#damped.unsubscribe(this.#animatedChangeListener)
-    this.#damped.unlistenAnimationFrame()
+    this.#damped.stopAnimation()
 
     this.#wheelControls.disconnect()
     this.#keyboardControls.disconnect()
@@ -569,6 +565,8 @@ export class ScrollElement extends CustomElement {
       }
     }
 
+    this.#gap = cssUnitParser.parse(getComputedStyle(this.#contentElement).gap)
+
     if (!this.#infiniteAttribute.current) {
       const cs = getComputedStyle(this)
 
@@ -576,7 +574,7 @@ export class ScrollElement extends CustomElement {
         ? parseFloat(cs.paddingBlockStart) + parseFloat(cs.paddingBlockEnd)
         : parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd)
 
-      this.#damped.max.current = this.#scrollSize
+      this.#damped.max = this.#scrollSize
     }
 
     this.#sections.forEach((section) => {
@@ -617,6 +615,7 @@ export class ScrollElement extends CustomElement {
         section.transform()
 
         if (
+          // this.targetScrollValue + this.viewportSize / 2 >=
           this.targetScrollValue + this.viewportSize / 2 >=
           section.position
         ) {
@@ -666,16 +665,19 @@ export class ScrollElement extends CustomElement {
         this.#damped.shift(value)
       }
     } else if (value === 'min') {
-      this.#damped.set(this.#damped.min.current)
+      this.#damped.set(this.#damped.min)
     } else if (value === 'max') {
-      this.#damped.set(this.#damped.delta)
+      this.#damped.set(this.#damped.length)
     }
   }
 
   #getScrollValue(type: 'target' | 'current' = 'current') {
     if (this.#infiniteAttribute.current && this.#sections.length) {
-      const mod = this.#damped[type] % (this.#scrollSize + this.#viewportSize)
-      const value = mod < 0 ? this.#scrollSize + mod + this.#viewportSize : mod
+      const mod =
+        this.#damped[type] % (this.#scrollSize + this.#viewportSize + this.#gap)
+
+      const value =
+        mod < 0 ? this.#scrollSize + mod + this.#viewportSize + this.#gap : mod
 
       return value
     } else {

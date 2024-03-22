@@ -5,5 +5,5 @@ export function register(
   attributes: JSX.AllAttributes | null = null,
   ...children: JSX.ComponentChildren
 ) {
-  return h(Component, { ...attributes, register: true }, ...children)
+  return h(Component, { ...attributes, __register: true }, ...children)
 }

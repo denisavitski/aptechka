@@ -33,9 +33,9 @@ export function h(
       return Fragment(children)
     }
 
-    const onlyRegister = attributes?.register
+    const onlyRegister = attributes?.__register
 
-    delete attributes?.register
+    delete attributes?.__register
 
     const name = `e-${camelToKebab(tag.name)}`
 

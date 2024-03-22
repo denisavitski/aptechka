@@ -1,47 +1,149 @@
-import { TickerCallbackEntry } from '@packages/ticker'
-import { EasingFunction, linear } from '@packages/utils'
-import { AnimatedOptions, Animated } from './Animated'
+import { Store, StoreEntry, StoreOptions } from '@packages/store'
+import { TickerAddOptions, TickerCallback, ticker } from '@packages/ticker'
+import {
+  EasingFunction,
+  ElementOrSelector,
+  clamp,
+  linear,
+  nullishCoalescing,
+  preciseNumber,
+} from '@packages/utils'
 
-export interface TweenedOptions extends AnimatedOptions {
+export interface TweenedAnimationOptions extends TickerAddOptions {
   easing?: EasingFunction
+  duration?: number
 }
 
-export class Tweened extends Animated {
-  public easing: EasingFunction
+export interface TweenedSetOptions extends TweenedAnimationOptions {
+  restart?: boolean
+}
 
-  constructor(options?: TweenedOptions) {
-    super({
-      ...options,
-      min: options?.min || 0,
-      max: options?.max || 1000,
-    })
+export interface TweenedOptions
+  extends TweenedAnimationOptions,
+    StoreOptions<number> {}
 
-    this.easing = options?.easing || linear
+export interface TweenedEntry extends StoreEntry<number> {
+  length: number
+  progress: number
+  direction: number
+}
+
+export class Tweened extends Store<number, 'number', TweenedEntry> {
+  #maxFPS: number | undefined
+  #order: number | undefined
+  #culling: ElementOrSelector | undefined | null | false
+
+  #easing: EasingFunction = linear
+  #duration = 1000
+
+  #isRunning = new Store(false)
+
+  #from = 0
+  #to = 0
+  #direction = 0
+
+  constructor(initial?: number, options?: TweenedOptions) {
+    super(initial || 0)
+    this.#updateOptions(options)
   }
 
-  public start() {
-    this.listenAnimationFrame()
+  public get isRunning() {
+    return this.#isRunning
   }
 
-  public pause() {
-    this.unlistenAnimationFrame()
+  public get direction() {
+    return this.#direction
   }
 
-  public stop() {
-    this.reset()
+  public get length() {
+    return this.#to - this.#from
   }
 
-  protected update() {
-    const normalized = (this.target - this.min.current) / (this.delta || 1)
-    const eased = this.easing(normalized)
-    this.current = this.min.current + eased * this.delta
+  public get progress() {
+    return this.length
+      ? preciseNumber((this.current - this.#from) / this.length, 6)
+      : 0
   }
 
-  protected handleAnimationFrame(e: TickerCallbackEntry) {
-    this.shift(e.elapsed)
+  public override get entry(): TweenedEntry {
+    return {
+      ...super.entry,
+      length: this.length,
+      direction: this.direction,
+      progress: this.progress,
+    }
+  }
 
-    if ((e.elapsed && this.current === 0) || this.current === this.delta) {
-      this.unlistenAnimationFrame()
+  public set(value: number, options?: TweenedSetOptions) {
+    if (options?.restart) {
+      this.current = this.initial
+    }
+
+    this.#from = this.current
+    this.#to = value
+    this.#direction = Math.sign(this.length)
+
+    this.#updateOptions(options)
+
+    if (!this.#duration) {
+      this.current = this.#to
+      this.#unlistenAnimationFrame()
+    } else {
+      this.#unlistenAnimationFrame()
+      this.#listenAnimationFrame()
+    }
+  }
+
+  public shift(value: number, options?: TweenedSetOptions) {
+    this.set(this.current + value, options)
+  }
+
+  public override reset() {
+    this.#unlistenAnimationFrame()
+    super.reset()
+  }
+
+  public override close() {
+    super.close()
+    this.#unlistenAnimationFrame()
+  }
+
+  #updateOptions(options?: TweenedAnimationOptions) {
+    this.#easing = nullishCoalescing(options?.easing, this.#easing)
+    this.#duration = nullishCoalescing(options?.duration, this.#duration)
+    this.#maxFPS = nullishCoalescing(options?.maxFPS, this.#maxFPS)
+    this.#order = nullishCoalescing(options?.order, this.#order)
+    this.#culling = nullishCoalescing(options?.culling, this.#culling)
+  }
+
+  #listenAnimationFrame() {
+    if (!this.#isRunning.current) {
+      this.#isRunning.current = true
+
+      ticker.subscribe(this.#animationFrameListener, {
+        maxFPS: this.#maxFPS,
+        order: this.#order,
+        culling: this.#culling,
+      })
+    }
+  }
+
+  #unlistenAnimationFrame() {
+    if (this.#isRunning.current) {
+      this.#isRunning.current = false
+
+      ticker.unsubscribe(this.#animationFrameListener)
+    }
+  }
+
+  #animationFrameListener: TickerCallback = (e) => {
+    const t = (e.timestamp - e.startTimestamp) / 1000 / (this.#duration / 1000)
+    const et = this.#easing(clamp(t, 0, 1))
+
+    this.current = preciseNumber(this.#from + (this.#to - this.#from) * et, 6)
+
+    if (t > 1) {
+      this.#unlistenAnimationFrame()
     }
   }
 }

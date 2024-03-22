@@ -6,7 +6,6 @@ import {
   input,
   label,
 } from '@packages/element-constructor'
-import { Animated } from '@packages/animation'
 import { Store, activeStores, storeRegistry } from '@packages/store'
 import { createJSONAndSave, debounce } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
@@ -220,14 +219,12 @@ export class TweakerElement extends TweakerFolderElement {
 
   #storesChangeListener = debounce(() => {
     activeStores.current.forEach((store) => {
-      if (!(store instanceof Animated)) {
-        const sname = store.passport!.name.split('.')
+      const sname = store.passport!.name.split('.')
 
-        this.handleStore({
-          store: store,
-          remainingFolders: sname.length > 1 ? sname.slice(0, -1) : [],
-        })
-      }
+      this.handleStore({
+        store: store,
+        remainingFolders: sname.length > 1 ? sname.slice(0, -1) : [],
+      })
     })
   }, 10)
 }
