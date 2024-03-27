@@ -1,0 +1,1 @@
+"use strict";const t=require("./ComponentElement-DuiOKawv.cjs"),c=require("./withCurrentComponent-Cig6ryJK.cjs");function o(n){c.withCurrentComponent(e=>{e.addDisconnectCallback(n)})}function r(n){const e=typeof n=="function"?n(t.currentComponentElement):n;return t.currentComponentElement&&o(()=>e.close()),e}exports._createStore=r;exports.onDisconnect=o;

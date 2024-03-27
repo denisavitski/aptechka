@@ -1,0 +1,17 @@
+export type EasingFunction = (t: number) => number;
+export declare const linear: EasingFunction;
+export declare const easeInQuad: EasingFunction;
+export declare const easeOutQuad: EasingFunction;
+export declare const easeInOutQuad: EasingFunction;
+export declare const easeInCubic: EasingFunction;
+export declare const easeOutCubic: EasingFunction;
+export declare const easeInOutCubic: EasingFunction;
+export declare const easeInQuart: EasingFunction;
+export declare const easeOutQuart: EasingFunction;
+export declare const easeInOutQuart: EasingFunction;
+export declare const easeInQuint: EasingFunction;
+export declare const easeOutQuint: EasingFunction;
+export declare const easeInOutQuint: EasingFunction;
+export declare const easeInExpo: EasingFunction;
+export declare const easeOutExpo: EasingFunction;
+export declare const easeInOutExpo: EasingFunction;

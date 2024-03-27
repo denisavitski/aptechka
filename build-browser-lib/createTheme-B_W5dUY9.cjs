@@ -1,0 +1,1 @@
+"use strict";const l=require("./string-vBu90jhV.cjs");function s(r,a){const t=(a==null?void 0:a.prefix)||"",c={style:{}};for(const e in r)c[e]={var:`var(--${t}${l.camelToKebab(e)})`,value:r[e]},c.style[`--${t}${l.camelToKebab(e)}`]=r[e];return c}exports.createTheme=s;
