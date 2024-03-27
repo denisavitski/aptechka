@@ -1,6 +1,4 @@
 node_modules
-build-browser-lib
-build-vite-plugin-htmc
-dev-browser-lib/static
-dev-browser-lib/components/demos
+dist
+lib
 .DS_Store

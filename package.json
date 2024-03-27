@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -14,415 +14,404 @@
   },
   "license": "ISC",
   "files": [
-    "build-browser-lib",
-    "build-vite-plugin-htmc"
+    "lib"
   ],
   "type": "module",
   "exports": {
     "./abstract-elements": {
-      "require": "./build-browser-lib/abstract-elements/index.cjs",
-      "default": "./build-browser-lib/abstract-elements/index.js",
-      "types": "./build-browser-lib/abstract-elements/index.d.ts"
+      "require": "./lib/abstract-elements/index.cjs",
+      "default": "./lib/abstract-elements/index.js",
+      "types": "./lib/abstract-elements/index.d.ts"
     },
     "./accordion": {
-      "require": "./build-browser-lib/accordion/index.cjs",
-      "default": "./build-browser-lib/accordion/index.js",
-      "types": "./build-browser-lib/accordion/index.d.ts"
+      "require": "./lib/accordion/index.cjs",
+      "default": "./lib/accordion/index.js",
+      "types": "./lib/accordion/index.d.ts"
     },
     "./animation": {
-      "require": "./build-browser-lib/animation/index.cjs",
-      "default": "./build-browser-lib/animation/index.js",
-      "types": "./build-browser-lib/animation/index.d.ts"
+      "require": "./lib/animation/index.cjs",
+      "default": "./lib/animation/index.js",
+      "types": "./lib/animation/index.d.ts"
     },
     "./animation/hooks": {
-      "require": "./build-browser-lib/animation/hooks/index.cjs",
-      "default": "./build-browser-lib/animation/hooks/index.js",
-      "types": "./build-browser-lib/animation/hooks/index.d.ts"
+      "require": "./lib/animation/hooks/index.cjs",
+      "default": "./lib/animation/hooks/index.js",
+      "types": "./lib/animation/hooks/index.d.ts"
     },
     "./attribute": {
-      "require": "./build-browser-lib/attribute/index.cjs",
-      "default": "./build-browser-lib/attribute/index.js",
-      "types": "./build-browser-lib/attribute/index.d.ts"
+      "require": "./lib/attribute/index.cjs",
+      "default": "./lib/attribute/index.js",
+      "types": "./lib/attribute/index.d.ts"
     },
     "./canvas": {
-      "require": "./build-browser-lib/canvas/index.cjs",
-      "default": "./build-browser-lib/canvas/index.js",
-      "types": "./build-browser-lib/canvas/index.d.ts"
+      "require": "./lib/canvas/index.cjs",
+      "default": "./lib/canvas/index.js",
+      "types": "./lib/canvas/index.d.ts"
     },
     "./connector": {
-      "require": "./build-browser-lib/connector/index.cjs",
-      "default": "./build-browser-lib/connector/index.js",
-      "types": "./build-browser-lib/connector/index.d.ts"
+      "require": "./lib/connector/index.cjs",
+      "default": "./lib/connector/index.js",
+      "types": "./lib/connector/index.d.ts"
     },
     "./controls": {
-      "require": "./build-browser-lib/controls/index.cjs",
-      "default": "./build-browser-lib/controls/index.js",
-      "types": "./build-browser-lib/controls/index.d.ts"
+      "require": "./lib/controls/index.cjs",
+      "default": "./lib/controls/index.js",
+      "types": "./lib/controls/index.d.ts"
     },
     "./css-unit-parser": {
-      "require": "./build-browser-lib/css-unit-parser/index.cjs",
-      "default": "./build-browser-lib/css-unit-parser/index.js",
-      "types": "./build-browser-lib/css-unit-parser/index.d.ts"
+      "require": "./lib/css-unit-parser/index.cjs",
+      "default": "./lib/css-unit-parser/index.js",
+      "types": "./lib/css-unit-parser/index.d.ts"
     },
     "./custom-element": {
-      "require": "./build-browser-lib/custom-element/index.cjs",
-      "default": "./build-browser-lib/custom-element/index.js",
-      "types": "./build-browser-lib/custom-element/index.d.ts"
+      "require": "./lib/custom-element/index.cjs",
+      "default": "./lib/custom-element/index.js",
+      "types": "./lib/custom-element/index.d.ts"
     },
     "./device": {
-      "require": "./build-browser-lib/device/index.cjs",
-      "default": "./build-browser-lib/device/index.js",
-      "types": "./build-browser-lib/device/index.d.ts"
+      "require": "./lib/device/index.cjs",
+      "default": "./lib/device/index.js",
+      "types": "./lib/device/index.d.ts"
     },
     "./element-constructor": {
-      "require": "./build-browser-lib/element-constructor/index.cjs",
-      "default": "./build-browser-lib/element-constructor/index.js",
-      "types": "./build-browser-lib/element-constructor/index.d.ts"
+      "require": "./lib/element-constructor/index.cjs",
+      "default": "./lib/element-constructor/index.js",
+      "types": "./lib/element-constructor/index.d.ts"
     },
     "./element-resizer": {
-      "require": "./build-browser-lib/element-resizer/index.cjs",
-      "default": "./build-browser-lib/element-resizer/index.js",
-      "types": "./build-browser-lib/element-resizer/index.d.ts"
+      "require": "./lib/element-resizer/index.cjs",
+      "default": "./lib/element-resizer/index.js",
+      "types": "./lib/element-resizer/index.d.ts"
     },
     "./element-resizer/hooks": {
-      "require": "./build-browser-lib/element-resizer/hooks/index.cjs",
-      "default": "./build-browser-lib/element-resizer/hooks/index.js",
-      "types": "./build-browser-lib/element-resizer/hooks/index.d.ts"
+      "require": "./lib/element-resizer/hooks/index.cjs",
+      "default": "./lib/element-resizer/hooks/index.js",
+      "types": "./lib/element-resizer/hooks/index.d.ts"
     },
     "./en3": {
-      "require": "./build-browser-lib/en3/index.cjs",
-      "default": "./build-browser-lib/en3/index.js",
-      "types": "./build-browser-lib/en3/index.d.ts"
+      "require": "./lib/en3/index.cjs",
+      "default": "./lib/en3/index.js",
+      "types": "./lib/en3/index.d.ts"
     },
     "./image": {
-      "require": "./build-browser-lib/image/index.cjs",
-      "default": "./build-browser-lib/image/index.js",
-      "types": "./build-browser-lib/image/index.d.ts"
+      "require": "./lib/image/index.cjs",
+      "default": "./lib/image/index.js",
+      "types": "./lib/image/index.d.ts"
     },
     "./intersector": {
-      "require": "./build-browser-lib/intersector/index.cjs",
-      "default": "./build-browser-lib/intersector/index.js",
-      "types": "./build-browser-lib/intersector/index.d.ts"
+      "require": "./lib/intersector/index.cjs",
+      "default": "./lib/intersector/index.js",
+      "types": "./lib/intersector/index.d.ts"
     },
     "./intersector/hooks": {
-      "require": "./build-browser-lib/intersector/hooks/index.cjs",
-      "default": "./build-browser-lib/intersector/hooks/index.js",
-      "types": "./build-browser-lib/intersector/hooks/index.d.ts"
+      "require": "./lib/intersector/hooks/index.cjs",
+      "default": "./lib/intersector/hooks/index.js",
+      "types": "./lib/intersector/hooks/index.d.ts"
     },
     "./jsx": {
-      "require": "./build-browser-lib/jsx/index.cjs",
-      "default": "./build-browser-lib/jsx/index.js",
-      "types": "./build-browser-lib/jsx/index.d.ts"
+      "require": "./lib/jsx/index.cjs",
+      "default": "./lib/jsx/index.js",
+      "types": "./lib/jsx/index.d.ts"
     },
     "./jsx/hooks": {
-      "require": "./build-browser-lib/jsx/hooks/index.cjs",
-      "default": "./build-browser-lib/jsx/hooks/index.js",
-      "types": "./build-browser-lib/jsx/hooks/index.d.ts"
+      "require": "./lib/jsx/hooks/index.cjs",
+      "default": "./lib/jsx/hooks/index.js",
+      "types": "./lib/jsx/hooks/index.d.ts"
     },
     "./ladder": {
-      "require": "./build-browser-lib/ladder/index.cjs",
-      "default": "./build-browser-lib/ladder/index.js",
-      "types": "./build-browser-lib/ladder/index.d.ts"
+      "require": "./lib/ladder/index.cjs",
+      "default": "./lib/ladder/index.js",
+      "types": "./lib/ladder/index.d.ts"
     },
     "./layout-box": {
-      "require": "./build-browser-lib/layout-box/index.cjs",
-      "default": "./build-browser-lib/layout-box/index.js",
-      "types": "./build-browser-lib/layout-box/index.d.ts"
+      "require": "./lib/layout-box/index.cjs",
+      "default": "./lib/layout-box/index.js",
+      "types": "./lib/layout-box/index.d.ts"
     },
     "./loading": {
-      "require": "./build-browser-lib/loading/index.cjs",
-      "default": "./build-browser-lib/loading/index.js",
-      "types": "./build-browser-lib/loading/index.d.ts"
+      "require": "./lib/loading/index.cjs",
+      "default": "./lib/loading/index.js",
+      "types": "./lib/loading/index.d.ts"
     },
     "./media": {
-      "require": "./build-browser-lib/media/index.cjs",
-      "default": "./build-browser-lib/media/index.js",
-      "types": "./build-browser-lib/media/index.d.ts"
+      "require": "./lib/media/index.cjs",
+      "default": "./lib/media/index.js",
+      "types": "./lib/media/index.d.ts"
     },
     "./modal": {
-      "require": "./build-browser-lib/modal/index.cjs",
-      "default": "./build-browser-lib/modal/index.js",
-      "types": "./build-browser-lib/modal/index.d.ts"
+      "require": "./lib/modal/index.cjs",
+      "default": "./lib/modal/index.js",
+      "types": "./lib/modal/index.d.ts"
     },
     "./morph": {
-      "require": "./build-browser-lib/morph/index.cjs",
-      "default": "./build-browser-lib/morph/index.js",
-      "types": "./build-browser-lib/morph/index.d.ts"
+      "require": "./lib/morph/index.cjs",
+      "default": "./lib/morph/index.js",
+      "types": "./lib/morph/index.d.ts"
     },
     "./notifier": {
-      "require": "./build-browser-lib/notifier/index.cjs",
-      "default": "./build-browser-lib/notifier/index.js",
-      "types": "./build-browser-lib/notifier/index.d.ts"
+      "require": "./lib/notifier/index.cjs",
+      "default": "./lib/notifier/index.js",
+      "types": "./lib/notifier/index.d.ts"
     },
     "./order": {
-      "require": "./build-browser-lib/order/index.cjs",
-      "default": "./build-browser-lib/order/index.js",
-      "types": "./build-browser-lib/order/index.d.ts"
+      "require": "./lib/order/index.cjs",
+      "default": "./lib/order/index.js",
+      "types": "./lib/order/index.d.ts"
     },
     "./popover": {
-      "require": "./build-browser-lib/popover/index.cjs",
-      "default": "./build-browser-lib/popover/index.js",
-      "types": "./build-browser-lib/popover/index.d.ts"
+      "require": "./lib/popover/index.cjs",
+      "default": "./lib/popover/index.js",
+      "types": "./lib/popover/index.d.ts"
     },
     "./resized": {
-      "require": "./build-browser-lib/resized/index.cjs",
-      "default": "./build-browser-lib/resized/index.js",
-      "types": "./build-browser-lib/resized/index.d.ts"
+      "require": "./lib/resized/index.cjs",
+      "default": "./lib/resized/index.js",
+      "types": "./lib/resized/index.d.ts"
     },
     "./router": {
-      "require": "./build-browser-lib/router/index.cjs",
-      "default": "./build-browser-lib/router/index.js",
-      "types": "./build-browser-lib/router/index.d.ts"
+      "require": "./lib/router/index.cjs",
+      "default": "./lib/router/index.js",
+      "types": "./lib/router/index.d.ts"
     },
     "./scroll": {
-      "require": "./build-browser-lib/scroll/index.cjs",
-      "default": "./build-browser-lib/scroll/index.js",
-      "types": "./build-browser-lib/scroll/index.d.ts"
+      "require": "./lib/scroll/index.cjs",
+      "default": "./lib/scroll/index.js",
+      "types": "./lib/scroll/index.d.ts"
     },
     "./scroll-entries": {
-      "require": "./build-browser-lib/scroll-entries/index.cjs",
-      "default": "./build-browser-lib/scroll-entries/index.js",
-      "types": "./build-browser-lib/scroll-entries/index.d.ts"
+      "require": "./lib/scroll-entries/index.cjs",
+      "default": "./lib/scroll-entries/index.js",
+      "types": "./lib/scroll-entries/index.d.ts"
     },
     "./select": {
-      "require": "./build-browser-lib/select/index.cjs",
-      "default": "./build-browser-lib/select/index.js",
-      "types": "./build-browser-lib/select/index.d.ts"
+      "require": "./lib/select/index.cjs",
+      "default": "./lib/select/index.js",
+      "types": "./lib/select/index.d.ts"
     },
     "./slicer": {
-      "require": "./build-browser-lib/slicer/index.cjs",
-      "default": "./build-browser-lib/slicer/index.js",
-      "types": "./build-browser-lib/slicer/index.d.ts"
+      "require": "./lib/slicer/index.cjs",
+      "default": "./lib/slicer/index.js",
+      "types": "./lib/slicer/index.d.ts"
     },
     "./source": {
-      "require": "./build-browser-lib/source/index.cjs",
-      "default": "./build-browser-lib/source/index.js",
-      "types": "./build-browser-lib/source/index.d.ts"
+      "require": "./lib/source/index.cjs",
+      "default": "./lib/source/index.js",
+      "types": "./lib/source/index.d.ts"
     },
     "./store": {
-      "require": "./build-browser-lib/store/index.cjs",
-      "default": "./build-browser-lib/store/index.js",
-      "types": "./build-browser-lib/store/index.d.ts"
+      "require": "./lib/store/index.cjs",
+      "default": "./lib/store/index.js",
+      "types": "./lib/store/index.d.ts"
     },
     "./store/hooks": {
-      "require": "./build-browser-lib/store/hooks/index.cjs",
-      "default": "./build-browser-lib/store/hooks/index.js",
-      "types": "./build-browser-lib/store/hooks/index.d.ts"
+      "require": "./lib/store/hooks/index.cjs",
+      "default": "./lib/store/hooks/index.js",
+      "types": "./lib/store/hooks/index.d.ts"
     },
     "./studio": {
-      "require": "./build-browser-lib/studio/index.cjs",
-      "default": "./build-browser-lib/studio/index.js",
-      "types": "./build-browser-lib/studio/index.d.ts"
+      "require": "./lib/studio/index.cjs",
+      "default": "./lib/studio/index.js",
+      "types": "./lib/studio/index.d.ts"
     },
     "./theme": {
-      "require": "./build-browser-lib/theme/index.cjs",
-      "default": "./build-browser-lib/theme/index.js",
-      "types": "./build-browser-lib/theme/index.d.ts"
+      "require": "./lib/theme/index.cjs",
+      "default": "./lib/theme/index.js",
+      "types": "./lib/theme/index.d.ts"
     },
     "./ticker": {
-      "require": "./build-browser-lib/ticker/index.cjs",
-      "default": "./build-browser-lib/ticker/index.js",
-      "types": "./build-browser-lib/ticker/index.d.ts"
+      "require": "./lib/ticker/index.cjs",
+      "default": "./lib/ticker/index.js",
+      "types": "./lib/ticker/index.d.ts"
     },
     "./ticker/hooks": {
-      "require": "./build-browser-lib/ticker/hooks/index.cjs",
-      "default": "./build-browser-lib/ticker/hooks/index.js",
-      "types": "./build-browser-lib/ticker/hooks/index.d.ts"
+      "require": "./lib/ticker/hooks/index.cjs",
+      "default": "./lib/ticker/hooks/index.js",
+      "types": "./lib/ticker/hooks/index.d.ts"
     },
     "./utils": {
-      "require": "./build-browser-lib/utils/index.cjs",
-      "default": "./build-browser-lib/utils/index.js",
-      "types": "./build-browser-lib/utils/index.d.ts"
+      "require": "./lib/utils/index.cjs",
+      "default": "./lib/utils/index.js",
+      "types": "./lib/utils/index.d.ts"
     },
     "./video": {
-      "require": "./build-browser-lib/video/index.cjs",
-      "default": "./build-browser-lib/video/index.js",
-      "types": "./build-browser-lib/video/index.d.ts"
+      "require": "./lib/video/index.cjs",
+      "default": "./lib/video/index.js",
+      "types": "./lib/video/index.d.ts"
     },
     "./window-resizer": {
-      "require": "./build-browser-lib/window-resizer/index.cjs",
-      "default": "./build-browser-lib/window-resizer/index.js",
-      "types": "./build-browser-lib/window-resizer/index.d.ts"
+      "require": "./lib/window-resizer/index.cjs",
+      "default": "./lib/window-resizer/index.js",
+      "types": "./lib/window-resizer/index.d.ts"
     },
     "./window-resizer/hooks": {
-      "require": "./build-browser-lib/window-resizer/hooks/index.cjs",
-      "default": "./build-browser-lib/window-resizer/hooks/index.js",
-      "types": "./build-browser-lib/window-resizer/hooks/index.d.ts"
-    },
-    "./plugins/htmc": {
-      "import": "./build-vite-plugin-htmc/index.js",
-      "types": "./build-vite-plugin-htmc/index.d.ts"
+      "require": "./lib/window-resizer/hooks/index.cjs",
+      "default": "./lib/window-resizer/hooks/index.js",
+      "types": "./lib/window-resizer/hooks/index.d.ts"
     }
   },
   "typesVersions": {
     "*": {
       "accordion": [
-        "build-browser-lib/accordion/index.d.ts"
+        "lib/accordion/index.d.ts"
       ],
       "animation": [
-        "build-browser-lib/animation/index.d.ts"
+        "lib/animation/index.d.ts"
       ],
       "animation/hooks": [
-        "build-browser-lib/animation/hooks/index.d.ts"
+        "lib/animation/hooks/index.d.ts"
       ],
       "attribute": [
-        "build-browser-lib/attribute/index.d.ts"
+        "lib/attribute/index.d.ts"
       ],
       "canvas": [
-        "build-browser-lib/canvas/index.d.ts"
+        "lib/canvas/index.d.ts"
       ],
       "component": [
-        "build-browser-lib/component/index.d.ts"
+        "lib/component/index.d.ts"
       ],
       "connector": [
-        "build-browser-lib/connector/index.d.ts"
+        "lib/connector/index.d.ts"
       ],
       "controls": [
-        "build-browser-lib/controls/index.d.ts"
+        "lib/controls/index.d.ts"
       ],
       "css-unit-parser": [
-        "build-browser-lib/css-unit-parser/index.d.ts"
+        "lib/css-unit-parser/index.d.ts"
       ],
       "custom-element": [
-        "build-browser-lib/custom-element/index.d.ts"
+        "lib/custom-element/index.d.ts"
       ],
       "device": [
-        "build-browser-lib/device/index.d.ts"
+        "lib/device/index.d.ts"
       ],
       "element-constructor": [
-        "build-browser-lib/element-constructor/index.d.ts"
+        "lib/element-constructor/index.d.ts"
       ],
       "element-resizer": [
-        "build-browser-lib/element-resizer/index.d.ts"
+        "lib/element-resizer/index.d.ts"
       ],
       "element-resizer/hooks": [
-        "build-browser-lib/element-resizer/hooks/index.d.ts"
+        "lib/element-resizer/hooks/index.d.ts"
       ],
       "en3": [
-        "build-browser-lib/en3/index.d.ts"
+        "lib/en3/index.d.ts"
       ],
       "image": [
-        "build-browser-lib/image/index.d.ts"
+        "lib/image/index.d.ts"
       ],
       "intersector": [
-        "build-browser-lib/intersector/index.d.ts"
+        "lib/intersector/index.d.ts"
       ],
       "intersector/hooks": [
-        "build-browser-lib/intersector/hooks/index.d.ts"
+        "lib/intersector/hooks/index.d.ts"
       ],
       "jsx": [
-        "build-browser-lib/jsx/index.d.ts"
+        "lib/jsx/index.d.ts"
       ],
       "jsx/hooks": [
-        "build-browser-lib/jsx/hooks/index.d.ts"
+        "lib/jsx/hooks/index.d.ts"
       ],
       "ladder": [
-        "build-browser-lib/ladder/index.d.ts"
+        "lib/ladder/index.d.ts"
       ],
       "layout-box": [
-        "build-browser-lib/layout-box/index.d.ts"
+        "lib/layout-box/index.d.ts"
       ],
       "loading": [
-        "build-browser-lib/loading/index.d.ts"
+        "lib/loading/index.d.ts"
       ],
       "media": [
-        "build-browser-lib/media/index.d.ts"
+        "lib/media/index.d.ts"
       ],
       "modal": [
-        "build-browser-lib/modal/index.d.ts"
+        "lib/modal/index.d.ts"
       ],
       "morph": [
-        "build-browser-lib/morph/index.d.ts"
+        "lib/morph/index.d.ts"
       ],
       "notifier": [
-        "build-browser-lib/notifier/index.d.ts"
+        "lib/notifier/index.d.ts"
       ],
       "order": [
-        "build-browser-lib/order/index.d.ts"
+        "lib/order/index.d.ts"
       ],
       "popover": [
-        "build-browser-lib/popover/index.d.ts"
+        "lib/popover/index.d.ts"
       ],
       "resized": [
-        "build-browser-lib/resized/index.d.ts"
+        "lib/resized/index.d.ts"
       ],
       "router": [
-        "build-browser-lib/router/index.d.ts"
+        "lib/router/index.d.ts"
       ],
       "scroll": [
-        "build-browser-lib/scroll/index.d.ts"
+        "lib/scroll/index.d.ts"
       ],
       "scroll-entries": [
-        "build-browser-lib/scroll-entries/index.d.ts"
+        "lib/scroll-entries/index.d.ts"
       ],
       "select": [
-        "build-browser-lib/select/index.d.ts"
+        "lib/select/index.d.ts"
       ],
       "slicer": [
-        "build-browser-lib/slicer/index.d.ts"
+        "lib/slicer/index.d.ts"
       ],
       "source": [
-        "build-browser-lib/source/index.d.ts"
+        "lib/source/index.d.ts"
       ],
       "store": [
-        "build-browser-lib/store/index.d.ts"
+        "lib/store/index.d.ts"
       ],
       "store/hooks": [
-        "build-browser-lib/store/hooks/index.d.ts"
+        "lib/store/hooks/index.d.ts"
       ],
       "studio": [
-        "build-browser-lib/studio/index.d.ts"
+        "lib/studio/index.d.ts"
       ],
       "theme": [
-        "build-browser-lib/theme/index.d.ts"
+        "lib/theme/index.d.ts"
       ],
       "ticker": [
-        "build-browser-lib/ticker/index.d.ts"
+        "lib/ticker/index.d.ts"
       ],
       "ticker/hooks": [
-        "build-browser-lib/ticker/hooks/index.d.ts"
+        "lib/ticker/hooks/index.d.ts"
       ],
       "utils": [
-        "build-browser-lib/utils/index.d.ts"
+        "lib/utils/index.d.ts"
       ],
       "video": [
-        "build-browser-lib/video/index.d.ts"
+        "lib/video/index.d.ts"
       ],
       "window-resizer": [
-        "build-browser-lib/window-resizer/index.d.ts"
+        "lib/window-resizer/index.d.ts"
       ],
       "window-resizer/hooks": [
-        "build-browser-lib/window-resizer/hooks/index.d.ts"
-      ],
-      "plugins/htmc": [
-        "build-vite-plugin-htmc/index.d.ts"
+        "lib/window-resizer/hooks/index.d.ts"
       ]
     }
   },
   "scripts": {
-    "dev": "vite --mode browser-htmc",
-    "build:browser-lib": "tsc && vite build --mode browser-lib",
-    "build:browser-htmc": "tsc && vite build --mode browser-htmc",
-    "build:plugin-htmc": "tsc && vite build --mode plugin-htmc",
+    "dev": "vite --mode site",
+    "build:lib": "tsc && vite build --mode lib",
+    "build:site": "tsc && vite build --mode site",
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
-    "@types/three": "^0.161.2",
-    "vite": "5.1.1",
-    "vite-plugin-dts": "^3.7.2",
-    "vite-plugin-htmc": "^0.1.5"
+    "@types/node": "^20.11.30",
+    "@types/three": "^0.162.0",
+    "vite": "5.2.6",
+    "vite-plugin-dts": "^3.8.0",
+    "vite-plugin-htmc": "^0.1.9"
   },
   "dependencies": {
-    "detect-gpu": "^5.0.37",
-    "linkedom-global": "^1.0.0",
+    "detect-gpu": "^5.0.38",
     "postprocessing": "^6.35.2",
-    "three": "^0.161.0",
+    "three": "^0.162.0",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.37",
-    "linkedom-global": "^1.0.0",
     "postprocessing": "^6.35.2",
     "three": "^0.161.0",
     "urlpattern-polyfill": "^10.0.0"

@@ -16,20 +16,13 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: Install dependencies
         run: npm install
-      - name: Build browser lib
-        run: npm run build:browser-lib
+      - name: Build lib
+        run: npm run build:lib
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: production-files
-          path: ./build-browser-lib
-      - name: Build htmc plugin
-        run: npm run build:plugin-htmc
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: production-files
-          path: ./build-vite-plugin-htmc
+          path: ./lib
       - name: Publish package
         run: npm publish --access public
         working-directory: ./

@@ -27,14 +27,14 @@
 
     "baseUrl": "./",
     "paths": {
-      "@packages/*": ["dev-browser-lib/components/packages/*"],
-      "@components/*": ["dev-browser-lib/components/*"],
-      "@assets/*": ["dev-browser-lib/assets/*"]
+      "@packages/*": ["src/components/packages/*"],
+      "@components/*": ["src/components/*"],
+      "@assets/*": ["src/assets/*"]
     },
 
     "jsx": "preserve",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment"
   },
-  "include": ["dev-browser-lib", "dev-vite-plugins/htmc"]
+  "include": ["src"]
 }
