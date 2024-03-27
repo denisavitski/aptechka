@@ -1,3 +1,5 @@
 node_modules
-public
+build-browser-lib
+build-vite-plugin-htmc
+dev-browser-lib/static
 .DS_Store
