@@ -120,6 +120,8 @@ export type ElementConstructorEvents = Partial<{
   >
 }>
 
+export type ElementConstructorChildrenChangeCallback = () => void
+
 export type ElementConstructorTagObject<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
 > = {
@@ -512,10 +514,24 @@ export class ElementConstructor<
 
         this.#disconnectCallbacks.add(
           child.subscribe(({ current }) => {
+            storeRootElement.dispatchEvent(
+              new CustomEvent('beforeChildrenChange', {
+                bubbles: true,
+                composed: true,
+              })
+            )
+
             this.#replaceChildren(
               storeRootElement,
               this.#getChildrenArray(current),
               Array.from(storeRootElement.childNodes)
+            )
+
+            storeRootElement.dispatchEvent(
+              new CustomEvent('afterChildrenChange', {
+                bubbles: true,
+                composed: true,
+              })
             )
           })
         )
@@ -648,5 +664,15 @@ export class ElementConstructor<
     })
 
     this.#disconnectCallbacks.clear()
+  }
+}
+
+declare global {
+  interface HTMLElementEventMap {
+    beforeChildrenChange: CustomEvent
+  }
+
+  interface HTMLElementEventMap {
+    afterChildrenChange: CustomEvent
   }
 }

@@ -19,15 +19,19 @@ export const nextComponentAttributes: { value: { [key: string]: any } | null } =
     value: null,
   }
 
+export let contextStack: Array<Map<string, any>> = []
+
 export class ComponentElement extends HTMLElement {
   #connectCallbacks: Set<ComponentConnectCallback> = new Set()
   #disconnectCallbacks: Set<ComponentDisconnectCallback> = new Set()
-  #contexts: Map<string, any> = new Map()
+  #contextMap: Map<string, any> = new Map()
 
   constructor(parameters?: ComponentElementParameters) {
     super()
 
     currentComponentElement = this
+
+    contextStack.push(this.#contextMap)
 
     const res = parameters?.tag({
       ...parameters.attributes,
@@ -41,6 +45,16 @@ export class ComponentElement extends HTMLElement {
 
     currentComponentElement = null!
     nextComponentAttributes.value = null
+
+    contextStack = contextStack.filter((cs) => cs !== this.#contextMap)
+
+    this.addEventListener('beforeChildrenChange', (e) => {
+      contextStack.push(this.#contextMap)
+    })
+
+    this.addEventListener('afterChildrenChange', (e) => {
+      contextStack = contextStack.filter((cs) => cs !== this.#contextMap)
+    })
   }
 
   public addConnectCallback(callback: ComponentConnectCallback) {
@@ -52,15 +66,7 @@ export class ComponentElement extends HTMLElement {
   }
 
   public createContext(name: string, value: any) {
-    this.#contexts.set(name, value)
-  }
-
-  public getContext(name: string) {
-    return this.#contexts.get(name)
-  }
-
-  public findContext(name: string) {
-    return this.#findParentContextComponent(name)
+    this.#contextMap.set(name, value)
   }
 
   protected connectedCallback() {
@@ -81,40 +87,5 @@ export class ComponentElement extends HTMLElement {
     this.#disconnectCallbacks.forEach((callback) => {
       callback(this)
     })
-  }
-
-  #findParentContextComponent(
-    contextName: string,
-    _element: Element | null = this
-  ): any {
-    if (!_element) {
-      return null
-    }
-
-    if (_element && 'findContext' in _element) {
-      const context = (_element as ComponentElement).getContext(contextName)
-
-      if (context) {
-        return context
-      }
-    }
-
-    let parentElement: Element | null = null
-
-    if (_element.parentElement) {
-      parentElement = _element.parentElement
-    } else {
-      const rootNode = _element.getRootNode()
-
-      if (rootNode instanceof ShadowRoot) {
-        parentElement = rootNode.host
-      }
-    }
-
-    if (parentElement) {
-      return this.#findParentContextComponent(contextName, parentElement)
-    }
-
-    return null
   }
 }

@@ -1,6 +1,6 @@
 export { _createStore } from './createStore'
 export { onConnect } from './onConnect'
-export { onContext, createContext, type ContextCallback } from './onContext'
+export { getContext, createContext } from './createContext'
 export { withCurrentComponent } from './withCurrentComponent'
 export { onDisconnect } from './onDisconnect'
 export { attachInternals } from './attachInternals'
