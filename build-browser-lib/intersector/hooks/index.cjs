@@ -1,1 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});require("../../Store-D0_rDIsE.cjs");const r=require("../../onConnect-XY4UppQZ.cjs"),c=require("../index.cjs");function i(...e){r.onConnect(t=>{const n=e.length>1?e[0]:t,o=e.length>1?e[1]:e[0];return c.intersector.subscribe(n,o)})}exports.useIntersector=i;

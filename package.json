@@ -400,7 +400,7 @@
     }
   },
   "scripts": {
-    "dev:browser-htmc": "vite --mode browser-htmc",
+    "dev": "vite --mode browser-htmc",
     "build:browser-lib": "tsc && vite build --mode browser-lib",
     "build:browser-htmc": "tsc && vite build --mode browser-htmc",
     "build:plugin-htmc": "tsc && vite build --mode plugin-htmc",
