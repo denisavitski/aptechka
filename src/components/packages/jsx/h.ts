@@ -34,6 +34,15 @@ export function h(
       return Fragment(children)
     }
 
+    if (tag.noCustomElement) {
+      const res = tag({
+        children,
+        ...attributes,
+      })
+
+      return res
+    }
+
     const onlyRegister = attributes?.__register
 
     delete attributes?.__register
@@ -62,12 +71,17 @@ export function h(
       customElements.define(name, Constructor)
     }
 
-    return onlyRegister
+    const key = attributes?.key
+    delete attributes?.key
+
+    const result = onlyRegister
       ? Constructor
       : () => {
           const r = new Constructor({ tag, attributes, children })
           return r
         }
+
+    return result
   }
 
   const deconservatedChildren = children

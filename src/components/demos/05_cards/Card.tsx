@@ -5,6 +5,8 @@ export interface CardParameters {
 }
 
 export const Card: JSX.Component<CardParameters> = (props) => {
+  console.log('Constructor', props.id)
+
   onConnect(() => {
     console.log('Card', props.id, 'onConnect')
   })
@@ -13,5 +15,5 @@ export const Card: JSX.Component<CardParameters> = (props) => {
     console.log('Card', props.id, 'onDisconnect')
   })
 
-  return <component data-card-id={props.id}></component>
+  return <component style={{ color: 'red' }}>{props.id}</component>
 }

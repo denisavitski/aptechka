@@ -588,21 +588,42 @@ export class ElementConstructor<
               })
             )
 
-            const currentItemsArray = [current].flat()
-            const previousItemsArray = [previous].flat()
+            const currentNodes = Array.from(rootElement.childNodes)
 
-            const currentChildNodes = Array.from(rootElement.childNodes)
-            const newChildNodes: Array<Node> = []
+            const currentItems = [current].flat()
+            const previousItems = [previous].flat()
 
-            currentItemsArray.forEach((item, index) => {
-              if (!previousItemsArray.includes(item)) {
-                newChildNodes.push(this.#itemToNode(item))
+            const nodesToDelete: Array<Node> = []
+
+            const previousItemsWithDeletedItems: Array<any> = []
+
+            previousItems.forEach((previousItem, index) => {
+              if (!currentItems.includes(previousItem) && currentNodes[index]) {
+                nodesToDelete.push(currentNodes[index])
               } else {
-                newChildNodes.push(currentChildNodes[index])
+                previousItemsWithDeletedItems.push(previousItem)
               }
             })
 
-            this.#replaceChildren(rootElement, newChildNodes, currentChildNodes)
+            currentItems.forEach((currentItem, index) => {
+              if (previousItemsWithDeletedItems[index]) {
+                if (currentItem !== previousItemsWithDeletedItems[index]) {
+                  const newNode = this.#getNode(currentItem)
+                  const currentNode = currentNodes[index]
+
+                  if (!currentNode.isEqualNode(newNode)) {
+                    rootElement.replaceChild(newNode, currentNode)
+                  }
+                }
+              } else {
+                const newNode = this.#getNode(currentItem)
+                storeRootElement.appendChild(newNode)
+              }
+            })
+
+            nodesToDelete.forEach((node) => {
+              rootElement.removeChild(node)
+            })
 
             rootElement.dispatchEvent(
               new CustomEvent('afterChildrenChange', {
@@ -648,57 +669,13 @@ export class ElementConstructor<
     }
   }
 
-  #itemToNode(item: any) {
-    if (item instanceof ElementConstructor) {
-      return item.node
-    } else if (typeof item === 'function') {
-      return isESClass(item) ? new item() : item()
+  #getNode(child: any) {
+    if (child instanceof ElementConstructor) {
+      return child.node
+    } else if (typeof child === 'function') {
+      return isESClass(child) ? new child() : child()
     } else {
-      return this.#getOrCreateNode(item)
-    }
-  }
-
-  #replaceChildren(
-    rootElement: HTMLElement,
-    newChildren: Array<Node>,
-    currentChildren: Array<Node>
-  ) {
-    if (currentChildren.length > newChildren.length) {
-      currentChildren.forEach((cc) => {
-        if (!newChildren.find((nc) => this.#areNodesEqual(cc, nc))) {
-          rootElement.removeChild(cc)
-
-          currentChildren = currentChildren.filter((c) => c !== cc)
-        }
-      })
-    }
-
-    currentChildren.forEach((currentChild, index) => {
-      if (index < newChildren.length) {
-        const newChild = newChildren[index]
-
-        if (!this.#areNodesEqual(currentChild, newChild)) {
-          rootElement.replaceChild(newChild, currentChild)
-        }
-      } else {
-        rootElement.removeChild(currentChild)
-      }
-    })
-
-    for (let i = currentChildren.length; i < newChildren.length; i++) {
-      rootElement.appendChild(newChildren[i])
-    }
-  }
-
-  #areNodesEqual(currentChild: Node, newChild: any) {
-    if (!newChild) {
-      return false
-    }
-
-    if (newChild instanceof Node) {
-      return currentChild.isEqualNode(newChild)
-    } else {
-      return currentChild.textContent === newChild.toString()
+      return this.#getOrCreateNode(child)
     }
   }
 

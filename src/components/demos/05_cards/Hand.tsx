@@ -6,7 +6,12 @@ export const Hand: JSX.Component = () => {
   const combat = getCombatContext()!
 
   const slots = createDerivedArray(combat.cards, (card) => {
-    return <Card {...card}></Card>
+    return (
+      <Card
+        {...card}
+        key={card.id}
+      ></Card>
+    )
   })
 
   return slots

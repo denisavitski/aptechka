@@ -11,6 +11,8 @@ export class DerivedArray<
 > extends Store<DerivedType[]> {
   #unsubscriber: Function
 
+  #keyMap = new Map<any, DerivedType>()
+
   constructor(
     store: Store<StoreType>,
     callback: DerivedArrayCallback<StoreType[number], DerivedType>,
@@ -22,10 +24,20 @@ export class DerivedArray<
       const res: Array<DerivedType> = []
 
       e.current.forEach((v, i) => {
-        if (e.current[i] === e.previous?.[i] && this.current[i]) {
-          res.push(this.current[i])
+        if (e.previous?.includes(v) && this.#keyMap.has(v)) {
+          res.push(this.#keyMap.get(v)!)
         } else {
-          res.push(callback(v, i))
+          const callbackReturn = callback(v, i)
+
+          this.#keyMap.set(v, callbackReturn)
+
+          res.push(callbackReturn)
+        }
+      })
+
+      this.#keyMap.forEach((v, k) => {
+        if (!e.current.includes(k)) {
+          this.#keyMap.delete(k)
         }
       })
 

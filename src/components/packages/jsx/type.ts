@@ -32,6 +32,7 @@ declare global {
 
     type Component<TProps extends object = object> = {
       formAssociated?: boolean
+      noCustomElement?: boolean
       (props: BaseProps & TProps): ComponentChild
     }
 
