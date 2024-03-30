@@ -145,6 +145,15 @@ export class ElementConstructor<
   #node: N
   #connectCallbacks: Set<Function> = new Set()
   #disconnectCallbacks: Set<Function> = new Set()
+  #connectorUnsubscribeCallback: (() => void) | undefined
+  #storeRootElements: Array<HTMLElement> | undefined
+  #events:
+    | Array<{
+        name: string
+        callback: any
+        options?: any
+      }>
+    | undefined
 
   constructor(value: T, object?: ElementConstructorTagObject<T>)
   constructor(value: string, object?: ElementConstructorTagObject<T>)
@@ -160,6 +169,24 @@ export class ElementConstructor<
 
   public get node() {
     return this.#node
+  }
+
+  public set node(v) {
+    this.#detachEvents()
+
+    this.#node = v
+
+    this.#connectorUnsubscribeCallback?.()
+
+    if (this.#node instanceof Element) {
+      this.#storeRootElements = [
+        ...this.#node.querySelectorAll<HTMLElement>('store-root'),
+      ]
+    }
+
+    this.#attachEvents()
+
+    this.#watchNode()
   }
 
   #createNode(value: any, forceSvg?: boolean) {
@@ -256,6 +283,10 @@ export class ElementConstructor<
       }
     }
 
+    this.#watchNode()
+  }
+
+  #watchNode() {
     if (
       isBrowser &&
       (this.#disconnectCallbacks.size || this.#connectCallbacks.size)
@@ -265,22 +296,23 @@ export class ElementConstructor<
           ? this.#node.firstChild
           : this.#node
 
-      connector.subscribe(watchNode as Node, {
-        connectCallback: this.#connect,
-        disconnectCallback: this.#disconnect,
-        unsubscribeAfterDisconnect: true,
-        maxWaitSec: 20,
-      })
+      this.#connectorUnsubscribeCallback = connector.subscribe(
+        watchNode as Node,
+        {
+          connectCallback: this.#connect,
+          disconnectCallback: this.#disconnect,
+          unsubscribeAfterDisconnect: true,
+          maxWaitSec: 20,
+        }
+      )
     }
   }
 
   #createClassList(classObject?: ElementConstructorClass) {
-    const element = this.#node as HTMLElement
-
     if (!classObject) {
       return
     } else if (typeof classObject === 'string') {
-      element.classList.add(classObject)
+      ;(this.#node as HTMLElement).classList.add(classObject)
     } else if (Array.isArray(classObject)) {
       classObject.forEach((v) => {
         this.#createClassList(v)
@@ -299,9 +331,9 @@ export class ElementConstructor<
           if (isActive instanceof Store) {
             this.#manageBooleanStoreClass(className, isActive)
           } else if (isActive) {
-            element.classList.add(className)
+            ;(this.#node as HTMLElement).classList.add(className)
           } else {
-            element.classList.remove(className)
+            ;(this.#node as HTMLElement).classList.remove(className)
           }
         }
       }
@@ -313,14 +345,12 @@ export class ElementConstructor<
       | ElementConstructorStringStoreClass
       | ElementConstructorStringArrayStoreClass
   ) {
-    const element = this.#node as HTMLElement
-
     this.#disconnectCallbacks.add(
       store.subscribe(({ current, previous }) => {
         if (previous) {
           ;[previous].flat().forEach((v) => {
             if (v) {
-              element.classList.remove(v)
+              ;(this.#node as Element).classList.remove(v)
             }
           })
         }
@@ -328,7 +358,7 @@ export class ElementConstructor<
         if (current) {
           ;[current].flat().forEach((v) => {
             if (v) {
-              element.classList.add(v)
+              ;(this.#node as Element).classList.add(v)
             }
           })
         }
@@ -337,14 +367,12 @@ export class ElementConstructor<
   }
 
   #manageBooleanStoreClass(className: string, store: Store<boolean>) {
-    const element = this.#node as HTMLElement
-
     this.#disconnectCallbacks.add(
       store.subscribe(({ current }) => {
         if (current) {
-          element.classList.add(className)
+          ;(this.#node as Element).classList.add(className)
         } else {
-          element.classList.remove(className)
+          ;(this.#node as Element).classList.remove(className)
         }
       })
     )
@@ -355,9 +383,9 @@ export class ElementConstructor<
       return
     }
 
-    const element = this.#node as HTMLElement
-
-    const isJSS = element.tagName === 'style' || element.tagName === 'STYLE'
+    const isJSS =
+      (this.#node as HTMLElement).tagName === 'style' ||
+      (this.#node as HTMLElement).tagName === 'STYLE'
 
     if (isJSS) {
       this.#createJSSStyle(object as ElementConstructorJSS)
@@ -384,15 +412,15 @@ export class ElementConstructor<
   }
 
   #createJSSStyle(object: ElementConstructorJSS) {
-    const element = this.#node as HTMLElement
-
     for (const key in object) {
       const value = (object as any)[key]
 
       if (typeof value === 'object' && !(value instanceof Store)) {
-        element.appendChild(document.createTextNode(`${key} {`))
+        ;(this.#node as HTMLElement).appendChild(
+          document.createTextNode(`${key} {`)
+        )
         this.#createJSSStyle(value)
-        element.appendChild(document.createTextNode(`}`))
+        ;(this.#node as HTMLElement).appendChild(document.createTextNode(`}`))
       } else {
         if (value instanceof Store) {
           const text = document.createTextNode('')
@@ -406,10 +434,9 @@ export class ElementConstructor<
               }
             })
           )
-
-          element.appendChild(text)
+          ;(this.#node as HTMLElement).appendChild(text)
         } else {
-          element.appendChild(
+          ;(this.#node as HTMLElement).appendChild(
             document.createTextNode(`${camelToKebab(key)}: ${value};`)
           )
         }
@@ -421,19 +448,17 @@ export class ElementConstructor<
     token: ElementConstructorStyleToken,
     value?: string | null | undefined
   ) {
-    const element = this.#node as HTMLElement
-
     if (token.includes('--')) {
       if (value) {
-        element.style.setProperty(token, value)
+        ;(this.#node as HTMLElement).style.setProperty(token, value)
       } else {
-        element.style.removeProperty(token)
+        ;(this.#node as HTMLElement).style.removeProperty(token)
       }
     } else {
       if (value) {
-        element.style[token as any] = value
+        ;(this.#node as HTMLElement).style[token as any] = value
       } else {
-        element.style[token as any] = ''
+        ;(this.#node as HTMLElement).style[token as any] = ''
       }
     }
   }
@@ -443,7 +468,9 @@ export class ElementConstructor<
       return
     }
 
-    const element = this.#node as HTMLElement
+    if (!this.#events) {
+      this.#events = []
+    }
 
     for (const k in events) {
       const eventName = k as keyof ElementConstructorEvents
@@ -454,15 +481,40 @@ export class ElementConstructor<
       const listener = events[eventName]
 
       if (typeof listener === 'object') {
-        element.addEventListener(
-          readyEventName,
-          listener.callback as EventListener,
-          listener.options
-        )
+        this.#events.push({
+          name: readyEventName,
+          callback: listener.callback,
+          options: listener.options,
+        })
       } else if (typeof listener === 'function') {
-        element.addEventListener(readyEventName, listener as EventListener)
+        this.#events.push({
+          name: readyEventName,
+          callback: listener,
+        })
       }
     }
+
+    this.#attachEvents()
+  }
+
+  #attachEvents() {
+    this.#events?.forEach((event) => {
+      ;(this.#node as HTMLElement).addEventListener(
+        event.name,
+        event.callback,
+        event.options
+      )
+    })
+  }
+
+  #detachEvents() {
+    this.#events?.forEach((event) => {
+      ;(this.#node as HTMLElement).removeEventListener(
+        event.name,
+        event.callback,
+        event.options
+      )
+    })
   }
 
   #createAttributes(attributes?: ElementConstructorAttributes<any>) {
@@ -511,25 +563,48 @@ export class ElementConstructor<
     children.forEach((child: any) => {
       if (child instanceof Store) {
         const storeRootElement = document.createElement('div')
+
         storeRootElement.style.display = 'contents'
         root.appendChild(storeRootElement)
 
+        if (!this.#storeRootElements) {
+          this.#storeRootElements = []
+        }
+
+        const storeRootElementIndex = this.#storeRootElements.length
+
+        storeRootElement.setAttribute('store-root', '')
+
+        this.#storeRootElements.push(storeRootElement)
+
         this.#disconnectCallbacks.add(
-          child.subscribe(({ current }) => {
-            storeRootElement.dispatchEvent(
+          child.subscribe(({ current, previous }) => {
+            const rootElement = this.#storeRootElements![storeRootElementIndex]
+
+            rootElement.dispatchEvent(
               new CustomEvent('beforeChildrenChange', {
                 bubbles: true,
                 composed: true,
               })
             )
 
-            this.#replaceChildren(
-              storeRootElement,
-              this.#getChildrenArray(current),
-              Array.from(storeRootElement.childNodes)
-            )
+            const currentItemsArray = [current].flat()
+            const previousItemsArray = [previous].flat()
 
-            storeRootElement.dispatchEvent(
+            const currentChildNodes = Array.from(rootElement.childNodes)
+            const newChildNodes: Array<Node> = []
+
+            currentItemsArray.forEach((item, index) => {
+              if (!previousItemsArray.includes(item)) {
+                newChildNodes.push(this.#itemToNode(item))
+              } else {
+                newChildNodes.push(currentChildNodes[index])
+              }
+            })
+
+            this.#replaceChildren(rootElement, newChildNodes, currentChildNodes)
+
+            rootElement.dispatchEvent(
               new CustomEvent('afterChildrenChange', {
                 bubbles: true,
                 composed: true,
@@ -573,22 +648,14 @@ export class ElementConstructor<
     }
   }
 
-  #getChildrenArray(children: any) {
-    const arr = [children]
-      .flat()
-      .map((v) => {
-        if (v instanceof ElementConstructor) {
-          return v.node
-        } else if (typeof v === 'function') {
-          return isESClass(v) ? new v() : v()
-        } else {
-          return this.#getOrCreateNode(v)
-        }
-      })
-      .flat()
-      .filter(Boolean) as Array<Node>
-
-    return arr
+  #itemToNode(item: any) {
+    if (item instanceof ElementConstructor) {
+      return item.node
+    } else if (typeof item === 'function') {
+      return isESClass(item) ? new item() : item()
+    } else {
+      return this.#getOrCreateNode(item)
+    }
   }
 
   #replaceChildren(
@@ -600,6 +667,7 @@ export class ElementConstructor<
       currentChildren.forEach((cc) => {
         if (!newChildren.find((nc) => this.#areNodesEqual(cc, nc))) {
           rootElement.removeChild(cc)
+
           currentChildren = currentChildren.filter((c) => c !== cc)
         }
       })
@@ -666,6 +734,8 @@ export class ElementConstructor<
     })
 
     this.#disconnectCallbacks.clear()
+
+    this.#detachEvents()
   }
 }
 

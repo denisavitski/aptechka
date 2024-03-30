@@ -210,9 +210,13 @@ declare global {
     type AllAttributes = UnknownAttributes & HTMLAttributes & HTMLOrSVGEvents
 
     type SpecialTagNames = 'component'
+    type CustomTagNames = `${string}--${string}`
 
     type IntrinsicElementsHTML = {
-      [TKey in ElementConstructorTagNames | SpecialTagNames]?: AllAttributes
+      [TKey in
+        | ElementConstructorTagNames
+        | SpecialTagNames
+        | CustomTagNames]?: AllAttributes
     }
 
     type IntrinsicElements = IntrinsicElementsHTML

@@ -182,6 +182,8 @@ class En3 {
     if (element) {
       return this.attachToHTMLElement<T>(element, object, options)
     }
+
+    return object
   }
 
   public remove(object: Object3D, detach?: boolean) {

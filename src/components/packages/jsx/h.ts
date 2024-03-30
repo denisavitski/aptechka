@@ -5,8 +5,9 @@ import {
   ComponentElementParameters,
   nextComponentAttributes,
 } from './ComponentElement'
+import { customConstructors } from '.'
 
-function getChildren(child: any) {
+function deconservateChild(child: any) {
   const unpreparedChildren = Array.isArray(child) ? child : [child]
   let children: Array<any> = []
 
@@ -14,7 +15,7 @@ function getChildren(child: any) {
     if (typeof child === 'function') {
       const res = child()
 
-      children = [...children, ...getChildren(res)]
+      children = [...children, ...deconservateChild(res)]
     } else {
       children.push(child)
     }
@@ -69,32 +70,41 @@ export function h(
         }
   }
 
-  const readyChildren = children
+  const deconservatedChildren = children
     .map((child) => {
-      return getChildren(child)
+      return deconservateChild(child)
     })
     .flat()
 
-  let constructedElement: ElementConstructor<any> = null!
-
   if (tag === 'component') {
     delete attributes?.lightChildren
-    constructedElement = Fragment(readyChildren)
+    const constructed = Fragment(deconservatedChildren)
     nextComponentAttributes.value = attributes
+
+    return constructed.node
   } else {
-    const childrenType = attributes?.lightChildren
-      ? 'lightChildren'
-      : 'children'
+    if (tag.includes('--')) {
+      const splitted = tag.split('--')
+      const tagSpace = splitted[0]
 
-    delete attributes?.children
+      const Constructor = customConstructors.get(tagSpace)
 
-    constructedElement = new ElementConstructor(tag, {
-      ...(attributes as any),
-      [childrenType]: readyChildren,
-    })
+      if (Constructor) {
+        new Constructor({ tag, attributes, children: deconservatedChildren })
+      }
+    } else {
+      const childrenType = attributes?.lightChildren
+        ? 'lightChildren'
+        : 'children'
+
+      delete attributes?.children
+
+      return new ElementConstructor(tag, {
+        ...(attributes as any),
+        [childrenType]: deconservatedChildren,
+      }).node
+    }
   }
-
-  return constructedElement.node
 }
 
 export function Fragment(children: any) {
