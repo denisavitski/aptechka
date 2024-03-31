@@ -5,3 +5,14 @@
   background-color: var(--aptechka-color-light);
   border-radius: var(--aptechka-border-radius);
 }
+
+e-popover-button {
+  background-color: red;
+}
+
+.content {
+  width: 70vw;
+  height: 50vh;
+
+  background-color: lightblue;
+}

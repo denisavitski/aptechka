@@ -59,6 +59,7 @@ const stylesheet = createStylesheet({
 
   '.close-button': {
     position: 'absolute',
+    zIndex: '1',
     top: 'var(---close-button-top, 0.5em)',
     right: 'var(---close-button-right, 0.5em)',
 
@@ -132,7 +133,7 @@ export class ModalElement extends PopoverElement {
                 type: 'close',
                 target: this.id,
                 class: 'close-button',
-                children: [
+                lightChildren: [
                   slot({
                     name: 'close-button',
                     children: span({ class: 'close-button-default' }),

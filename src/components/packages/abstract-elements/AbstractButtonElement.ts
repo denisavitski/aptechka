@@ -1,26 +1,34 @@
 import { CustomElement } from '@packages/custom-element'
-import { element } from '@packages/element-constructor'
+import {
+  button,
+  createStylesheet,
+  element,
+  slot,
+} from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
+
+const stylesheet = createStylesheet({
+  button: {
+    all: 'inherit',
+  },
+})
 
 export abstract class AbstractButtonElement extends CustomElement {
   constructor() {
     super()
 
+    this.openShadow(stylesheet)
+
     if (isBrowser) {
       element(this, {
-        style: {
-          cursor: 'default',
-        },
-        tabIndex: this.getAttribute('tabindex') || '0',
-        role: 'button',
-        onKeydown: (e) => {
-          if (e.code === 'Space') {
-            this.click()
-          }
-        },
-        onClick: () => {
-          this.click()
-        },
+        children: [
+          button({
+            onClick: () => {
+              this.click()
+            },
+            children: [slot()],
+          }),
+        ],
       })
     }
   }
