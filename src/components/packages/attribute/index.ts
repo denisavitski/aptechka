@@ -48,9 +48,21 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
   }
 
   public override subscribe(callback: StoreCallback<StoreEntry<T>>) {
-    const observe = !this.subscribers.size
-
     const unsub = super.subscribe(callback)
+
+    this.observe()
+
+    return unsub
+  }
+
+  public override unsubscribe(callback: StoreCallback<StoreEntry<T>>) {
+    super.unsubscribe(callback)
+
+    this.unobserve()
+  }
+
+  public observe() {
+    const observe = !this.subscribers.size
 
     if (observe) {
       this.#mutationObserver.observe(this.#element, {
@@ -59,13 +71,9 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
 
       this.#tryUpdate()
     }
-
-    return unsub
   }
 
-  public override unsubscribe(callback: StoreCallback<StoreEntry<T>>) {
-    super.unsubscribe(callback)
-
+  public unobserve() {
     if (!this.subscribers.size) {
       this.#mutationObserver.disconnect()
     }
@@ -73,7 +81,7 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
 
   public override close() {
     super.close()
-    this.#mutationObserver.disconnect()
+    this.unobserve()
   }
 
   #tryUpdate() {

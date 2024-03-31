@@ -500,10 +500,30 @@ export class ScrollElement extends CustomElement {
   }
 
   protected connectedCallback() {
+    this.#axisAttribute.observe()
+    this.#pagesAttribute.observe()
+    this.#splitAttribute.observe()
+    this.#sectionalAttribute.observe()
+    this.#wheelMaxDeltaAttribute.observe()
+    this.#infiniteAttribute.observe()
+    this.#dampingAttribute.observe()
+    this.#disabledAttribute.observe()
+    this.#hibernatedAttribute.observe()
+
     this.#awake()
   }
 
   protected disconnectedCallback() {
+    this.#axisAttribute.unobserve()
+    this.#pagesAttribute.unobserve()
+    this.#splitAttribute.unobserve()
+    this.#sectionalAttribute.unobserve()
+    this.#wheelMaxDeltaAttribute.unobserve()
+    this.#infiniteAttribute.unobserve()
+    this.#dampingAttribute.unobserve()
+    this.#disabledAttribute.unobserve()
+    this.#hibernatedAttribute.unobserve()
+
     this.#hibernate()
   }
 

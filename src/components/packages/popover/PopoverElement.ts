@@ -69,11 +69,9 @@ export class PopoverElement extends CustomElement {
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
     if (this.#history.current) {
-      history.replaceState(
-        '',
-        '',
-        location.href.replace(new RegExp(`[&?]${this.#searchName}`, 'g'), '')
-      )
+      const url = new URL(location.href)
+      url.searchParams.delete(this.#searchName)
+      history.replaceState(null, '', url.href)
     }
 
     this.classList.remove('opened')
@@ -89,6 +87,9 @@ export class PopoverElement extends CustomElement {
   }
 
   protected connectedCallback() {
+    this.#history.observe()
+    this.#single.observe()
+
     this.style.opacity = '0'
     this.style.display = 'none'
 
@@ -100,6 +101,9 @@ export class PopoverElement extends CustomElement {
   }
 
   protected disconnectedCallback() {
+    this.#history.unobserve()
+    this.#single.unobserve()
+
     clearTimeout(this.#closeTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
