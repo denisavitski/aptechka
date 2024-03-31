@@ -172,11 +172,17 @@ class En3 {
     })
   }
 
+  public add<T extends Object3D<any>>(object: T): T
   public add<T extends Object3D<any>>(
     object: T,
-    element?: ElementOrSelector<HTMLElement>,
+    element: ElementOrSelector<HTMLElement>,
     options?: En3AttachOptions
-  ) {
+  ): En3AttachedObject3D<T>
+  public add<T extends Object3D<any>>(...args: Array<any>): any {
+    const object = args[0] as T
+    const element = args[1] as ElementOrSelector<HTMLElement>
+    const options = args[2] as En3AttachOptions
+
     this.scene.add(object)
 
     if (element) {

@@ -9,11 +9,6 @@ export function browserSharedConfig() {
         '@assets': resolve(__dirname, 'src/assets'),
       },
     },
-    esbuild: {
-      jsxFactory: 'h',
-      jsxFragment: 'Fragment',
-      jsxInject: `import { h, Fragment } from '@packages/jsx'`,
-    },
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',

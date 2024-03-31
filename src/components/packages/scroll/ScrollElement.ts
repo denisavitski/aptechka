@@ -417,31 +417,6 @@ export class ScrollElement extends CustomElement {
     this.#damped.unsubscribe(...parameters)
   }
 
-  public get context() {
-    return {
-      currentScrollValue: this.currentScrollValue,
-      targetScrollValue: this.targetScrollValue,
-      contentElement: this.contentElement,
-      position: this.position,
-      contentPosition: this.contentPosition,
-      viewportSize: this.viewportSize,
-      scrollSize: this.scrollSize,
-      gap: this.gap,
-      counter: this.counter,
-      distance: this.distance,
-      overscroll: this.overscroll,
-      vertical: this.vertical,
-      currentProgress: this.currentProgress,
-      targetProgress: this.targetProgress,
-      speed: this.speed,
-      direction: this.direction,
-      isRunning: this.isRunning,
-      range: this.range,
-      curve: this.curve,
-      visible: this.visible,
-    }
-  }
-
   //https://github.com/pmndrs/drei/blob/d3282cdd02d170ef603a5e096505d83dc93cd57a/src/web/ScrollControls.tsx#L85C7-L100C9
   public range(from: number, distance: number, margin: number = 0) {
     const start = from - margin

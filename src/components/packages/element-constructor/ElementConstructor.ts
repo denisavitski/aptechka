@@ -13,6 +13,8 @@ import {
   connector,
 } from '@packages/connector'
 
+export type StoreOr<T> = T | Store<T>
+
 export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
   SVGElementTagNameMap
 
@@ -611,13 +613,20 @@ export class ElementConstructor<
                   const newNode = this.#getNode(currentItem)
                   const currentNode = currentNodes[index]
 
-                  if (!currentNode.isEqualNode(newNode)) {
-                    rootElement.replaceChild(newNode, currentNode)
+                  if (newNode instanceof Node) {
+                    if (!currentNode.isEqualNode(newNode)) {
+                      rootElement.replaceChild(newNode, currentNode)
+                    }
+                  } else {
+                    rootElement.removeChild(currentNode)
                   }
                 }
               } else {
                 const newNode = this.#getNode(currentItem)
-                storeRootElement.appendChild(newNode)
+
+                if (newNode instanceof Node) {
+                  storeRootElement.appendChild(newNode)
+                }
               }
             })
 

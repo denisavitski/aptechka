@@ -10,6 +10,7 @@ export {
   findParentElement,
   getElement,
   findScrollParentElement,
+  getAllParentElements,
   type ElementOrSelector,
 } from './dom'
 export {

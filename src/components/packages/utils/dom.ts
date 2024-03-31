@@ -49,3 +49,30 @@ export function findScrollParentElement(
 
   return findScrollParentElement(node.parentNode, _initial)
 }
+
+export function getAllParentElements(node: Node) {
+  let allParentNodes: Array<HTMLElement> = []
+
+  document.documentElement.addEventListener(
+    '__illuminate-tree',
+    (e) => {
+      const path = e.composedPath()
+
+      path.forEach((item) => {
+        if (item instanceof HTMLElement) {
+          allParentNodes.push(item)
+        }
+      })
+    },
+    { once: true }
+  )
+
+  node.dispatchEvent(
+    new CustomEvent('__illuminate-tree', {
+      bubbles: true,
+      composed: true,
+    })
+  )
+
+  return allParentNodes
+}

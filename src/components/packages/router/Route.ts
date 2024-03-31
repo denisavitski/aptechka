@@ -1,4 +1,3 @@
-import { instantiate } from '@packages/jsx'
 import { isBrowser, isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<any>
@@ -120,16 +119,9 @@ export class Route {
         searchParams,
       }
 
-      if (isESClass(this.#elementConstructor)) {
-        this.#element = new (this.#elementConstructor as any)(
-          routeParameters
-        ) as HTMLElement
-      } else {
-        this.#element = instantiate(
-          this.#elementConstructor as any,
-          routeParameters
-        )
-      }
+      this.#element = new (this.#elementConstructor as any)(
+        routeParameters
+      ) as HTMLElement
 
       containerElement.appendChild(this.#element!)
 

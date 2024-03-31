@@ -1,4 +1,5 @@
 node_modules
 dist
 lib
+src/components/demos
 .DS_Store

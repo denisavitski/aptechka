@@ -1,4 +1,5 @@
 import { Axes2D } from '@packages/utils'
+import { getAllParentElements } from '@packages/utils/dom'
 
 interface ScrollEntry {
   axis: Axes2D
@@ -57,9 +58,9 @@ class ScrollEntries {
   }
 
   public getAll(element: HTMLElement) {
-    const elements = Array.from(this.#elements).filter(
-      (v) => v !== element && v.contains(element)
-    )
+    const elements = getAllParentElements(element).filter((parentElement) => {
+      return this.#elements.has(parentElement)
+    })
 
     const entries: Array<ScrollEntry> = []
 

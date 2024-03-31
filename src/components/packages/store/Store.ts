@@ -83,6 +83,7 @@ export interface StoreOptions<
   passport?: StorePassport<StoreManager>
   validate?: StoreMiddleware<StoreType>
   skipSubscribeNotification?: boolean
+  notifyAndClose?: boolean
 }
 
 export class Store<
@@ -98,6 +99,7 @@ export class Store<
   #callbacks = new Set<StoreCallback<Entry>>()
   #skipSubscribeNotification: boolean
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
+  #notifyAndClose: boolean
 
   constructor(
     value: StoreType,
@@ -116,6 +118,8 @@ export class Store<
     if (options?.validate) {
       this.addMiddleware(options.validate)
     }
+
+    this.#notifyAndClose = options?.notifyAndClose || false
 
     this.#skipSubscribeNotification =
       options?.skipSubscribeNotification || false
@@ -153,6 +157,10 @@ export class Store<
 
       this.#current = value
       this.#notify()
+
+      if (this.#notifyAndClose) {
+        this.close()
+      }
     }
   }
 
