@@ -60,8 +60,8 @@ const stylesheet = createStylesheet({
   '.close-button': {
     position: 'absolute',
     zIndex: '1',
-    top: 'var(---close-button-top, 0.5em)',
-    right: 'var(---close-button-right, 0.5em)',
+    top: 'var(--close-button-top, 0.5em)',
+    right: 'var(--close-button-right, 0.5em)',
 
     background: 'none',
     border: 'none',
@@ -71,8 +71,8 @@ const stylesheet = createStylesheet({
   },
 
   '.close-button-default': {
-    width: 'var(---close-button-size, 1.5em)',
-    height: 'var(---close-button-size, 1.5em)',
+    width: 'var(--close-button-size, 1.5em)',
+    height: 'var(--close-button-size, 1.5em)',
 
     display: 'flex',
     alignItems: 'center',
@@ -96,7 +96,7 @@ const stylesheet = createStylesheet({
 
     position: 'absolute',
 
-    width: 'var(---close-button-thickness, 0.1em)',
+    width: 'var(--close-button-thickness, 0.1em)',
     height: '100%',
 
     backgroundColor: `var(--close-button-color, ${aptechkaTheme.colorDark.var})`,
