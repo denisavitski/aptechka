@@ -1,5 +1,9 @@
 .box {
-  width: 10vmin;
-  height: 10vmin;
+  --size: 40vmin;
+  position: absolute;
+  top: calc(50vh - var(--size) / 2);
+  left: calc(50vw - var(--size) / 2);
+  width: var(--size);
+  height: var(--size);
   background-color: tomato;
 }

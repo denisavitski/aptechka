@@ -1,26 +1,23 @@
-import { Store, StoreEntry, StoreOptions } from '@packages/store'
-import { TickerAddOptions, TickerCallback, ticker } from '@packages/ticker'
+import { StoreEntry, StoreManagers, StoreOptions } from '@packages/store'
+import { TickerAddOptions, TickerCallbackEntry } from '@packages/ticker'
 import {
   EasingFunction,
-  ElementOrSelector,
   clamp,
   linear,
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
+import { Animation, AnimationOptions } from './Animation'
 
-export interface TweenedAnimationOptions extends TickerAddOptions {
+export interface TweenedOptions extends AnimationOptions {
   easing?: EasingFunction
   duration?: number
 }
 
-export interface TweenedSetOptions extends TweenedAnimationOptions {
+export interface TweenedSetOptions
+  extends Omit<TweenedOptions, keyof StoreOptions<number>> {
   restart?: boolean
 }
-
-export interface TweenedOptions
-  extends TweenedAnimationOptions,
-    StoreOptions<number> {}
 
 export interface TweenedEntry extends StoreEntry<number> {
   length: number
@@ -28,27 +25,19 @@ export interface TweenedEntry extends StoreEntry<number> {
   direction: number
 }
 
-export class Tweened extends Store<number, 'number', TweenedEntry> {
-  #maxFPS: number | undefined
-  #order: number | undefined
-  #culling: ElementOrSelector | undefined | null | false
-
+export class Tweened extends Animation<TweenedOptions, TweenedEntry> {
   #easing: EasingFunction = linear
   #duration = 1000
-
-  #isRunning = new Store(false)
 
   #from = 0
   #to = 0
   #direction = 0
 
-  constructor(initial?: number, options?: TweenedOptions) {
-    super(initial || 0)
-    this.#updateOptions(options)
-  }
-
-  public get isRunning() {
-    return this.#isRunning
+  constructor(
+    initial?: number,
+    options?: TweenedOptions & TickerAddOptions & StoreOptions<number>
+  ) {
+    super(initial || 0, options)
   }
 
   public get direction() {
@@ -83,14 +72,14 @@ export class Tweened extends Store<number, 'number', TweenedEntry> {
     this.#to = value
     this.#direction = Math.sign(this.length)
 
-    this.#updateOptions(options)
+    this.updateOptions(options)
 
     if (!this.#duration) {
       this.current = this.#to
-      this.#unlistenAnimationFrame()
+      this.unlistenAnimationFrame()
     } else {
-      this.#unlistenAnimationFrame()
-      this.#listenAnimationFrame()
+      this.unlistenAnimationFrame()
+      this.listenAnimationFrame()
     }
   }
 
@@ -98,52 +87,25 @@ export class Tweened extends Store<number, 'number', TweenedEntry> {
     this.set(this.current + value, options)
   }
 
-  public override reset() {
-    this.#unlistenAnimationFrame()
-    super.reset()
-  }
+  public override updateOptions(
+    options?:
+      | Omit<TweenedOptions, keyof StoreOptions<number, keyof StoreManagers>>
+      | undefined
+  ) {
+    super.updateOptions(options)
 
-  public override close() {
-    super.close()
-    this.#unlistenAnimationFrame()
-  }
-
-  #updateOptions(options?: TweenedAnimationOptions) {
     this.#easing = nullishCoalescing(options?.easing, this.#easing)
     this.#duration = nullishCoalescing(options?.duration, this.#duration)
-    this.#maxFPS = nullishCoalescing(options?.maxFPS, this.#maxFPS)
-    this.#order = nullishCoalescing(options?.order, this.#order)
-    this.#culling = nullishCoalescing(options?.culling, this.#culling)
   }
 
-  #listenAnimationFrame() {
-    if (!this.#isRunning.current) {
-      this.#isRunning.current = true
-
-      ticker.subscribe(this.#animationFrameListener, {
-        maxFPS: this.#maxFPS,
-        order: this.#order,
-        culling: this.#culling,
-      })
-    }
-  }
-
-  #unlistenAnimationFrame() {
-    if (this.#isRunning.current) {
-      this.#isRunning.current = false
-
-      ticker.unsubscribe(this.#animationFrameListener)
-    }
-  }
-
-  #animationFrameListener: TickerCallback = (e) => {
+  protected override handleAnimationFrame(e: TickerCallbackEntry): void {
     const t = (e.timestamp - e.startTimestamp) / 1000 / (this.#duration / 1000)
     const et = this.#easing(clamp(t, 0, 1))
 
     this.current = preciseNumber(this.#from + (this.#to - this.#from) * et, 6)
 
     if (t > 1) {
-      this.#unlistenAnimationFrame()
+      this.unlistenAnimationFrame()
     }
   }
 }

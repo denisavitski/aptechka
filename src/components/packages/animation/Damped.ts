@@ -1,17 +1,14 @@
-import { Store, StoreEntry, StoreOptions } from '@packages/store'
-import { TickerAddOptions, TickerCallback, ticker } from '@packages/ticker'
-import {
-  ElementOrSelector,
-  clamp,
-  damp,
-  nullishCoalescing,
-  preciseNumber,
-} from '@packages/utils'
+import { StoreEntry, StoreManagers, StoreOptions } from '@packages/store'
+import { TickerAddOptions, TickerCallbackEntry } from '@packages/ticker'
+import { clamp, damp, nullishCoalescing, preciseNumber } from '@packages/utils'
+import { Animation } from './Animation'
 
 export interface DampedOptions extends TickerAddOptions, StoreOptions<number> {
-  damping?: number
   min?: number
   max?: number
+  stiffness?: number
+  damping?: number
+  mass?: number
 }
 
 export interface DampedEntry extends StoreEntry<number> {
@@ -20,30 +17,26 @@ export interface DampedEntry extends StoreEntry<number> {
   length: number
   progress: number
   direction: number
-  speed: number
 }
 
-export class Damped extends Store<number, 'number', DampedEntry> {
-  #maxFPS: number | undefined
-  #order: number | undefined
-  #culling: ElementOrSelector | undefined | null | false
-  #damping: number
-  #isRunning = new Store(false)
+export class Damped extends Animation<DampedOptions, DampedEntry> {
+  public damping = 0.01
+  public stiffness = 0
+  public mass = 0
+
+  #target = 0
   #direction = 0
-  #speed = 0
   #min = 0
   #max = 0
-  #target: number
+  #velocity = 0
+  #speed = 0
 
   constructor(initial?: number, options?: DampedOptions) {
-    super(initial || 0)
+    super(initial || 0, options)
 
-    this.#damping = options?.damping || 0.01
-    this.#order = options?.order
-    this.#maxFPS = options?.maxFPS
-    this.#culling = options?.culling
     this.#min = nullishCoalescing(options?.min, -Infinity)
     this.#max = nullishCoalescing(options?.max, Infinity)
+
     this.#target = this.current
   }
 
@@ -51,20 +44,8 @@ export class Damped extends Store<number, 'number', DampedEntry> {
     return this.#target
   }
 
-  public get isRunning() {
-    return this.#isRunning
-  }
-
   public get direction() {
     return this.#direction
-  }
-
-  public get maxFPS() {
-    return this.#maxFPS
-  }
-
-  public get speed() {
-    return this.#speed
   }
 
   public get min() {
@@ -85,6 +66,14 @@ export class Damped extends Store<number, 'number', DampedEntry> {
     this.#lengthChange()
   }
 
+  public get velocity() {
+    return this.#velocity
+  }
+
+  public get speed() {
+    return this.#speed
+  }
+
   public get length() {
     return this.#max - this.#min
   }
@@ -95,14 +84,6 @@ export class Damped extends Store<number, 'number', DampedEntry> {
       : 0
   }
 
-  public get damping() {
-    return this.#damping
-  }
-
-  public set damping(value: number) {
-    this.#damping = value
-  }
-
   public override get entry(): DampedEntry {
     return {
       ...super.entry,
@@ -111,7 +92,6 @@ export class Damped extends Store<number, 'number', DampedEntry> {
       length: this.length,
       direction: this.direction,
       progress: this.progress,
-      speed: this.speed,
     }
   }
 
@@ -125,9 +105,8 @@ export class Damped extends Store<number, 'number', DampedEntry> {
     }
 
     if (this.#target !== previous) {
-      this.#speed = 0
       this.#direction = Math.sign(value - this.#target) || 1
-      this.#startAnimation()
+      this.listenAnimationFrame()
     }
   }
 
@@ -135,60 +114,54 @@ export class Damped extends Store<number, 'number', DampedEntry> {
     this.set(this.#target + value, equalize)
   }
 
-  public override close() {
-    super.close()
-    this.stopAnimation()
-  }
-
   public override reset() {
     this.set(this.initial, true)
+    super.reset()
   }
 
-  public stopAnimation() {
-    if (this.#isRunning.current) {
-      this.#speed = 0
-      this.#isRunning.current = false
-
-      ticker.unsubscribe(this.#animationFrameListener)
+  public override listenAnimationFrame() {
+    if (this.current !== this.target) {
+      super.listenAnimationFrame()
     }
   }
 
-  #listenAnimationFrame() {
-    if (!this.#isRunning.current) {
-      this.#isRunning.current = true
+  public override updateOptions(
+    options?:
+      | Omit<DampedOptions, keyof StoreOptions<number, keyof StoreManagers>>
+      | undefined
+  ) {
+    super.updateOptions(options)
 
-      ticker.subscribe(this.#animationFrameListener, {
-        maxFPS: this.#maxFPS,
-        order: this.#order,
-        culling: this.#culling,
-      })
-    }
+    this.damping = nullishCoalescing(options?.damping, this.damping)
+    this.mass = nullishCoalescing(options?.damping, this.mass)
+    this.stiffness = nullishCoalescing(options?.damping, this.stiffness)
   }
 
-  #startAnimation() {
-    if (this.#damping) {
-      if (this.current !== this.target) {
-        this.#listenAnimationFrame()
-      }
-    } else {
-      this.current = this.target
-      this.stopAnimation()
-    }
-  }
-
-  #animationFrameListener: TickerCallback = (e) => {
-    const current = this.current
-
+  protected override handleAnimationFrame(e: TickerCallbackEntry) {
     if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
-      this.stopAnimation()
+      this.unlistenAnimationFrame()
       this.current = this.target
     }
 
-    this.current = damp(this.current, this.target, this.#damping, e.elapsed)
+    const current = this.current
 
     const delta = Math.abs(current - this.target)
 
     this.#speed = delta / e.elapsed
+
+    const dt = e.elapsed / 1000
+
+    if (this.mass || this.stiffness) {
+      const acceleration =
+        (this.#target - this.current) * this.stiffness -
+        this.#velocity * this.damping
+
+      this.#velocity += (acceleration / this.mass) * dt
+
+      this.current += this.#velocity * dt
+    } else {
+      this.current = damp(this.current, this.target, this.damping, dt)
+    }
   }
 
   #lengthChange = () => {

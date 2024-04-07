@@ -131,7 +131,6 @@ export function isESClass(fn: Function) {
 export function mixin(baseClass: any, ...mixins: any[]) {
   mixins.forEach((baseCtor) => {
     Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
-      console.log(name)
       Object.defineProperty(
         baseClass.prototype,
         name,

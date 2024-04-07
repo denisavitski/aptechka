@@ -3,8 +3,11 @@
   height: 100%;
 
   --gap: 10vw;
-  --damping: 0.01;
   --mouse-drag: true;
+
+  --damping: 40;
+  --stiffness: 500;
+  --mass: 2;
 }
 
 .main-slide {
@@ -24,8 +27,11 @@
 
   --axis: x;
   --gap: 10vw;
-  --damping: 0.01;
   --mouse-drag: true;
+
+  --damping: 40;
+  --stiffness: 500;
+  --mass: 2;
 
   overflow: hidden;
 }

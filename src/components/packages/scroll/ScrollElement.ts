@@ -157,6 +157,8 @@ export class ScrollElement extends CustomElement {
   )
   #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 0.03)
+  #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
+  #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
   #mouseDragCSSProperty = new CSSProperty<boolean>(this, '--mouse-drag', false)
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
@@ -307,6 +309,14 @@ export class ScrollElement extends CustomElement {
         this.#damped.damping = e.current
       })
 
+      this.#massCSSProperty.subscribe((e) => {
+        this.#damped.mass = e.current
+      })
+
+      this.#stiffnessCSSProperty.subscribe((e) => {
+        this.#damped.stiffness = e.current
+      })
+
       this.#disabledCSSProperty.subscribe((e) => {
         if (e.current && !e.previous) {
           this.#disable()
@@ -327,6 +337,14 @@ export class ScrollElement extends CustomElement {
 
   public get dampingCSSProperty() {
     return this.#dampingCSSProperty
+  }
+
+  public get maxxCSSProperty() {
+    return this.#massCSSProperty
+  }
+
+  public get stiffnessCSSProperty() {
+    return this.#stiffnessCSSProperty
   }
 
   public get mouseDragCSSProperty() {
@@ -606,7 +624,7 @@ export class ScrollElement extends CustomElement {
     if (!this.#disabled) {
       this.#disabled = true
       this.#damped.unsubscribe(this.#animatedChangeListener)
-      this.#damped.stopAnimation()
+      this.#damped.unlistenAnimationFrame()
 
       this.#wheelControls.disconnect()
       this.#keyboardControls.disconnect()
