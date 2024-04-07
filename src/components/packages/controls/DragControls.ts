@@ -53,7 +53,9 @@ export class DragControls extends Controls {
   }
 
   #pointerdownListener = (grabEvent: PointerEvent) => {
-    ticker.unsubscribe(this.#tickListener)
+    if (!this.swipe) {
+      ticker.unsubscribe(this.#tickListener)
+    }
 
     let prev = grabEvent
     this.#delta = 0
@@ -81,7 +83,7 @@ export class DragControls extends Controls {
       () => {
         this.#delta = this.#delta * 3
 
-        if (this.#swiped) {
+        if (!this.swipe) {
           ticker.subscribe(this.#tickListener, { order: TICK_ORDER.SCROLL - 1 })
         }
 
