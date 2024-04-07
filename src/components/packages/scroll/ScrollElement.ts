@@ -1,10 +1,5 @@
 import { Damped } from '@packages/animation'
-import { Attribute } from '@packages/attribute'
-import {
-  WheelControls,
-  KeyboardControls,
-  ControlsValue,
-} from '@packages/controls'
+import { WheelControls, KeyboardControls } from '@packages/controls'
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
@@ -24,6 +19,7 @@ import {
   slot,
 } from '@packages/element-constructor'
 import { cssUnitParser } from '@packages/css-unit-parser'
+import { CSSProperty } from '@packages/css-property'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
@@ -72,7 +68,7 @@ class Section {
     const df = this.#scrollElement.viewportSize - this.#size
 
     if (
-      this.#scrollElement.infiniteAttribute.current &&
+      this.#scrollElement.infiniteProperty.current &&
       this.#scrollElement.overscroll &&
       this.#position + this.#size < this.#scrollElement.currentScrollValue
     ) {
@@ -143,21 +139,21 @@ const stylesheet = createStylesheet({
 export class ScrollElement extends CustomElement {
   #damped: Damped = null!
 
-  #axisAttribute = new Attribute<Axes2D>(this, 'axis', 'y')
-  #pagesAttribute = new Attribute<number>(this, 'pages', 0, {
+  #axisProperty = new CSSProperty<Axes2D>(this, '--axis', 'y')
+  #pagesProperty = new CSSProperty<number>(this, '--pages', 0, {
     validate: (v) => Math.max(0, v - 1),
   })
-  #splitAttribute = new Attribute<boolean>(this, 'split', false)
-  #sectionalAttribute = new Attribute<boolean>(this, 'sectional', false)
-  #wheelMaxDeltaAttribute = new Attribute<boolean>(
+  #splitProperty = new CSSProperty<boolean>(this, '--split', false)
+  #sectionalProperty = new CSSProperty<boolean>(this, '--sectional', false)
+  #wheelMaxDeltaProperty = new CSSProperty<boolean>(
     this,
-    'wheel-max-delta',
+    '--wheel-max-delta',
     false
   )
-  #infiniteAttribute = new Attribute<boolean>(this, 'infinite', false)
-  #dampingAttribute = new Attribute<number>(this, 'damping', 0.03)
-  #disabledAttribute = new Attribute<boolean>(this, 'disabled', false)
-  #hibernatedAttribute = new Attribute<boolean>(this, 'hibernated', false)
+  #infiniteProperty = new CSSProperty<boolean>(this, '--infinite', false)
+  #dampingProperty = new CSSProperty<number>(this, '--damping', 0.03)
+  #disabledProperty = new CSSProperty<boolean>(this, '--disabled', false)
+  #hibernatedProperty = new CSSProperty<boolean>(this, '--hibernated', false)
 
   #contentElement: HTMLElement = null!
   #slotElement: HTMLSlotElement = null!
@@ -200,7 +196,7 @@ export class ScrollElement extends CustomElement {
             class: 'content',
             children: [slot({ ref: (e) => (this.#slotElement = e) })],
             style: {
-              flexDirection: new Derived(this.#axisAttribute, (e) =>
+              flexDirection: new Derived(this.#axisProperty, (e) =>
                 e === 'x' ? 'row' : 'column'
               ),
             },
@@ -215,32 +211,34 @@ export class ScrollElement extends CustomElement {
       this.#keyboardControls = new KeyboardControls({ element: this })
       this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
 
-      this.#axisAttribute.subscribe(({ current }) => {
+      this.#axisProperty.subscribe(({ current }) => {
         this.#contentElement.style.flexDirection =
           current === 'x' ? 'row' : 'column'
 
-        this.#wheelControls.axis = this.#wheelMaxDeltaAttribute.current
+        this.#wheelControls.axis = this.#wheelMaxDeltaProperty.current
           ? 'max'
           : current
 
+        this.#keyboardControls.dimension = current === 'x' ? 'width' : 'height'
+
         if (this.isConnected) {
           this.#resizeListener()
         }
       })
 
-      this.#wheelMaxDeltaAttribute.subscribe((e) => {
+      this.#wheelMaxDeltaProperty.subscribe((e) => {
         this.#wheelControls.axis = e.current
           ? 'max'
-          : this.#axisAttribute.current
+          : this.#axisProperty.current
       })
 
-      this.#pagesAttribute.subscribe(() => {
+      this.#pagesProperty.subscribe(() => {
         if (this.isConnected) {
           this.#resizeListener()
         }
       })
 
-      this.#splitAttribute.subscribe(({ current }) => {
+      this.#splitProperty.subscribe(({ current }) => {
         if (this.isConnected) {
           if (current) {
             this.#split()
@@ -250,7 +248,7 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#sectionalAttribute.subscribe((e) => {
+      this.#sectionalProperty.subscribe((e) => {
         this.#counter.current = 0
         this.#wheelControls.debounce = e.current
         this.#damped.reset()
@@ -264,7 +262,7 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#infiniteAttribute.subscribe((e) => {
+      this.#infiniteProperty.subscribe((e) => {
         if (!e.current) {
           this.#overscroll = 0
           this.#damped.max = this.#scrollSize
@@ -272,7 +270,7 @@ export class ScrollElement extends CustomElement {
         } else {
           if (this.isConnected) {
             if (!this.#sections.length) {
-              this.#splitAttribute.current = true
+              this.#splitProperty.current = true
             }
           }
 
@@ -283,11 +281,11 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#dampingAttribute.subscribe((e) => {
+      this.#dampingProperty.subscribe((e) => {
         this.#damped.damping = e.current
       })
 
-      this.#disabledAttribute.subscribe((e) => {
+      this.#disabledProperty.subscribe((e) => {
         if (e.current && !e.previous) {
           this.#disable()
         } else if (!e.current && e.previous) {
@@ -295,7 +293,7 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#hibernatedAttribute.subscribe((e) => {
+      this.#hibernatedProperty.subscribe((e) => {
         if (e.current && !e.previous) {
           this.#hibernate()
         } else if (!e.current && e.previous) {
@@ -305,40 +303,40 @@ export class ScrollElement extends CustomElement {
     }
   }
 
-  public get dampingAttribute() {
-    return this.#dampingAttribute
+  public get dampingProperty() {
+    return this.#dampingProperty
   }
 
   public get axisAttibute() {
-    return this.#axisAttribute
+    return this.#axisProperty
   }
 
   public get pagesAttibute() {
-    return this.#pagesAttribute
+    return this.#pagesProperty
   }
 
   public get splitAttibute() {
-    return this.#splitAttribute
+    return this.#splitProperty
   }
 
   public get sectionalAttibute() {
-    return this.#sectionalAttribute
+    return this.#sectionalProperty
   }
 
-  public get infiniteAttribute() {
-    return this.#infiniteAttribute
+  public get infiniteProperty() {
+    return this.#infiniteProperty
   }
 
   public get dampingAttibute() {
-    return this.#dampingAttribute
+    return this.#dampingProperty
   }
 
   public get disabledAttibute() {
-    return this.#disabledAttribute
+    return this.#disabledProperty
   }
 
   public get hibernatedAttibute() {
-    return this.#hibernatedAttribute
+    return this.#hibernatedProperty
   }
 
   public get currentScrollValue() {
@@ -386,7 +384,7 @@ export class ScrollElement extends CustomElement {
   }
 
   public get vertical() {
-    return this.#axisAttribute.current === 'y'
+    return this.#axisProperty.current === 'y'
   }
 
   public get currentProgress() {
@@ -407,6 +405,14 @@ export class ScrollElement extends CustomElement {
 
   public get isRunning() {
     return this.#damped.isRunning
+  }
+
+  public override get scrollWidth(): number {
+    return this.#axisProperty.current === 'y' ? 0 : this.#damped.length
+  }
+
+  public override get scrollHeight(): number {
+    return this.#axisProperty.current === 'x' ? 0 : this.#damped.length
   }
 
   public onScroll(...parameters: Parameters<Damped['subscribe']>) {
@@ -459,7 +465,7 @@ export class ScrollElement extends CustomElement {
 
       const limit = this.#sections.length - 1
 
-      if (this.#infiniteAttribute.current) {
+      if (this.#infiniteProperty.current) {
         if (this.#counter.current === 0 && previousCounter === limit) {
           shiftValue =
             this.#scrollSize +
@@ -500,29 +506,29 @@ export class ScrollElement extends CustomElement {
   }
 
   protected connectedCallback() {
-    this.#axisAttribute.observe()
-    this.#pagesAttribute.observe()
-    this.#splitAttribute.observe()
-    this.#sectionalAttribute.observe()
-    this.#wheelMaxDeltaAttribute.observe()
-    this.#infiniteAttribute.observe()
-    this.#dampingAttribute.observe()
-    this.#disabledAttribute.observe()
-    this.#hibernatedAttribute.observe()
+    this.#axisProperty.observe()
+    this.#pagesProperty.observe()
+    this.#splitProperty.observe()
+    this.#sectionalProperty.observe()
+    this.#wheelMaxDeltaProperty.observe()
+    this.#infiniteProperty.observe()
+    this.#dampingProperty.observe()
+    this.#disabledProperty.observe()
+    this.#hibernatedProperty.observe()
 
     this.#awake()
   }
 
   protected disconnectedCallback() {
-    this.#axisAttribute.unobserve()
-    this.#pagesAttribute.unobserve()
-    this.#splitAttribute.unobserve()
-    this.#sectionalAttribute.unobserve()
-    this.#wheelMaxDeltaAttribute.unobserve()
-    this.#infiniteAttribute.unobserve()
-    this.#dampingAttribute.unobserve()
-    this.#disabledAttribute.unobserve()
-    this.#hibernatedAttribute.unobserve()
+    this.#axisProperty.unobserve()
+    this.#pagesProperty.unobserve()
+    this.#splitProperty.unobserve()
+    this.#sectionalProperty.unobserve()
+    this.#wheelMaxDeltaProperty.unobserve()
+    this.#infiniteProperty.unobserve()
+    this.#dampingProperty.unobserve()
+    this.#disabledProperty.unobserve()
+    this.#hibernatedProperty.unobserve()
 
     this.#hibernate()
   }
@@ -573,7 +579,7 @@ export class ScrollElement extends CustomElement {
 
     this.#contentElement.style.transform = ''
 
-    if (this.#splitAttribute.current) {
+    if (this.#splitProperty.current) {
       this.#unsplit()
     }
 
@@ -581,7 +587,7 @@ export class ScrollElement extends CustomElement {
   }
 
   #awake() {
-    if (this.#splitAttribute.current) {
+    if (this.#splitProperty.current) {
       this.#split()
     }
 
@@ -605,8 +611,8 @@ export class ScrollElement extends CustomElement {
 
     this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
 
-    if (this.#pagesAttribute.current) {
-      this.#scrollSize = this.#viewportSize * this.#pagesAttribute.current
+    if (this.#pagesProperty.current) {
+      this.#scrollSize = this.#viewportSize * this.#pagesProperty.current
       const contentSize = this.#scrollSize + this.#viewportSize
 
       if (this.vertical) {
@@ -631,7 +637,7 @@ export class ScrollElement extends CustomElement {
 
     this.#gap = cssUnitParser.parse(getComputedStyle(this.#contentElement).gap)
 
-    if (!this.#infiniteAttribute.current) {
+    if (!this.#infiniteProperty.current) {
       const cs = getComputedStyle(this)
 
       this.#scrollSize += this.vertical
@@ -646,7 +652,7 @@ export class ScrollElement extends CustomElement {
       section.transform()
     })
 
-    if (this.#infiniteAttribute.current && this.#sections.length) {
+    if (this.#infiniteProperty.current && this.#sections.length) {
       const lastSection = this.#sections[this.#sections.length - 1]
       const lastSectionMax =
         lastSection.position + lastSection.size - this.#viewportSize
@@ -657,7 +663,7 @@ export class ScrollElement extends CustomElement {
       this.#distance = this.#scrollSize
     }
 
-    if (this.#sectionalAttribute.current && this.#sections.length) {
+    if (this.#sectionalProperty.current && this.#sections.length) {
       const section = this.#sections[this.#counter.current]
       this.#damped.set(section.position, true)
     } else {
@@ -679,7 +685,6 @@ export class ScrollElement extends CustomElement {
         section.transform()
 
         if (
-          // this.targetScrollValue + this.viewportSize / 2 >=
           this.targetScrollValue + this.viewportSize / 2 >=
           section.position
         ) {
@@ -700,11 +705,11 @@ export class ScrollElement extends CustomElement {
       }
     }
 
-    scrollEntries.update(this, this.#axisAttribute.current, currentScrollValue)
+    scrollEntries.update(this, this.#axisProperty.current, currentScrollValue)
   }
 
   #setCounter(value: number) {
-    if (this.#infiniteAttribute.current) {
+    if (this.#infiniteProperty.current) {
       this.#counter.current = value % this.#sections.length
       this.#counter.current =
         this.#counter.current < 0
@@ -715,28 +720,22 @@ export class ScrollElement extends CustomElement {
     }
   }
 
-  #controlsListener = (value: ControlsValue) => {
-    if (typeof value === 'number') {
-      if (this.#sectionalAttribute.current) {
-        const direction = Math.sign(value)
+  #controlsListener = (value: number) => {
+    if (this.#sectionalProperty.current) {
+      const direction = Math.sign(value)
 
-        if (this.#sections.length) {
-          this.shiftSections(direction)
-        } else {
-          this.#damped.shift(direction * this.#viewportSize)
-        }
+      if (this.#sections.length) {
+        this.shiftSections(direction)
       } else {
-        this.#damped.shift(value)
+        this.#damped.shift(direction * this.#viewportSize)
       }
-    } else if (value === 'min') {
-      this.#damped.set(this.#damped.min)
-    } else if (value === 'max') {
-      this.#damped.set(this.#damped.length)
+    } else {
+      this.#damped.shift(value)
     }
   }
 
   #getScrollValue(type: 'target' | 'current' = 'current') {
-    if (this.#infiniteAttribute.current && this.#sections.length) {
+    if (this.#infiniteProperty.current && this.#sections.length) {
       const mod =
         this.#damped[type] % (this.#scrollSize + this.#viewportSize + this.#gap)
 

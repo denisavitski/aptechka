@@ -84,6 +84,7 @@ export interface StoreOptions<
   validate?: StoreMiddleware<StoreType>
   skipSubscribeNotification?: boolean
   notifyAndClose?: boolean
+  invisible?: boolean
 }
 
 export class Store<
@@ -100,6 +101,7 @@ export class Store<
   #skipSubscribeNotification: boolean
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
   #notifyAndClose: boolean
+  #invisible: boolean
 
   constructor(
     value: StoreType,
@@ -120,6 +122,7 @@ export class Store<
     }
 
     this.#notifyAndClose = options?.notifyAndClose || false
+    this.#invisible = options?.invisible || false
 
     this.#skipSubscribeNotification =
       options?.skipSubscribeNotification || false
@@ -192,7 +195,7 @@ export class Store<
   }
 
   public subscribe(callback: StoreCallback<Entry>) {
-    if (this.#passport && !this.#callbacks.size) {
+    if (!this.#invisible && !this.#callbacks.size) {
       shareStore(this)
     }
 
@@ -210,7 +213,7 @@ export class Store<
   public unsubscribe(callback: StoreCallback<Entry>) {
     this.#callbacks.delete(callback)
 
-    if (this.#passport && !this.#callbacks.size) {
+    if (!this.#callbacks.size) {
       unshareStore(this)
     }
   }
@@ -222,9 +225,7 @@ export class Store<
   public close() {
     this.#callbacks.clear()
 
-    if (this.#passport) {
-      unshareStore(this)
-    }
+    unshareStore(this)
   }
 
   #notify() {
@@ -234,7 +235,9 @@ export class Store<
   }
 }
 
-export const activeStores = new Store<Array<Store<any, any, any>>>([])
+export const activeStores = new Store<Array<Store<any, any, any>>>([], {
+  invisible: true,
+})
 
 function shareStore(store: Store<any, any, any>) {
   if (!activeStores.current.includes(store)) {

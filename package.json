@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -53,15 +53,30 @@
       "default": "./lib/controls/index.js",
       "types": "./lib/controls/index.d.ts"
     },
+    "./css-property": {
+      "require": "./lib/css-property/index.cjs",
+      "default": "./lib/css-property/index.js",
+      "types": "./lib/css-property/index.d.ts"
+    },
     "./css-unit-parser": {
       "require": "./lib/css-unit-parser/index.cjs",
       "default": "./lib/css-unit-parser/index.js",
       "types": "./lib/css-unit-parser/index.d.ts"
     },
+    "./css-value-parser": {
+      "require": "./lib/css-value-parser/index.cjs",
+      "default": "./lib/css-value-parser/index.js",
+      "types": "./lib/css-value-parser/index.d.ts"
+    },
     "./custom-element": {
       "require": "./lib/custom-element/index.cjs",
       "default": "./lib/custom-element/index.js",
       "types": "./lib/custom-element/index.d.ts"
+    },
+    "./dev": {
+      "require": "./lib/dev/index.cjs",
+      "default": "./lib/dev/index.js",
+      "types": "./lib/dev/index.d.ts"
     },
     "./device": {
       "require": "./lib/device/index.cjs",
@@ -232,11 +247,20 @@
       "controls": [
         "lib/controls/index.d.ts"
       ],
+      "css-property-parser": [
+        "lib/css-property-parser/index.d.ts"
+      ],
       "css-unit-parser": [
         "lib/css-unit-parser/index.d.ts"
       ],
+      "css-value-parser": [
+        "lib/css-value-parser/index.d.ts"
+      ],
       "custom-element": [
         "lib/custom-element/index.d.ts"
+      ],
+      "dev": [
+        "lib/dev/index.d.ts"
       ],
       "device": [
         "lib/device/index.d.ts"

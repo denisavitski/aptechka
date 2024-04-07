@@ -28,10 +28,15 @@ export function buildConfig() {
           'canvas/index': './src/components/packages/canvas/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',
           'controls/index': './src/components/packages/controls/index.ts',
+          'css-property/index':
+            './src/components/packages/css-property/index.ts',
           'css-unit-parser/index':
             './src/components/packages/css-unit-parser/index.ts',
+          'css-value-parser/index':
+            './src/components/packages/css-value-parser/index.ts',
           'custom-element/index':
             './src/components/packages/custom-element/index.ts',
+          'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
           'element-constructor/index':
             './src/components/packages/element-constructor/index.ts',

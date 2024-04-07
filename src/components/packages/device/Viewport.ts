@@ -25,9 +25,7 @@ class Viewport {
   #width = 0
   #height = 0
   #pixelRatio = 0
-  #store_type = new Store<keyof typeof ViewportBreakpoints | undefined>(
-    undefined
-  )
+  #type = new Store<keyof typeof ViewportBreakpoints | undefined>(undefined)
 
   constructor() {
     if (isBrowser) {
@@ -37,13 +35,13 @@ class Viewport {
         this.#pixelRatio = devicePixelRatio
 
         if (matchMedia(ViewportMediaRules['<=mobile']).matches) {
-          this.#store_type.current = 'mobile'
+          this.#type.current = 'mobile'
         } else if (matchMedia(ViewportMediaRules['<=tablet']).matches) {
-          this.#store_type.current = 'tablet'
+          this.#type.current = 'tablet'
         } else if (matchMedia(ViewportMediaRules['<=notebook']).matches) {
-          this.#store_type.current = 'notebook'
+          this.#type.current = 'notebook'
         } else if (matchMedia(ViewportMediaRules['>=desktop']).matches) {
-          this.#store_type.current = 'desktop'
+          this.#type.current = 'desktop'
         }
       }, RESIZE_ORDER.DEVICE)
     }
@@ -57,8 +55,8 @@ class Viewport {
     return this.#height
   }
 
-  public get store_type() {
-    return this.#store_type
+  public get type() {
+    return this.#type
   }
 
   public get pixelRatio() {

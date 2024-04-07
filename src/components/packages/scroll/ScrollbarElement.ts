@@ -4,12 +4,13 @@ import { windowResizer } from '@packages/window-resizer'
 import { isBrowser } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
+import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   ':host': {
     display: 'inline-block',
     zIndex: '1',
-    backgroundColor: '#efefef',
+    backgroundColor: aptechkaTheme.colorLight.var,
   },
 
   ':host([axis="y"])': {
@@ -29,7 +30,7 @@ const stylesheet = createStylesheet({
   },
 
   '.default-thumb': {
-    backgroundColor: '#181818',
+    backgroundColor: aptechkaTheme.colorDark.var,
     borderRadius: '1vmin',
     touchAction: 'none',
   },
@@ -58,6 +59,7 @@ export class ScrollbarElement extends ScrollUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
+        slot: 'static',
         children: [slot({ ref: (e) => (this.#slotElement = e) })],
       })
     }

@@ -56,14 +56,18 @@ class StoreRegistry {
       }
 
       activeStores.current.forEach((store) => {
-        this.updateStore(store)
+        if (store.passport) {
+          this.updateStore(store)
+        }
       })
     }
   }
 
   public resetState() {
     activeStores.current.forEach((store) => {
-      store.reset()
+      if (store.passport) {
+        store.reset()
+      }
     })
 
     this.saveState()
