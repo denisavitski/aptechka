@@ -1,11 +1,11 @@
-import { CustomElement } from '@packages/custom-element'
+import { isBrowser } from '@packages/utils'
+import { ScrollUserElement } from './ScrollUserElement'
 import {
   button,
   createStylesheet,
   element,
   slot,
 } from '@packages/element-constructor'
-import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   button: {
@@ -13,7 +13,7 @@ const stylesheet = createStylesheet({
   },
 })
 
-export abstract class AbstractButtonElement extends CustomElement {
+export abstract class ScrollButtonElement extends ScrollUserElement {
   constructor() {
     super()
 
@@ -24,7 +24,7 @@ export abstract class AbstractButtonElement extends CustomElement {
         children: [
           button({
             onClick: () => {
-              this.click()
+              this.handleClick()
             },
             children: [slot()],
           }),
@@ -33,5 +33,5 @@ export abstract class AbstractButtonElement extends CustomElement {
     }
   }
 
-  public abstract override click(): void
+  protected abstract handleClick(): void
 }

@@ -219,12 +219,14 @@ export class TweakerElement extends TweakerFolderElement {
 
   #storesChangeListener = debounce(() => {
     activeStores.current.forEach((store) => {
-      const sname = store.passport!.name.split('.')
+      if (store.passport) {
+        const sname = store.passport.name.split('.')
 
-      this.handleStore({
-        store: store,
-        remainingFolders: sname.length > 1 ? sname.slice(0, -1) : [],
-      })
+        this.handleStore({
+          store: store,
+          remainingFolders: sname.length > 1 ? sname.slice(0, -1) : [],
+        })
+      }
     })
   }, 10)
 }

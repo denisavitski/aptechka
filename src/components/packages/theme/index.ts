@@ -15,6 +15,7 @@ export const aptechkaTheme = createTheme(
     heightInput: '30px',
 
     borderRadius: '12px',
+    borderRadiusSmall: '4px',
 
     gapLarge: '16px',
     gapMedium: '12px',

@@ -1,6 +1,11 @@
 import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
-import { createStylesheet, element, slot } from '@packages/element-constructor'
+import {
+  button,
+  createStylesheet,
+  element,
+  slot,
+} from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
 import { isBrowser } from '@packages/utils'
 
@@ -10,6 +15,10 @@ const stylesheet = createStylesheet({
     height: aptechkaTheme.heightInput.var,
     display: 'inline-flex',
     alignItems: 'center',
+  },
+
+  button: {
+    all: 'inherit',
   },
 })
 
@@ -22,16 +31,14 @@ export class SelectOptionElement extends SelectUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        tabIndex: '0',
-        onClick: () => {
-          this.#pick()
-        },
-        onKeydown: (e) => {
-          if (e.code === 'Space') {
-            this.#pick()
-          }
-        },
-        children: [slot()],
+        children: [
+          button({
+            onClick: () => {
+              this.#pick()
+            },
+            children: slot(),
+          }),
+        ],
       })
     }
   }

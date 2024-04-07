@@ -351,6 +351,10 @@ export class ScrollElement extends CustomElement {
     return this.#contentElement
   }
 
+  public get sections() {
+    return this.#sections
+  }
+
   public get position() {
     return this.#position
   }
@@ -487,15 +491,12 @@ export class ScrollElement extends CustomElement {
     }
   }
 
-  public shiftSections(
-    direction: number,
-    behaviour: ScrollBehaviour = 'smooth'
-  ) {
+  public shiftSections(step: number, behaviour: ScrollBehaviour = 'smooth') {
     if (!this.#sections.length) {
       return
     }
 
-    this.scrollToSection(this.#counter.current + direction, behaviour)
+    this.scrollToSection(this.#counter.current + step, behaviour)
   }
 
   public setPosition(
@@ -544,6 +545,12 @@ export class ScrollElement extends CustomElement {
 
     this.#contentElement.style.transform = ''
 
+    this.dispatchEvent(
+      new CustomEvent('sectionsChange', {
+        composed: true,
+      })
+    )
+
     this.#resizeListener()
   }
 
@@ -553,6 +560,12 @@ export class ScrollElement extends CustomElement {
     })
 
     this.#sections = []
+
+    this.dispatchEvent(
+      new CustomEvent('sectionsChange', {
+        composed: true,
+      })
+    )
   }
 
   #disable() {
@@ -752,5 +765,9 @@ export class ScrollElement extends CustomElement {
 declare global {
   interface HTMLElementTagNameMap {
     'e-scroll': ScrollElement
+  }
+
+  interface HTMLElementEventMap {
+    sectionsChange: CustomEvent
   }
 }

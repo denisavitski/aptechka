@@ -4,7 +4,8 @@
 
   --gap: 10vw;
   --damping: 0.01;
-  --pages: 4;
+  --sectional: true;
+  --infinite: true;
 }
 
 .main-slide {
@@ -12,6 +13,24 @@
   height: 100vh;
 
   background-color: tomato;
+}
+
+e-scroll-bullet-buttons {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+e-scroll-bullet-buttons button {
+  width: 10px;
+  height: 10px;
+  background-color: black;
+}
+
+e-scroll-bullet-buttons button.current {
+  background-color: green;
 }
 
 @media (max-width: 1024px) {

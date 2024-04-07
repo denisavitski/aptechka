@@ -1,2 +1,5 @@
 export { ScrollElement } from './ScrollElement'
 export { ScrollbarElement } from './ScrollbarElement'
+export { ScrollSetButtonElement } from './ScrollSetButtonElement'
+export { ScrollStepButtonElement } from './ScrollStepButtonElement'
+export { ScrollBulletButtonsElement } from './ScrollBulletButtonsElement'

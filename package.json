@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -18,11 +18,6 @@
   ],
   "type": "module",
   "exports": {
-    "./abstract-elements": {
-      "require": "./lib/abstract-elements/index.cjs",
-      "default": "./lib/abstract-elements/index.js",
-      "types": "./lib/abstract-elements/index.d.ts"
-    },
     "./accordion": {
       "require": "./lib/accordion/index.cjs",
       "default": "./lib/accordion/index.js",
@@ -42,6 +37,11 @@
       "require": "./lib/canvas/index.cjs",
       "default": "./lib/canvas/index.js",
       "types": "./lib/canvas/index.d.ts"
+    },
+    "./checkbox": {
+      "require": "./lib/checkbox/index.cjs",
+      "default": "./lib/checkbox/index.js",
+      "types": "./lib/checkbox/index.d.ts"
     },
     "./connector": {
       "require": "./lib/connector/index.cjs",
@@ -237,6 +237,9 @@
       ],
       "canvas": [
         "lib/canvas/index.d.ts"
+      ],
+      "checkbox": [
+        "lib/checkbox/index.d.ts"
       ],
       "component": [
         "lib/component/index.d.ts"

@@ -3,7 +3,12 @@ import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { isBrowser } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
-import { createStylesheet, element, slot } from '@packages/element-constructor'
+import {
+  createStylesheet,
+  div,
+  element,
+  slot,
+} from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
@@ -60,7 +65,12 @@ export class ScrollbarElement extends ScrollUserElement {
 
       element(this, {
         slot: 'static',
-        children: [slot({ ref: (e) => (this.#slotElement = e) })],
+        children: [
+          slot({
+            ref: (e) => (this.#slotElement = e),
+            children: div({ class: 'default-thumb' }),
+          }),
+        ],
       })
     }
   }
@@ -72,15 +82,10 @@ export class ScrollbarElement extends ScrollUserElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
-    const slottedThumb = this.#slotElement.assignedElements()[0]
+    const slottedThumb = (this.#slotElement.assignedElements()[0] ||
+      this.#slotElement.firstElementChild) as HTMLElement
 
-    if (slottedThumb instanceof HTMLElement) {
-      this.#thumbElement = slottedThumb
-    } else {
-      this.#thumbElement = document.createElement('div')
-      this.#thumbElement.classList.add('default-thumb')
-      this.shadowRoot!.appendChild(this.#thumbElement)
-    }
+    this.#thumbElement = slottedThumb
 
     this.#thumbElement.addEventListener('pointerdown', this.#grabListener)
 

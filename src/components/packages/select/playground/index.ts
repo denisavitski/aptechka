@@ -4,7 +4,7 @@ const node = element('div', {
   children: element('e-select', {
     lightChildren: [
       element('e-select-head', {
-        children: [
+        lightChildren: [
           span({
             'data-value-holder': '',
           }),

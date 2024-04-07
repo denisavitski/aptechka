@@ -1,3 +1,4 @@
+import '@packages/checkbox'
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'
@@ -34,8 +35,7 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
 
     element(this, {
       children: [
-        input({
-          type: 'checkbox',
+        element('e-checkbox', {
           onChange: (e) => {
             this.updateStores((e.currentTarget as HTMLInputElement).checked)
           },
