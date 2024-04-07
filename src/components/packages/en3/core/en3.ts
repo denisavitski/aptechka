@@ -14,7 +14,7 @@ import {
   WebGLRendererParameters,
 } from 'three'
 import { dispose } from '../utils/dispose'
-import { En3Raycaster } from '..'
+import { En3Raycaster } from './En3Raycaster'
 
 export type En3AttachedObject3D<T extends Object3D> = T & {
   userData: {

@@ -35,6 +35,7 @@ export {
 export { dispatchSizeChangeEvent } from './events'
 export { createJSONAndSave } from './file'
 export { debounce, throttle } from './function'
+export { setupDrag } from './gestures'
 export {
   getCumulativePosition,
   getCumulativeOffsetLeft,

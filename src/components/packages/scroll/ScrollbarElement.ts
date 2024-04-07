@@ -1,7 +1,7 @@
 import { define } from '@packages/custom-element'
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
-import { isBrowser } from '@packages/utils'
+import { isBrowser, setupDrag } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
 import {
   createStylesheet,
@@ -152,24 +152,14 @@ export class ScrollbarElement extends ScrollUserElement {
   }
 
   #grabListener = (grabEvent: PointerEvent) => {
-    const move = (moveEvent: PointerEvent) => {
+    setupDrag((moveEvent: PointerEvent) => {
       const moveCursor = this.#isHorisontal ? moveEvent.x : moveEvent.y
 
       const mult = this.scrollElement.distance / this.#thumbScrollSize
       const delta = (moveCursor - grabCursor) * mult
 
       this.scrollElement.setPosition(startValue + delta)
-    }
-
-    const drop = () => {
-      removeEventListener('pointermove', move)
-      removeEventListener('pointerup', drop)
-      removeEventListener('touchend', drop)
-    }
-
-    addEventListener('pointermove', move)
-    addEventListener('pointerup', drop)
-    addEventListener('touchend', drop)
+    })
 
     const startValue = this.scrollElement.targetScrollValue
     const grabCursor = this.#isHorisontal ? grabEvent.x : grabEvent.y
