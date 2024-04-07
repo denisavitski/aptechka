@@ -1,9 +1,10 @@
 import { Axes2D } from '@packages/utils'
 import { getAllParentElements } from '@packages/utils/dom'
 
-interface ScrollEntry {
+export interface ScrollEntry {
   axis: Axes2D
   value: number
+  element: HTMLElement
 }
 
 class ScrollEntries {
@@ -14,7 +15,9 @@ class ScrollEntries {
     this.#entires.set(element, {
       axis: 'y',
       value: 0,
+      element,
     })
+
     this.#elements.add(element)
   }
 
@@ -35,26 +38,6 @@ class ScrollEntries {
 
   public getEntry(element: HTMLElement) {
     return this.#entires.get(element)!
-  }
-
-  public getClosest(element: HTMLElement): ScrollEntry | null {
-    let parent = element.parentElement
-
-    while (parent && !this.hasEntry(parent)) {
-      parent = parent.parentElement
-    }
-
-    if (parent && parent !== element) {
-      const entry = this.getEntry(parent)
-
-      if (entry) {
-        return entry
-      } else {
-        return this.getClosest(parent)
-      }
-    }
-
-    return null
   }
 
   public getAll(element: HTMLElement) {

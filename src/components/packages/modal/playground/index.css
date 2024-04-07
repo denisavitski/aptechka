@@ -1,9 +1,4 @@
-.y {
-  width: 50vw;
-  height: 50vh;
-
-  background-color: var(--aptechka-color-light);
-  border-radius: var(--aptechka-border-radius);
+#x {
 }
 
 e-popover-button {
@@ -15,4 +10,8 @@ e-popover-button {
   height: 50vh;
 
   background-color: lightblue;
+}
+
+.opened .content {
+  transform: translateY(0);
 }

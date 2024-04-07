@@ -1,23 +1,14 @@
-import { element, span } from '@packages/element-constructor'
+import '..'
 
-const node = element('div', {
-  children: element('e-select', {
-    lightChildren: [
-      element('e-select-head', {
-        lightChildren: [
-          span({
-            'data-value-holder': '',
-          }),
-        ],
-      }),
-      ...[1, 2, 3].map((v, i) =>
-        element('e-select-option', {
-          lightChildren: v,
-          default: i === 0 ? true : null,
-        })
-      ),
-    ],
-  }),
+const form = document.querySelector('form')!
+
+form.addEventListener('submit', (e) => {
+  e.preventDefault()
+
+  const formData = new FormData(form)
+
+  // Display the key/value pairs
+  for (var pair of formData.entries()) {
+    console.log(pair[0] + ', ' + pair[1])
+  }
 })
-
-document.body.appendChild(node.node)

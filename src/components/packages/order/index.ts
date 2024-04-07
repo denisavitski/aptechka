@@ -4,6 +4,7 @@ export enum RESIZE_ORDER {
   MEDIA,
   SOURCE_MANAGER,
   SCROLL,
+  SEGMENT,
   LAYOUT_BOX,
   EN3 = 100000,
 }

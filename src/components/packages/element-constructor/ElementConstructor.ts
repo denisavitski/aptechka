@@ -144,7 +144,7 @@ export class ElementConstructor<
     ? ElementConstructorTagNameMap[T]
     : Node
 > {
-  #node: N
+  #node: N = null!
   #connectCallbacks: Set<Function> = new Set()
   #disconnectCallbacks: Set<Function> = new Set()
   #connectorUnsubscribeCallback: (() => void) | undefined
@@ -161,12 +161,14 @@ export class ElementConstructor<
   constructor(value: string, object?: ElementConstructorTagObject<T>)
   constructor(value: Node, object?: ElementConstructorTagObject<T>)
   constructor(...args: any[]) {
-    const p1 = args[0] as T
-    const p2 = args[1] as ElementConstructorTagObject<T> | undefined
+    if (isBrowser) {
+      const p1 = args[0] as T
+      const p2 = args[1] as ElementConstructorTagObject<T> | undefined
 
-    this.#node = this.#createNode(p1, p2?.forceSvg)
+      this.#node = this.#createNode(p1, p2?.forceSvg)
 
-    this.#applyProperties(p2)
+      this.#applyProperties(p2)
+    }
   }
 
   public get node() {

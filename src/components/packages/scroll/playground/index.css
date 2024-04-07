@@ -3,13 +3,17 @@
   height: 100%;
 
   --gap: 10vw;
-  --damping: 0.01;
+  --damping: 0.007;
   --infinite: true;
 }
 
 .main-slide {
   width: 100vw;
   height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   background-color: tomato;
 }
@@ -30,6 +34,20 @@ e-scroll-bullet-buttons button {
 
 e-scroll-bullet-buttons button.current {
   background-color: green;
+}
+
+#se {
+  width: 10vmin;
+  height: 10vmin;
+  background-color: lightblue;
+
+  --start-offset: -50vh;
+  --distance-offset: 20vh;
+  --smootherstep: true;
+  --progress-var: progress;
+  --captured: captured;
+
+  transform: rotate(calc(var(--progress) * 360deg));
 }
 
 @media (max-width: 1024px) {

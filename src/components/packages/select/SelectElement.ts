@@ -125,6 +125,8 @@ export class SelectElement extends CustomElement {
         composed: true,
       })
     )
+
+    this.#internals.setFormValue(this.#value)
   }
 
   public get internals() {
