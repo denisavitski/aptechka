@@ -22,6 +22,6 @@ export class LinearControls extends Controls {
   }
 
   #animationFrameCallback: TickerCallback = (e) => {
-    this.changeEvent.notify(e.elapsed * this.speed)
+    this.changeEvent.notify('linear', e.elapsed * this.speed)
   }
 }

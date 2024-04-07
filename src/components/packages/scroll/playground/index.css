@@ -3,8 +3,8 @@
   height: 100%;
 
   --gap: 10vw;
-  --damping: 0.007;
-  --infinite: true;
+  --damping: 0.01;
+  --mouse-drag: true;
 }
 
 .main-slide {
@@ -48,10 +48,4 @@ e-scroll-bullet-buttons button.current {
   --captured: captured;
 
   transform: rotate(calc(var(--progress) * 360deg));
-}
-
-@media (max-width: 1024px) {
-  .main-scroll {
-    --disabled: true;
-  }
 }

@@ -1,5 +1,9 @@
 import { Damped } from '@packages/animation'
-import { WheelControls, KeyboardControls } from '@packages/controls'
+import {
+  WheelControls,
+  KeyboardControls,
+  DragControls,
+} from '@packages/controls'
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
@@ -20,6 +24,7 @@ import {
 } from '@packages/element-constructor'
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
+import { device } from '@packages/device'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
@@ -152,6 +157,7 @@ export class ScrollElement extends CustomElement {
   )
   #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 0.03)
+  #mouseDragCSSProperty = new CSSProperty<boolean>(this, '--mouse-drag', false)
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
 
@@ -167,11 +173,15 @@ export class ScrollElement extends CustomElement {
 
   #wheelControls: WheelControls = null!
   #keyboardControls: KeyboardControls = null!
+  #dragControls: DragControls = null!
 
   #counter = new Store(0)
 
   #overscroll = 0
   #distance = 0
+
+  #disabled = true
+  #hibernated = true
 
   constructor() {
     super()
@@ -211,6 +221,9 @@ export class ScrollElement extends CustomElement {
       this.#keyboardControls = new KeyboardControls({ element: this })
       this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
 
+      this.#dragControls = new DragControls({ element: this })
+      this.#dragControls.changeEvent.subscribe(this.#controlsListener)
+
       this.#axisCSSProperty.subscribe(({ current }) => {
         this.#contentElement.style.flexDirection =
           current === 'x' ? 'row' : 'column'
@@ -220,6 +233,14 @@ export class ScrollElement extends CustomElement {
           : current
 
         this.#keyboardControls.dimension = current === 'x' ? 'width' : 'height'
+
+        this.#dragControls.axis = current
+
+        if (current === 'x') {
+          this.style.touchAction = 'pan-y'
+        } else if (current === 'y') {
+          this.style.touchAction = 'pan-x'
+        }
 
         if (this.isConnected) {
           this.#resizeListener()
@@ -251,6 +272,7 @@ export class ScrollElement extends CustomElement {
       this.#sectionalCSSProperty.subscribe((e) => {
         this.#counter.current = 0
         this.#wheelControls.debounce = e.current
+        this.#dragControls.swipe = e.current
         this.#damped.reset()
 
         if (this.isConnected) {
@@ -305,6 +327,10 @@ export class ScrollElement extends CustomElement {
 
   public get dampingCSSProperty() {
     return this.#dampingCSSProperty
+  }
+
+  public get mouseDragCSSProperty() {
+    return this.#mouseDragCSSProperty
   }
 
   public get axisAttibute() {
@@ -383,6 +409,12 @@ export class ScrollElement extends CustomElement {
     return this.#distance
   }
 
+  public get infiniteDistance() {
+    return this.#infiniteCSSProperty.current
+      ? this.#distance + this.#gap
+      : this.#distance
+  }
+
   public get overscroll() {
     return this.#overscroll
   }
@@ -392,11 +424,11 @@ export class ScrollElement extends CustomElement {
   }
 
   public get currentProgress() {
-    return this.currentScrollValue / (this.#distance + this.#gap) || 0
+    return this.currentScrollValue / this.infiniteDistance || 0
   }
 
   public get targetProgress() {
-    return this.targetScrollValue / (this.#distance + this.#gap) || 0
+    return this.targetScrollValue / this.infiniteDistance || 0
   }
 
   public get speed() {
@@ -514,6 +546,7 @@ export class ScrollElement extends CustomElement {
     this.#wheelMaxDeltaCSSProperty.observe()
     this.#infiniteCSSProperty.observe()
     this.#dampingCSSProperty.observe()
+    this.#mouseDragCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -528,6 +561,7 @@ export class ScrollElement extends CustomElement {
     this.#wheelMaxDeltaCSSProperty.unobserve()
     this.#infiniteCSSProperty.unobserve()
     this.#dampingCSSProperty.unobserve()
+    this.#mouseDragCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
@@ -569,46 +603,62 @@ export class ScrollElement extends CustomElement {
   }
 
   #disable() {
-    this.#damped.unsubscribe(this.#animatedChangeListener)
-    this.#damped.stopAnimation()
+    if (!this.#disabled) {
+      this.#disabled = true
+      this.#damped.unsubscribe(this.#animatedChangeListener)
+      this.#damped.stopAnimation()
 
-    this.#wheelControls.disconnect()
-    this.#keyboardControls.disconnect()
+      this.#wheelControls.disconnect()
+      this.#keyboardControls.disconnect()
+      this.#dragControls.disconnect()
+    }
   }
 
   #enable() {
-    this.#damped.subscribe(this.#animatedChangeListener)
+    if (this.#disabled) {
+      this.#disabled = false
+      this.#damped.subscribe(this.#animatedChangeListener)
 
-    this.#wheelControls.connect()
-    this.#keyboardControls.connect()
+      this.#wheelControls.connect()
+      this.#keyboardControls.connect()
+      this.#dragControls.connect()
+    }
   }
 
   #hibernate() {
-    windowResizer.unsubscribe(this.#resizeListener)
+    if (!this.#hibernated) {
+      this.#hibernated = true
 
-    this.#damped.reset()
+      windowResizer.unsubscribe(this.#resizeListener)
 
-    this.#disable()
+      this.#damped.reset()
 
-    this.#contentElement.style.transform = ''
+      this.#disable()
 
-    if (this.#splitCSSProperty.current) {
-      this.#unsplit()
+      this.#contentElement.style.transform = ''
+
+      if (this.#splitCSSProperty.current) {
+        this.#unsplit()
+      }
+
+      scrollEntries.unregister(this)
     }
-
-    scrollEntries.unregister(this)
   }
 
   #awake() {
-    if (this.#splitCSSProperty.current) {
-      this.#split()
+    if (this.#hibernated) {
+      this.#hibernated = false
+
+      if (this.#splitCSSProperty.current) {
+        this.#split()
+      }
+
+      scrollEntries.register(this)
+
+      windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
+
+      this.#enable()
     }
-
-    scrollEntries.register(this)
-
-    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
-
-    this.#enable()
   }
 
   #resizeListener = () => {
@@ -746,7 +796,15 @@ export class ScrollElement extends CustomElement {
     }
   }
 
-  #controlsListener = (value: number) => {
+  #controlsListener = (type: string, value: number) => {
+    if (
+      type === 'drag' &&
+      !device.isMobile &&
+      !this.#mouseDragCSSProperty.current
+    ) {
+      return
+    }
+
     if (this.#sectionalCSSProperty.current) {
       const direction = Math.sign(value)
 

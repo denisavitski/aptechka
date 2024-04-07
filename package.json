@@ -355,7 +355,7 @@
     }
   },
   "scripts": {
-    "dev": "vite --mode site",
+    "dev": "vite --host --mode site",
     "build:lib": "tsc && vite build --mode lib",
     "build:site": "tsc && vite build --mode site",
     "preview": "vite preview"

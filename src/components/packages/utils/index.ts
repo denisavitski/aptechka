@@ -74,6 +74,7 @@ export {
   capitalize,
   uncapitalize,
   generateId,
+  isUppercase,
 } from './string'
 export {
   getElementTransitionDurationMS,

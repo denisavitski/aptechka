@@ -17,7 +17,7 @@ export class WheelControls extends Controls {
 
   #element: HTMLElement | Window = null!
 
-  #timeout: ReturnType<typeof setTimeout> | undefined
+  #timeoutId: ReturnType<typeof setTimeout> | undefined
   #prevEventDate: number
 
   constructor(options?: WheelControlsOptions) {
@@ -54,6 +54,7 @@ export class WheelControls extends Controls {
         'wheel',
         this.#wheelListener as EventListener
       )
+      clearTimeout(this.#timeoutId)
     }
   }
 
@@ -92,17 +93,17 @@ export class WheelControls extends Controls {
         return
       }
 
-      if (this.#timeout) {
+      if (this.#timeoutId) {
         return
       }
 
-      this.changeEvent.notify(delta)
+      this.changeEvent.notify('wheel', delta)
 
-      this.#timeout = setTimeout(() => {
-        this.#timeout = undefined
+      this.#timeoutId = setTimeout(() => {
+        this.#timeoutId = undefined
       }, 80)
     } else {
-      this.changeEvent.notify(delta)
+      this.changeEvent.notify('wheel', delta)
     }
   }
 }

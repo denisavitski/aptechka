@@ -80,3 +80,7 @@ export function generateId(
 
   return generatedKey
 }
+
+export function isUppercase(string: string) {
+  return /^\p{Lu}/u.test(string)
+}
