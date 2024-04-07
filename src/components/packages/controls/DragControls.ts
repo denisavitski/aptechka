@@ -16,6 +16,8 @@ export interface DragControlsOptions {
 }
 
 export class DragControls extends Controls {
+  static #currentElement: HTMLElement | null = null
+
   public axis: Axes2D
   public swipe: boolean
 
@@ -53,6 +55,16 @@ export class DragControls extends Controls {
   }
 
   #pointerdownListener = (grabEvent: PointerEvent) => {
+    if (
+      grabEvent
+        .composedPath()
+        .find(
+          (p) => p instanceof HTMLElement && p.hasAttribute('drag-dead-zone')
+        )
+    ) {
+      return
+    }
+
     if (!this.swipe) {
       ticker.unsubscribe(this.#tickListener)
     }
@@ -62,7 +74,11 @@ export class DragControls extends Controls {
 
     setupDrag(
       (moveEvent) => {
-        if (this.#swiped) {
+        if (
+          this.#swiped ||
+          (DragControls.#currentElement &&
+            DragControls.#currentElement !== this.#element)
+        ) {
           return
         }
 
@@ -70,20 +86,31 @@ export class DragControls extends Controls {
           this.#swiped = true
         }
 
+        const dx = prev.x - moveEvent.x
+        const dy = prev.y - moveEvent.y
+
         if (this.axis === 'x') {
-          this.#delta = prev.x - moveEvent.x
+          this.#delta = dx
         } else {
-          this.#delta = prev.y - moveEvent.y
+          this.#delta = dy
         }
 
         prev = moveEvent
 
         this.changeEvent.notify('drag', this.#delta)
+
+        if (
+          (this.axis === 'x' && Math.abs(dx) > Math.abs(dy)) ||
+          (this.axis === 'y' && Math.abs(dx) < Math.abs(dy))
+        ) {
+          DragControls.#currentElement = this.#element
+        }
       },
       () => {
-        this.#delta = this.#delta * 3
+        DragControls.#currentElement = null
 
         if (!this.swipe) {
+          this.#delta = this.#delta * 3
           ticker.subscribe(this.#tickListener, { order: TICK_ORDER.SCROLL - 1 })
         }
 

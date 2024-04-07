@@ -65,6 +65,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
       element(this, {
         slot: 'static',
+        'drag-dead-zone': '',
         children: [
           slot({
             ref: (e) => (this.#slotElement = e),

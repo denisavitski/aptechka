@@ -5,7 +5,6 @@
   --gap: 10vw;
   --damping: 0.01;
   --mouse-drag: true;
-  --sectional: true;
 }
 
 .main-slide {
@@ -19,34 +18,25 @@
   background-color: tomato;
 }
 
-e-scroll-bullet-buttons {
-  position: absolute;
-  z-index: 1;
+.second-scroll {
+  width: 90%;
+  height: 60%;
+
+  --axis: x;
+  --gap: 10vw;
+  --damping: 0.01;
+  --mouse-drag: true;
+
+  overflow: hidden;
+}
+
+.second-slide {
+  width: 90vw;
+  height: 60dvh;
+
   display: flex;
   align-items: center;
-  gap: 10px;
-}
+  justify-content: center;
 
-e-scroll-bullet-buttons button {
-  width: 10px;
-  height: 10px;
-  background-color: black;
-}
-
-e-scroll-bullet-buttons button.current {
-  background-color: green;
-}
-
-#se {
-  width: 10vmin;
-  height: 10vmin;
-  background-color: lightblue;
-
-  --start-offset: -50vh;
-  --distance-offset: 20vh;
-  --smootherstep: true;
-  --progress-var: progress;
-  --captured: captured;
-
-  transform: rotate(calc(var(--progress) * 360deg));
+  background-color: blue;
 }
