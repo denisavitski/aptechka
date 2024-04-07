@@ -5,7 +5,7 @@ import { Store } from '@packages/store'
 
 import arrowIcon from '@assets/icons/arrow.svg?raw'
 
-import { studioStorage } from '../studioStorage'
+import { tweakerStorage } from './tweakerStorage'
 
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { StoreBox } from './TweakerElement'
@@ -93,9 +93,9 @@ export class TweakerFolderElement extends AccordionElement {
         e.stopPropagation()
 
         if (e.detail.opened) {
-          studioStorage.openPanel(this.#key)
+          tweakerStorage.openPanel(this.#key)
         } else {
-          studioStorage.closePanel(this.#key)
+          tweakerStorage.closePanel(this.#key)
         }
       },
       children: [
@@ -153,7 +153,7 @@ export class TweakerFolderElement extends AccordionElement {
     super.connectedCallback()
 
     setTimeout(() => {
-      if (studioStorage.isPanelOpened(this.#key)) {
+      if (tweakerStorage.isPanelOpened(this.#key)) {
         this.openAll({ skipTransition: true })
       }
     }, 50)

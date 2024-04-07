@@ -9,6 +9,7 @@ import {
 import { Store, activeStores, storeRegistry } from '@packages/store'
 import { createJSONAndSave, debounce } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
+import { aptechkaTheme } from '@packages/theme'
 
 import resetIcon from '@assets/icons/reset.svg?raw'
 import copyIcon from '@assets/icons/copy.svg?raw'
@@ -16,10 +17,12 @@ import downloadIcon from '@assets/icons/download.svg?raw'
 import uploadIcon from '@assets/icons/upload.svg?raw'
 
 import { TweakerFolderElement } from './TweakerFolderElement'
-import { aptechkaTheme } from '@packages/theme'
+import { tweakerStorage } from './tweakerStorage'
 
 const stylesheet = createStylesheet({
   ':host': {
+    fontFamily: 'sans-serif',
+
     position: 'absolute',
     top: aptechkaTheme.tweakerOffset.var,
     right: aptechkaTheme.tweakerOffset.var,
@@ -121,6 +124,8 @@ export class TweakerElement extends TweakerFolderElement {
       key: '',
     })
 
+    tweakerStorage.load()
+
     this.addStylesheet(stylesheet)
 
     this.head.current = [
@@ -191,7 +196,6 @@ export class TweakerElement extends TweakerFolderElement {
                 },
               }),
             ],
-            onClick: () => {},
           }),
         ],
       }),
@@ -209,12 +213,21 @@ export class TweakerElement extends TweakerFolderElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
+    window.addEventListener('beforeunload', this.#unloadListener)
     activeStores.subscribe(this.#storesChangeListener)
   }
 
   protected override disconnectedCallback() {
     super.disconnectedCallback()
+
+    window.removeEventListener('beforeunload', this.#unloadListener)
+    tweakerStorage.save()
+
     activeStores.unsubscribe(this.#storesChangeListener)
+  }
+
+  #unloadListener = () => {
+    tweakerStorage.save()
   }
 
   #storesChangeListener = debounce(() => {

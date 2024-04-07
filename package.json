@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -193,11 +193,6 @@
       "default": "./lib/store/index.js",
       "types": "./lib/store/index.d.ts"
     },
-    "./studio": {
-      "require": "./lib/studio/index.cjs",
-      "default": "./lib/studio/index.js",
-      "types": "./lib/studio/index.d.ts"
-    },
     "./theme": {
       "require": "./lib/theme/index.cjs",
       "default": "./lib/theme/index.js",
@@ -207,6 +202,11 @@
       "require": "./lib/ticker/index.cjs",
       "default": "./lib/ticker/index.js",
       "types": "./lib/ticker/index.d.ts"
+    },
+    "./twekaer": {
+      "require": "./lib/twekaer/index.cjs",
+      "default": "./lib/twekaer/index.js",
+      "types": "./lib/twekaer/index.d.ts"
     },
     "./utils": {
       "require": "./lib/utils/index.cjs",
@@ -334,14 +334,14 @@
       "store": [
         "lib/store/index.d.ts"
       ],
-      "studio": [
-        "lib/studio/index.d.ts"
-      ],
       "theme": [
         "lib/theme/index.d.ts"
       ],
       "ticker": [
         "lib/ticker/index.d.ts"
+      ],
+      "tweaker": [
+        "lib/tweaker/index.d.ts"
       ],
       "utils": [
         "lib/utils/index.d.ts"

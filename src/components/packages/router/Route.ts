@@ -18,7 +18,7 @@ export class Route {
   #pattern: string
   #module: RouteModule
   #urlPattern: URLPattern
-  #elementConstructor: typeof HTMLElement | (() => HTMLElement) | null
+  #elementConstructor: CustomElementConstructor | null
   #element: HTMLElement | null
   #isActive: boolean
   #nest: HTMLElement | ShadowRoot | null
@@ -119,9 +119,7 @@ export class Route {
         searchParams,
       }
 
-      this.#element = new (this.#elementConstructor as any)(
-        routeParameters
-      ) as HTMLElement
+      this.#element = new this.#elementConstructor(routeParameters)
 
       containerElement.appendChild(this.#element!)
 

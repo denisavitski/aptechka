@@ -1,10 +1,10 @@
 import { storeRegistry } from '@packages/store'
 
-export interface StudioStorageState {
+export interface TweakerStorageState {
   openedPanels: Array<string>
 }
 
-class StudioStorage {
+class TweakerStorage {
   #localStorageStudioName = ''
   #openedPanels: Array<string> = []
 
@@ -27,7 +27,7 @@ class StudioStorage {
   }
 
   public save() {
-    const state: StudioStorageState = {
+    const state: TweakerStorageState = {
       openedPanels: this.#openedPanels,
     }
 
@@ -41,7 +41,7 @@ class StudioStorage {
 
     if (stringState) {
       try {
-        const state: StudioStorageState = JSON.parse(stringState)
+        const state: TweakerStorageState = JSON.parse(stringState)
 
         if (state.openedPanels) {
           this.#openedPanels = state.openedPanels
@@ -53,4 +53,4 @@ class StudioStorage {
   }
 }
 
-export const studioStorage = new StudioStorage()
+export const tweakerStorage = new TweakerStorage()

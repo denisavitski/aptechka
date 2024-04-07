@@ -62,9 +62,9 @@ export function buildConfig() {
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
-          'studio/index': './src/components/packages/studio/index.ts',
           'theme/index': './src/components/packages/theme/index.ts',
           'ticker/index': './src/components/packages/ticker/index.ts',
+          'tweaker/index': './src/components/packages/tweaker/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
           'video/index': './src/components/packages/video/index.ts',
           'window-resizer/index':
