@@ -10,6 +10,7 @@ import {
   slot,
 } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
+import { elementResizer } from '@packages/element-resizer'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -91,6 +92,7 @@ export class ScrollbarElement extends ScrollUserElement {
     this.#thumbElement.addEventListener('pointerdown', this.#grabListener)
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
+    elementResizer.subscribe(this, this.#resizeListener)
 
     this.scrollElement.onScroll(this.#scrollListener)
 
@@ -101,6 +103,7 @@ export class ScrollbarElement extends ScrollUserElement {
     this.#thumbElement.removeEventListener('pointerdown', this.#grabListener)
 
     windowResizer.unsubscribe(this.#resizeListener)
+    elementResizer.unsubscribe(this.#resizeListener)
 
     this.scrollElement.offScroll(this.#scrollListener)
 
@@ -153,14 +156,21 @@ export class ScrollbarElement extends ScrollUserElement {
   }
 
   #grabListener = (grabEvent: PointerEvent) => {
-    setupDrag((moveEvent: PointerEvent) => {
-      const moveCursor = this.#isHorisontal ? moveEvent.x : moveEvent.y
+    document.documentElement.classList.add('grabbing')
 
-      const mult = this.scrollElement.distance / this.#thumbScrollSize
-      const delta = (moveCursor - grabCursor) * mult
+    setupDrag(
+      (moveEvent: PointerEvent) => {
+        const moveCursor = this.#isHorisontal ? moveEvent.x : moveEvent.y
 
-      this.scrollElement.setPosition(startValue + delta)
-    })
+        const mult = this.scrollElement.distance / this.#thumbScrollSize
+        const delta = (moveCursor - grabCursor) * mult
+
+        this.scrollElement.setPosition(startValue + delta)
+      },
+      () => {
+        document.documentElement.classList.remove('grabbing')
+      }
+    )
 
     const startValue = this.scrollElement.targetScrollValue
     const grabCursor = this.#isHorisontal ? grabEvent.x : grabEvent.y

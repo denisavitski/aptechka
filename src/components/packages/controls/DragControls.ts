@@ -72,6 +72,8 @@ export class DragControls extends Controls {
     let prev = grabEvent
     this.#delta = 0
 
+    document.documentElement.classList.add('grabbing')
+
     setupDrag(
       (moveEvent) => {
         if (
@@ -113,6 +115,8 @@ export class DragControls extends Controls {
           this.#delta = this.#delta * 3
           ticker.subscribe(this.#tickListener, { order: TICK_ORDER.SCROLL - 1 })
         }
+
+        document.documentElement.classList.remove('grabbing')
 
         this.#swiped = false
       }

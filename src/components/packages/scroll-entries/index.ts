@@ -1,3 +1,4 @@
+import { Notifier } from '@packages/notifier'
 import { Axes2D } from '@packages/utils'
 import { getAllParentElements } from '@packages/utils/dom'
 
@@ -7,9 +8,16 @@ export interface ScrollEntry {
   element: HTMLElement
 }
 
+export type ScrollEntriesRegisterCallback = () => void
+
 class ScrollEntries {
   #elements: Set<HTMLElement> = new Set()
   #entires: WeakMap<HTMLElement, ScrollEntry> = new WeakMap()
+  #notifier = new Notifier<ScrollEntriesRegisterCallback>()
+
+  public get notifier() {
+    return this.#notifier
+  }
 
   public register(element: HTMLElement) {
     this.#entires.set(element, {
@@ -19,11 +27,15 @@ class ScrollEntries {
     })
 
     this.#elements.add(element)
+
+    this.#notifier.notify()
   }
 
   public unregister(element: HTMLElement) {
     this.#entires.delete(element)
     this.#elements.delete(element)
+
+    this.#notifier.notify()
   }
 
   public update(element: HTMLElement, axis: Axes2D, value: number) {

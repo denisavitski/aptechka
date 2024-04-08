@@ -1,7 +1,7 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { Ladder } from '@packages/ladder'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { scrollEntries } from '@packages/scroll-entries'
+import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { StoreCallback, StoreEntry } from '@packages/store'
 import { ticker } from '@packages/ticker'
 import {
@@ -114,6 +114,8 @@ export class LayoutBox {
   #position = new Ladder({ x: 0, y: 0, z: 0 })
   #scale = new Ladder({ x: 0, y: 0, z: 0 })
 
+  #scrollEntries: Map<ScrollEntry, LayoutBoxScrollStepCallback> = new Map()
+
   constructor(
     element: ElementOrSelector<HTMLElement>,
     options?: LayoutBoxOptions
@@ -164,13 +166,7 @@ export class LayoutBox {
         z: 0,
       })
 
-      addEventListener('DOMContentLoaded', () => {
-        scrollEntries.getAll(this.element).forEach((entry) => {
-          this.setScrollStep(() => {
-            return entry
-          })
-        })
-      })
+      scrollEntries.notifier.subscribe(this.#scrollEntriesListener)
 
       ticker.subscribe(this.#tickListener, {
         order: TICK_ORDER.LAYOUT_BOX,
@@ -256,6 +252,8 @@ export class LayoutBox {
     ticker.unsubscribe(this.#tickListener)
     elementResizer.unsubscribe(this.#resizeListener)
     windowResizer.unsubscribe(this.#resizeListener)
+    scrollEntries.notifier.unsubscribe(this.#scrollEntriesListener)
+    this.#scrollEntries.clear()
 
     this.#position.close()
     this.#rotation.close()
@@ -465,5 +463,28 @@ export class LayoutBox {
   #tickListener = () => {
     this.#updateScrollPosition()
     this.#recalculate()
+  }
+
+  #scrollEntriesListener = () => {
+    const allEntries = scrollEntries.getAll(this.element)
+
+    this.#scrollEntries.forEach((value, key) => {
+      if (!allEntries.includes(key)) {
+        this.deleteScrollStep(value)
+        this.#scrollEntries.delete(key)
+      }
+    })
+
+    allEntries.forEach((entry) => {
+      if (!this.#scrollEntries.has(entry)) {
+        const callback = () => {
+          return entry
+        }
+
+        this.#scrollEntries.set(entry, callback)
+
+        this.setScrollStep(callback)
+      }
+    })
   }
 }

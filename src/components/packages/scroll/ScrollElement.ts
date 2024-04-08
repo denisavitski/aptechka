@@ -156,7 +156,7 @@ export class ScrollElement extends CustomElement {
     false
   )
   #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
-  #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 0.03)
+  #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
   #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
   #mouseDragCSSProperty = new CSSProperty<boolean>(this, '--mouse-drag', false)
@@ -331,6 +331,10 @@ export class ScrollElement extends CustomElement {
         } else if (!e.current && e.previous) {
           this.#awake()
         }
+      })
+
+      this.#damped.isRunning.subscribe((e) => {
+        this.classList.toggle('active', e.current)
       })
     }
   }
