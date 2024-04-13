@@ -8,6 +8,16 @@ export function define(name: string, extend?: keyof HTMLElementTagNameMap) {
   }
 }
 
+export function defineElement(
+  name: string,
+  Constructor: CustomElementConstructor,
+  extend?: keyof HTMLElementTagNameMap
+) {
+  if (isBrowser && !customElements.get(name)) {
+    customElements.define(name, Constructor, { extends: extend })
+  }
+}
+
 const HTMLElement = (
   isBrowser
     ? window.HTMLElement

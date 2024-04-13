@@ -13,32 +13,37 @@ export type BezierPoint = {
 
 export function getPathData(
   svgRaw: string,
-  { normalize = true, pathSelector = 'path' }: GenerateSVGPathDataOptions = {}
-): Array<BezierPoint> {
+  { pathSelector = 'path' }: GenerateSVGPathDataOptions = {}
+) {
   const el = document.createElement(null!) as HTMLElement
   el.innerHTML = svgRaw
 
   const svg = el.firstElementChild as SVGElement
   const path = svg.querySelector(pathSelector) as SVGPathElement
 
-  const pathData = (path as any).getPathData() as Array<BezierPoint>
+  const data = (path as any).getPathData() as Array<BezierPoint>
 
-  if (normalize) {
-    const viewBox = svg
-      .getAttribute('viewBox')!
-      .split(' ')
-      .map((v) => parseFloat(v))
+  const viewBoxArray = svg
+    .getAttribute('viewBox')!
+    .split(' ')
+    .map((v) => v.trim())
 
-    const minSize = Math.min(viewBox[2], viewBox[3])
-
-    pathData.forEach((command) => {
-      command.values = command.values.map((v) => {
-        return v / minSize
-      })
-    })
+  const viewBox = {
+    x: parseInt(viewBoxArray[0]),
+    y: parseInt(viewBoxArray[1]),
+    width: parseInt(viewBoxArray[2]),
+    height: parseInt(viewBoxArray[3]),
   }
 
-  return pathData
+  const size = Math.min(viewBox.width, viewBox.height)
+
+  data.forEach((command) => {
+    command.values = command.values.map((v) => {
+      return v / size
+    })
+  })
+
+  return data
 }
 
 function bezierCurve(
@@ -76,7 +81,7 @@ export interface GeneratePointsOptions extends GenerateSVGPathDataOptions {
 export function getPoints(svgRaw: string, options?: GeneratePointsOptions) {
   const segments = options?.segments || 20
 
-  const data: BezierPoint[] = getPathData(svgRaw, options)
+  const data = getPathData(svgRaw, options)
 
   let points: Array<Dot2D> = []
 
@@ -92,6 +97,7 @@ export function getPoints(svgRaw: string, options?: GeneratePointsOptions) {
       const end: Dot2D = { x: values[4], y: values[5] }
 
       const curvePoints = bezierCurve(start, control1, control2, end, segments)
+
       points = [...points, ...curvePoints]
     }
   }

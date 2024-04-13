@@ -1,4 +1,4 @@
-export { insert } from './array'
+export { insert, shiftArray } from './array'
 export { parseAttribute, parseAttributeValue } from './attributes'
 export { isBrowser } from './browser'
 export { measureText, fixPosition, cover } from './canvas'
