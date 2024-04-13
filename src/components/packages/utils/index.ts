@@ -80,6 +80,12 @@ export {
   getElementTransitionDurationMS,
   getElementTransitionDurationS,
 } from './style'
+export {
+  type GenerateSVGPathDataOptions,
+  type BezierPoint,
+  getPathData,
+  getPoints,
+} from './svg'
 export type {
   Axes2D,
   Axes3D,
