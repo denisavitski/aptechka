@@ -84,10 +84,11 @@ export class Morph {
   }
 
   public async navigate(
-    pathname: string,
+    path: string,
     historyAction: MorphHistoryAction = 'push'
   ) {
-    pathname = this.#preparePathname(pathname)
+    const parts = this.#getPathParts(path)
+    let { pathname, hash, parameters } = parts
 
     if (
       this.#candidatePathname === pathname ||
@@ -102,6 +103,11 @@ export class Morph {
 
     try {
       let isOkToSwitch = true
+
+      this.#beforeNavigationEvent.notify({
+        pathname,
+        isCached,
+      })
 
       if (this.preprocessor) {
         try {
@@ -118,11 +124,6 @@ export class Morph {
         }
       }
 
-      this.#beforeNavigationEvent.notify({
-        pathname,
-        isCached,
-      })
-
       if (!isOkToSwitch || this.#candidatePathname !== pathname) {
         return
       }
@@ -135,6 +136,7 @@ export class Morph {
       }
 
       const currentHeadChildren = Array.from(document.head.children)
+
       const newHeadChildren = Array.from(
         (newDocument.head.cloneNode(true) as HTMLElement).children
       )
@@ -143,17 +145,33 @@ export class Morph {
         currentHeadChildren,
         newHeadChildren
       )
+
       const removeHeadChildren = this.#excludeElements(
         currentHeadChildren,
         identicalHeadChildren
       )
+
       const addHeadChildren = this.#excludeElements(
         newHeadChildren,
         identicalHeadChildren
       )
 
-      removeHeadChildren.forEach((child) => child.remove())
-      addHeadChildren.forEach((child) => document.head.appendChild(child))
+      removeHeadChildren.forEach((child) => {
+        child.remove()
+      })
+
+      addHeadChildren.forEach((child, index) => {
+        if (child.tagName === 'SCRIPT' && child.getAttribute('src')) {
+          const newScriptTag = document.createElement('script')
+          newScriptTag.type = 'module'
+          newScriptTag.src = child.getAttribute('src')!
+          addHeadChildren[index] = newScriptTag
+        }
+      })
+
+      addHeadChildren.forEach((child, index) => {
+        document.head.appendChild(child)
+      })
 
       const elementsWithLoad = addHeadChildren.filter(
         (child) =>
@@ -178,20 +196,27 @@ export class Morph {
         })
       }
 
+      this.#currentPathname = pathname
+
+      const por = parameters || location.search
+
+      const h = hash ? (hash.startsWith('#') ? hash : '#' + hash) : ''
+      const p = por ? (por.startsWith('?') ? por : '?' + por) : ''
+
+      const pathPlus = `${pathname}${h}${p}`
+
+      if (historyAction === 'push') {
+        history.pushState(pathname, '', pathPlus)
+      } else if (historyAction === 'replace') {
+        history.replaceState(pathname, '', pathPlus)
+      }
+
       const newMorphElements = this.#getMorphElements(newDocument)
 
       this.#morphElements.forEach((morphElement, i) => {
-        const newMorphElement = newMorphElements[i]
+        const newMorphElement = newMorphElements[i]!
         morphElement.innerHTML = newMorphElement.innerHTML
       })
-
-      this.#currentPathname = pathname
-
-      if (historyAction === 'push') {
-        history.pushState(pathname, '', pathname + location.search)
-      } else if (historyAction === 'replace') {
-        history.replaceState(pathname, '', pathname + location.search)
-      }
 
       this.#findLinks()
 
@@ -222,14 +247,25 @@ export class Morph {
     return document
   }
 
-  #preparePathname(pathname: string) {
-    pathname = pathname.replace(this.#base, '')
+  #getPathParts(path: string) {
+    path = path.replace(this.#base, '')
 
-    if (pathname.startsWith('/')) {
-      pathname = pathname.slice(1)
+    if (path.startsWith('/')) {
+      path = path.slice(1)
     }
 
-    return this.#base + pathname
+    const split1 = path.split('#')
+    const split2 = split1[0].split('?')
+
+    const pathname = this.#base + split2[0]
+    const parameters = split2?.[1]
+    const hash = split1?.[1]
+
+    return {
+      pathname,
+      parameters,
+      hash,
+    }
   }
 
   #findLinks() {

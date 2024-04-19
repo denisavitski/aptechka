@@ -96,7 +96,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
     this.scrollElement.onScroll(this.#scrollListener)
 
-    this.scrollElement.axisAttibute.subscribe(this.#axisListener)
+    this.scrollElement.axisCSSProperty.subscribe(this.#axisListener)
   }
 
   protected disconnectedCallback() {
@@ -107,7 +107,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
     this.scrollElement.offScroll(this.#scrollListener)
 
-    this.scrollElement.axisAttibute.unsubscribe(this.#axisListener)
+    this.scrollElement.axisCSSProperty.unsubscribe(this.#axisListener)
   }
 
   #resizeListener = () => {
@@ -152,7 +152,7 @@ export class ScrollbarElement extends ScrollUserElement {
   }
 
   #axisListener = () => {
-    this.setAttribute('axis', this.scrollElement.axisAttibute.current)
+    this.setAttribute('axis', this.scrollElement.axisCSSProperty.current)
   }
 
   #grabListener = (grabEvent: PointerEvent) => {

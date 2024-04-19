@@ -10,6 +10,7 @@ export class Link {
     this.#morph = morph
     this.#element = element
     this.#pathname = this.#element.getAttribute('href') || '/'
+
     this.#historyAction =
       (this.#element.getAttribute(
         'data-history-action'

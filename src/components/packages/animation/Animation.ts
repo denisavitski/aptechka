@@ -27,9 +27,8 @@ export abstract class Animation<
 
   #isRunning = new Store(false)
 
-  constructor(initial?: number, options?: Options) {
+  constructor(initial?: number) {
     super(initial || 0)
-    this.updateOptions(options)
   }
 
   public get isRunning() {
@@ -50,12 +49,6 @@ export abstract class Animation<
     this.unlistenAnimationFrame()
   }
 
-  public updateOptions(options?: Omit<Options, keyof StoreOptions<number>>) {
-    this.#maxFPS = nullishCoalescing(options?.maxFPS, this.#maxFPS)
-    this.#order = nullishCoalescing(options?.order, this.#order)
-    this.#culling = nullishCoalescing(options?.culling, this.#culling)
-  }
-
   public listenAnimationFrame() {
     if (!this.#isRunning.current) {
       this.#isRunning.current = true
@@ -74,6 +67,12 @@ export abstract class Animation<
 
       ticker.unsubscribe(this.#animationFrameListener)
     }
+  }
+
+  public updateOptions(options?: Omit<Options, keyof StoreOptions<number>>) {
+    this.#maxFPS = nullishCoalescing(options?.maxFPS, this.#maxFPS)
+    this.#order = nullishCoalescing(options?.order, this.#order)
+    this.#culling = nullishCoalescing(options?.culling, this.#culling)
   }
 
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void

@@ -12,12 +12,16 @@ export function getRootVariables<
 
           if (value) {
             variables[name] = value.toString() as any
-          } else {
-            console.warn(`variable named ${name} not found`)
           }
         })
       }
     })
+  })
+
+  names.forEach((name) => {
+    if (!variables[name]) {
+      console.warn(`variable named ${name} not found`)
+    }
   })
 
   return variables

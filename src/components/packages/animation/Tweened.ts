@@ -37,7 +37,8 @@ export class Tweened extends Animation<TweenedOptions, TweenedEntry> {
     initial?: number,
     options?: TweenedOptions & TickerAddOptions & StoreOptions<number>
   ) {
-    super(initial || 0, options)
+    super(initial || 0)
+    this.updateOptions(options)
   }
 
   public get direction() {

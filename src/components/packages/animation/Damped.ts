@@ -32,12 +32,14 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
   #speed = 0
 
   constructor(initial?: number, options?: DampedOptions) {
-    super(initial || 0, options)
+    super(initial || 0)
 
     this.#min = nullishCoalescing(options?.min, -Infinity)
     this.#max = nullishCoalescing(options?.max, Infinity)
 
     this.#target = this.current
+
+    this.updateOptions(options)
   }
 
   public get target() {
