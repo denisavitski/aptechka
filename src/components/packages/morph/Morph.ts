@@ -71,6 +71,29 @@ export class Morph {
     }
   }
 
+  public normalizePath(path: string) {
+    path = path.replace(this.#base, '')
+
+    if (path.startsWith('/')) {
+      path = path.slice(1)
+    }
+
+    const split1 = path.split('#')
+    const split2 = split1[0].split('?')
+
+    const leaf = split2[0].endsWith('/') ? split2[0].slice(0, -1) : split2[0]
+    const pathname = this.#base + leaf
+    const parameters = split2?.[1]
+    const hash = split1?.[1]
+
+    return {
+      leaf,
+      pathname,
+      parameters,
+      hash,
+    }
+  }
+
   public beforeNavigationEvent(callback: MorphNavigationCallback) {
     return this.#beforeNavigationEvent.subscribe(callback)
   }
@@ -80,7 +103,7 @@ export class Morph {
   }
 
   public async prefetch(path: string) {
-    const parts = this.#splitPath(path)
+    const parts = this.normalizePath(path)
     return this.#fetchDocument(parts.pathname)
   }
 
@@ -88,7 +111,7 @@ export class Morph {
     path: string,
     historyAction: MorphHistoryAction = 'push'
   ) {
-    const parts = this.#splitPath(path)
+    const parts = this.normalizePath(path)
     let { pathname, hash, parameters } = parts
 
     if (
@@ -248,27 +271,6 @@ export class Morph {
     return document
   }
 
-  #splitPath(path: string) {
-    path = path.replace(this.#base, '')
-
-    if (path.startsWith('/')) {
-      path = path.slice(1)
-    }
-
-    const split1 = path.split('#')
-    const split2 = split1[0].split('?')
-
-    const pathname = this.#base + split2[0]
-    const parameters = split2?.[1]
-    const hash = split1?.[1]
-
-    return {
-      pathname,
-      parameters,
-      hash,
-    }
-  }
-
   #findLinks() {
     const linkElements = [
       ...document.documentElement.querySelectorAll('a'),
@@ -276,9 +278,7 @@ export class Morph {
 
     this.#links.forEach((link) => link.destroy())
 
-    this.#links = linkElements.map(
-      (element) => new Link(element, this, this.#base)
-    )
+    this.#links = linkElements.map((element) => new Link(element, this))
   }
 
   #getMorphElements(document: Document) {

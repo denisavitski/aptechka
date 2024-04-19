@@ -6,7 +6,7 @@ export class Link {
   #pathname: string
   #historyAction: MorphHistoryAction
 
-  constructor(element: HTMLAnchorElement, morph: Morph, base: string) {
+  constructor(element: HTMLAnchorElement, morph: Morph) {
     this.#morph = morph
     this.#element = element
     this.#pathname = this.#element.getAttribute('href') || '/'
@@ -18,7 +18,10 @@ export class Link {
 
     this.#element.addEventListener('click', this.#clickListener)
 
-    if (this.#pathname === location.pathname.replace(base.slice(0, -1), '')) {
+    const p1 = morph.normalizePath(this.#pathname)
+    const p2 = morph.normalizePath(location.pathname)
+
+    if (p1.pathname === p2.pathname) {
       this.#element.classList.add('current')
     }
 
@@ -40,5 +43,6 @@ export class Link {
 
   #pointerListener = () => {
     this.#morph.prefetch(this.#pathname)
+    this.#element.removeEventListener('pointerenter', this.#pointerListener)
   }
 }
