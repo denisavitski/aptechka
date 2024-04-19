@@ -6,7 +6,7 @@ export class Link {
   #pathname: string
   #historyAction: MorphHistoryAction
 
-  constructor(element: HTMLAnchorElement, morph: Morph) {
+  constructor(element: HTMLAnchorElement, morph: Morph, base: string) {
     this.#morph = morph
     this.#element = element
     this.#pathname = this.#element.getAttribute('href') || '/'
@@ -18,7 +18,7 @@ export class Link {
 
     this.#element.addEventListener('click', this.#clickListener)
 
-    if (this.#pathname === location.pathname) {
+    if (this.#pathname === location.pathname.replace(base.slice(0, -1), '')) {
       this.#element.classList.add('current')
     }
 

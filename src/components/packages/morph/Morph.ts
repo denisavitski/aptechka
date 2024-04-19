@@ -79,15 +79,16 @@ export class Morph {
     return this.#afterNavigationEvent.subscribe(callback)
   }
 
-  public async prefetch(pathname: string) {
-    return this.#fetchDocument(pathname)
+  public async prefetch(path: string) {
+    const parts = this.#splitPath(path)
+    return this.#fetchDocument(parts.pathname)
   }
 
   public async navigate(
     path: string,
     historyAction: MorphHistoryAction = 'push'
   ) {
-    const parts = this.#getPathParts(path)
+    const parts = this.#splitPath(path)
     let { pathname, hash, parameters } = parts
 
     if (
@@ -247,7 +248,7 @@ export class Morph {
     return document
   }
 
-  #getPathParts(path: string) {
+  #splitPath(path: string) {
     path = path.replace(this.#base, '')
 
     if (path.startsWith('/')) {
@@ -275,7 +276,9 @@ export class Morph {
 
     this.#links.forEach((link) => link.destroy())
 
-    this.#links = linkElements.map((element) => new Link(element, this))
+    this.#links = linkElements.map(
+      (element) => new Link(element, this, this.#base)
+    )
   }
 
   #getMorphElements(document: Document) {
