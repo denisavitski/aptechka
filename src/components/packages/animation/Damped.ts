@@ -20,7 +20,7 @@ export interface DampedEntry extends StoreEntry<number> {
 }
 
 export class Damped extends Animation<DampedOptions, DampedEntry> {
-  public damping = 0.01
+  public damping = 1
   public stiffness = 0
   public mass = 0
 
@@ -40,6 +40,8 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
     this.#target = this.current
 
     this.updateOptions(options)
+
+    this.listenAnimationFrame()
   }
 
   public get target() {
@@ -135,8 +137,8 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
     super.updateOptions(options)
 
     this.damping = nullishCoalescing(options?.damping, this.damping)
-    this.mass = nullishCoalescing(options?.damping, this.mass)
-    this.stiffness = nullishCoalescing(options?.damping, this.stiffness)
+    this.mass = nullishCoalescing(options?.mass, this.mass)
+    this.stiffness = nullishCoalescing(options?.stiffness, this.stiffness)
   }
 
   protected override handleAnimationFrame(e: TickerCallbackEntry) {

@@ -2,7 +2,6 @@ import { define } from '@packages/custom-element'
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { isBrowser, setupDrag } from '@packages/utils'
-import { ScrollUserElement } from './ScrollUserElement'
 import {
   createStylesheet,
   div,
@@ -11,6 +10,7 @@ import {
 } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
 import { elementResizer } from '@packages/element-resizer'
+import { ScrollUserElement } from './ScrollUserElement'
 
 const stylesheet = createStylesheet({
   ':host': {

@@ -1,18 +1,52 @@
-.main-scroll {
+.artists {
   width: 100%;
   height: 100%;
-  --gap: 10vmin;
-  --split: true;
-  --axis: x;
-  --sectional: true;
-  --sections-in-view: 4;
-  --auto-size: true;
 }
 
-.main-slide {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.artists__inner {
+  width: 100%;
+  height: 100%;
 
-  background-color: lightcyan;
+  overflow: hidden;
+}
+
+.artists__top {
+  display: grid;
+  grid-template-columns: var(--width-left) 1fr;
+  align-items: center;
+
+  margin-bottom: 6rem;
+}
+
+.artists__heading {
+  font-size: var(--font-size-section-heading);
+  font-weight: 400;
+}
+
+.artists__description {
+  font-size: 2rem;
+  width: 50.4rem;
+}
+
+.artists__slider {
+  --axis: x;
+  --gap: 5vmin;
+  --sectional: true;
+  --damping: 5;
+  --mouse-drag: true;
+  --sections-in-view: 4;
+  --auto-size: true;
+
+  width: 100%;
+
+  margin-bottom: 10.2rem;
+}
+
+.artists__slider__item {
+  height: 100px;
+
+  background-color: black;
+
+  border-radius: 3.6rem;
+  overflow: hidden;
 }

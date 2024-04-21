@@ -2,7 +2,9 @@ import { Damped } from '../Damped'
 
 const box = document.querySelector('.box') as HTMLElement
 
-const damped = new Damped(0, {})
+const damped = new Damped(0, {
+  damping: 1,
+})
 
 damped.subscribe((e) => {
   box.style.transform = `rotate(${e.current}deg)`

@@ -7,6 +7,7 @@ import {
 } from '../attachments/En3SourceManager'
 import { En3SourceConsumer } from './En3SourceConsumer'
 import { windowResizer } from '@packages/window-resizer'
+import { RoundedBoxGeometry } from 'three/examples/jsm/Addons.js'
 
 export type En3ImageLikeMaterial<TTexture extends Texture> = Material & {
   map: TTexture | null
@@ -18,8 +19,8 @@ export interface En3ImageLikeParameters<
 > extends En3SourceManagerParameters<TTexture> {
   width?: number
   height?: number
-  widthSegments?: number
-  heightSegments?: number
+  round?: number
+  segments?: number
   material?: TMaterial
   cover?: boolean
   loader: En3SourceManagerLoader<TTexture>
@@ -29,7 +30,7 @@ export class En3ImageLike<
     TTexture extends Texture,
     TMaterial extends En3ImageLikeMaterial<TTexture>
   >
-  extends Mesh<PlaneGeometry, TMaterial>
+  extends Mesh<RoundedBoxGeometry, TMaterial>
   implements En3SourceConsumer<TTexture>
 {
   #sourceManager: En3SourceManager<TTexture>
@@ -37,11 +38,12 @@ export class En3ImageLike<
 
   constructor(parameters: En3ImageLikeParameters<TTexture, TMaterial>) {
     super(
-      new PlaneGeometry(
+      new RoundedBoxGeometry(
         parameters.width,
         parameters.height,
-        parameters.widthSegments,
-        parameters.heightSegments
+        1,
+        parameters.segments,
+        parameters.round || 0
       ),
       parameters.material
     )
