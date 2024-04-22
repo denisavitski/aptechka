@@ -21,8 +21,14 @@ export class Link {
     const p1 = morph.normalizePath(this.#pathname)
     const p2 = morph.normalizePath(location.pathname)
 
-    if (p1.pathname === p2.pathname) {
-      this.#element.classList.add('current')
+    if (this.#element.hasAttribute('data-include')) {
+      if (p2.pathname.includes(p1.pathname)) {
+        this.#element.classList.add('current')
+      }
+    } else {
+      if (p1.pathname === p2.pathname) {
+        this.#element.classList.add('current')
+      }
     }
 
     if (this.#element.hasAttribute('data-prefetch')) {
