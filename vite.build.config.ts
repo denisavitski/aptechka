@@ -25,6 +25,8 @@ export function buildConfig() {
           'attribute/index': './src/components/packages/attribute/index.ts',
           'canvas/index': './src/components/packages/canvas/index.ts',
           'checkbox/index': './src/components/packages/checkbox/index.ts',
+          'class-linked-status/index':
+            './src/components/packages/class-linked-status/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',
           'controls/index': './src/components/packages/controls/index.ts',
           'css-property/index':
@@ -52,6 +54,7 @@ export function buildConfig() {
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
+          'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
           'resized/index': './src/components/packages/resized/index.ts',
           'router/index': './src/components/packages/router/index.ts',
@@ -59,6 +62,7 @@ export function buildConfig() {
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
           'select/index': './src/components/packages/select/index.ts',
+          'sequence/index': './src/components/packages/sequence/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',

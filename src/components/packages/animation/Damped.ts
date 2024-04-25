@@ -20,7 +20,7 @@ export interface DampedEntry extends StoreEntry<number> {
 }
 
 export class Damped extends Animation<DampedOptions, DampedEntry> {
-  public damping = 1
+  public damping = 20
   public stiffness = 0
   public mass = 0
 

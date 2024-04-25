@@ -1,0 +1,10 @@
+e-pointer {
+  width: 40vmin;
+  height: 40vmin;
+  display: block;
+
+  background-color: tomato;
+
+  --normalize: true;
+  --cartesian: true;
+}

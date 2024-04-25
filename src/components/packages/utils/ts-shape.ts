@@ -7,10 +7,12 @@ export type Dot2D = {
   y: number
 }
 
-export type Rect2D = Dot2D & {
+export type Dimension2D = {
   width: number
   height: number
 }
+
+export type Rect2D = Dot2D & Dimension2D
 
 export type Circle = Dot2D & {
   radius: number

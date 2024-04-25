@@ -1,0 +1,11 @@
+e-sequence {
+  --fps: 60;
+  --fit: contain;
+  --autoplay: true;
+}
+
+@media (max-width: 768px) {
+  e-sequence {
+    --fit: cover;
+  }
+}

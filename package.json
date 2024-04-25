@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.4.20",
+  "version": "0.4.21",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -42,6 +42,11 @@
       "require": "./lib/checkbox/index.cjs",
       "default": "./lib/checkbox/index.js",
       "types": "./lib/checkbox/index.d.ts"
+    },
+    "./class-linked-status": {
+      "require": "./lib/class-linked-status/index.cjs",
+      "default": "./lib/class-linked-status/index.js",
+      "types": "./lib/class-linked-status/index.d.ts"
     },
     "./connector": {
       "require": "./lib/connector/index.cjs",
@@ -148,6 +153,11 @@
       "default": "./lib/order/index.js",
       "types": "./lib/order/index.d.ts"
     },
+    "./pointer": {
+      "require": "./lib/pointer/index.cjs",
+      "default": "./lib/pointer/index.js",
+      "types": "./lib/pointer/index.d.ts"
+    },
     "./popover": {
       "require": "./lib/popover/index.cjs",
       "default": "./lib/popover/index.js",
@@ -177,6 +187,11 @@
       "require": "./lib/select/index.cjs",
       "default": "./lib/select/index.js",
       "types": "./lib/select/index.d.ts"
+    },
+    "./sequence": {
+      "require": "./lib/sequence/index.cjs",
+      "default": "./lib/sequence/index.js",
+      "types": "./lib/sequence/index.d.ts"
     },
     "./slicer": {
       "require": "./lib/slicer/index.cjs",
@@ -240,6 +255,9 @@
       ],
       "checkbox": [
         "lib/checkbox/index.d.ts"
+      ],
+      "class-linked-status": [
+        "lib/class-linked-status/index.d.ts"
       ],
       "component": [
         "lib/component/index.d.ts"
@@ -307,6 +325,9 @@
       "order": [
         "lib/order/index.d.ts"
       ],
+      "pointer": [
+        "lib/pointer/index.d.ts"
+      ],
       "popover": [
         "lib/popover/index.d.ts"
       ],
@@ -324,6 +345,9 @@
       ],
       "select": [
         "lib/select/index.d.ts"
+      ],
+      "sequence": [
+        "lib/sequence/index.d.ts"
       ],
       "slicer": [
         "lib/slicer/index.d.ts"

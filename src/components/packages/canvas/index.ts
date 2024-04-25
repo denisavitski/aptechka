@@ -1,3 +1,4 @@
+import { CSSProperty } from '@packages/css-property'
 import { define, CustomElement } from '@packages/custom-element'
 import {
   canvas,
@@ -34,6 +35,8 @@ export type Canvas2DRenderCallback = (entry: Canvas2DRenderDetail) => void
 
 @define('e-canvas')
 export class CanvasElement extends CustomElement {
+  #fpsCSSProperty = new CSSProperty<number>(this, '--fps', 0)
+
   #canvasElement: HTMLCanvasElement = null!
   #context: CanvasRenderingContext2D = null!
 
@@ -57,6 +60,16 @@ export class CanvasElement extends CustomElement {
         },
       }),
     })
+
+    this.#fpsCSSProperty.subscribe((e) => {
+      if (typeof e.previous !== 'undefined' && e.current !== e.previous) {
+        this.#run()
+      }
+    })
+  }
+
+  public get fpsCSSProperty() {
+    return this.#fpsCSSProperty
   }
 
   public get canvasElement() {
@@ -93,23 +106,34 @@ export class CanvasElement extends CustomElement {
   }
 
   protected connectedCallback() {
+    this.#fpsCSSProperty.observe()
+
     elementResizer.subscribe(this, this.#resizeListener)
+
+    this.#run()
+  }
+
+  protected disconnectedCallback() {
+    this.#fpsCSSProperty.unobserve()
+
+    elementResizer.unsubscribe(this.#resizeListener)
+
+    this.#stop()
+  }
+
+  #run() {
+    ticker.unsubscribe(this.#tickListener)
 
     if (!this.hasAttribute('static')) {
       ticker.subscribe(this.#tickListener, {
         culling: this,
-        maxFPS: this.hasAttribute('fps')
-          ? parseInt(this.getAttribute('fps')!)
-          : undefined,
+        maxFPS: this.#fpsCSSProperty.current,
       })
     }
   }
 
-  protected disconnectedCallback() {
-    elementResizer.unsubscribe(this.#resizeListener)
+  #stop() {
     ticker.unsubscribe(this.#tickListener)
-
-    this.#canvasElement.remove()
   }
 
   #resizeListener: ElementResizerCallback = (e) => {
