@@ -1,8 +1,8 @@
 import { Damped, DampedOptions } from '@packages/animation'
 import {
   ElementOrSelector,
+  clamp,
   getElement,
-  getPointerPosition,
   normalize,
   screenToCartesian,
 } from '@packages/utils'
@@ -81,7 +81,10 @@ export class Pointer {
   }
 
   #pointerMoveListener = (e: PointerEvent) => {
-    const pos = getPointerPosition(e)
+    const pos = {
+      x: e.offsetX,
+      y: e.offsetY,
+    }
 
     const size = {
       width: this.element.offsetWidth,
@@ -103,8 +106,8 @@ export class Pointer {
     if (this.normalize) {
       const res = normalize(pointer, size)
 
-      pointer.x = res.x * 2
-      pointer.y = res.y * 2
+      pointer.x = clamp(res.x * 2, -1, 1)
+      pointer.y = clamp(res.y * 2, -1, 1)
     }
 
     this.#x.set(pointer.x)
