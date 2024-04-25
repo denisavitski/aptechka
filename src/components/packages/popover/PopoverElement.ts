@@ -49,6 +49,7 @@ export class PopoverElement extends CustomElement {
 
     this.classList.add('triggered')
     this.style.display = 'block'
+    this.dispatchEvent(new CustomEvent('popoverTriggered'))
 
     setTimeout(() => {
       addEventListener('click', this.#clickOutsideListener)
@@ -56,6 +57,7 @@ export class PopoverElement extends CustomElement {
 
       this.style.opacity = '1'
       this.classList.add('opened')
+      this.dispatchEvent(new CustomEvent('popoverOpened'))
     })
   }
 
@@ -76,6 +78,7 @@ export class PopoverElement extends CustomElement {
 
     this.classList.remove('opened')
     this.style.opacity = '0'
+    this.dispatchEvent(new CustomEvent('popoverClosing'))
 
     removeEventListener('click', this.#clickOutsideListener)
     removeEventListener('keydown', this.#keydownListener)
@@ -83,6 +86,7 @@ export class PopoverElement extends CustomElement {
     setTimeout(() => {
       this.classList.remove('triggered')
       this.style.display = 'none'
+      this.dispatchEvent(new CustomEvent('popoverClosed'))
     }, getElementTransitionDurationMS(this))
   }
 
@@ -176,5 +180,12 @@ export class PopoverElement extends CustomElement {
 declare global {
   interface HTMLElementTagNameMap {
     'e-popover': PopoverElement
+  }
+
+  interface HTMLElementEventMap {
+    popoverTriggered: CustomEvent
+    popoverOpened: CustomEvent
+    popoverClosing: CustomEvent
+    popoverClosed: CustomEvent
   }
 }

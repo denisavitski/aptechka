@@ -7,6 +7,7 @@ import {
   element,
 } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
+import { StoreEntry } from '@packages/store'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
 
@@ -67,10 +68,64 @@ export class PopoverButtonElement extends CustomElement {
 
       if (popoverElement) {
         this.#popoverElement = popoverElement as PopoverElement
+
+        this.#popoverElement.addEventListener(
+          'popoverTriggered',
+          this.#popoverTriggeredListener
+        )
+        this.#popoverElement.addEventListener(
+          'popoverOpened',
+          this.#popoverOpenedListener
+        )
+        this.#popoverElement.addEventListener(
+          'popoverClosing',
+          this.#popoverClosingListener
+        )
+        this.#popoverElement.addEventListener(
+          'popoverClosed',
+          this.#popoverClosedListener
+        )
       } else {
         console.warn(this, `target ${targetId} not found`)
       }
     }
+  }
+
+  protected disconnectedCallback() {
+    if (this.#popoverElement) {
+      this.#popoverElement.removeEventListener(
+        'popoverTriggered',
+        this.#popoverTriggeredListener
+      )
+      this.#popoverElement.removeEventListener(
+        'popoverOpened',
+        this.#popoverOpenedListener
+      )
+      this.#popoverElement.removeEventListener(
+        'popoverClosing',
+        this.#popoverClosingListener
+      )
+      this.#popoverElement.removeEventListener(
+        'popoverClosed',
+        this.#popoverClosedListener
+      )
+    }
+  }
+
+  #popoverTriggeredListener = () => {
+    this.classList.add('triggered')
+  }
+
+  #popoverOpenedListener = () => {
+    this.classList.add('opened')
+  }
+
+  #popoverClosingListener = () => {
+    this.classList.remove('opened')
+  }
+
+  #popoverClosedListener = () => {
+    this.classList.remove('triggered')
   }
 }
 
