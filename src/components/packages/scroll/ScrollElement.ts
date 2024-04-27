@@ -742,6 +742,7 @@ export class ScrollElement extends CustomElement {
     this.#autoplayCSSProperty.observe()
     this.#autoplayCSSProperty.observe()
     this.#autoplayPauseDurationCSSProperty.observe()
+    this.#autoplayUserDirectionCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -764,6 +765,7 @@ export class ScrollElement extends CustomElement {
     this.#sectionDistanceScaleCSSProperty.unobserve()
     this.#autoplayCSSProperty.unobserve()
     this.#autoplayPauseDurationCSSProperty.unobserve()
+    this.#autoplayUserDirectionCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
