@@ -61,9 +61,13 @@ export class WheelControls extends Controls {
   #wheelListener = (event: WheelEvent) => {
     let delta = 0
 
+    event.preventDefault()
+
     if (
-      (this.axis === 'x' && Math.abs(event.deltaY) > Math.abs(event.deltaX)) ||
-      (this.axis === 'y' && Math.abs(event.deltaX) > Math.abs(event.deltaY))
+      (this.axis === 'x' &&
+        Math.abs(event.deltaY) > Math.abs(event.deltaX) * 0.5) ||
+      (this.axis === 'y' &&
+        Math.abs(event.deltaX) > Math.abs(event.deltaY) * 0.5)
     ) {
       return
     }
@@ -78,7 +82,6 @@ export class WheelControls extends Controls {
         : event.deltaY) * this.speed
 
     event.stopPropagation()
-    event.preventDefault()
 
     if (this.debounce) {
       const now = Date.now()
