@@ -99,13 +99,12 @@ export class DragControls extends Controls {
 
         prev = moveEvent
 
-        this.changeEvent.notify('drag', this.#delta)
-
         if (
           (this.axis === 'x' && Math.abs(dx) > Math.abs(dy)) ||
-          (this.axis === 'y' && Math.abs(dx) < Math.abs(dy))
+          (this.axis === 'y' && Math.abs(dy) > Math.abs(dx))
         ) {
           DragControls.#currentElement = this.#element
+          this.changeEvent.notify('drag', this.#delta)
         }
       },
       () => {
