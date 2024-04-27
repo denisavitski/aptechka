@@ -32,7 +32,7 @@
   --axis: x;
   --gap: 5vmin;
   --damping: 10;
-  --mouse-drag: true;
+  --mouse-drag: false;
   --sections-in-view: 3;
   --auto-size: true;
   --static-position: relative;

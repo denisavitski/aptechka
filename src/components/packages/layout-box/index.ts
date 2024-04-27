@@ -167,6 +167,7 @@ export class LayoutBox {
       })
 
       scrollEntries.notifier.subscribe(this.#scrollEntriesListener)
+      this.#scrollEntriesListener()
 
       ticker.subscribe(this.#tickListener, {
         order: TICK_ORDER.LAYOUT_BOX,

@@ -182,6 +182,7 @@ const stylesheet = createStylesheet({
     width: '100%',
     height: '100%',
     gap: 'var(--gap, 0px)',
+    willChange: 'var(--will-change, transform)',
   },
 
   ':host([hibernated="true"]) .content': {
