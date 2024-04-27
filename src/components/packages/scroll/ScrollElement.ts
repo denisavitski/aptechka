@@ -3,6 +3,7 @@ import {
   WheelControls,
   KeyboardControls,
   DragControls,
+  AutoplayControls,
 } from '@packages/controls'
 import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
@@ -98,7 +99,7 @@ class Section {
 
     const distanceAddition =
       this.#scrollElement.viewportSize *
-      this.#scrollElement.sectionDistanceScale.current
+      this.#scrollElement.sectionDistanceScaleCSSProperty.current
 
     if (
       this.#scrollElement.infiniteCSSProperty.current &&
@@ -218,11 +219,23 @@ export class ScrollElement extends CustomElement {
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
   #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
   #mouseDragCSSProperty = new CSSProperty<boolean>(this, '--mouse-drag', false)
-  #sectionDistanceScale = new CSSProperty<number>(
+  #sectionDistanceScaleCSSProperty = new CSSProperty<number>(
     this,
     '--section-distance-scale',
     0.5
   )
+  #autoplayCSSProperty = new CSSProperty<number>(this, '--autoplay', 0)
+  #autoplayPauseDurationCSSProperty = new CSSProperty<number>(
+    this,
+    '--autoplay-pause-duration',
+    0
+  )
+  #autoplayUserDirectionCSSProperty = new CSSProperty<boolean>(
+    this,
+    '--autoplay-user-direction',
+    false
+  )
+
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
 
@@ -239,6 +252,7 @@ export class ScrollElement extends CustomElement {
   #wheelControls: WheelControls = null!
   #keyboardControls: KeyboardControls = null!
   #dragControls: DragControls = null!
+  #autoplayControls: AutoplayControls = null!
 
   #counter = new Store(0)
 
@@ -281,15 +295,22 @@ export class ScrollElement extends CustomElement {
       })
 
       this.#wheelControls = new WheelControls({ element: this.#contentElement })
-      this.#wheelControls.changeEvent.subscribe(this.#controlsListener)
+      this.#wheelControls.changeEvent.subscribe(
+        this.#notAutoplayControlListener
+      )
 
       this.#keyboardControls = new KeyboardControls({
         element: this.#contentElement,
       })
-      this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
+      this.#keyboardControls.changeEvent.subscribe(
+        this.#notAutoplayControlListener
+      )
 
       this.#dragControls = new DragControls({ element: this.#contentElement })
-      this.#dragControls.changeEvent.subscribe(this.#controlsListener)
+      this.#dragControls.changeEvent.subscribe(this.#notAutoplayControlListener)
+
+      this.#autoplayControls = new AutoplayControls()
+      this.#autoplayControls.changeEvent.subscribe(this.#controlsListener)
 
       this.#axisCSSProperty.subscribe(({ current }) => {
         this.#contentElement.style.flexDirection =
@@ -339,6 +360,7 @@ export class ScrollElement extends CustomElement {
       this.#sectionalCSSProperty.subscribe((e) => {
         this.#wheelControls.debounce = e.current
         this.#dragControls.swipe = e.current
+        this.#autoplayControls.interval = e.current
 
         if (this.isConnected) {
           if (e.current && !e.previous && !this.#sections.length) {
@@ -414,6 +436,22 @@ export class ScrollElement extends CustomElement {
         }
       })
 
+      this.#autoplayCSSProperty.subscribe((e) => {
+        this.#autoplayControls.speed = e.current
+
+        if (e.current && !e.previous) {
+          this.#autoplayControls.connect()
+        } else if (!e.current && e.previous) {
+          this.#autoplayControls.disconnect()
+        }
+      })
+
+      this.#autoplayUserDirectionCSSProperty.subscribe((e) => {
+        if (!e.current) {
+          this.#autoplayControls.direction = 1
+        }
+      })
+
       this.#damped.isRunning.subscribe((e) => {
         this.classList.toggle('active', e.current)
       })
@@ -474,8 +512,20 @@ export class ScrollElement extends CustomElement {
     return this.#mouseDragCSSProperty
   }
 
-  public get sectionDistanceScale() {
-    return this.#sectionDistanceScale
+  public get sectionDistanceScaleCSSProperty() {
+    return this.#sectionDistanceScaleCSSProperty
+  }
+
+  public get autoplayCSSProperty() {
+    return this.#autoplayCSSProperty
+  }
+
+  public get autoplayPauseDurationCSSProperty() {
+    return this.#autoplayPauseDurationCSSProperty
+  }
+
+  public get autoplayUserDirectionCSSProperty() {
+    return this.#autoplayUserDirectionCSSProperty
   }
 
   public get disabledCSSProperty() {
@@ -688,7 +738,10 @@ export class ScrollElement extends CustomElement {
     this.#massCSSProperty.observe()
     this.#stiffnessCSSProperty.observe()
     this.#mouseDragCSSProperty.observe()
-    this.#sectionDistanceScale.observe()
+    this.#sectionDistanceScaleCSSProperty.observe()
+    this.#autoplayCSSProperty.observe()
+    this.#autoplayCSSProperty.observe()
+    this.#autoplayPauseDurationCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -708,7 +761,9 @@ export class ScrollElement extends CustomElement {
     this.#massCSSProperty.unobserve()
     this.#stiffnessCSSProperty.unobserve()
     this.#mouseDragCSSProperty.unobserve()
-    this.#sectionDistanceScale.unobserve()
+    this.#sectionDistanceScaleCSSProperty.unobserve()
+    this.#autoplayCSSProperty.unobserve()
+    this.#autoplayPauseDurationCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
@@ -763,6 +818,7 @@ export class ScrollElement extends CustomElement {
       this.#wheelControls.disconnect()
       this.#keyboardControls.disconnect()
       this.#dragControls.disconnect()
+      this.#autoplayControls.disconnect()
     }
   }
 
@@ -774,6 +830,10 @@ export class ScrollElement extends CustomElement {
       this.#wheelControls.connect()
       this.#keyboardControls.connect()
       this.#dragControls.connect()
+
+      if (this.#autoplayCSSProperty.current) {
+        this.#autoplayControls.connect()
+      }
     }
   }
 
@@ -962,6 +1022,18 @@ export class ScrollElement extends CustomElement {
     } else {
       this.#counter.current = clamp(value, 0, this.limit)
     }
+  }
+
+  #notAutoplayControlListener = (type: string, value: number) => {
+    this.#autoplayControls.pauseAndContinue(
+      this.#autoplayPauseDurationCSSProperty.current
+    )
+
+    if (this.#autoplayUserDirectionCSSProperty.current) {
+      this.#autoplayControls.direction = Math.sign(value) || 1
+    }
+
+    this.#controlsListener(type, value)
   }
 
   #controlsListener = (type: string, value: number) => {

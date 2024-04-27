@@ -123,12 +123,13 @@ export class DragControls extends Controls {
   }
 
   #tickListener = () => {
-    if (!this.#delta) {
+    if (!Math.floor(this.#delta)) {
       ticker.unsubscribe(this.#tickListener)
     }
 
     this.#delta *= 0.95
     this.#delta = preciseNumber(this.#delta, 3)
+
     this.changeEvent.notify('drag', this.#delta)
   }
 }

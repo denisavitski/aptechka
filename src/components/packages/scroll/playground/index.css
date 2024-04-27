@@ -32,13 +32,15 @@
   --axis: x;
   --gap: 5vmin;
   --damping: 10;
-  --mouse-drag: false;
+  --mouse-drag: true;
   --sections-in-view: 3;
   --auto-size: true;
   --static-position: relative;
   --static-width: 100%;
   --static-height: max-content;
   --infinite: true;
+  --autoplay: 0.1;
+  --autoplay-user-direction: true;
 
   width: 100%;
 
@@ -47,7 +49,7 @@
 
 @media (max-width: 1024px) {
   .artists__slider {
-    --auto-size: false;
+    --autoplay: 0;
   }
 }
 

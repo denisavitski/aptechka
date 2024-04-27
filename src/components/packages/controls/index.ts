@@ -1,5 +1,8 @@
 export { Controls } from './Controls'
 export { KeyboardControls } from './KeyboardControls'
-export { LinearControls, type LinearControlsOptions } from './LinearControls'
+export {
+  AutoplayControls,
+  type AutoplayControlsOptions,
+} from './AutoplayControls'
 export { WheelControls, type WheelControlsOptions } from './WheelControls'
 export { DragControls, type DragControlsOptions } from './DragControls'
