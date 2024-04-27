@@ -31,11 +31,15 @@
 .artists__slider {
   --axis: x;
   --gap: 5vmin;
-  --sectional: true;
-  --damping: 5;
-  --mouse-drag: true;
+  --damping: 3;
+  --mouse-drag: false;
   --sections-in-view: 4;
   --auto-size: true;
+  --static-position: relative;
+  --static-width: 100%;
+  --static-height: max-content;
+  --infinite: true;
+  --sectional: true;
 
   width: 100%;
 
@@ -43,10 +47,16 @@
 }
 
 .artists__slider__item {
+  width: 500px;
   height: 100px;
 
   background-color: black;
 
   border-radius: 3.6rem;
   overflow: hidden;
+}
+
+e-scroll-step-button {
+  font-size: 5vmin;
+  margin-right: 2vmin;
 }

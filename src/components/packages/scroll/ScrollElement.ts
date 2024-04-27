@@ -168,6 +168,7 @@ export class ScrollElement extends CustomElement {
   })
   #splitCSSProperty = new CSSProperty<boolean>(this, '--split', false)
   #sectionalCSSProperty = new CSSProperty<boolean>(this, '--sectional', false)
+  #autoSizeCSSProperty = new CSSProperty<boolean>(this, '--auto-size', false)
   #wheelMaxDeltaCSSProperty = new CSSProperty<boolean>(
     this,
     '--wheel-max-delta',
@@ -178,7 +179,7 @@ export class ScrollElement extends CustomElement {
     '--sections-in-view',
     1
   )
-  #autoSizeCSSProperty = new CSSProperty<boolean>(this, '--auto-size', false)
+
   #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
@@ -296,27 +297,30 @@ export class ScrollElement extends CustomElement {
       })
 
       this.#sectionalCSSProperty.subscribe((e) => {
-        this.#counter.current = 0
         this.#wheelControls.debounce = e.current
         this.#dragControls.swipe = e.current
-        this.#damped.reset()
 
         if (this.isConnected) {
-          if (e.current && !e.previous) {
+          if (e.current && !e.previous && !this.#sections.length) {
             this.#split()
-          } else if (!e.current && e.previous) {
+          } else if (!e.current && e.previous && this.#sections.length) {
+            this.#unsplit()
+          }
+        }
+      })
+
+      this.#autoSizeCSSProperty.subscribe((e) => {
+        if (this.isConnected) {
+          this.#resizeListener()
+          if (e.current && !e.previous && !this.#sections.length) {
+            this.#split()
+          } else if (!e.current && e.previous && this.#sections.length) {
             this.#unsplit()
           }
         }
       })
 
       this.#sectionsInViewCSSProperty.subscribe((e) => {
-        if (this.isConnected) {
-          this.#resizeListener()
-        }
-      })
-
-      this.#autoSizeCSSProperty.subscribe((e) => {
         if (this.isConnected) {
           this.#resizeListener()
         }
@@ -397,16 +401,16 @@ export class ScrollElement extends CustomElement {
     return this.#sectionalCSSProperty
   }
 
+  public get autoSizeCSSProperty() {
+    return this.#autoSizeCSSProperty
+  }
+
   public get wheelMaxDeltaCSSProperty() {
     return this.#wheelMaxDeltaCSSProperty
   }
 
   public get sectionsInViewCSSProperty() {
     return this.#sectionsInViewCSSProperty
-  }
-
-  public get autoSizeCSSProperty() {
-    return this.#autoSizeCSSProperty
   }
 
   public get infiniteCSSProperty() {
@@ -556,7 +560,6 @@ export class ScrollElement extends CustomElement {
     return this.currentProgress >= start && this.currentProgress <= end
   }
 
-  // TODO: Поправить значение когда скролл не секционный ??
   public scrollToSection(
     sectionIndex: number,
     behaviour: ScrollBehaviour = 'smooth'
@@ -575,15 +578,24 @@ export class ScrollElement extends CustomElement {
     if (previousSection && currentSection) {
       let shiftValue = 0
 
+      const nearestSection = this.#findNearestSection()
+
+      const scrolledFromNearestSection = nearestSection
+        ? this.targetScrollValue - nearestSection.position
+        : 0
+
       if (this.#infiniteCSSProperty.current) {
-        if (this.#counter.current === 0 && previousCounter === this.limit) {
+        if (
+          this.#counter.current === 0 &&
+          previousCounter === this.#sections.length - 1
+        ) {
           shiftValue =
             this.#scrollSize +
             this.#viewportSize -
             previousSection.position +
             this.#gap
         } else if (
-          this.#counter.current === this.limit &&
+          this.#counter.current === this.#sections.length - 1 &&
           previousCounter === 0
         ) {
           shiftValue =
@@ -596,7 +608,10 @@ export class ScrollElement extends CustomElement {
         shiftValue = currentSection.position - previousSection.position
       }
 
-      this.#damped.shift(shiftValue, behaviour === 'instant')
+      this.#damped.shift(
+        shiftValue - scrolledFromNearestSection,
+        behaviour === 'instant'
+      )
     }
   }
 
@@ -676,6 +691,9 @@ export class ScrollElement extends CustomElement {
 
     this.#sections = []
 
+    this.#counter.current = 0
+    this.#damped.reset()
+
     this.dispatchEvent(
       new CustomEvent('sectionsChange', {
         composed: true,
@@ -743,7 +761,10 @@ export class ScrollElement extends CustomElement {
   }
 
   #resizeListener = () => {
+    this.#damped.unlistenAnimationFrame()
+
     const prevProgress = this.currentScrollValue / this.#scrollSize || 0
+    const prevCounter = this.#counter.current
 
     this.#position = this.vertical
       ? getCumulativeOffsetTop(this)
@@ -754,30 +775,6 @@ export class ScrollElement extends CustomElement {
       : getCumulativeOffsetLeft(this.#contentElement)
 
     this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
-
-    if (this.#pagesCSSProperty.current) {
-      this.#scrollSize = this.#viewportSize * this.#pagesCSSProperty.current
-      const contentSize = this.#scrollSize + this.#viewportSize
-
-      if (this.vertical) {
-        this.#contentElement.style.width = contentSize + 'px'
-        this.#contentElement.style.height = '100%'
-      } else {
-        this.#contentElement.style.height = contentSize + 'px'
-        this.#contentElement.style.width = '100%'
-      }
-    } else {
-      if (this.vertical) {
-        this.#contentElement.style.width = '100%'
-        this.#contentElement.style.height = 'max-content'
-        this.#scrollSize =
-          this.#contentElement.offsetHeight - this.#viewportSize
-      } else {
-        this.#contentElement.style.width = 'max-content'
-        this.#contentElement.style.height = '100%'
-        this.#scrollSize = this.#contentElement.offsetWidth - this.#viewportSize
-      }
-    }
 
     if (this.vertical) {
       this.#gap = cssUnitParser.parse(
@@ -803,20 +800,45 @@ export class ScrollElement extends CustomElement {
       })
     }
 
+    this.#sections.forEach((section) => {
+      section.resize()
+    })
+
+    if (this.#pagesCSSProperty.current) {
+      this.#scrollSize = this.#viewportSize * this.#pagesCSSProperty.current
+      const contentSize = this.#scrollSize + this.#viewportSize
+
+      if (this.vertical) {
+        this.#contentElement.style.width = contentSize + 'px'
+        this.#contentElement.style.height = '100%'
+      } else {
+        this.#contentElement.style.height = contentSize + 'px'
+        this.#contentElement.style.width = '100%'
+      }
+    } else {
+      if (this.vertical) {
+        this.#contentElement.style.width = '100%'
+        this.#contentElement.style.height = 'max-content'
+        this.#scrollSize =
+          this.#contentElement.offsetHeight - this.#viewportSize
+      } else {
+        this.#contentElement.style.width = 'max-content'
+        this.#contentElement.style.height = '100%'
+        this.#scrollSize = this.#contentElement.offsetWidth - this.#viewportSize
+      }
+    }
+
     if (!this.#infiniteCSSProperty.current) {
       const cs = getComputedStyle(this)
 
-      this.#scrollSize += this.vertical
+      const padding = this.vertical
         ? parseFloat(cs.paddingBlockStart) + parseFloat(cs.paddingBlockEnd)
         : parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd)
 
+      this.#scrollSize += padding
+
       this.#damped.max = this.#scrollSize
     }
-
-    this.#sections.forEach((section) => {
-      section.resize()
-      section.transform()
-    })
 
     if (this.#infiniteCSSProperty.current && this.#sections.length) {
       const lastSection = this.#sections[this.#sections.length - 1]
@@ -831,7 +853,8 @@ export class ScrollElement extends CustomElement {
     }
 
     if (this.#sectionalCSSProperty.current && this.#sections.length) {
-      const section = this.#sections[this.#counter.current]
+      const section = this.#sections[prevCounter]
+
       this.#damped.set(section.position, true)
     } else {
       this.#damped.set(prevProgress * this.#scrollSize, true)
@@ -938,6 +961,22 @@ export class ScrollElement extends CustomElement {
         this.classList.remove('end')
       }
     }
+  }
+
+  #findNearestSection() {
+    let nearestIndex = null
+    let minDiff = Infinity
+
+    for (let i = 0; i < this.#sections.length; i++) {
+      const diff = Math.abs(this.#sections[i].position - this.targetScrollValue)
+
+      if (diff < minDiff) {
+        minDiff = diff
+        nearestIndex = i
+      }
+    }
+
+    return nearestIndex !== null ? this.#sections[nearestIndex] : null
   }
 }
 
