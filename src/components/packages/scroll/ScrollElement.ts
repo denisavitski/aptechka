@@ -28,12 +28,19 @@ import { device } from '@packages/device'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
+export type SectionMark = 'current' | 'previous' | 'next' | null
+
+export type SectionmarkChangeEvent = CustomEvent<{
+  mark: SectionMark
+}>
+
 class Section {
   #element: HTMLElement
   #scrollElement: ScrollElement
 
   #size = 0
   #position = 0
+  #currentMark: SectionMark = null
 
   constructor(element: HTMLElement, scrollElement: ScrollElement) {
     this.#element = element
@@ -53,6 +60,7 @@ class Section {
   public destroy() {
     scrollEntries.unregister(this.#element)
     this.#element.style.transform = ''
+    this.mark(null)
   }
 
   public setSize(value?: number) {
@@ -113,6 +121,29 @@ class Section {
       this.#element.style.transform = `translate3d(0px, ${value * -1}px, 0px)`
     } else {
       this.#element.style.transform = `translate3d(${value * -1}px, 0px, 0px)`
+    }
+  }
+
+  public mark(mark: SectionMark) {
+    if (this.#currentMark !== mark) {
+      if (this.#currentMark) {
+        this.#element.classList.remove(this.#currentMark)
+      }
+
+      if (mark) {
+        this.#element.classList.add(mark)
+      }
+
+      this.#currentMark = mark
+
+      this.#element.dispatchEvent(
+        new CustomEvent<SectionmarkChangeEvent['detail']>('sectionsChange', {
+          composed: true,
+          detail: {
+            mark: this.#currentMark,
+          },
+        })
+      )
     }
   }
 }
@@ -179,7 +210,6 @@ export class ScrollElement extends CustomElement {
     '--sections-in-view',
     1
   )
-
   #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
@@ -242,13 +272,15 @@ export class ScrollElement extends CustomElement {
         ],
       })
 
-      this.#wheelControls = new WheelControls({ element: this })
+      this.#wheelControls = new WheelControls({ element: this.#contentElement })
       this.#wheelControls.changeEvent.subscribe(this.#controlsListener)
 
-      this.#keyboardControls = new KeyboardControls({ element: this })
+      this.#keyboardControls = new KeyboardControls({
+        element: this.#contentElement,
+      })
       this.#keyboardControls.changeEvent.subscribe(this.#controlsListener)
 
-      this.#dragControls = new DragControls({ element: this })
+      this.#dragControls = new DragControls({ element: this.#contentElement })
       this.#dragControls.changeEvent.subscribe(this.#controlsListener)
 
       this.#axisCSSProperty.subscribe(({ current }) => {
@@ -323,6 +355,7 @@ export class ScrollElement extends CustomElement {
       this.#sectionsInViewCSSProperty.subscribe((e) => {
         if (this.isConnected) {
           this.#resizeListener()
+          this.#updateMarks()
         }
       })
 
@@ -949,17 +982,38 @@ export class ScrollElement extends CustomElement {
 
   #updateMarks() {
     if (this.#sections.length) {
-      if (this.#counter.current === 0) {
+      const counter = this.#counter.current
+
+      if (counter === 0) {
         this.classList.add('start')
       } else {
         this.classList.remove('start')
       }
 
-      if (this.#counter.current === this.limit) {
+      if (counter === this.limit) {
         this.classList.add('end')
       } else {
         this.classList.remove('end')
       }
+
+      this.#sections.forEach((section, index) => {
+        const overflow = counter - this.limit - 1
+
+        const currentRange = counter + this.#sectionsInViewCSSProperty.current
+
+        const vv = this.sections.length - currentRange
+
+        if ((index >= counter && index < currentRange) || index <= overflow) {
+          section.mark('current')
+        } else if (
+          (index >= currentRange && index < currentRange + vv / 2) ||
+          index <= overflow + this.#sectionsInViewCSSProperty.current
+        ) {
+          section.mark('next')
+        } else {
+          section.mark('previous')
+        }
+      })
     }
   }
 
@@ -987,5 +1041,6 @@ declare global {
 
   interface HTMLElementEventMap {
     sectionsChange: CustomEvent
+    sectionMarkChange: SectionmarkChangeEvent
   }
 }

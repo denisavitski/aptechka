@@ -31,9 +31,9 @@
 .artists__slider {
   --axis: x;
   --gap: 5vmin;
-  --damping: 3;
+  --damping: 10;
   --mouse-drag: false;
-  --sections-in-view: 4;
+  --sections-in-view: 3;
   --auto-size: true;
   --static-position: relative;
   --static-width: 100%;
@@ -50,13 +50,26 @@
   width: 500px;
   height: 100px;
 
-  background-color: black;
+  background-color: tomato;
 
   border-radius: 3.6rem;
-  overflow: hidden;
+
+  font-size: 12vmin;
+  color: black;
 }
 
 e-scroll-step-button {
   font-size: 5vmin;
   margin-right: 2vmin;
+}
+
+e-scroll-bullet-buttons {
+  display: flex;
+  gap: 2rem;
+}
+
+e-scroll-bullet-buttons button {
+  width: 20px;
+  height: 20px;
+  background-color: red;
 }
