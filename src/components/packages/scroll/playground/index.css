@@ -39,11 +39,16 @@
   --static-width: 100%;
   --static-height: max-content;
   --infinite: true;
-  --sectional: true;
 
   width: 100%;
 
   margin-bottom: 10.2rem;
+}
+
+@media (max-width: 1024px) {
+  .artists__slider {
+    --auto-size: false;
+  }
 }
 
 .artists__slider__item {

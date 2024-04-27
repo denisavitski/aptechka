@@ -96,7 +96,9 @@ class Section {
   public transform() {
     let offset = 0
 
-    const df = this.#scrollElement.viewportSize
+    const distanceAddition =
+      this.#scrollElement.viewportSize *
+      this.#scrollElement.sectionDistanceScale.current
 
     if (
       this.#scrollElement.infiniteCSSProperty.current &&
@@ -113,8 +115,9 @@ class Section {
     )
 
     const valueToClamp = this.#scrollElement.currentScrollValue + offset
-    const min = this.#position - this.#scrollElement.viewportSize - df
-    const max = this.#position + this.#size + df
+    const min =
+      this.#position - this.#scrollElement.viewportSize - distanceAddition
+    const max = this.#position + this.#size + distanceAddition
     const value = clamp(valueToClamp, min, max)
 
     if (this.#scrollElement.vertical) {
@@ -215,6 +218,11 @@ export class ScrollElement extends CustomElement {
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
   #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
   #mouseDragCSSProperty = new CSSProperty<boolean>(this, '--mouse-drag', false)
+  #sectionDistanceScale = new CSSProperty<number>(
+    this,
+    '--section-distance-scale',
+    0.5
+  )
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
 
@@ -466,6 +474,10 @@ export class ScrollElement extends CustomElement {
     return this.#mouseDragCSSProperty
   }
 
+  public get sectionDistanceScale() {
+    return this.#sectionDistanceScale
+  }
+
   public get disabledCSSProperty() {
     return this.#disabledCSSProperty
   }
@@ -668,11 +680,15 @@ export class ScrollElement extends CustomElement {
     this.#pagesCSSProperty.observe()
     this.#splitCSSProperty.observe()
     this.#sectionalCSSProperty.observe()
+    this.#autoSizeCSSProperty.observe()
     this.#wheelMaxDeltaCSSProperty.observe()
     this.#sectionsInViewCSSProperty.observe()
     this.#infiniteCSSProperty.observe()
     this.#dampingCSSProperty.observe()
+    this.#massCSSProperty.observe()
+    this.#stiffnessCSSProperty.observe()
     this.#mouseDragCSSProperty.observe()
+    this.#sectionDistanceScale.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -684,11 +700,15 @@ export class ScrollElement extends CustomElement {
     this.#pagesCSSProperty.unobserve()
     this.#splitCSSProperty.unobserve()
     this.#sectionalCSSProperty.unobserve()
+    this.#autoSizeCSSProperty.unobserve()
     this.#wheelMaxDeltaCSSProperty.unobserve()
     this.#sectionsInViewCSSProperty.unobserve()
     this.#infiniteCSSProperty.unobserve()
     this.#dampingCSSProperty.unobserve()
+    this.#massCSSProperty.unobserve()
+    this.#stiffnessCSSProperty.unobserve()
     this.#mouseDragCSSProperty.unobserve()
+    this.#sectionDistanceScale.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
