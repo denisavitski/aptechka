@@ -244,7 +244,7 @@ class En3 {
       z-index: -1;
     `
 
-    this.#containerElement.prepend(this.#webglRenderer.domElement)
+    this.#containerElement.append(this.#webglRenderer.domElement)
 
     this.#raycaster = new En3Raycaster()
 

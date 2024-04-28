@@ -218,10 +218,10 @@
       "default": "./lib/ticker/index.js",
       "types": "./lib/ticker/index.d.ts"
     },
-    "./twekaer": {
-      "require": "./lib/twekaer/index.cjs",
-      "default": "./lib/twekaer/index.js",
-      "types": "./lib/twekaer/index.d.ts"
+    "./tweaker": {
+      "require": "./lib/tweaker/index.cjs",
+      "default": "./lib/tweaker/index.js",
+      "types": "./lib/tweaker/index.d.ts"
     },
     "./utils": {
       "require": "./lib/utils/index.cjs",

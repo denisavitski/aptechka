@@ -31,16 +31,17 @@
 .artists__slider {
   --axis: x;
   --gap: 5vmin;
-  --damping: 10;
-  --mouse-drag: false;
+  --damping: 20;
+  --stiffness: 200;
+  --mass: 3;
+  --mouse-drag: true;
   --sections-in-view: 3;
   --auto-size: true;
   --static-position: relative;
   --static-width: 100%;
   --static-height: max-content;
   --infinite: true;
-  --autoplay: 0.1;
-  --autoplay-user-direction: true;
+  --wheel-max-delta: true;
 
   width: 100%;
 
