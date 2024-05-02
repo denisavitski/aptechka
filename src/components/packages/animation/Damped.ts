@@ -1,7 +1,7 @@
-import { StoreEntry, StoreManagers, StoreOptions } from '@packages/store'
+import { StoreManagers, StoreOptions } from '@packages/store'
 import { TickerAddOptions, TickerCallbackEntry } from '@packages/ticker'
 import { clamp, damp, nullishCoalescing, preciseNumber } from '@packages/utils'
-import { Animation } from './Animation'
+import { Animation, AnimationEntry } from './Animation'
 
 export interface DampedOptions extends TickerAddOptions, StoreOptions<number> {
   min?: number
@@ -11,12 +11,9 @@ export interface DampedOptions extends TickerAddOptions, StoreOptions<number> {
   mass?: number
 }
 
-export interface DampedEntry extends StoreEntry<number> {
+export interface DampedEntry extends AnimationEntry {
   min: number
   max: number
-  length: number
-  progress: number
-  direction: number
 }
 
 export class Damped extends Animation<DampedOptions, DampedEntry> {

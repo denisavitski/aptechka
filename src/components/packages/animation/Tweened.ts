@@ -7,7 +7,7 @@ import {
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
-import { Animation, AnimationOptions } from './Animation'
+import { Animation, AnimationEntry, AnimationOptions } from './Animation'
 
 export interface TweenedOptions extends AnimationOptions {
   easing?: EasingFunction
@@ -19,11 +19,7 @@ export interface TweenedSetOptions
   restart?: boolean
 }
 
-export interface TweenedEntry extends StoreEntry<number> {
-  length: number
-  progress: number
-  direction: number
-}
+export interface TweenedEntry extends AnimationEntry {}
 
 export class Tweened extends Animation<TweenedOptions, TweenedEntry> {
   #easing: EasingFunction = linear
