@@ -6,14 +6,14 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   protected override connectedCallback() {
     super.connectedCallback()
 
-    this.captureEvent.subscribe(() => {
-      if (this.hasAttribute('e-autoplay')) {
+    this.addEventListener('sourceCapture', () => {
+      if (this.hasAttribute('capture-autoplay')) {
         this.consumerElement.play()
       }
     })
 
-    this.releaseEvent.subscribe(() => {
-      if (this.hasAttribute('e-autoplay')) {
+    this.addEventListener('sourceRelease', () => {
+      if (this.hasAttribute('capture-autoplay')) {
         this.consumerElement.pause()
 
         if (this.hasAttribute('replay')) {

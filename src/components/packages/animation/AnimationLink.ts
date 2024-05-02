@@ -87,9 +87,7 @@ export class AnimationLink<
     }
 
     if (this.#isRunned) {
-      const dir = Math.sign(e.current - (e.previous || 0))
-
-      if (dir > 0 && e.progress !== 0 && e.progress >= this.#startValue) {
+      if (e.progress !== 0 && e.progress >= this.#startValue) {
         this.#startForward()
       } else if (e.progress <= this.#startValue) {
         this.#startBack()

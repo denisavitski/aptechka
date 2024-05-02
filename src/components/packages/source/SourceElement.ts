@@ -1,7 +1,6 @@
 import { CustomElement } from '@packages/custom-element'
 import { intersector } from '@packages/intersector'
 import { loading } from '@packages/loading'
-import { Notifier } from '@packages/notifier'
 import type { Source } from './SourceClass'
 import { SourceManager } from './SourceManager'
 
@@ -11,15 +10,15 @@ export interface SourceConsumer extends HTMLElement {
   src: string | null
 }
 
-export abstract class SourceElement<T extends SourceConsumer> extends CustomElement {
+export abstract class SourceElement<
+  T extends SourceConsumer
+> extends CustomElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
   #isFirstLoadHappened = false
   #intersectionHappened = false
   #isLazy = false
   #id: string
-  #captureEvent = new Notifier()
-  #releaseEvent = new Notifier()
 
   constructor() {
     super()
@@ -29,14 +28,6 @@ export abstract class SourceElement<T extends SourceConsumer> extends CustomElem
 
   public get consumerElement() {
     return this.#consumerElement
-  }
-
-  public get captureEvent() {
-    return this.#captureEvent
-  }
-
-  public get releaseEvent() {
-    return this.#releaseEvent
   }
 
   protected abstract createConsumer(): T
@@ -58,12 +49,12 @@ export abstract class SourceElement<T extends SourceConsumer> extends CustomElem
     this.#consumerElement.classList.add('source-consumer')
 
     Array.from(this.attributes).forEach((attr) => {
-      if (attr.nodeName.startsWith('e-')) {
-        const originalAttributeName = attr.nodeName.slice(2)
+      if (attr.name !== 'srcset') {
         const value = attr.nodeValue || ''
 
-        this.#consumerElement.setAttribute(originalAttributeName, value)
-        ;(this.#consumerElement as any)[originalAttributeName] = value ? value : true
+        if (attr.name in this.#consumerElement) {
+          ;(this.#consumerElement as any)[attr.name] = value ? value : true
+        }
       }
     })
 
@@ -89,8 +80,6 @@ export abstract class SourceElement<T extends SourceConsumer> extends CustomElem
   protected disconnectedCallback() {
     intersector.unsubscribe(this.#intersectionListener)
 
-    this.#captureEvent.close()
-    this.#releaseEvent.close()
     this.#sourceManager.close()
 
     this.#consumerElement.onloadeddata = null
@@ -111,7 +100,9 @@ export abstract class SourceElement<T extends SourceConsumer> extends CustomElem
       this.classList.remove('loaded')
       this.classList.add('loading')
 
-      const url = isKeepSourceParameters ? source.url : source.name + source.extension
+      const url = isKeepSourceParameters
+        ? source.url
+        : source.name + source.extension
 
       this.consumeSource(url)
 
@@ -169,9 +160,16 @@ export abstract class SourceElement<T extends SourceConsumer> extends CustomElem
     }
 
     if (entry.isIntersecting) {
-      this.#captureEvent.notify()
+      this.dispatchEvent(new CustomEvent('sourceCapture'))
     } else {
-      this.#releaseEvent.notify()
+      this.dispatchEvent(new CustomEvent('sourceRelease'))
     }
+  }
+}
+
+declare global {
+  interface HTMLElementEventMap {
+    sourceCapture: CustomEvent
+    sourceRelase: CustomEvent
   }
 }
