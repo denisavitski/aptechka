@@ -1,8 +1,12 @@
 export { Source } from './SourceClass'
-export { SourceSet, type SourceSetMediaSources, type SourceSetMediaBucket } from './SourceSet'
+export {
+  SourceSet,
+  type SourceSetMediaSources,
+  type SourceSetMediaBucket,
+} from './SourceSet'
 export {
   SourceManager,
   type SourceManagerSourceSet,
   type SourceManagerParameters,
 } from './SourceManager'
-export { SourceElement, type SourceConsumer } from './SourceElement'
+export { SourceElement } from './SourceElement'

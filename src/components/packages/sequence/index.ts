@@ -1,10 +1,9 @@
-import { CanvasElement } from '@packages/canvas'
-import { ClassLinkedStatus } from '@packages/class-linked-status'
+import { Canvas2DRenderDetail, CanvasElement } from '@packages/canvas'
 import { CSSProperty } from '@packages/css-property'
 import { define } from '@packages/custom-element'
 import { elementResizer } from '@packages/element-resizer'
-import { SourceManager, SourceManagerSourceSet } from '@packages/source'
-import { contain, cover } from '@packages/utils'
+import { SourceElement, SourceManagerSourceSet } from '@packages/source'
+import { contain, cover, isBrowser } from '@packages/utils'
 
 export interface SequenceElementParameters {
   srcset: SourceManagerSourceSet
@@ -28,9 +27,7 @@ function extractNumbersBetweenCurlyBraces(str: string) {
 }
 
 @define('e-sequence')
-export class SequenceElement extends CanvasElement {
-  #sourceManager: SourceManager
-
+export class SequenceElement extends SourceElement<CanvasElement> {
   #currentImages: Array<HTMLImageElement> = []
 
   #fitCSSProperty = new CSSProperty<'contain' | 'cover'>(
@@ -45,12 +42,6 @@ export class SequenceElement extends CanvasElement {
 
   #offsetYCSSProperty = new CSSProperty<number>(this, '--offset-y', 0.5)
 
-  #status = new ClassLinkedStatus(this, {
-    loading: false,
-    loaded: false,
-    error: false,
-  })
-
   #imageDimensions: ReturnType<typeof contain> = null!
 
   #currentIndex = 0
@@ -60,95 +51,29 @@ export class SequenceElement extends CanvasElement {
   constructor(parameters?: SequenceElementParameters) {
     super()
 
-    const srcset = parameters?.srcset || this.getAttribute('srcset')
-    const pad = parseInt(
-      (parameters?.pad || this.getAttribute('pad') || '1').toString()
-    )
+    if (isBrowser) {
+      this.#pad = parseInt(
+        (parameters?.pad || this.getAttribute('pad') || '1').toString()
+      )
 
-    if (!srcset) {
-      throw new Error('Sequence Element must have a srcset attribute')
+      this.#fitCSSProperty.subscribe(this.#resizeListener)
+      this.#offsetXCSSProperty.subscribe(this.#resizeListener)
+      this.#offsetYCSSProperty.subscribe(this.#resizeListener)
+
+      this.addEventListener('sourceCapture', (e) => {
+        this.consumerElement.addEventListener(
+          'canvasRender',
+          this.#renderListener
+        )
+      })
+
+      this.addEventListener('sourceRelease', (e) => {
+        this.consumerElement.removeEventListener(
+          'canvasRender',
+          this.#renderListener
+        )
+      })
     }
-
-    this.#fitCSSProperty.subscribe(this.#resizeListener)
-    this.#offsetXCSSProperty.subscribe(this.#resizeListener)
-    this.#offsetYCSSProperty.subscribe(this.#resizeListener)
-
-    this.#sourceManager = new SourceManager({
-      srcset,
-    })
-
-    this.#sourceManager.subscribe(async (v) => {
-      if (v.current) {
-        const newImages: Array<HTMLImageElement> = []
-
-        const minmax = extractNumbersBetweenCurlyBraces(v.current.name)
-
-        if (minmax) {
-          for (let i = minmax.start; i <= minmax.end; i++) {
-            const src = v.current.url.replace(
-              /\{([^}]+)\}/,
-              i.toString().padStart(pad, '0')
-            )
-            const image = new Image()
-            image.src = src
-            newImages.push(image)
-          }
-        } else {
-          const image = new Image()
-          image.src = v.current.url
-          newImages.push(image)
-        }
-
-        this.#status.set('loading', true)
-        this.#status.set('error', false)
-        this.#status.set('loaded', false)
-
-        try {
-          await Promise.all(
-            newImages.map((image, i) => {
-              return new Promise<void>((res, rej) => {
-                image.onload = () => {
-                  res()
-                }
-
-                image.onerror = (e) => {
-                  rej(`${image.src} Image not found`)
-                }
-              })
-            })
-          )
-
-          this.#currentImages = newImages
-          this.#resizeListener()
-
-          this.#status.set('loaded', true)
-        } catch (e) {
-          console.error(e)
-          this.#status.set('error', true)
-        }
-
-        this.#status.set('loading', false)
-      }
-    })
-
-    this.addEventListener('canvasRender', (e) => {
-      if (this.#status.isFalse('loaded') || !this.#imageDimensions) {
-        return
-      }
-
-      e.detail.context.clearRect(0, 0, e.detail.width, e.detail.height)
-
-      const element = this.#currentImages[this.#currentIndex]
-
-      if (element) {
-        e.detail.context.drawImage(element, ...this.#imageDimensions)
-      }
-
-      if (this.#autoplayCSSProperty.current) {
-        this.#currentIndex =
-          (this.#currentIndex + 1) % this.#currentImages.length
-      }
-    })
   }
 
   public setProgress(value: number) {
@@ -165,8 +90,6 @@ export class SequenceElement extends CanvasElement {
     this.#offsetXCSSProperty.observe()
     this.#offsetYCSSProperty.observe()
 
-    this.#sourceManager.connect()
-
     elementResizer.subscribe(this, this.#resizeListener)
   }
 
@@ -179,11 +102,77 @@ export class SequenceElement extends CanvasElement {
     this.#offsetYCSSProperty.unobserve()
 
     this.#currentImages = []
-    this.#status.reset()
-
-    this.#sourceManager.disconnect()
 
     elementResizer.unsubscribe(this.#resizeListener)
+
+    this.consumerElement.removeEventListener(
+      'canvasRender',
+      this.#renderListener
+    )
+  }
+
+  protected override createConsumer() {
+    return new CanvasElement()
+  }
+
+  protected override async consumeSource(url: string | null) {
+    if (url) {
+      this.consumerElement.removeEventListener(
+        'canvasRender',
+        this.#renderListener
+      )
+
+      const newImages: Array<HTMLImageElement> = []
+
+      const minmax = extractNumbersBetweenCurlyBraces(url)
+
+      if (minmax) {
+        for (let i = minmax.start; i <= minmax.end; i++) {
+          const src = url.replace(
+            /\{([^}]+)\}/,
+            i.toString().padStart(this.#pad, '0')
+          )
+          const image = new Image()
+          image.src = src
+          newImages.push(image)
+        }
+      } else {
+        const image = new Image()
+        image.src = url
+        newImages.push(image)
+      }
+
+      try {
+        await Promise.all(
+          newImages.map((image, i) => {
+            return new Promise<void>((res, rej) => {
+              image.onload = () => {
+                res()
+              }
+
+              image.onerror = (e) => {
+                rej(`${image.src} Image not found`)
+              }
+            })
+          })
+        )
+
+        this.#currentImages = newImages
+        this.#resizeListener()
+
+        this.consumerElement.onload?.(new Event('load'))
+
+        if (!this.isLazy) {
+          this.consumerElement.addEventListener(
+            'canvasRender',
+            this.#renderListener
+          )
+        }
+      } catch (e) {
+        console.error(e)
+        this.consumerElement.onerror?.(new Event('error'))
+      }
+    }
   }
 
   #resizeListener = () => {
@@ -194,8 +183,8 @@ export class SequenceElement extends CanvasElement {
         this.#imageDimensions = cover(
           image.naturalWidth,
           image.naturalHeight,
-          this.width,
-          this.height,
+          this.consumerElement.width,
+          this.consumerElement.height,
           this.#offsetXCSSProperty.current,
           this.#offsetYCSSProperty.current
         )
@@ -203,12 +192,30 @@ export class SequenceElement extends CanvasElement {
         this.#imageDimensions = contain(
           image.naturalWidth,
           image.naturalHeight,
-          this.width,
-          this.height,
+          this.consumerElement.width,
+          this.consumerElement.height,
           this.#offsetXCSSProperty.current,
           this.#offsetYCSSProperty.current
         )
       }
+    }
+  }
+
+  #renderListener = (e: CustomEvent<Canvas2DRenderDetail>) => {
+    if (this.status.isFalse('loaded') || !this.#imageDimensions) {
+      return
+    }
+
+    e.detail.context.clearRect(0, 0, e.detail.width, e.detail.height)
+
+    const element = this.#currentImages[this.#currentIndex]
+
+    if (element) {
+      e.detail.context.drawImage(element, ...this.#imageDimensions)
+    }
+
+    if (this.#autoplayCSSProperty.current) {
+      this.#currentIndex = (this.#currentIndex + 1) % this.#currentImages.length
     }
   }
 }

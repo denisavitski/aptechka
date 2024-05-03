@@ -52,6 +52,8 @@ export class Intersector {
       entry: alreadyObserved?.entry || null,
     })
 
+    console.log(this.#subscribers)
+
     return () => {
       this.unsubscribe(callback)
     }

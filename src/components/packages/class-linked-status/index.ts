@@ -1,35 +1,35 @@
+import { Store } from '@packages/store'
 import { camelToKebab } from '@packages/utils'
 
-export class ClassLinkedStatus<T extends { [key in string]: boolean }> {
+export class ClassLinkedStatus<
+  T extends { [key in string]: boolean }
+> extends Store<T> {
   #element: HTMLElement
-  #value: T
-  #initial: T
 
   constructor(element: HTMLElement, value: T) {
+    super(value)
+
     this.#element = element
-    this.#value = value
-    this.#initial = { ...value }
   }
 
   public isTrue(key: keyof T) {
-    return this.#value[key] === true
+    return this.current[key] === true
   }
 
   public isFalse(key: keyof T) {
-    return this.#value[key] === false
+    return this.current[key] === false
   }
 
-  public reset() {
-    for (const key in this.#initial) {
-      this.set(
-        key as Extract<keyof T, 'string'>,
-        this.#initial[key as keyof T]!
-      )
+  public override reset() {
+    super.reset()
+
+    for (const key in this.initial) {
+      this.set(key as Extract<keyof T, 'string'>, this.initial[key as keyof T]!)
     }
   }
 
   public set(key: keyof T, value = true) {
-    ;(this.#value as any)[key] = value
+    this.current = { ...this.current, [key]: value }
 
     if (value) {
       this.#element.classList.add(camelToKebab(key as string))

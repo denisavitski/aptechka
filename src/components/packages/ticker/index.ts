@@ -1,5 +1,4 @@
-import { intersector } from '@packages/intersector'
-import { ElementOrSelector, isBrowser } from '@packages/utils'
+import { ElementOrSelector, getElement, isBrowser } from '@packages/utils'
 
 export interface TickerCallbackEntry {
   timestamp: number
@@ -23,6 +22,7 @@ class TickerSubscriber {
   #startTimestamp = 0
   #elapsed = 0
   #isVisible = false
+  #intersectionObserver: IntersectionObserver | null = null
 
   constructor(callback: TickerCallback, options?: TickerAddOptions) {
     this.#callback = callback
@@ -30,7 +30,14 @@ class TickerSubscriber {
     this.#order = options?.order || 0
 
     if (options?.culling && isBrowser) {
-      intersector.subscribe(options.culling, this.#intersectionListener)
+      const element = getElement(options.culling)
+
+      if (element) {
+        this.#intersectionObserver = new IntersectionObserver(
+          this.#intersectionListener
+        )
+        this.#intersectionObserver.observe(element)
+      }
     } else {
       this.#isVisible = true
     }
@@ -75,10 +82,11 @@ class TickerSubscriber {
   }
 
   public destroy() {
-    intersector.unsubscribe(this.#intersectionListener)
+    this.#intersectionObserver?.disconnect()
   }
 
-  #intersectionListener = (entry: IntersectionObserverEntry) => {
+  #intersectionListener = (entries: Array<IntersectionObserverEntry>) => {
+    const entry = entries[0]
     this.#isVisible = entry.isIntersecting
   }
 }

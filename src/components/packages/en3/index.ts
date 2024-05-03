@@ -1,7 +1,5 @@
 export { en3, type En3AttachedObject3D, type En3Parameters } from './core/en3'
 
-export { en3LazyLoader } from './instances/en3LazyLoader'
-
 export { en3TextureLoader } from './loaders/en3TextureLoader'
 export { en3GLTFLoader } from './loaders/en3GLTFLoader'
 

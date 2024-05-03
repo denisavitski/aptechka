@@ -1,7 +1,7 @@
 import { define } from '@packages/custom-element'
-import { ScrollUserElement } from './ScrollUserElement'
 import { debounce } from '@packages/utils'
 import { ScrollBehaviour, ScrollElement } from './ScrollElement'
+import { ScrollUserElement } from './ScrollUserElement'
 
 class BulletButton {
   #element: HTMLButtonElement

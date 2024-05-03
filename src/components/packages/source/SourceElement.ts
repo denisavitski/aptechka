@@ -1,33 +1,51 @@
 import { CustomElement } from '@packages/custom-element'
-import { intersector } from '@packages/intersector'
 import { loading } from '@packages/loading'
 import type { Source } from './SourceClass'
 import { SourceManager } from './SourceManager'
+import { ClassLinkedStatus } from '@packages/class-linked-status'
+import { isBrowser } from '@packages/utils'
 
 let id = 0
 
-export interface SourceConsumer extends HTMLElement {
-  src: string | null
-}
-
 export abstract class SourceElement<
-  T extends SourceConsumer
+  T extends HTMLElement
 > extends CustomElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
   #isFirstLoadHappened = false
   #intersectionHappened = false
   #isLazy = false
-  #id: string
+  #id: string = ''
+
+  #status = new ClassLinkedStatus(this, {
+    loading: false,
+    loaded: false,
+    error: false,
+  })
+
+  #intersectionObserver: IntersectionObserver = null!
 
   constructor() {
     super()
 
-    this.#id = `source-consumer-${++id}`
+    if (isBrowser) {
+      this.#id = `source-consumer-${++id}`
+      this.#intersectionObserver = new IntersectionObserver(
+        this.#intersectionListener
+      )
+    }
   }
 
   public get consumerElement() {
     return this.#consumerElement
+  }
+
+  public get status() {
+    return this.#status
+  }
+
+  public get isLazy() {
+    return this.#isLazy
   }
 
   protected abstract createConsumer(): T
@@ -72,13 +90,13 @@ export abstract class SourceElement<
       }
     })
 
-    intersector.subscribe(this, this.#intersectionListener)
+    this.#intersectionObserver.observe(this)
 
     this.#sourceManager.connect()
   }
 
   protected disconnectedCallback() {
-    intersector.unsubscribe(this.#intersectionListener)
+    this.#intersectionObserver.disconnect()
 
     this.#sourceManager.close()
 
@@ -87,6 +105,8 @@ export abstract class SourceElement<
     this.#consumerElement.onerror = null
 
     this.#consumerElement.remove()
+
+    this.#status.reset()
   }
 
   #loadSource(source: Source | undefined) {
@@ -97,8 +117,9 @@ export abstract class SourceElement<
     if (source) {
       const isKeepSourceParameters = this.hasAttribute('keep-source-parameters')
 
-      this.classList.remove('loaded')
-      this.classList.add('loading')
+      this.#status.set('loaded', false)
+      this.#status.set('error', false)
+      this.#status.set('loading', true)
 
       const url = isKeepSourceParameters
         ? source.url
@@ -106,46 +127,29 @@ export abstract class SourceElement<
 
       this.consumeSource(url)
 
-      const loadListener = () => {
-        this.classList.remove('error')
-        this.classList.remove('loading')
-        this.classList.add('loaded')
-
-        if (!this.#isLazy && !this.#isFirstLoadHappened) {
-          loading.setLoaded(this.#id, 1)
-        }
-
-        this.#isFirstLoadHappened = true
-      }
-
-      const errorListener = () => {
-        this.classList.remove('loading')
-        this.classList.add('error')
-
-        if (!this.#isLazy && !this.#isFirstLoadHappened) {
-          loading.setError(this.#id, url)
-        }
-
-        this.#isFirstLoadHappened = true
-      }
-
       if (!this.#isLazy && !this.#isFirstLoadHappened) {
         loading.setTotal(this.#id, 1)
       }
 
       this.#consumerElement.onloadeddata = () => {
-        loadListener()
+        this.#loadListener()
       }
+
       this.#consumerElement.onload = () => {
-        loadListener()
+        this.#loadListener()
       }
-      this.#consumerElement.onerror = errorListener
+
+      this.#consumerElement.onerror = () => {
+        this.#errorListener(url)
+      }
     } else {
       this.consumeSource(null)
     }
   }
 
-  #intersectionListener = (entry: IntersectionObserverEntry) => {
+  #intersectionListener = (entries: Array<IntersectionObserverEntry>) => {
+    const entry = entries[0]
+
     if (this.#isLazy) {
       if (!this.#intersectionHappened && entry.isIntersecting) {
         if (
@@ -164,6 +168,30 @@ export abstract class SourceElement<
     } else {
       this.dispatchEvent(new CustomEvent('sourceRelease'))
     }
+  }
+
+  #loadListener = () => {
+    this.#status.set('loaded', true)
+    this.#status.set('error', false)
+    this.#status.set('loading', false)
+
+    if (!this.#isLazy && !this.#isFirstLoadHappened) {
+      loading.setLoaded(this.#id, 1)
+    }
+
+    this.#isFirstLoadHappened = true
+  }
+
+  #errorListener = (url: string) => {
+    this.#status.set('loaded', false)
+    this.#status.set('error', true)
+    this.#status.set('loading', false)
+
+    if (!this.#isLazy && !this.#isFirstLoadHappened) {
+      loading.setError(this.#id, url)
+    }
+
+    this.#isFirstLoadHappened = true
   }
 }
 
