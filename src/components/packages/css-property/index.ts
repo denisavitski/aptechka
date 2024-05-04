@@ -10,6 +10,13 @@ import {
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
 
+export interface CSSPropertyOptions<
+  StoreType extends number | boolean | string,
+  StoreManager extends StoreManagerType = StoreManagerType
+> extends StoreOptions<StoreType, StoreManager> {
+  rawValueCheck?: boolean
+}
+
 export class CSSProperty<
   StoreType extends number | boolean | string,
   StoreManager extends StoreManagerType = StoreManagerType
@@ -17,18 +24,24 @@ export class CSSProperty<
   #element: HTMLElement
   #property: string
   #currentRawValue: string
+  #rawValueCheck: boolean
 
   constructor(
     elementOrSelector: ElementOrSelector<HTMLElement>,
     property: string,
     defaultValue: StoreType,
-    options?: StoreOptions<StoreType, StoreManager>
+    options?: CSSPropertyOptions<StoreType, StoreManager>
   ) {
     super(defaultValue, options)
 
     this.#element = getElement(elementOrSelector)!
     this.#property = property
     this.#currentRawValue = defaultValue.toString()
+    this.#rawValueCheck = options?.rawValueCheck === false ? false : true
+  }
+
+  public get currentRawValue() {
+    return this.#currentRawValue
   }
 
   public observe() {
@@ -60,16 +73,18 @@ export class CSSProperty<
       this.#property
     )
 
-    if (this.#currentRawValue !== rawValue) {
-      this.#currentRawValue = rawValue
+    if (this.#rawValueCheck && this.#currentRawValue === rawValue) {
+      return
+    }
 
-      if (rawValue) {
-        const result = cssValueParser.parse(this.#currentRawValue)
+    this.#currentRawValue = rawValue
 
-        this.current = result
-      } else {
-        this.current = this.initial
-      }
+    if (rawValue) {
+      const result = cssValueParser.parse(this.#currentRawValue)
+
+      this.current = result
+    } else {
+      this.current = this.initial
     }
   }
 

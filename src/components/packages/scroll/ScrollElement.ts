@@ -465,6 +465,10 @@ export class ScrollElement extends CustomElement {
     }
   }
 
+  public get damped() {
+    return this.#damped
+  }
+
   public get axisCSSProperty() {
     return this.#axisCSSProperty
   }
@@ -605,18 +609,6 @@ export class ScrollElement extends CustomElement {
 
   public get targetProgress() {
     return this.targetScrollValue / this.infiniteDistance || 0
-  }
-
-  public get speed() {
-    return this.#damped.speed
-  }
-
-  public get direction() {
-    return this.#damped.direction
-  }
-
-  public get isRunning() {
-    return this.#damped.isRunning
   }
 
   public override get scrollWidth(): number {
