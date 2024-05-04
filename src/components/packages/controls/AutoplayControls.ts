@@ -73,7 +73,7 @@ export class AutoplayControls extends Controls {
     if (!this.#paused) {
       this.changeEvent.notify(
         'autoplay',
-        e.elapsed * this.#speed * this.direction
+        e.timeBetweenFrames * this.#speed * this.direction
       )
     }
   }

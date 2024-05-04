@@ -2,8 +2,9 @@ import { ElementOrSelector, getElement, isBrowser } from '@packages/utils'
 
 export interface TickerCallbackEntry {
   timestamp: number
-  elapsed: number
-  startTimestamp: number
+  subscribeTimestamp: number
+  timeBetweenFrames: number
+  timeElapsedSinceSubscription: number
 }
 
 export type TickerCallback = (entry: TickerCallbackEntry) => void
@@ -19,8 +20,8 @@ class TickerSubscriber {
   #maxFPS: number | undefined
   #order: number
   #lastTimestamp = 0
-  #startTimestamp = 0
-  #elapsed = 0
+  #subscribeTimestamp = 0
+  #timeBetweenFrames = 0
   #isVisible = false
   #intersectionObserver: IntersectionObserver | null = null
 
@@ -52,19 +53,20 @@ class TickerSubscriber {
   }
 
   public sync(timestamp: number) {
-    this.#lastTimestamp = timestamp - this.#elapsed
+    this.#lastTimestamp = timestamp - this.#timeBetweenFrames
   }
 
   public tick(timestamp: number) {
-    this.#elapsed = Math.max(0, timestamp - this.#lastTimestamp)
+    this.#timeBetweenFrames = Math.max(0, timestamp - this.#lastTimestamp)
 
-    if (!this.#startTimestamp) {
-      this.#startTimestamp = timestamp
+    if (!this.#subscribeTimestamp) {
+      this.#subscribeTimestamp = timestamp
     }
 
     if (this.#maxFPS) {
-      if (this.#elapsed >= 1000 / this.#maxFPS) {
-        this.#lastTimestamp = timestamp - (this.#elapsed % this.#maxFPS)
+      if (this.#timeBetweenFrames >= 1000 / this.#maxFPS) {
+        this.#lastTimestamp =
+          timestamp - (this.#timeBetweenFrames % this.#maxFPS)
       } else {
         return
       }
@@ -74,9 +76,10 @@ class TickerSubscriber {
 
     if (this.#isVisible) {
       this.#callback({
-        elapsed: this.#elapsed,
+        timeBetweenFrames: this.#timeBetweenFrames,
         timestamp: timestamp,
-        startTimestamp: this.#startTimestamp,
+        subscribeTimestamp: this.#subscribeTimestamp,
+        timeElapsedSinceSubscription: timestamp - this.#subscribeTimestamp,
       })
     }
   }

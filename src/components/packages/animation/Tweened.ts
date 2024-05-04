@@ -42,8 +42,8 @@ export class Tweened extends Animation {
     }
   }
 
-  protected override handleAnimationFrame(e: TickerCallbackEntry): void {
-    const t = (e.timestamp - e.startTimestamp) / 1000 / (this.#duration / 1000)
+  public override update(elapsed: number): void {
+    const t = elapsed / 1000 / (this.#duration / 1000)
     const et = this.#easing(clamp(t, 0, 1))
 
     this.current = preciseNumber(this.from + (this.to - this.from) * et, 6)
@@ -51,6 +51,10 @@ export class Tweened extends Animation {
     if (t > 1) {
       this.unlistenAnimationFrame()
     }
+  }
+
+  protected override handleAnimationFrame(e: TickerCallbackEntry): void {
+    this.update(e.timeElapsedSinceSubscription)
   }
 
   protected override start() {

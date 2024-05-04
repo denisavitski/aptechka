@@ -248,6 +248,8 @@ export abstract class Animation<
     })
   }
 
+  public abstract update(...args: any[]): void
+
   protected start() {
     this.listenAnimationFrame()
   }

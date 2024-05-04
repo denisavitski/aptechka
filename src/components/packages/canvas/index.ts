@@ -28,7 +28,7 @@ export interface Canvas2DRenderDetail {
   canvasElement: HTMLCanvasElement
   context: CanvasRenderingContext2D
   timestamp: number
-  elapsed: number
+  timeBetweenFrames: number
 }
 
 export type Canvas2DRenderCallback = (entry: Canvas2DRenderDetail) => void
@@ -45,7 +45,7 @@ export class CanvasElement extends CustomElement {
   #pixelRatio = 1
 
   #timestamp = 0
-  #elapsed = 1
+  #timeBetweenFrames = 1
 
   constructor() {
     super()
@@ -101,7 +101,7 @@ export class CanvasElement extends CustomElement {
       pixelRatio: this.#pixelRatio,
       context: this.#context,
       timestamp: this.#timestamp,
-      elapsed: this.#elapsed,
+      timeBetweenFrames: this.#timeBetweenFrames,
     }
   }
 
@@ -152,7 +152,7 @@ export class CanvasElement extends CustomElement {
 
   #tickListener: TickerCallback = (e) => {
     this.#timestamp = e.timestamp
-    this.#elapsed = e.elapsed
+    this.#timeBetweenFrames = e.timeBetweenFrames
 
     this.#dispatchRenderEvent()
   }

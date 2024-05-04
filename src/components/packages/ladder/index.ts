@@ -218,7 +218,7 @@ export class Ladder<
 
     for (const item of this.steps) {
       const step = item[1]
-      const done = step.update(e.elapsed)
+      const done = step.update(e.timeBetweenFrames)
       needUpdate += done ? 0 : 1
     }
 

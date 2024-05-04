@@ -59,19 +59,14 @@ export class Damped extends Animation<DampedEntry> {
     this.stiffness = nullishCoalescing(options?.stiffness, this.stiffness)
   }
 
-  protected override handleAnimationFrame(e: TickerCallbackEntry) {
-    if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
-      this.unlistenAnimationFrame()
-      this.current = this.target
-    }
-
+  public override update(timeBetweenFrames: number): void {
     const current = this.current
 
     const delta = Math.abs(current - this.target)
 
-    this.#speed = delta / e.elapsed
+    this.#speed = delta / timeBetweenFrames
 
-    const dt = e.elapsed / 1000
+    const dt = timeBetweenFrames / 1000
 
     if (this.mass || this.stiffness) {
       const acceleration =
@@ -84,5 +79,14 @@ export class Damped extends Animation<DampedEntry> {
     } else {
       this.current = damp(this.current, this.target, this.damping, dt)
     }
+  }
+
+  protected override handleAnimationFrame(e: TickerCallbackEntry) {
+    if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
+      this.unlistenAnimationFrame()
+      this.current = this.target
+    }
+
+    this.update(e.timeBetweenFrames)
   }
 }
