@@ -10,8 +10,8 @@ export class AnimationLink<
   Entry extends AnimationEntry = AnimationEntry,
   Options extends AnimationLinkOptions = AnimationLinkOptions
 > {
-  #triggerAnimation: Animation<any, Entry>
-  #targetAnimation: Animation<any, AnimationEntry>
+  #triggerAnimation: Animation<Entry>
+  #targetAnimation: Animation<AnimationEntry>
 
   #startValue: number
   #setValue: number
@@ -23,8 +23,8 @@ export class AnimationLink<
   #options: Options | undefined
 
   constructor(
-    triggerAnimation: Animation<any, Entry>,
-    targetAnimation: Animation<any, AnimationEntry>,
+    triggerAnimation: Animation<Entry>,
+    targetAnimation: Animation<AnimationEntry>,
     startValue: number,
     setValue: number,
     options?: Options | undefined
@@ -87,9 +87,9 @@ export class AnimationLink<
     }
 
     if (this.#isRunned) {
-      if (e.progress !== 0 && e.progress >= this.#startValue) {
+      if (e.direction > 0 && e.progress >= this.#startValue) {
         this.#startForward()
-      } else if (e.progress <= this.#startValue) {
+      } else if (e.direction < 0 && e.progress <= this.#startValue) {
         this.#startBack()
       }
     }

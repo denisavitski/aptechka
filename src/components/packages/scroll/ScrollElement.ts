@@ -620,11 +620,11 @@ export class ScrollElement extends CustomElement {
   }
 
   public override get scrollWidth(): number {
-    return this.#axisCSSProperty.current === 'y' ? 0 : this.#damped.length
+    return this.#axisCSSProperty.current === 'y' ? 0 : this.#damped.distance
   }
 
   public override get scrollHeight(): number {
-    return this.#axisCSSProperty.current === 'x' ? 0 : this.#damped.length
+    return this.#axisCSSProperty.current === 'x' ? 0 : this.#damped.distance
   }
 
   public onScroll(...parameters: Parameters<Damped['subscribe']>) {
@@ -704,10 +704,9 @@ export class ScrollElement extends CustomElement {
         shiftValue = currentSection.position - previousSection.position
       }
 
-      this.#damped.shift(
-        shiftValue - scrolledFromNearestSection,
-        behaviour === 'instant'
-      )
+      this.#damped.shift(shiftValue - scrolledFromNearestSection, {
+        equalize: behaviour === 'instant',
+      })
     }
   }
 
@@ -723,7 +722,9 @@ export class ScrollElement extends CustomElement {
     value: number,
     behaviour: 'smooth' | 'instant' = 'smooth'
   ) {
-    this.#damped.set(value, behaviour === 'instant')
+    this.#damped.set(value, {
+      equalize: behaviour === 'instant',
+    })
   }
 
   protected connectedCallback() {
@@ -971,9 +972,13 @@ export class ScrollElement extends CustomElement {
     if (this.#sectionalCSSProperty.current && this.#sections.length) {
       const section = this.#sections[prevCounter]
 
-      this.#damped.set(section.position, true)
+      this.#damped.set(section.position, {
+        equalize: true,
+      })
     } else {
-      this.#damped.set(prevProgress * this.#scrollSize, true)
+      this.#damped.set(prevProgress * this.#scrollSize, {
+        equalize: true,
+      })
     }
   }
 

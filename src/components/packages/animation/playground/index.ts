@@ -1,30 +1,32 @@
+import { ticker } from '@packages/ticker'
 import { Damped } from '../Damped'
 import { Tweened } from '../Tweened'
+import { easeInOutExpo, easeInQuint, easeOutExpo } from '@packages/utils'
 
 const box = document.querySelector('.box') as HTMLElement
 
-const damped = new Tweened(0, {
-  duration: 1000,
+const t1 = new Tweened(0, {
+  min: 0,
+  max: 360,
+  easing: easeInOutExpo,
 })
 
-damped.subscribe((e) => {
-  box.style.transform = `rotate(${e.current}deg)`
+const t2 = new Tweened(0, {
+  min: 0,
+  max: 100,
+  easing: easeOutExpo,
 })
 
-const linked = new Tweened(0, {
-  duration: 500,
-})
+t1.link(t2, 0.1, 100)
 
-linked.subscribe((e) => {
-  box.style.width = `${100 + e.current}px`
+ticker.subscribe(() => {
+  box.style.transform = `translateX(${t2.current}px) rotate(${t1.current}deg)`
 })
-
-damped.link(linked, 0.5, 300)
 
 addEventListener('keydown', (e) => {
   if (e.key === '1') {
-    damped.set(360)
+    t1.set(360)
   } else if (e.key === '2') {
-    damped.set(0)
+    t1.set(0)
   }
 })

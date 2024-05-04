@@ -1,70 +1,38 @@
-import { StoreManagers, StoreOptions } from '@packages/store'
-import { TickerAddOptions, TickerCallbackEntry } from '@packages/ticker'
-import { clamp, damp, nullishCoalescing, preciseNumber } from '@packages/utils'
-import { Animation, AnimationEntry } from './Animation'
+import { TickerCallbackEntry } from '@packages/ticker'
+import { damp, nullishCoalescing, preciseNumber } from '@packages/utils'
+import {
+  Animation,
+  AnimationConstructorOptions,
+  AnimationEntry,
+  AnimationOptions,
+} from './Animation'
 
-export interface DampedOptions extends TickerAddOptions, StoreOptions<number> {
-  min?: number
-  max?: number
+export interface DampedOptions extends AnimationOptions {
   stiffness?: number
   damping?: number
   mass?: number
 }
 
 export interface DampedEntry extends AnimationEntry {
-  min: number
-  max: number
+  velocity: number
+  speed: number
 }
 
-export class Damped extends Animation<DampedOptions, DampedEntry> {
+export class Damped extends Animation<DampedEntry> {
   public damping = 20
   public stiffness = 0
   public mass = 0
 
-  #target = 0
-  #direction = 0
-  #min = 0
-  #max = 0
   #velocity = 0
   #speed = 0
 
-  constructor(initial?: number, options?: DampedOptions) {
-    super(initial || 0)
+  constructor(
+    initial?: number,
+    options?: AnimationConstructorOptions<DampedOptions>
+  ) {
+    super(initial)
 
-    this.#min = nullishCoalescing(options?.min, -Infinity)
-    this.#max = nullishCoalescing(options?.max, Infinity)
-
-    this.#target = this.current
-
-    this.updateOptions(options)
-
-    this.listenAnimationFrame()
-  }
-
-  public get target() {
-    return this.#target
-  }
-
-  public get direction() {
-    return this.#direction
-  }
-
-  public get min() {
-    return this.#min
-  }
-
-  public set min(value: number) {
-    this.#min = value
-    this.#lengthChange()
-  }
-
-  public get max() {
-    return this.#max
-  }
-
-  public set max(value: number) {
-    this.#max = value
-    this.#lengthChange()
+    this.updateOptions({ ...options, equalize: true })
   }
 
   public get velocity() {
@@ -75,62 +43,15 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
     return this.#speed
   }
 
-  public get length() {
-    return this.#max - this.#min
-  }
-
-  public get progress() {
-    return this.length
-      ? preciseNumber((this.current - this.#min) / this.length, 6)
-      : 0
-  }
-
-  public override get entry(): DampedEntry {
+  public override get entry() {
     return {
       ...super.entry,
-      min: this.#min,
-      max: this.#max,
-      length: this.length,
-      direction: this.direction,
-      progress: this.progress,
+      velocity: this.#velocity,
+      speed: this.#speed,
     }
   }
 
-  public set(value: number, equalize = false) {
-    const previous = this.#target
-
-    this.#target = clamp(value, this.#min, this.#max)
-
-    if (equalize) {
-      this.current = this.#target
-    }
-
-    if (this.#target !== previous) {
-      this.#direction = Math.sign(value - this.#target) || 1
-      this.listenAnimationFrame()
-    }
-  }
-
-  public shift(value: number, equalize = false) {
-    this.set(this.#target + value, equalize)
-  }
-
-  public override reset() {
-    this.set(this.initial, true)
-    super.reset()
-  }
-
-  public override listenAnimationFrame() {
-    if (this.current !== this.target) {
-      super.listenAnimationFrame()
-    }
-  }
-
-  public override updateOptions(
-    options?:
-      | Omit<DampedOptions, keyof StoreOptions<number, keyof StoreManagers>>
-      | undefined
-  ) {
+  public override updateOptions(options?: DampedOptions) {
     super.updateOptions(options)
 
     this.damping = nullishCoalescing(options?.damping, this.damping)
@@ -154,7 +75,7 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
 
     if (this.mass || this.stiffness) {
       const acceleration =
-        (this.#target - this.current) * this.stiffness -
+        (this.target - this.current) * this.stiffness -
         this.#velocity * this.damping
 
       this.#velocity += (acceleration / this.mass) * dt
@@ -163,9 +84,5 @@ export class Damped extends Animation<DampedOptions, DampedEntry> {
     } else {
       this.current = damp(this.current, this.target, this.damping, dt)
     }
-  }
-
-  #lengthChange = () => {
-    this.set(this.#target, true)
   }
 }

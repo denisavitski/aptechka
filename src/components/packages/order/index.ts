@@ -10,7 +10,8 @@ export enum RESIZE_ORDER {
 }
 
 export enum TICK_ORDER {
-  SCROLL = -100000,
+  SCROLL = -1000000,
+  ANIMATION,
   LAYOUT_BOX,
   LADDER,
   EN3 = 100000,
