@@ -136,14 +136,18 @@ export abstract class Animation<
     }
   }
 
+  public setTarget(value: number) {
+    this.#direction = Math.sign(value - this.#target)
+
+    this.#target = clamp(value, this.#min, this.#max)
+
+    this.#from = this.current
+    this.#to = value
+  }
+
   public set(value: number, options?: AnimationOptions) {
     if (this.#target !== value) {
-      this.#direction = Math.sign(value - this.#target)
-
-      this.#target = clamp(value, this.#min, this.#max)
-
-      this.#from = this.current
-      this.#to = value
+      this.setTarget(value)
 
       if (options) {
         this.updateOptions(options)
@@ -248,13 +252,12 @@ export abstract class Animation<
     })
   }
 
-  public abstract update(...args: any[]): void
-
   protected start() {
     this.listenAnimationFrame()
   }
 
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void
+  protected abstract updateManually(...args: any[]): any
 
   #animationFrameListener: TickerCallback = (e) => {
     this.handleAnimationFrame(e)
