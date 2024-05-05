@@ -1,16 +1,17 @@
 import { CSSProperty } from '@packages/css-property'
-import { RESIZE_ORDER } from '@packages/order'
+import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import {
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
 } from '@packages/utils/layout'
-import { clamp, smootherstep, smoothstep, step } from '@packages/utils/math'
+import { clamp, step } from '@packages/utils/math'
 import { define } from '@packages/custom-element'
 import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { ScrollUserElement } from './ScrollUserElement'
 import { debounce } from '@packages/utils'
+import { Damped } from '@packages/animation'
 
 export interface ScrollSegmentResizeDetail {
   start: number
@@ -18,21 +19,22 @@ export interface ScrollSegmentResizeDetail {
   finish: number
 }
 
-export interface ScrollSegmentPassDetail extends ScrollSegmentResizeDetail {
-  passed: number
-  progress: number
-}
-
 @define('e-scroll-segment')
 export class ScrollSegmentElement extends ScrollUserElement {
+  #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
+  #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
+  #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
   #targetCSSProperty = new CSSProperty<string>(this, '--target', '')
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #distanceOffsetCSSProperty = new CSSProperty<number>(
     this,
     '--distance-offset',
-    0
+    0,
+    { rawValueCheck: false }
   )
-  #startOffsetCSSProperty = new CSSProperty<number>(this, '--start-offset', 0)
+  #startOffsetCSSProperty = new CSSProperty<number>(this, '--start-offset', 0, {
+    rawValueCheck: false,
+  })
   #captureOnceCSSProperty = new CSSProperty<boolean>(
     this,
     '--capture-once',
@@ -65,12 +67,6 @@ export class ScrollSegmentElement extends ScrollUserElement {
   #distanceVarCSSProperty = new CSSProperty<string>(this, '--distance-var', '')
   #startVarCSSProperty = new CSSProperty<string>(this, '--start-var', '')
   #finishVarCSSProperty = new CSSProperty<string>(this, '--finish-var', '')
-  #smoothstepCSSProperty = new CSSProperty<boolean>(this, '--smoothstep', false)
-  #smootherstepCSSProperty = new CSSProperty<boolean>(
-    this,
-    '--smootherstep',
-    false
-  )
 
   #isCaptured = new Store(false)
   #isReleased = new Store(false)
@@ -86,7 +82,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
   #directionSize = 0
   #moverDirectionSize = 0
 
-  #passed = 0
+  #passed = new Damped(0, { order: TICK_ORDER.SCROLL - 1, min: 0, max: 1 })
   #progress = 0
 
   #start = 0
@@ -96,6 +92,10 @@ export class ScrollSegmentElement extends ScrollUserElement {
   #isResized = false
   #isCapturedOnce = false
   #isDisabled = true
+
+  constructor() {
+    super()
+  }
 
   public get distanceOffsetCSSProperty() {
     return this.#distanceOffsetCSSProperty
@@ -153,16 +153,20 @@ export class ScrollSegmentElement extends ScrollUserElement {
     return this.#finishVarCSSProperty
   }
 
-  public get smoothstepCSSProperty() {
-    return this.#smoothstepCSSProperty
-  }
-
-  public get smootherstepCSSProperty() {
-    return this.#smootherstepCSSProperty
-  }
-
   public get disabledCSSProperty() {
     return this.#disabledCSSProperty
+  }
+
+  public get dampingCSSProperty() {
+    return this.#dampingCSSProperty
+  }
+
+  public get massCSSProperty() {
+    return this.#massCSSProperty
+  }
+
+  public get stiffnessCSSProperty() {
+    return this.#stiffnessCSSProperty
   }
 
   public get targetCSSProperty() {
@@ -258,6 +262,8 @@ export class ScrollSegmentElement extends ScrollUserElement {
     this.setVar(this.#finishVarCSSProperty.current, this.#finish)
     this.setVar(this.#distanceVarCSSProperty.current, this.#distance)
 
+    this.#passed.max = this.#distance
+
     this.#isResized = true
   }
 
@@ -268,9 +274,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
       scrollValue += se.value
     })
 
-    this.#passed =
-      this.updateValue(scrollValue - this.#start, 0, this.#distance) || 0
-    this.#progress = this.#passed / this.#distance || 0
+    this.#passed.set(scrollValue - this.#start)
 
     const fscrollValue = Math.round(scrollValue)
 
@@ -306,17 +310,14 @@ export class ScrollSegmentElement extends ScrollUserElement {
     }
 
     if (fscrollValue > this.#start && fscrollValue < this.#finish) {
-      this.#passListener()
-
       if (!this.#isCaptured.current) {
         this.#captureListener()
       }
     } else if (this.#isCaptured.current) {
-      this.#passed = step(this.#distance / 2, this.#passed, 0, this.#distance)
+      this.#passed.set(
+        step(this.#distance / 2, this.#passed.current, 0, this.#distance)
+      )
 
-      this.#progress = this.#passed / this.#distance
-
-      this.#passListener()
       this.#releaseListener()
     }
 
@@ -333,7 +334,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
 
     this.#directionPosition = 0
     this.#directionSize = 0
-    this.#passed = 0
+    this.#passed.reset()
     this.#progress = 0
     this.#start = 0
     this.#distance = 0
@@ -358,6 +359,9 @@ export class ScrollSegmentElement extends ScrollUserElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
+    this.#dampingCSSProperty.observe()
+    this.#massCSSProperty.observe()
+    this.#stiffnessCSSProperty.observe()
     this.#targetCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#distanceOffsetCSSProperty.observe()
@@ -374,8 +378,6 @@ export class ScrollSegmentElement extends ScrollUserElement {
     this.#distanceVarCSSProperty.observe()
     this.#startVarCSSProperty.observe()
     this.#finishVarCSSProperty.observe()
-    this.#smoothstepCSSProperty.observe()
-    this.#smootherstepCSSProperty.observe()
 
     let isConnected = false
 
@@ -390,26 +392,38 @@ export class ScrollSegmentElement extends ScrollUserElement {
       this.enable()
     }
 
-    this.#targetCSSProperty.subscribe((v) => {
-      if (v.previous) {
+    this.#dampingCSSProperty.subscribe((e) => {
+      this.#passed.damping = e.current
+    })
+
+    this.#massCSSProperty.subscribe((e) => {
+      this.#passed.mass = e.current
+    })
+
+    this.#stiffnessCSSProperty.subscribe((e) => {
+      this.#passed.stiffness = e.current
+    })
+
+    this.#targetCSSProperty.subscribe((e) => {
+      if (e.previous) {
         this.#removeCurrentMarks()
       }
 
-      if (v.current) {
-        if (v.current === 'parent') {
+      if (e.current) {
+        if (e.current === 'parent') {
           this.#targetElement = this.parentElement || this
         } else {
-          this.#targetElement = document.querySelector(v.current) || this
+          this.#targetElement = document.querySelector(e.current) || this
         }
       } else {
         this.#targetElement = this
       }
     })
 
-    this.#disabledCSSProperty.subscribe((detail) => {
-      if (detail.current && !detail.previous) {
+    this.#disabledCSSProperty.subscribe((e) => {
+      if (e.current && !e.previous) {
         this.disable()
-      } else if (!detail.current && detail.previous) {
+      } else if (!e.current && e.previous) {
         this.resize()
         this.enable()
       }
@@ -464,7 +478,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
       if (this.#isDisabled) return
 
       this.removeVar(v.previous)
-      this.setVar(v.current, this.passed)
+      this.setVar(v.current, this.passed.current)
     })
 
     this.#progressVarCSSProperty.subscribe((v) => {
@@ -494,6 +508,18 @@ export class ScrollSegmentElement extends ScrollUserElement {
       this.setVar(v.current, this.#distance)
     })
 
+    this.#passed.subscribe((e) => {
+      this.#progress = this.#passed.current / this.#distance || 0
+      this.setVar(
+        this.#passedVarCSSProperty.current,
+        this.#passed.current.toFixed(6)
+      )
+      this.setVar(
+        this.#progressVarCSSProperty.current,
+        this.#progress.toFixed(6)
+      )
+    })
+
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SEGMENT)
 
     this.scrollElement.onScroll(this.#tickListener)
@@ -506,6 +532,9 @@ export class ScrollSegmentElement extends ScrollUserElement {
 
     this.scrollElement.offScroll(this.#tickListener)
 
+    this.#dampingCSSProperty.close()
+    this.#massCSSProperty.close()
+    this.#stiffnessCSSProperty.close()
     this.#targetCSSProperty.close()
     this.#disabledCSSProperty.close()
     this.#distanceOffsetCSSProperty.close()
@@ -522,8 +551,6 @@ export class ScrollSegmentElement extends ScrollUserElement {
     this.#distanceVarCSSProperty.close()
     this.#startVarCSSProperty.close()
     this.#finishVarCSSProperty.close()
-    this.#smoothstepCSSProperty.close()
-    this.#smootherstepCSSProperty.close()
     this.#isCaptured.close()
     this.#isReleased.close()
     this.#isCapturedFromStart.close()
@@ -545,42 +572,12 @@ export class ScrollSegmentElement extends ScrollUserElement {
     }
   }
 
-  protected updateValue(v: number, min = 0, max = 1) {
-    if (this.smootherstepCSSProperty.current) {
-      return smootherstep(v, min, max) * max
-    } else if (this.#smoothstepCSSProperty.current) {
-      return smoothstep(v, min, max) * max
-    } else {
-      return clamp(v, min, max)
-    }
-  }
-
   protected getDistance() {
     return this.#directionSize + this.#moverDirectionSize
   }
 
   protected getStart() {
     return this.#directionPosition - this.#moverDirectionSize
-  }
-
-  #passListener() {
-    this.#dispatchPassEvent()
-    this.setVar(this.#passedVarCSSProperty.current, this.#passed)
-    this.setVar(this.#progressVarCSSProperty.current, this.#progress)
-  }
-
-  #dispatchPassEvent() {
-    this.dispatchEvent(
-      new CustomEvent<ScrollSegmentPassDetail>('segmentPass', {
-        detail: {
-          distance: this.#distance,
-          start: this.#start,
-          finish: this.#finish,
-          passed: this.#passed,
-          progress: this.#progress,
-        },
-      })
-    )
   }
 
   #captureListener() {
@@ -761,9 +758,5 @@ export class ScrollSegmentElement extends ScrollUserElement {
 declare global {
   interface HTMLElementTagNameMap {
     'e-scroll-segment': ScrollSegmentElement
-  }
-
-  interface HTMLElementEventMap {
-    segmentPass: CustomEvent<ScrollSegmentPassDetail>
   }
 }

@@ -30,7 +30,7 @@ export class Damped extends Animation<DampedEntry> {
     initial?: number,
     options?: AnimationConstructorOptions<DampedOptions>
   ) {
-    super(initial)
+    super(initial, options)
 
     this.updateOptions({ ...options, equalize: true })
   }
@@ -52,11 +52,11 @@ export class Damped extends Animation<DampedEntry> {
   }
 
   public override updateOptions(options?: DampedOptions) {
-    super.updateOptions(options)
-
     this.damping = nullishCoalescing(options?.damping, this.damping)
     this.mass = nullishCoalescing(options?.mass, this.mass)
     this.stiffness = nullishCoalescing(options?.stiffness, this.stiffness)
+
+    super.updateOptions(options)
   }
 
   public updateManually(value: number) {

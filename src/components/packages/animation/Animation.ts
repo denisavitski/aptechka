@@ -29,7 +29,7 @@ export interface AnimationOptions extends TickerAddOptions {
 }
 
 export type AnimationConstructorOptions<Options extends AnimationOptions> =
-  StoreOptions<number> & Options
+  StoreOptions<number, 'number'> & Options
 
 export abstract class Animation<
   Entry extends AnimationEntry = AnimationEntry
@@ -40,8 +40,8 @@ export abstract class Animation<
 
   #isRunning = new Store(false)
 
-  #linked: Array<AnimationLink<Entry>> = []
-  #linkedTo: Animation<any> | null = null
+  #linked: Set<AnimationLink> = new Set()
+  #animationLink: AnimationLink | null = null
 
   #direction = 0
   #target = 0
@@ -52,8 +52,16 @@ export abstract class Animation<
   #from = 0
   #to = 1
 
-  constructor(initial?: number) {
-    super(initial || 0)
+  constructor(initial?: number, options?: StoreOptions<number, 'number'>) {
+    super(initial || 0, options)
+  }
+
+  public get linked() {
+    return this.#linked
+  }
+
+  public get animationLink() {
+    return this.#animationLink
   }
 
   public get direction() {
@@ -178,9 +186,9 @@ export abstract class Animation<
 
     this.unlistenAnimationFrame()
 
-    this.#linkedTo?.unlink(this)
+    this.unlink()
 
-    this.#linked = []
+    this.#linked.clear()
   }
 
   public listenAnimationFrame() {
@@ -200,6 +208,10 @@ export abstract class Animation<
       this.#isRunning.current = false
 
       ticker.unsubscribe(this.#animationFrameListener)
+
+      this.#linked.forEach((link) => {
+        link.targetAnimation.unlistenAnimationFrame()
+      })
     }
   }
 
@@ -216,40 +228,28 @@ export abstract class Animation<
     }
   }
 
-  public link<A extends Animation<any>>(
+  public linkTo<A extends Animation<any>>(
     animation: A,
     startValue: number,
     setValue: number,
     options?: Parameters<A['updateOptions']>[0] & AnimationLinkOptions
   ) {
-    const found = this.#linked.find(
-      (link) => link.targetAnimation === animation
+    this.unlink()
+
+    this.#animationLink = new AnimationLink(
+      animation,
+      this,
+      startValue,
+      setValue,
+      options
     )
-
-    if (!found) {
-      const link = new AnimationLink(
-        this,
-        animation,
-        startValue,
-        setValue,
-        options
-      )
-
-      animation.#linkedTo = this
-
-      this.#linked.push(link)
-    }
   }
 
-  public unlink(animation: Animation<any>) {
-    this.#linked = this.#linked.filter((link) => {
-      if (link.targetAnimation === animation) {
-        link.destroy()
-        return false
-      }
-
-      return true
-    })
+  public unlink() {
+    if (this.#animationLink) {
+      this.#animationLink.destroy()
+      this.#animationLink = null
+    }
   }
 
   protected start() {

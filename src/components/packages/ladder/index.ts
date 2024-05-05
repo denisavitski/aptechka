@@ -13,25 +13,35 @@ export type LadderSteps<
 
 export type LadderDefaultValueType = { [key: string]: number }
 
+interface LadderStepSpring {
+  damping?: number
+  mass?: number
+  stiffness?: number
+}
+
 interface LadderStepParameters<
   T extends LadderDefaultValueType = LadderDefaultValueType
-> {
+> extends LadderStepSpring {
   operation: LadderOperation
   value: T
-  damping?: number
 }
 
 class LadderStep<T extends LadderDefaultValueType = LadderDefaultValueType> {
+  public damping = 0
+  public mass = 0
+  public stiffness = 0
+
   #operation: LadderOperation
   #value: T
   #targetValue: T
-  #damping: number
+  #velocity = 0
 
   constructor(parameters: LadderStepParameters<T>) {
     this.#operation = parameters.operation
     this.#value = parameters.value
     this.#targetValue = this.#value
-    this.#damping = parameters.damping || 0
+
+    this.spring = parameters
   }
 
   public get operation() {
@@ -45,29 +55,45 @@ class LadderStep<T extends LadderDefaultValueType = LadderDefaultValueType> {
   public set value(value: T) {
     this.#targetValue = value
 
-    if (!this.#damping) {
+    if (!this.damping) {
       this.#value = value
     }
   }
 
-  public get damping() {
-    return this.#damping
+  public set spring(value: LadderStepSpring | undefined) {
+    this.damping = value?.damping || 0
+    this.mass = value?.mass || 0
+    this.stiffness = value?.stiffness || 0
   }
 
-  public set damping(value: number) {
-    this.#damping = value
-  }
-
-  public update(elapsed: number) {
+  public update(timeBetweenFrames: number) {
     let needUpdate = 0
 
+    const dt = timeBetweenFrames / 1000
+
     for (const key in this.#value) {
-      this.#value[key] = damp(
-        this.#value[key],
-        this.#targetValue[key],
-        this.damping,
-        elapsed
-      ) as any
+      if (
+        this.#targetValue[key] !== this.#value[key] &&
+        (this.mass || this.stiffness)
+      ) {
+        const acceleration =
+          (this.#targetValue[key] - this.#value[key]) * this.stiffness -
+          this.#velocity * this.damping
+
+        this.#velocity += (acceleration / this.mass) * dt
+
+        if (key === 'x') {
+        }
+
+        this.#value[key] += (this.#velocity * dt) as any
+      } else {
+        this.#value[key] = damp(
+          this.#value[key],
+          this.#targetValue[key],
+          this.damping,
+          dt
+        ) as any
+      }
 
       if (
         preciseNumber(this.#value[key], 4) !==
@@ -88,6 +114,7 @@ export class Ladder<
   #base: V
   #steps: LadderSteps<K, V>
   #bindings: Set<V>
+  #tickerRunning = false
 
   constructor(base: V) {
     super(base, {
@@ -112,6 +139,7 @@ export class Ladder<
     this.#bindings.clear()
     this.#steps.clear()
     ticker.unsubscribe(this.#tickListener)
+    this.#tickerRunning = false
   }
 
   public bind(sub: V) {
@@ -134,7 +162,7 @@ export class Ladder<
     stepName: K,
     operation: LadderOperation,
     setValue: Partial<V>,
-    damping?: number
+    spring?: LadderStepSpring
   ) {
     const value = {} as V
 
@@ -145,11 +173,11 @@ export class Ladder<
     let step = this.steps.get(stepName)
 
     if (!step) {
-      step = new LadderStep({ operation, value: { ...this.#base }, damping })
+      step = new LadderStep({ operation, value: { ...this.#base }, ...spring })
       this.steps.set(stepName, step)
     }
 
-    step.damping = damping || 0
+    step.spring = spring
     step.value = value
 
     this.#checkSteps()
@@ -206,9 +234,11 @@ export class Ladder<
       }
     })
 
-    if (dampedSteps) {
+    if (dampedSteps && !this.#tickerRunning) {
+      this.#tickerRunning = true
       ticker.subscribe(this.#tickListener)
-    } else {
+    } else if (!dampedSteps && this.#tickerRunning) {
+      this.#tickerRunning = false
       ticker.unsubscribe(this.#tickListener)
     }
   }

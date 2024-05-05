@@ -1,4 +1,4 @@
-import { StoreCallback, StoreOptions } from '@packages/store'
+import { Store, StoreCallback, StoreOptions } from '@packages/store'
 import { Animation, AnimationEntry, AnimationOptions } from './Animation'
 
 export interface AnimationLinkOptions
@@ -7,14 +7,13 @@ export interface AnimationLinkOptions
 }
 
 export class AnimationLink<
-  Entry extends AnimationEntry = AnimationEntry,
   Options extends AnimationLinkOptions = AnimationLinkOptions
 > {
-  #triggerAnimation: Animation<Entry>
-  #targetAnimation: Animation<AnimationEntry>
+  #triggerAnimation: Animation<any>
+  #targetAnimation: Animation<any>
 
-  #startValue: number
-  #setValue: number
+  #startValue: Store<number, 'number'>
+  #setValue: Store<number, 'number'>
 
   #isForward = false
   #isBack = false
@@ -23,8 +22,8 @@ export class AnimationLink<
   #options: Options | undefined
 
   constructor(
-    triggerAnimation: Animation<Entry>,
-    targetAnimation: Animation<AnimationEntry>,
+    triggerAnimation: Animation<any>,
+    targetAnimation: Animation<any>,
     startValue: number,
     setValue: number,
     options?: Options | undefined
@@ -32,20 +31,46 @@ export class AnimationLink<
     this.#triggerAnimation = triggerAnimation
     this.#targetAnimation = targetAnimation
 
-    this.#startValue = startValue
-    this.#setValue = setValue
+    this.#startValue = new Store(startValue, {
+      passport: targetAnimation.passport
+        ? {
+            name: targetAnimation.passport + '-start',
+            manager: {
+              type: 'number',
+            },
+          }
+        : undefined,
+    })
+    this.#setValue = new Store(setValue, {
+      passport: targetAnimation.passport
+        ? {
+            name: targetAnimation.passport + '-set',
+            manager: {
+              type: 'number',
+            },
+          }
+        : undefined,
+    })
 
     this.#options = options
 
     this.#triggerAnimation.subscribe(this.#progressListener)
+    this.#triggerAnimation.linked.add(this)
   }
 
   public get targetAnimation() {
     return this.#targetAnimation
   }
 
+  public get triggerAnimation() {
+    return this.#triggerAnimation
+  }
+
   public destroy() {
+    this.#setValue.close()
+    this.#startValue.close()
     this.#triggerAnimation.unsubscribe(this.#progressListener)
+    this.#triggerAnimation.linked.delete(this)
   }
 
   #startForward() {
@@ -53,7 +78,7 @@ export class AnimationLink<
       this.#isBack = false
       this.#isForward = true
 
-      this.#setAnimation(this.#setValue)
+      this.#setAnimation(this.#setValue.current)
     }
   }
 
@@ -87,9 +112,9 @@ export class AnimationLink<
     }
 
     if (this.#isRunned) {
-      if (e.direction > 0 && e.progress >= this.#startValue) {
+      if (e.direction > 0 && e.progress >= this.#startValue.current) {
         this.#startForward()
-      } else if (e.direction < 0 && e.progress <= this.#startValue) {
+      } else if (e.direction < 0 && e.progress <= this.#startValue.current) {
         this.#startBack()
       }
     }

@@ -15,6 +15,5 @@ const t1 = new Damped(0, {
 })
 
 t1.subscribe(() => {
-  console.log(t1.current)
   box.style.transform = `rotate(${t1.current}deg)`
 })

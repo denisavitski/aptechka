@@ -12,6 +12,10 @@ export const aptechkaTheme = createTheme(
     tweakerOffset: '20px',
     tweakerFolderHeight: '40px',
 
+    timelineWidth: '50vw',
+    timelineHeight: '30vh',
+    timelineOffset: '20px',
+
     heightInput: '30px',
 
     borderRadius: '12px',

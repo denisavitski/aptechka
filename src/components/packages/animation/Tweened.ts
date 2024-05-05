@@ -26,7 +26,7 @@ export class Tweened extends Animation {
     initial?: number,
     options?: AnimationConstructorOptions<TweenedOptions>
   ) {
-    super(initial || 0)
+    super(initial || 0, options)
 
     this.updateOptions({ ...options, equalize: true })
   }
