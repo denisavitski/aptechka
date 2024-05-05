@@ -301,8 +301,9 @@ export class ScrollElement extends CustomElement {
       )
 
       this.#keyboardControls = new KeyboardControls({
-        element: this.#contentElement,
+        element: this,
       })
+
       this.#keyboardControls.changeEvent.subscribe(
         this.#notAutoplayControlListener
       )

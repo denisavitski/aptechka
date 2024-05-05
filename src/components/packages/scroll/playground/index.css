@@ -12,6 +12,7 @@
   --wheel-max-delta: true;
 
   width: 100%;
+  display: block;
 }
 
 .slider__item {
