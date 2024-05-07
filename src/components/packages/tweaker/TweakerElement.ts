@@ -173,26 +173,20 @@ export class TweakerElement extends TweakerFolderElement {
                 onChange: (e) => {
                   const input = e.currentTarget as HTMLInputElement
 
-                  input.onchange = () => {
-                    const file = input.files?.[0]
+                  const file = input.files?.[0]
 
-                    if (file) {
-                      const reader = new FileReader()
+                  if (file) {
+                    const reader = new FileReader()
 
-                      reader.onload = (e) => {
-                        const result = e.target?.result?.toString()
+                    reader.onload = (e) => {
+                      const result = e.target?.result?.toString()
 
-                        if (result) {
-                          storeRegistry.loadState(result)
-                        }
+                      if (result) {
+                        storeRegistry.loadState(result)
                       }
-                      reader.readAsText(file)
                     }
-
-                    input.onchange = null
+                    reader.readAsText(file)
                   }
-
-                  input.click()
                 },
               }),
             ],

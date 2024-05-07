@@ -283,6 +283,7 @@ class En3 {
   }
 
   public render(scene: Scene, camera: OrthographicCamera | PerspectiveCamera) {
+    this.#webglRenderer.setRenderTarget(null)
     this.#webglRenderer.render(scene, camera)
   }
 
