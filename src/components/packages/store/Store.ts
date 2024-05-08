@@ -80,7 +80,7 @@ export interface StoreOptions<
   StoreManager extends StoreManagerType = StoreManagerType
 > {
   equalityCheck?: StoreEqualityCheckCallback<StoreType>
-  passport?: StorePassport<StoreManager>
+  passport?: StorePassport<StoreManager> | undefined
   validate?: StoreMiddleware<StoreType>
   skipSubscribeNotification?: boolean
   notifyAndClose?: boolean

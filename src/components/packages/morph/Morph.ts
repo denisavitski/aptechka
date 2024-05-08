@@ -61,7 +61,7 @@ export class Morph {
         parameters?.waitForHeadToLoad === false ? false : true
       this.#cachePages = parameters?.cachePages === false ? false : true
 
-      this.#morphElements = this.#getMorphElements(document)
+      this.#morphElements = this.#getMorphElements(document.body)
 
       this.#currentPathname = location.pathname
 
@@ -237,11 +237,45 @@ export class Morph {
         history.replaceState(pathname, '', pathPlus)
       }
 
-      const newMorphElements = this.#getMorphElements(newDocument)
+      const newMorphElements = this.#getMorphElements(
+        newDocument.body.cloneNode(true) as HTMLElement
+      )
 
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
-        morphElement.innerHTML = newMorphElement.innerHTML
+
+        let currentMorphElementChildNodes = [...morphElement.childNodes]
+        let newMorphElementChildNodes = [...newMorphElement.childNodes]
+
+        currentMorphElementChildNodes.forEach((childNode) => {
+          if (childNode instanceof HTMLElement) {
+            const remain = childNode.hasAttribute('data-remain')
+
+            let founded: HTMLElement | undefined
+
+            newMorphElementChildNodes = newMorphElementChildNodes.filter(
+              (child) => {
+                if (
+                  child instanceof HTMLElement &&
+                  child.outerHTML === childNode.outerHTML
+                ) {
+                  founded = child
+                  return false
+                }
+
+                return true
+              }
+            )
+
+            if (!(remain && founded)) {
+              childNode.remove()
+            }
+          } else {
+            childNode.remove()
+          }
+        })
+
+        morphElement.append(...newMorphElementChildNodes)
       })
 
       this.#findLinks()
@@ -283,9 +317,8 @@ export class Morph {
     this.#links = linkElements.map((element) => new Link(element, this))
   }
 
-  #getMorphElements(document: Document) {
-    const elements = document.querySelectorAll<HTMLElement>('[data-morph]')
-    return elements.length ? [...elements] : [document.body]
+  #getMorphElements(el: HTMLElement) {
+    return [...el.querySelectorAll<HTMLElement>('[data-morph]')] || [el]
   }
 
   #intersectElements(
