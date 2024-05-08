@@ -58,6 +58,10 @@ export class PointerElement extends CustomElement {
     })
   }
 
+  public get pointer() {
+    return this.#pointer
+  }
+
   protected connectedCallback() {
     this.#pointer.connect()
 
