@@ -82,8 +82,8 @@ export class Pointer {
 
   #pointerMoveListener = (e: PointerEvent) => {
     const pos = {
-      x: e.offsetX,
-      y: e.offsetY,
+      x: e.clientX,
+      y: e.clientY,
     }
 
     const size = {
