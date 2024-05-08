@@ -1,7 +1,5 @@
-e-scroll {
-}
-
 section {
+  position: relative;
   width: 100vw;
   height: 100dvh;
 
@@ -10,9 +8,10 @@ section {
   justify-content: center;
 }
 
-div {
-  width: 20vmin;
-  height: 20vmin;
-
-  background-color: tomato;
+#clip-1 {
+  position: absolute;
+  left: 0;
+  width: 50vw;
+  height: 50vh;
+  border: 5px solid green;
 }

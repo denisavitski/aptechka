@@ -1,6 +1,12 @@
 import '@packages/scroll'
 
-import { En3Clip, en3, en3GLTFLoader, traverseMaterials } from '@packages/en3'
+import {
+  En3Clip,
+  En3ClipHelpers,
+  en3,
+  en3GLTFLoader,
+  traverseMaterials,
+} from '@packages/en3'
 import { ticker } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import {
@@ -21,7 +27,7 @@ en3.setup({
   webGLRendererParameters: {
     antialias: true,
   },
-  cameraType: 'orthographic',
+  cameraType: 'perspective',
 })
 
 en3.webglRenderer.toneMapping = ACESFilmicToneMapping
@@ -116,9 +122,9 @@ class World extends Group {
     super()
 
     this.#sectionElement = getElement(parameters.containerElement)!
-    this.#clip = new En3Clip(this.#sectionElement, 3)
+    this.#clip = new En3Clip('#clip-1', 1)
 
-    // en3.add(new En3ClipHelpers(this.#clip, 1500))
+    en3.add(new En3ClipHelpers(this.#clip, 500))
 
     parameters.particles.forEach((p) => {
       this.#particles.push(new Particles(p))
@@ -152,7 +158,7 @@ const apples = new World({
   containerElement: '#apples',
   particles: [
     {
-      url: '/models/apple-opt.glb',
+      url: '/strawberry-opt.glb',
       amount: 15,
     },
   ],
@@ -164,7 +170,7 @@ const pears = new World({
   containerElement: '#pears',
   particles: [
     {
-      url: '/models/pear-opt.glb',
+      url: '/strawberry-opt.glb',
       amount: 15,
     },
   ],

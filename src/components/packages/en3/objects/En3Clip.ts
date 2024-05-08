@@ -2,7 +2,8 @@ import { Plane, Vector3 } from 'three'
 import { LayoutBox } from '@packages/layout-box'
 import { TICK_ORDER } from '@packages/order'
 import { ticker } from '@packages/ticker'
-import { ElementOrSelector } from '@packages/utils'
+import { ElementOrSelector, screenToCartesian } from '@packages/utils'
+import { en3 } from '../core/en3'
 
 export class En3Clip {
   #layoutBox: LayoutBox = null!
@@ -35,19 +36,28 @@ export class En3Clip {
   }
 
   #tickListener = () => {
-    const scrollValueX = this.#layoutBox.position.x
-    const scrollValueY = this.#layoutBox.position.y
+    const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
+    const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
+
+    const sizeXDiff = en3.width - this.#layoutBox.scale.x
+    const xDiff = this.#layoutBox.left - sizeXDiff
+    const sizeYDiff = en3.height - this.#layoutBox.scale.y
+    const yDiff = this.#layoutBox.top - sizeYDiff
 
     // Top
-    this.#planes[0].constant = this.#layoutBox.scale.y / 2 + scrollValueY * -1
+    this.#planes[0].constant =
+      this.#layoutBox.scale.y / 2 + scrollValueY * -1 - sizeYDiff / 2 - yDiff
 
     // Bottom
-    this.#planes[1].constant = this.#layoutBox.scale.y / 2 + scrollValueY
+    this.#planes[1].constant =
+      this.#layoutBox.scale.y / 2 + scrollValueY + sizeYDiff / 2 + yDiff
 
     // Right
-    this.#planes[2].constant = this.#layoutBox.scale.x / 2 + scrollValueX
+    this.#planes[2].constant =
+      this.#layoutBox.scale.x / 2 + scrollValueX + sizeXDiff / 2 + xDiff
 
     // Left
-    this.#planes[3].constant = this.#layoutBox.scale.x / 2 + scrollValueX * -1
+    this.#planes[3].constant =
+      this.#layoutBox.scale.x / 2 + scrollValueX * -1 - sizeXDiff / 2 - xDiff
   }
 }
