@@ -36,9 +36,11 @@ export const aptechkaTheme = createTheme(
 )
 
 if (isBrowser) {
-  document.head.appendChild(
-    style({
-      ':root': aptechkaTheme.style,
-    }).node
-  )
+  const styleNode = style({
+    ':root': aptechkaTheme.style,
+  }).node
+
+  styleNode.setAttribute('data-permanent', '')
+
+  document.head.appendChild(styleNode)
 }

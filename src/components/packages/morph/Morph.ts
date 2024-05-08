@@ -181,7 +181,9 @@ export class Morph {
       )
 
       removeHeadChildren.forEach((child) => {
-        child.remove()
+        if (!child.hasAttribute('data-permanent')) {
+          child.remove()
+        }
       })
 
       addHeadChildren.forEach((child, index) => {
@@ -193,7 +195,7 @@ export class Morph {
         }
       })
 
-      addHeadChildren.forEach((child, index) => {
+      addHeadChildren.forEach((child) => {
         document.head.appendChild(child)
       })
 
