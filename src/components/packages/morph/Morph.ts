@@ -63,12 +63,21 @@ export class Morph {
 
       this.#morphElements = this.#getMorphElements(document.body)
 
-      this.#currentPathname = location.pathname
+      this.#currentPathname = this.normalizePath(location.pathname).pathname
+
+      document.documentElement.setAttribute(
+        'data-current-pathname',
+        this.#currentPathname
+      )
 
       this.#findLinks()
 
       addEventListener('popstate', this.#popStateListener)
     }
+  }
+
+  public get currentPathname() {
+    return this.#currentPathname
   }
 
   public normalizePath(path: string) {
@@ -279,6 +288,8 @@ export class Morph {
       })
 
       this.#findLinks()
+
+      document.documentElement.setAttribute('data-current-pathname', pathname)
 
       this.postprocessor?.({ pathname, isCached })
       this.#afterNavigationEvent.notify({ pathname, isCached })
