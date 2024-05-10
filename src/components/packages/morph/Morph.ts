@@ -189,12 +189,6 @@ export class Morph {
         identicalHeadChildren
       )
 
-      removeHeadChildren.forEach((child) => {
-        if (!child.hasAttribute('data-permanent')) {
-          child.remove()
-        }
-      })
-
       addHeadChildren.forEach((child, index) => {
         if (child.tagName === 'SCRIPT' && child.getAttribute('src')) {
           const newScriptTag = document.createElement('script')
@@ -230,6 +224,12 @@ export class Morph {
           }
         })
       }
+
+      removeHeadChildren.forEach((child) => {
+        if (!child.hasAttribute('data-permanent')) {
+          child.remove()
+        }
+      })
 
       this.#currentPathname = pathname
 
