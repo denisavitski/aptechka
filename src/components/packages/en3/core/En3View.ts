@@ -16,6 +16,7 @@ export interface En3ViewOptions {
   cameraFar?: number
   cameraFov?: 'auto' | number
   sizeElement?: ElementOrSelector<HTMLElement>
+  beforeRender?: () => void
 }
 
 export type En3AttachedObject3D<T extends Object3D> = T & {
@@ -28,6 +29,8 @@ export type En3AttachOptions = Omit<
   LayoutBoxOptions,
   'containerElement' | 'cartesian'
 >
+
+export type En3ViewBeforeRenderCallback = () => void
 
 export class En3View {
   #name: string
@@ -42,6 +45,8 @@ export class En3View {
   #cameraFov: 'auto' | number
 
   #sizeElement: HTMLElement
+
+  public beforeRenderCallback: En3ViewBeforeRenderCallback | undefined
 
   #width = 0
   #height = 0
@@ -68,6 +73,8 @@ export class En3View {
 
     this.#sizeElement =
       getElement<HTMLElement>(options?.sizeElement) || document.documentElement
+
+    this.beforeRenderCallback = options?.beforeRender
   }
 
   public get name() {

@@ -17,23 +17,30 @@ const mesh = new Mesh(
   new MeshBasicMaterial({ color: 'red' })
 )
 
-const m2 = mesh.clone(true)
+mesh.scale.setScalar(200)
 
-m2.scale.setScalar(200)
+en3.view.add(mesh)
 
-en3.createView('second', {
+const mesh2 = new Mesh(
+  new BoxGeometry(),
+  new MeshBasicMaterial({ color: 'red' })
+)
+
+mesh2.scale.setScalar(200)
+
+const view2 = en3.createView('second', {
   sizeElement: '.right',
 })
 
-en3.getView('second').add(m2)
+view2.add(mesh2)
 
-const clip = new En3Clip(en3.getView('second'), '.left-clip-2')
+const clip = new En3Clip('second')
 const clipHelpers = new En3ClipHelpers(clip, 300)
 
-en3.getView('second').add(clipHelpers)
+view2.add(clipHelpers)
 
-m2.material.clippingPlanes = clip.planes
+mesh2.material.clippingPlanes = clip.planes
 
 ticker.subscribe((e) => {
-  m2.rotation.y = e.timestamp * 0.001
+  mesh2.rotation.y = e.timestamp * 0.001
 })

@@ -122,19 +122,19 @@ class En3 {
   }
 
   public createView(name: string, viewOptions?: En3ViewOptions) {
-    if (!this.#views.has(name)) {
-      const size = this.#views.size
+    const size = this.#views.size
 
-      const view = new En3View(name, viewOptions)
+    const view = new En3View(name, viewOptions)
 
-      this.#views.set(name, view)
+    this.#views.set(name, view)
 
-      view.resize()
+    view.resize()
 
-      if (size <= 1) {
-        this.#webglRenderer.setScissorTest(true)
-      }
+    if (size <= 1) {
+      this.#webglRenderer.setScissorTest(true)
     }
+
+    return view
   }
 
   public getView(name: string) {
@@ -157,6 +157,7 @@ class En3 {
         view.width,
         view.height
       )
+
       this.#webglRenderer.setViewport(
         view.left,
         view.top,
@@ -164,6 +165,8 @@ class En3 {
         view.height
       )
     }
+
+    view.beforeRenderCallback?.()
 
     this.#webglRenderer.render(view.scene, view.camera)
   }

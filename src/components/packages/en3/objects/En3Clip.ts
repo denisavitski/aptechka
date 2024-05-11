@@ -4,6 +4,12 @@ import { TICK_ORDER } from '@packages/order'
 import { ticker } from '@packages/ticker'
 import { ElementOrSelector } from '@packages/utils'
 import { En3View } from '../core/En3View'
+import { en3 } from '../core/en3'
+
+export interface En3ClipOptions {
+  viewName?: string
+  scale?: number
+}
 
 export class En3Clip {
   #view: En3View
@@ -11,13 +17,14 @@ export class En3Clip {
   #planes: Array<Plane> = []
 
   constructor(
-    view: En3View,
     elementOrSelector: ElementOrSelector<HTMLElement>,
-    scale = 1
+    options?: En3ClipOptions
   ) {
-    this.#view = view
+    this.#view = en3.getView(options?.viewName || 'default')
 
     this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: false })
+
+    const scale = options?.scale || 1
 
     this.#planes = [
       new Plane(new Vector3(0, -1 * scale, 0)),
