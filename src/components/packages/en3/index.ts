@@ -4,6 +4,7 @@ export {
   type En3ViewOptions,
   type En3AttachedObject3D,
   type En3AttachOptions,
+  type En3ViewBeforeRenderCallback,
 } from './core/En3View'
 
 export { en3TextureLoader } from './loaders/en3TextureLoader'

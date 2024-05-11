@@ -149,7 +149,7 @@ export class En3View {
 
     dispose(this.#scene)
 
-    en3.removeView(this)
+    en3.destroyView(this.name)
   }
 
   public attachToHTMLElement<T extends Object3D>(

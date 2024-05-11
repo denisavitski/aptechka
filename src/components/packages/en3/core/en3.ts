@@ -1,14 +1,8 @@
-import { LayoutBox } from '@packages/layout-box'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
-import {
-  Object3D,
-  REVISION,
-  WebGLRenderer,
-  WebGLRendererParameters,
-} from 'three'
+import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 
 export interface En3Options {
@@ -121,12 +115,12 @@ class En3 {
     this.#isCreated = false
   }
 
-  public createView(name: string, viewOptions?: En3ViewOptions) {
+  public createView(viewName: string, viewOptions?: En3ViewOptions) {
     const size = this.#views.size
 
-    const view = new En3View(name, viewOptions)
+    const view = new En3View(viewName, viewOptions)
 
-    this.#views.set(name, view)
+    this.#views.set(viewName, view)
 
     view.resize()
 
@@ -137,15 +131,21 @@ class En3 {
     return view
   }
 
-  public getView(name: string) {
-    return this.#views.get(name)!
+  public getView(viewName: string) {
+    return this.#views.get(viewName)!
   }
 
-  public removeView(view: En3View) {
-    this.#views.delete(view.name)
+  public destroyView(viewName: string) {
+    const view = this.#views.get(viewName)
 
-    if (this.#views.size <= 1) {
-      this.#webglRenderer.setScissorTest(false)
+    if (view) {
+      this.#views.delete(viewName)
+
+      view.destroy()
+
+      if (this.#views.size <= 1) {
+        this.#webglRenderer.setScissorTest(false)
+      }
     }
   }
 
