@@ -6,41 +6,19 @@ console.log('Playground')
 
 en3.setup({
   view: {
-    // sizeElement: '.right',
+    sizeElement: '.right-content',
   },
 })
-
-en3.webglRenderer.localClippingEnabled = true
 
 const mesh = new Mesh(
   new BoxGeometry(),
   new MeshBasicMaterial({ color: 'red' })
 )
 
-mesh.scale.setScalar(200)
+mesh.scale.setScalar(30)
 
 en3.view.add(mesh)
 
-const mesh2 = new Mesh(
-  new BoxGeometry(),
-  new MeshBasicMaterial({ color: 'red' })
-)
-
-mesh2.scale.setScalar(200)
-
-const view2 = en3.createView('second', {
-  sizeElement: '.right',
-})
-
-view2.add(mesh2)
-
-const clip = new En3Clip('second')
-const clipHelpers = new En3ClipHelpers(clip, 300)
-
-view2.add(clipHelpers)
-
-mesh2.material.clippingPlanes = clip.planes
-
 ticker.subscribe((e) => {
-  mesh2.rotation.y = e.timestamp * 0.001
+  mesh.rotation.y = e.timestamp * 0.001
 })

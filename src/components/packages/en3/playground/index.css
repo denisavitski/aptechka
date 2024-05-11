@@ -1,17 +1,20 @@
 .wrap {
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
 
   display: grid;
   grid-template-columns: 1fr 1fr;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid greenyellow;
 }
 
-.left {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
+.right-content {
+  width: 30vmin;
+  height: 30vmin;
 
-.right {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  border: 1px solid red;
 }

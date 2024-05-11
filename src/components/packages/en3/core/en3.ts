@@ -85,7 +85,13 @@ class En3 {
 
     this.#containerElement.append(this.#webglRenderer.domElement)
 
-    this.#views.set('default', new En3View('default', options?.view))
+    this.#views.set(
+      'default',
+      new En3View('default', {
+        sizeElement: this.#containerElement,
+        ...options?.view,
+      })
+    )
 
     this.#isCreated = true
 
@@ -124,7 +130,7 @@ class En3 {
 
     view.resize()
 
-    if (size <= 1) {
+    if (size === 1) {
       this.#webglRenderer.setScissorTest(true)
     }
 
@@ -150,20 +156,16 @@ class En3 {
   }
 
   public render(view: En3View) {
-    if (this.#views.size > 1) {
-      this.#webglRenderer.setScissor(
-        view.left,
-        view.top,
-        view.width,
-        view.height
-      )
+    if (
+      this.#views.size > 1 ||
+      this.view.sizeElement !== this.#containerElement
+    ) {
+      const left = view.left
+      const top = en3.height - view.height - view.top
 
-      this.#webglRenderer.setViewport(
-        view.left,
-        view.top,
-        view.width,
-        view.height
-      )
+      this.#webglRenderer.setScissor(left, top, view.width, view.height)
+
+      this.#webglRenderer.setViewport(left, top, view.width, view.height)
     }
 
     view.beforeRenderCallback?.()

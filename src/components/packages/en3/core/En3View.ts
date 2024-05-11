@@ -114,9 +114,14 @@ export class En3View {
     this.resize()
   }
 
+  public get sizeElement() {
+    return this.#sizeElement
+  }
+
   public resize() {
     this.#width = this.#sizeElement.offsetWidth
     this.#height = this.#sizeElement.offsetHeight
+
     this.#top = getCumulativeOffsetTop(this.#sizeElement)
     this.#left = getCumulativeOffsetLeft(this.#sizeElement)
 
