@@ -2,14 +2,21 @@ import { Plane, Vector3 } from 'three'
 import { LayoutBox } from '@packages/layout-box'
 import { TICK_ORDER } from '@packages/order'
 import { ticker } from '@packages/ticker'
-import { ElementOrSelector, screenToCartesian } from '@packages/utils'
-import { en3 } from '../core/en3'
+import { ElementOrSelector } from '@packages/utils'
+import { En3View } from '../core/En3View'
 
 export class En3Clip {
-  #layoutBox: LayoutBox = null!
+  #view: En3View
+  #layoutBox: LayoutBox
   #planes: Array<Plane> = []
 
-  constructor(elementOrSelector: ElementOrSelector<HTMLElement>, scale = 1) {
+  constructor(
+    view: En3View,
+    elementOrSelector: ElementOrSelector<HTMLElement>,
+    scale = 1
+  ) {
+    this.#view = view
+
     this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: false })
 
     this.#planes = [
@@ -36,13 +43,16 @@ export class En3Clip {
   }
 
   #tickListener = () => {
+    const left = this.#layoutBox.left - this.#view.left
+    const top = this.#layoutBox.top - this.#view.top
+
     const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
     const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
 
-    const sizeXDiff = en3.width - this.#layoutBox.scale.x
-    const xDiff = this.#layoutBox.left - sizeXDiff
-    const sizeYDiff = en3.height - this.#layoutBox.scale.y
-    const yDiff = this.#layoutBox.top - sizeYDiff
+    const sizeXDiff = this.#view.width - this.#layoutBox.scale.x
+    const xDiff = left - sizeXDiff
+    const sizeYDiff = this.#view.height - this.#layoutBox.scale.y
+    const yDiff = top - sizeYDiff
 
     // Top
     this.#planes[0].constant =

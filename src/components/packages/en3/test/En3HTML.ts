@@ -41,7 +41,7 @@ export class En3HTML extends CSS3DObject {
   }
 
   static #tickListener = () => {
-    this.#cssRenderer.render(en3.scene, en3.camera)
+    this.#cssRenderer.render(en3.view.scene, en3.view.camera)
   }
 
   static #resizeListener = () => {

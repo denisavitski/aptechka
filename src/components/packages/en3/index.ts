@@ -1,4 +1,10 @@
-export { en3, type En3AttachedObject3D, type En3Parameters } from './core/en3'
+export { en3 } from './core/en3'
+export {
+  En3View,
+  type En3ViewOptions,
+  type En3AttachedObject3D,
+  type En3AttachOptions,
+} from './core/En3View'
 
 export { en3TextureLoader } from './loaders/en3TextureLoader'
 export { en3GLTFLoader } from './loaders/en3GLTFLoader'
@@ -35,14 +41,6 @@ export { coverTexture } from './utils/coverTexture'
 export { getCurrentViewport } from './utils/getCurrentViewport'
 
 export { En3HTML, type En3HTMLParameters } from './test/En3HTML'
-
-export {
-  En3Raycaster,
-  type En3RaycasterEventType,
-  type En3RaycasterEvent,
-  type En3RaycasterOptions,
-  type En3RaycasterCallback,
-} from './core/En3Raycaster'
 
 export {
   En3ModifiedMaterial,
