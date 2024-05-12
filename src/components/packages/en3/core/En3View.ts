@@ -74,6 +74,10 @@ export class En3View {
     this.beforeRenderCallback = options?.beforeRender
 
     this.#box = new LayoutBox(this.#sizeElement)
+
+    this.#box.onScale(() => {
+      this.resize()
+    })
   }
 
   public get name() {

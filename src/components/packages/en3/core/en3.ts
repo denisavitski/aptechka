@@ -128,8 +128,6 @@ class En3 {
 
     this.#views.set(viewName, view)
 
-    view.resize()
-
     if (size === 1) {
       this.#webglRenderer.setScissorTest(true)
     }
@@ -191,10 +189,6 @@ class En3 {
     this.#pixelRatio = Math.min(this.#maxPixelRatio, devicePixelRatio || 1)
     this.#webglRenderer.setPixelRatio(this.#pixelRatio)
     this.#webglRenderer.setSize(this.#width, this.#height)
-
-    this.#views.forEach((view) => {
-      view.resize()
-    })
 
     this.onResize?.()
   }

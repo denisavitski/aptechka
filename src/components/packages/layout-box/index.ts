@@ -180,13 +180,13 @@ export class LayoutBox {
         this.#scrollEntriesListener()
       }
 
+      elementResizer.subscribe(this.element, this.#resizeListener)
+      windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.LAYOUT_BOX)
+
       ticker.subscribe(this.#tickListener, {
         order: TICK_ORDER.LAYOUT_BOX,
         culling: options?.culling ? this.element : undefined,
       })
-
-      elementResizer.subscribe(this.element, this.#resizeListener)
-      windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.LAYOUT_BOX)
     }
   }
 
