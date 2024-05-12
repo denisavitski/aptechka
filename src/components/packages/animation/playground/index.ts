@@ -10,10 +10,11 @@ input.addEventListener('input', () => {
 })
 
 const t1 = new Damped(0, {
-  min: 0,
-  max: 1000,
+  min: -100,
+  max: 100,
 })
 
 t1.subscribe(() => {
+  console.log(t1.progress)
   box.style.transform = `rotate(${t1.current}deg)`
 })
