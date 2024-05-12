@@ -53,8 +53,13 @@ export class En3Clip {
     const left = this.#layoutBox.left - this.#view.box.left
     const top = this.#layoutBox.top - this.#view.box.top
 
-    const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
-    const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
+    let scrollValueX = 0
+    let scrollValueY = 0
+
+    if (!this.#view.isClipped) {
+      scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
+      scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
+    }
 
     const sizeXDiff = this.#view.box.width - this.#layoutBox.scale.x
     const xDiff = left - sizeXDiff

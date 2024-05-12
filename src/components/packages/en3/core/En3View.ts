@@ -105,6 +105,10 @@ export class En3View {
     return this.#sizeElement
   }
 
+  public get isClipped() {
+    return this.#sizeElement !== en3.containerElement
+  }
+
   public resize() {
     const { width, height } = this.#box
 
@@ -149,7 +153,7 @@ export class En3View {
       ...options,
       containerElement: this.#sizeElement,
       cartesian: true,
-      scrollStep: this.#sizeElement === en3.containerElement ? true : false,
+      scrollStep: !this.isClipped,
     })
 
     box.bindObject(object)

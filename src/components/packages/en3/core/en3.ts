@@ -156,10 +156,7 @@ class En3 {
   }
 
   public render(view: En3View) {
-    if (
-      this.#views.size > 1 ||
-      this.view.sizeElement !== this.#containerElement
-    ) {
+    if (this.#views.size > 1 || this.view.isClipped) {
       const left =
         view.box.left + view.box.CSSTranslation.x + view.box.scrollValue.x
 

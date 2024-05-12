@@ -1,5 +1,5 @@
 e-scroll {
-  --axis: x;
+  --axis: y;
   --infinite: true;
 }
 
@@ -32,16 +32,24 @@ section {
   width: 30vmin;
   height: 30vmin;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  justify-content: center;
+  justify-items: center;
 
   border: 1px solid red;
 
   transform: translate(50%, 50%);
 }
 
+.clip {
+  height: 100%;
+  width: 100%;
+}
+
 .box {
+  position: absolute;
+
   width: 10vmin;
   height: 10vmin;
 
