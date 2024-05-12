@@ -18,7 +18,7 @@ export interface DampedEntry extends AnimationEntry {
   speed: number
 }
 
-export class Damped extends Animation<DampedEntry> {
+export class Damped extends Animation<DampedEntry, DampedOptions> {
   public damping = 20
   public stiffness = 0
   public mass = 0

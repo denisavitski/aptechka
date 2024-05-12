@@ -80,6 +80,10 @@ export class Morph {
     return this.#currentPathname
   }
 
+  public get links() {
+    return this.#links
+  }
+
   public normalizePath(path: string) {
     path = path.replace(this.#base, '')
 
@@ -258,7 +262,7 @@ export class Morph {
 
         currentMorphElementChildNodes.forEach((childNode) => {
           if (childNode instanceof HTMLElement) {
-            const remain = childNode.hasAttribute('data-remain')
+            const remain = childNode.getAttribute('data-remain')
 
             let founded: HTMLElement | undefined
 
@@ -266,7 +270,8 @@ export class Morph {
               (child) => {
                 if (
                   child instanceof HTMLElement &&
-                  child.outerHTML === childNode.outerHTML
+                  remain &&
+                  child.getAttribute('data-remain') === remain
                 ) {
                   founded = child
                   return false

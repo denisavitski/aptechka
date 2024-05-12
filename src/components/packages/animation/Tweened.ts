@@ -9,6 +9,7 @@ import {
 import {
   Animation,
   AnimationConstructorOptions,
+  AnimationEntry,
   AnimationOptions,
 } from './Animation'
 
@@ -18,7 +19,7 @@ export interface TweenedOptions extends AnimationOptions {
   restart?: boolean
 }
 
-export class Tweened extends Animation {
+export class Tweened extends Animation<AnimationEntry, TweenedOptions> {
   #easing: EasingFunction = linear
   #duration = 1000
 

@@ -32,7 +32,8 @@ export type AnimationConstructorOptions<Options extends AnimationOptions> =
   StoreOptions<number, 'number'> & Options
 
 export abstract class Animation<
-  Entry extends AnimationEntry = AnimationEntry
+  Entry extends AnimationEntry = AnimationEntry,
+  Options extends AnimationOptions = AnimationOptions
 > extends Store<number, 'number', Entry> {
   #maxFPS: number | undefined
   #order = TICK_ORDER.ANIMATION
@@ -79,6 +80,7 @@ export abstract class Animation<
   public set min(value: number) {
     this.#min = value
 
+    //@ts-ignore
     this.set(this.#target, {
       equalize: true,
     })
@@ -91,6 +93,7 @@ export abstract class Animation<
   public set max(value: number) {
     this.#max = value
 
+    //@ts-ignore
     this.set(this.#target, {
       equalize: true,
     })
@@ -153,7 +156,7 @@ export abstract class Animation<
     this.#to = value
   }
 
-  public set(value: number, options?: AnimationOptions) {
+  public set(value: number, options?: Options) {
     if (this.#target !== value) {
       this.setTarget(value)
 
@@ -167,11 +170,12 @@ export abstract class Animation<
     }
   }
 
-  public shift(value: number, options?: AnimationOptions) {
+  public shift(value: number, options?: Options) {
     this.set(this.#target + value, options)
   }
 
   public override reset() {
+    //@ts-ignore
     this.set(this.initial, { equalize: true })
 
     super.reset()

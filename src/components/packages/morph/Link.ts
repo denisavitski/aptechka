@@ -5,10 +5,12 @@ export class Link {
   #element: HTMLAnchorElement
   #pathname: string
   #historyAction: MorphHistoryAction
+  #matchPaths: Array<string> | undefined
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
     this.#morph = morph
     this.#element = element
+
     this.#pathname = this.#element.getAttribute('href') || '/'
 
     this.#historyAction =
@@ -21,7 +23,7 @@ export class Link {
     const p1 = morph.normalizePath(this.#pathname)
     const p2 = morph.normalizePath(location.pathname)
 
-    const matchPaths = this.#element
+    this.#matchPaths = this.#element
       .getAttribute('data-match-paths')
       ?.split(',')
       .map((v) => morph.normalizePath(v.trim()).pathname)
@@ -31,8 +33,14 @@ export class Link {
         this.#element.classList.add('current')
       }
     } else {
-      if (p1.pathname === p2.pathname || matchPaths?.includes(p2.pathname)) {
+      if (
+        p1.pathname === p2.pathname ||
+        this.#matchPaths?.includes(p2.pathname)
+      ) {
         this.#element.classList.add('current')
+        this.#element.classList.add('clicked')
+      } else {
+        this.#element.classList.remove('clicked')
       }
     }
 
@@ -49,6 +57,18 @@ export class Link {
 
   #clickListener = (e: MouseEvent) => {
     e.preventDefault()
+
+    this.#morph.links.forEach((link) => {
+      if (
+        this.#pathname === link.#pathname ||
+        link.#matchPaths?.includes(this.#pathname)
+      ) {
+        link.#element.classList.add('clicked')
+      } else {
+        link.#element.classList.remove('clicked')
+      }
+    })
+
     this.#morph.navigate(this.#pathname, this.#historyAction)
   }
 
