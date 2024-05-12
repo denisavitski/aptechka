@@ -74,7 +74,7 @@ export class En3ImageLike<
 
           detail.current.colorSpace = SRGBColorSpace
           detail.current.center.set(0.5, 0.5)
-          this.material.map = detail.current
+          this.material.map = detail.current.clone()
           this.material.needsUpdate = true
           this.#resizeListener()
         }

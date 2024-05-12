@@ -2,7 +2,7 @@
  * https://github.com/donmccurdy/three-gltf-viewer/blob/main/src/viewer.js
  */
 
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 
@@ -55,15 +55,16 @@ class En3GLTFLoader {
     const [url, onLoad, ...rest] = parameters
 
     if (en3.cacheAssets && en3Cache.has(url)) {
-      const cached = en3Cache.get(url)!
-      onLoad(cached.data)
+      const cached = en3Cache.get(url)!.data as GLTF
+
+      onLoad(cached)
     } else {
       this.gltfLoader.load(
         url,
         (data) => {
           if (en3.cacheAssets) {
             en3Cache.set(url, {
-              data,
+              data: data,
               dispose: () => {
                 data.cameras.forEach((c) => dispose(c))
                 data.scenes.forEach((scene) => {

@@ -3,7 +3,10 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { dispose } from '../utils/dispose'
 import { en3GLTFLoader } from '../loaders/en3GLTFLoader'
 import { En3SourceConsumer } from './En3SourceConsumer'
-import { En3SourceManager, En3SourceManagerParameters } from '../attachments/En3SourceManager'
+import {
+  En3SourceManager,
+  En3SourceManagerParameters,
+} from '../attachments/En3SourceManager'
 
 export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
   #sourceManager: En3SourceManager<GLTF>
@@ -24,7 +27,7 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
           dispose(child)
         })
       } else {
-        this.add(...detail.current.scene.children)
+        this.add(...detail.current.scene.clone(true).children)
       }
     })
   }
