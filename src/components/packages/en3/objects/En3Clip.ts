@@ -50,15 +50,15 @@ export class En3Clip {
   }
 
   #tickListener = () => {
-    const left = this.#layoutBox.left - this.#view.left
-    const top = this.#layoutBox.top - this.#view.top
+    const left = this.#layoutBox.left - this.#view.box.left
+    const top = this.#layoutBox.top - this.#view.box.top
 
     const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
     const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
 
-    const sizeXDiff = this.#view.width - this.#layoutBox.scale.x
+    const sizeXDiff = this.#view.box.width - this.#layoutBox.scale.x
     const xDiff = left - sizeXDiff
-    const sizeYDiff = this.#view.height - this.#layoutBox.scale.y
+    const sizeYDiff = this.#view.box.height - this.#layoutBox.scale.y
     const yDiff = top - sizeYDiff
 
     // Top

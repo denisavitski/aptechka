@@ -60,6 +60,7 @@ export interface LayoutBoxOptions {
   positionStep?: boolean
   culling?: boolean
   transformStep?: boolean
+  scrollStep?: boolean
 }
 
 export interface LayoutBoxScrollStepCallbackReturn {
@@ -81,6 +82,8 @@ export interface LayoutBoxBindedObject {
   rotation?: LayoutBoxXYZ
 }
 
+export type LayoutBoxLadder = { x: number; y: number; z: number }
+
 export class LayoutBox {
   #element: HTMLElement = null!
   #containerElement: HTMLElement = null!
@@ -93,6 +96,7 @@ export class LayoutBox {
   #isSizeStep = true
   #isPositionStep = true
   #isTransformStep = true
+  #isScrollStep = true
 
   #width = 0
   #height = 0
@@ -106,13 +110,15 @@ export class LayoutBox {
   #y = 0
   #z = 0
 
-  #CSSTranslation = { x: 0, y: 0, z: 0 }
-  #CSSRotation = { x: 0, y: 0, z: 0 }
-  #CSSScale = { x: 1, y: 1, z: 1 }
+  #CSSTranslation: LayoutBoxXYZ = { x: 0, y: 0, z: 0 }
+  #CSSRotation: LayoutBoxXYZ = { x: 0, y: 0, z: 0 }
+  #CSSScale: LayoutBoxXYZ = { x: 1, y: 1, z: 1 }
 
-  #rotation = new Ladder({ x: 0, y: 0, z: 0 })
-  #position = new Ladder({ x: 0, y: 0, z: 0 })
-  #scale = new Ladder({ x: 0, y: 0, z: 0 })
+  #rotation = new Ladder<LayoutBoxLadder>({ x: 0, y: 0, z: 0 })
+  #position = new Ladder<LayoutBoxLadder>({ x: 0, y: 0, z: 0 })
+  #scale = new Ladder<LayoutBoxLadder>({ x: 0, y: 0, z: 0 })
+
+  #scrollValue: LayoutBoxXYZ = { x: 0, y: 0, z: 0 }
 
   #scrollEntries: Map<ScrollEntry, LayoutBoxScrollStepCallback> = new Map()
 
@@ -135,6 +141,9 @@ export class LayoutBox {
         options?.positionStep !== undefined ? options.positionStep : true
       this.#isTransformStep =
         options?.transformStep !== undefined ? options.transformStep : true
+
+      this.#isScrollStep =
+        options?.scrollStep !== undefined ? options.scrollStep : true
 
       this.#scale.setStep('_size', '+', {
         x: 1,
@@ -166,8 +175,10 @@ export class LayoutBox {
         z: 0,
       })
 
-      scrollEntries.notifier.subscribe(this.#scrollEntriesListener)
-      this.#scrollEntriesListener()
+      if (this.#isScrollStep) {
+        scrollEntries.notifier.subscribe(this.#scrollEntriesListener)
+        this.#scrollEntriesListener()
+      }
 
       ticker.subscribe(this.#tickListener, {
         order: TICK_ORDER.LAYOUT_BOX,
@@ -199,12 +210,28 @@ export class LayoutBox {
     return this.#scale.current
   }
 
+  public get scrollValue() {
+    return this.#scrollValue
+  }
+
   public get left() {
     return this.#left
   }
 
   public get top() {
     return this.#top
+  }
+
+  public get CSSTranslation() {
+    return this.#CSSTranslation
+  }
+
+  public get CSSRotation() {
+    return this.#CSSRotation
+  }
+
+  public get CSSScale() {
+    return this.#CSSScale
   }
 
   public get front() {
@@ -221,6 +248,18 @@ export class LayoutBox {
 
   public get depth() {
     return this.#depth
+  }
+
+  public destroy() {
+    ticker.unsubscribe(this.#tickListener)
+    elementResizer.unsubscribe(this.#resizeListener)
+    windowResizer.unsubscribe(this.#resizeListener)
+    scrollEntries.notifier.unsubscribe(this.#scrollEntriesListener)
+    this.#scrollEntries.clear()
+
+    this.#position.close()
+    this.#rotation.close()
+    this.#scale.close()
   }
 
   public bindObject(object: LayoutBoxBindedObject) {
@@ -249,52 +288,84 @@ export class LayoutBox {
     )
   }
 
-  public destroy() {
-    ticker.unsubscribe(this.#tickListener)
-    elementResizer.unsubscribe(this.#resizeListener)
-    windowResizer.unsubscribe(this.#resizeListener)
-    scrollEntries.notifier.unsubscribe(this.#scrollEntriesListener)
-    this.#scrollEntries.clear()
-
-    this.#position.close()
-    this.#rotation.close()
-    this.#scale.close()
-  }
-
-  public setPositionStep(...args: Parameters<Ladder['setStep']>) {
+  public setPositionStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['setStep']>
+  ) {
     this.#position.setStep(...args)
   }
 
-  public getPositionStep(...args: Parameters<Ladder['getStepValue']>) {
+  public getPositionStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getStepValue']>
+  ) {
     return this.#position.getStepValue(...args)
   }
 
-  public setRotationStep(...args: Parameters<Ladder['setStep']>) {
+  public setRotationStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['setStep']>
+  ) {
     this.#rotation.setStep(...args)
   }
 
-  public getRotationStep(...args: Parameters<Ladder['getStepValue']>) {
+  public getRotationStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getStepValue']>
+  ) {
     return this.#rotation.getStepValue(...args)
   }
 
-  public setScaleStep(...args: Parameters<Ladder['setStep']>) {
+  public setScaleStep(...args: Parameters<Ladder<LayoutBoxLadder>['setStep']>) {
     this.#scale.setStep(...args)
   }
 
-  public getScaleStep(...args: Parameters<Ladder['getStepValue']>) {
+  public getScaleStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getStepValue']>
+  ) {
     return this.#scale.getStepValue(...args)
   }
 
-  public deletePositionStep(...args: Parameters<Ladder['deleteStep']>) {
+  public deletePositionStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['deleteStep']>
+  ) {
     this.#position.deleteStep(...args)
   }
 
-  public deleteRotationStep(...args: Parameters<Ladder['deleteStep']>) {
+  public deleteRotationStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['deleteStep']>
+  ) {
     this.#rotation.deleteStep(...args)
   }
 
-  public deleteScaleStep(...args: Parameters<Ladder['deleteStep']>) {
+  public deleteScaleStep(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['deleteStep']>
+  ) {
     this.#scale.deleteStep(...args)
+  }
+
+  public onPosition(...args: Parameters<Ladder<LayoutBoxLadder>['subscribe']>) {
+    return this.#position.subscribe(...args)
+  }
+
+  public offPosition(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['unsubscribe']>
+  ) {
+    this.#position.unsubscribe(...args)
+  }
+
+  public onScale(...args: Parameters<Ladder<LayoutBoxLadder>['subscribe']>) {
+    return this.#scale.subscribe(...args)
+  }
+
+  public offScale(...args: Parameters<Ladder<LayoutBoxLadder>['unsubscribe']>) {
+    this.#scale.unsubscribe(...args)
+  }
+
+  public onRotation(...args: Parameters<Ladder<LayoutBoxLadder>['subscribe']>) {
+    return this.#rotation.subscribe(...args)
+  }
+
+  public offRotation(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['unsubscribe']>
+  ) {
+    this.#rotation.unsubscribe(...args)
   }
 
   #recalculate() {
@@ -434,6 +505,10 @@ export class LayoutBox {
   }
 
   #updateScrollPosition() {
+    this.#scrollValue.x = 0
+    this.#scrollValue.y = 0
+    this.#scrollValue.z = 0
+
     for (
       let index = 0;
       index < this.#scrollStepSetterCallbacks.length;
@@ -447,10 +522,13 @@ export class LayoutBox {
         axis = this.#scrollAxis
       }
 
+      const value =
+        callbackReturn.value * (axis === 'x' ? -1 : this.#isCartesian ? 1 : -1)
+
+      this.#scrollValue[axis] += value
+
       this.#position.setStep(`_scroll_${index}`, '+', {
-        [axis]:
-          callbackReturn.value *
-          (axis === 'x' ? -1 : this.#isCartesian ? 1 : -1),
+        [axis]: value,
       })
     }
   }

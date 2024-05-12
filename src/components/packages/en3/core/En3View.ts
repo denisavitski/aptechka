@@ -27,7 +27,7 @@ export type En3AttachedObject3D<T extends Object3D> = T & {
 
 export type En3AttachOptions = Omit<
   LayoutBoxOptions,
-  'containerElement' | 'cartesian'
+  'containerElement' | 'cartesian' | 'scrollStep'
 >
 
 export type En3ViewBeforeRenderCallback = () => void
@@ -48,10 +48,7 @@ export class En3View {
 
   public beforeRenderCallback: En3ViewBeforeRenderCallback | undefined
 
-  #width = 0
-  #height = 0
-  #top = 0
-  #left = 0
+  #box: LayoutBox
 
   constructor(name: string, options?: En3ViewOptions) {
     this.#name = name
@@ -75,6 +72,8 @@ export class En3View {
       getElement<HTMLElement>(options?.sizeElement) || document.documentElement
 
     this.beforeRenderCallback = options?.beforeRender
+
+    this.#box = new LayoutBox(this.#sizeElement)
   }
 
   public get name() {
@@ -89,20 +88,8 @@ export class En3View {
     return this.#scene
   }
 
-  public get width() {
-    return this.#width
-  }
-
-  public get height() {
-    return this.#height
-  }
-
-  public get top() {
-    return this.#top
-  }
-
-  public get left() {
-    return this.#left
+  public get box() {
+    return this.#box
   }
 
   public get cameraDistance() {
@@ -119,27 +106,21 @@ export class En3View {
   }
 
   public resize() {
-    this.#width = this.#sizeElement.offsetWidth
-    this.#height = this.#sizeElement.offsetHeight
-
-    this.#top = getCumulativeOffsetTop(this.#sizeElement)
-    this.#left = getCumulativeOffsetLeft(this.#sizeElement)
+    const { width, height } = this.#box
 
     this.#camera.position.z = this.#cameraDistance
 
     if (this.#camera instanceof PerspectiveCamera) {
-      this.#camera.aspect = this.#width / this.#height
+      this.#camera.aspect = width / height
       this.#camera.fov =
         this.#cameraFov === 'auto'
-          ? 2 *
-            Math.atan(this.#height / 2 / this.#cameraDistance) *
-            (180 / Math.PI)
+          ? 2 * Math.atan(height / 2 / this.#cameraDistance) * (180 / Math.PI)
           : this.#cameraFov
     } else if (this.#camera instanceof OrthographicCamera) {
-      this.#camera.left = this.#width / -2
-      this.#camera.right = this.#width / 2
-      this.#camera.top = this.#height / 2
-      this.#camera.bottom = this.#height / -2
+      this.#camera.left = width / -2
+      this.#camera.right = width / 2
+      this.#camera.top = height / 2
+      this.#camera.bottom = height / -2
     }
 
     this.#camera.updateProjectionMatrix()
@@ -155,6 +136,8 @@ export class En3View {
     dispose(this.#scene)
 
     en3.destroyView(this.name)
+
+    this.#box.destroy()
   }
 
   public attachToHTMLElement<T extends Object3D>(
@@ -166,6 +149,7 @@ export class En3View {
       ...options,
       containerElement: this.#sizeElement,
       cartesian: true,
+      scrollStep: this.#sizeElement === en3.containerElement ? true : false,
     })
 
     box.bindObject(object)

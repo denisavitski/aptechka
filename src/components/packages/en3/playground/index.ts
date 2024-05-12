@@ -1,12 +1,13 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three'
-import { En3Clip, En3ClipHelpers, en3 } from '..'
+import { en3 } from '..'
 import { ticker } from '@packages/ticker'
+import '@packages/scroll'
 
 console.log('Playground')
 
 en3.setup({
   view: {
-    sizeElement: '.right-content',
+    sizeElement: '.content',
   },
 })
 
@@ -17,7 +18,7 @@ const mesh = new Mesh(
 
 mesh.scale.setScalar(30)
 
-en3.view.add(mesh)
+en3.view.add(mesh, '.box')
 
 ticker.subscribe((e) => {
   mesh.rotation.y = e.timestamp * 0.001

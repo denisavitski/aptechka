@@ -160,12 +160,24 @@ class En3 {
       this.#views.size > 1 ||
       this.view.sizeElement !== this.#containerElement
     ) {
-      const left = view.left
-      const top = en3.height - view.height - view.top
+      const left =
+        view.box.left + view.box.CSSTranslation.x + view.box.scrollValue.x
 
-      this.#webglRenderer.setScissor(left, top, view.width, view.height)
+      const top =
+        en3.height -
+        view.box.height -
+        view.box.top +
+        view.box.CSSTranslation.y +
+        view.box.scrollValue.y * -1
 
-      this.#webglRenderer.setViewport(left, top, view.width, view.height)
+      this.#webglRenderer.setScissor(left, top, view.box.width, view.box.height)
+
+      this.#webglRenderer.setViewport(
+        left,
+        top,
+        view.box.width,
+        view.box.height
+      )
     }
 
     view.beforeRenderCallback?.()

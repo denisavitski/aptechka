@@ -1,3 +1,19 @@
+e-scroll {
+  --axis: x;
+  --infinite: true;
+}
+
+section {
+  height: 100vh;
+  width: 100vw;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid red;
+}
+
 .wrap {
   width: 50%;
   height: 50%;
@@ -12,9 +28,22 @@
   border: 1px solid greenyellow;
 }
 
-.right-content {
+.content {
   width: 30vmin;
   height: 30vmin;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: 1px solid red;
+
+  transform: translate(50%, 50%);
+}
+
+.box {
+  width: 10vmin;
+  height: 10vmin;
+
+  border: 1px solid tomato;
 }
