@@ -1,5 +1,11 @@
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three'
-import { En3Clip, En3ClipHelpers, en3 } from '..'
+import {
+  En3Clip,
+  En3ClipHelpers,
+  en3,
+  en3GLTFLoader,
+  en3TextureLoader,
+} from '..'
 import { ticker } from '@packages/ticker'
 import '@packages/scroll'
 
@@ -36,4 +42,16 @@ view2.add(mesh, '.box')
 
 ticker.subscribe((e) => {
   mesh.rotation.y = e.timestamp * 0.001
+})
+
+en3TextureLoader.load(
+  '/env.png',
+  (texture) => {},
+  (e) => {
+    console.log(e)
+  }
+)
+
+en3GLTFLoader.load('/strawberry-opt.glb', (e) => {
+  console.log(e)
 })

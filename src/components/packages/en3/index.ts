@@ -7,6 +7,7 @@ export {
   type En3ViewBeforeRenderCallback,
 } from './core/En3View'
 
+export { en3Cache } from './loaders/en3Cache'
 export { en3TextureLoader } from './loaders/en3TextureLoader'
 export { en3GLTFLoader } from './loaders/en3GLTFLoader'
 

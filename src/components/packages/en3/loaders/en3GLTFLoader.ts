@@ -8,6 +8,8 @@ import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js'
 
 import { MeshoptDecoder } from '../libs/MeshoptDecoder'
 import { en3 } from '../core/en3'
+import { en3Cache } from './en3Cache'
+import { dispose } from '../utils/dispose'
 
 class En3GLTFLoader {
   readonly #gltfLoader = new GLTFLoader()
@@ -43,11 +45,39 @@ class En3GLTFLoader {
 
   public load(...parameters: Parameters<typeof this.gltfLoader.load>) {
     if (!this.#ktx2DetectedSupport) {
-      this.#gltfLoader.setKTX2Loader(this.#ktx2Loader.detectSupport(en3.webglRenderer))
+      this.#gltfLoader.setKTX2Loader(
+        this.#ktx2Loader.detectSupport(en3.webglRenderer)
+      )
+
       this.#ktx2DetectedSupport = true
     }
 
-    this.gltfLoader.load(...parameters)
+    const [url, onLoad, ...rest] = parameters
+
+    if (en3.cacheAssets && en3Cache.has(url)) {
+      const cached = en3Cache.get(url)!
+      onLoad(cached.data)
+    } else {
+      this.gltfLoader.load(
+        url,
+        (data) => {
+          if (en3.cacheAssets) {
+            en3Cache.set(url, {
+              data,
+              dispose: () => {
+                data.cameras.forEach((c) => dispose(c))
+                data.scenes.forEach((scene) => {
+                  dispose(scene)
+                })
+              },
+            })
+          }
+
+          onLoad(data)
+        },
+        ...rest
+      )
+    }
   }
 }
 

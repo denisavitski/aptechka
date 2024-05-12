@@ -4,12 +4,15 @@ import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
+import { en3Cache } from '../loaders/en3Cache'
+import { dispose } from '../utils/dispose'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
   maxPixelRatio?: number
   containerElement?: ElementOrSelector<HTMLElement>
   view?: En3ViewOptions
+  cacheAssets?: boolean
 }
 
 class En3 {
@@ -28,6 +31,7 @@ class En3 {
   #maxPixelRatio = 2
 
   #isCreated = false
+  #cacheAssets = false
 
   public get CDNVersion() {
     return this.#CDNVersion
@@ -59,6 +63,10 @@ class En3 {
 
   public get pixelRatio() {
     return this.#pixelRatio
+  }
+
+  public get cacheAssets() {
+    return this.#cacheAssets
   }
 
   public setup(options?: En3Options) {
@@ -93,6 +101,8 @@ class En3 {
       })
     )
 
+    this.#cacheAssets = options?.cacheAssets || false
+
     this.#isCreated = true
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3)
@@ -119,6 +129,12 @@ class En3 {
     this.#webglRenderer = null!
 
     this.#isCreated = false
+
+    en3Cache.forEach((v) => {
+      v.dispose()
+    })
+
+    en3Cache.clear()
   }
 
   public createView(viewName: string, viewOptions?: En3ViewOptions) {
