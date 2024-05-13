@@ -26,6 +26,7 @@ import {
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
+import { elementResizer } from '@packages/element-resizer'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
@@ -839,6 +840,7 @@ export class ScrollElement extends CustomElement {
       this.#hibernated = true
 
       windowResizer.unsubscribe(this.#resizeListener)
+      elementResizer.unsubscribe(this.#resizeListener)
 
       this.#damped.reset()
 
@@ -865,6 +867,7 @@ export class ScrollElement extends CustomElement {
       scrollEntries.register(this)
 
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
+      elementResizer.subscribe(this, this.#resizeListener)
 
       this.#enable()
     }
