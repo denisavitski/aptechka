@@ -7,7 +7,8 @@ export interface En3SourceManagerLoader<T> {
   load: Loader<T>['load']
 }
 
-export interface En3SourceManagerFullParameters<T> extends SourceManagerParameters {
+export interface En3SourceManagerFullParameters<T>
+  extends SourceManagerParameters {
   keepSourceParameters?: boolean
   loader: En3SourceManagerLoader<T>
   lazy?: boolean
@@ -19,7 +20,11 @@ export type En3SourceManagerParameters<T> = Omit<
   'loader' | 'element' | 'consumer'
 >
 
-export type En3SourceManagerLoadingState = 'start' | 'complete' | 'error' | undefined
+export type En3SourceManagerLoadingState =
+  | 'start'
+  | 'complete'
+  | 'error'
+  | undefined
 
 export class En3SourceManager<T> extends SourceManager {
   #data = new Store<T | undefined | null>(null)
@@ -73,6 +78,8 @@ export class En3SourceManager<T> extends SourceManager {
     }
   }
 
+  public processData?(data: T): T
+
   #updateData = () => {
     if (this.#isLazy && !this.#isLazyLoaded) {
       return
@@ -96,7 +103,7 @@ export class En3SourceManager<T> extends SourceManager {
       this.#loader.load(
         url,
         (data) => {
-          this.#data.current = data
+          this.#data.current = this.processData?.(data) || data
           this.#loading.current = 'complete'
 
           if (!this.#isLazy) {

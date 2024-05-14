@@ -4,7 +4,11 @@ import { Texture } from 'three'
 /**
  * texture.matrixAutoUpdate must be false
  */
-export function coverTexture(texture: Texture, planeSize: Dot2D, aspect?: number) {
+export function coverTexture(
+  texture: Texture,
+  planeSize: Dot2D,
+  aspect?: number
+) {
   const width = planeSize.x
   const height = planeSize.y
   const _aspect = aspect || texture.image.width / texture.image.height

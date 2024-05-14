@@ -7,6 +7,7 @@ import {
   En3SourceManager,
   En3SourceManagerParameters,
 } from '../attachments/En3SourceManager'
+import { en3 } from '../core/en3'
 
 export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
   #sourceManager: En3SourceManager<GLTF>
@@ -20,6 +21,18 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
       ...parameters,
     })
 
+    this.#sourceManager.processData = (data) => {
+      if (en3.cacheAssets) {
+        data.scene = data.scene.clone(true)
+
+        data.scenes = data.scenes.map((scene) => {
+          return scene.clone(true)
+        })
+      }
+
+      return data
+    }
+
     this.#sourceManager.data.subscribe((detail) => {
       if (!detail.current) {
         this.children.forEach((child) => {
@@ -27,7 +40,7 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
           dispose(child)
         })
       } else {
-        this.add(...detail.current.scene.clone(true).children)
+        this.add(...detail.current.scene.children)
       }
     })
   }

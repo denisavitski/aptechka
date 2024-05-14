@@ -30,16 +30,8 @@ section {
 
 .content {
   width: 30vmin;
-  height: 30vmin;
-
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  justify-items: center;
-
+  height: 50vmin;
   border: 1px solid red;
-
-  transform: translate(50%, 50%);
 }
 
 .clip {

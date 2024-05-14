@@ -1,4 +1,4 @@
-import { Material, Mesh, PlaneGeometry, SRGBColorSpace, Texture } from 'three'
+import { Material, Mesh, SRGBColorSpace, Texture } from 'three'
 import { coverTexture } from '../utils/coverTexture'
 import {
   En3SourceManager,
@@ -8,10 +8,13 @@ import {
 import { En3SourceConsumer } from './En3SourceConsumer'
 import { windowResizer } from '@packages/window-resizer'
 import { RoundedBoxGeometry } from 'three/examples/jsm/Addons.js'
+import { en3 } from '../core/en3'
 
 export type En3ImageLikeMaterial<TTexture extends Texture> = Material & {
   map: TTexture | null
 }
+
+export type En3ImageLikeFit = 'cover' | 'contain'
 
 export interface En3ImageLikeParameters<
   TTexture extends Texture,
@@ -22,7 +25,7 @@ export interface En3ImageLikeParameters<
   round?: number
   segments?: number
   material?: TMaterial
-  cover?: boolean
+  fit?: En3ImageLikeFit
   loader: En3SourceManagerLoader<TTexture>
 }
 
@@ -34,7 +37,7 @@ export class En3ImageLike<
   implements En3SourceConsumer<TTexture>
 {
   #sourceManager: En3SourceManager<TTexture>
-  #isCover: boolean
+  #fit: En3ImageLikeFit | undefined
 
   constructor(parameters: En3ImageLikeParameters<TTexture, TMaterial>) {
     super(
@@ -53,7 +56,7 @@ export class En3ImageLike<
       ...parameters,
     })
 
-    this.#isCover = parameters.cover || false
+    this.#fit = parameters.fit
 
     this.addEventListener('added', () => {
       windowResizer.subscribe(this.#resizeListener)
@@ -63,18 +66,27 @@ export class En3ImageLike<
       windowResizer.unsubscribe(this.#resizeListener)
     })
 
+    this.#sourceManager.processData = (d) => {
+      if (en3.cacheAssets) {
+        return d.clone()
+      }
+
+      return d
+    }
+
     this.#sourceManager.data.subscribe((detail) => {
       if (!detail.current && detail.previous) {
         detail.previous.dispose()
       } else if (detail.current) {
         if (this.material) {
-          if (this.#isCover) {
+          if (this.#fit) {
             detail.current.matrixAutoUpdate = false
           }
 
           detail.current.colorSpace = SRGBColorSpace
           detail.current.center.set(0.5, 0.5)
-          this.material.map = detail.current.clone()
+
+          this.material.map = detail.current
           this.material.needsUpdate = true
           this.#resizeListener()
         }
@@ -98,8 +110,10 @@ export class En3ImageLike<
   }
 
   #resizeListener = () => {
-    if (this.#sourceManager.data.current && this.#isCover) {
-      this.onCoverResize(this.#sourceManager.data.current)
+    if (this.#sourceManager.data.current) {
+      if (this.#fit === 'cover') {
+        this.onCoverResize(this.#sourceManager.data.current)
+      }
     }
   }
 }

@@ -1,9 +1,15 @@
 import { Loader, VideoTexture } from 'three'
-import { En3ImageLike, En3ImageLikeMaterial, En3ImageLikeParameters } from './En3ImageLike'
+import {
+  En3ImageLike,
+  En3ImageLikeMaterial,
+  En3ImageLikeParameters,
+} from './En3ImageLike'
 import { coverTexture } from '../utils/coverTexture'
 
 class En3VideoLoader<
-  P extends Parameters<Loader<VideoTexture>['load']> = Parameters<Loader<VideoTexture>['load']>
+  P extends Parameters<Loader<VideoTexture>['load']> = Parameters<
+    Loader<VideoTexture>['load']
+  >
 > {
   public load(...parameters: P) {
     const url = parameters[0]
@@ -29,17 +35,17 @@ class En3VideoLoader<
   }
 }
 
-export interface En3VideoParameters<TMaterial extends En3ImageLikeMaterial<VideoTexture>>
-  extends Omit<En3ImageLikeParameters<VideoTexture, TMaterial>, 'loader'> {
+export interface En3VideoParameters<
+  TMaterial extends En3ImageLikeMaterial<VideoTexture>
+> extends Omit<En3ImageLikeParameters<VideoTexture, TMaterial>, 'loader'> {
   autoplay?: boolean
   muted?: boolean
   loop?: boolean
 }
 
-export class En3Video<TMaterial extends En3ImageLikeMaterial<VideoTexture>> extends En3ImageLike<
-  VideoTexture,
-  TMaterial
-> {
+export class En3Video<
+  TMaterial extends En3ImageLikeMaterial<VideoTexture>
+> extends En3ImageLike<VideoTexture, TMaterial> {
   #isAutoplay: boolean
   #isMuted: boolean
   #isLoop: boolean
