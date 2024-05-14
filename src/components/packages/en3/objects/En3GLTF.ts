@@ -23,11 +23,17 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
 
     this.#sourceManager.processData = (data) => {
       if (en3.cacheAssets) {
-        data.scene = data.scene.clone(true)
+        const d = {
+          ...data,
+        }
 
-        data.scenes = data.scenes.map((scene) => {
-          return scene.clone(true)
+        d.scene = data.scene.clone(true)
+
+        d.scenes = data.scenes.map((scene) => {
+          return data.scene === scene ? d.scene : scene.clone(true)
         })
+
+        return d
       }
 
       return data
