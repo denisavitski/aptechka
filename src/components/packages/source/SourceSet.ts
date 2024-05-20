@@ -26,16 +26,18 @@ export class SourceSet {
     })
 
     const max = tmp
-      .filter((v) => v[1].queryType === 'max')
-      .sort((a, b) => b[1].queryPx - a[1].queryPx)
+      .filter((v) => v[1].queryType.includes('max'))
+      .sort((a, b) => b[1].queryValue - a[1].queryValue)
 
     const min = tmp
-      .filter((v) => v[1].queryType === 'min' && v[1].queryPx !== 0)
-      .sort((a, b) => a[1].queryPx - b[1].queryPx)
+      .filter((v) => v[1].queryType.includes('min') && v[1].queryValue !== 0)
+      .sort((a, b) => a[1].queryValue - b[1].queryValue)
 
     const defaultMatch = tmp.filter((t) => t[0] === '(min-width: 0px)')
 
-    const sorted = defaultMatch ? [...defaultMatch, ...max, ...min] : [...max, ...min]
+    const sorted = defaultMatch
+      ? [...defaultMatch, ...max, ...min]
+      : [...max, ...min]
 
     sorted.forEach((v) => {
       if (!this.#mediaBuckets.has(v[0])) {

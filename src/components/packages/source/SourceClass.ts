@@ -3,8 +3,8 @@ export class Source {
   #name: string
   #density: number
   #query: string
-  #queryPx: number
-  #queryType: 'max' | 'min'
+  #queryValue: number
+  #queryType: 'max' | 'min' | 'max-ratio' | 'min-ratio'
   #extension: string
 
   constructor(url: string) {
@@ -26,21 +26,33 @@ export class Source {
 
     const maxpattern = /\d+max/g
     const minpattern = /\d+min/g
+    const maxAspectPattern = /\d+mar/g
+    const minAspectPattern = /\d+mir/g
 
     const maxmatch = splitted.find((s) => s.match(maxpattern))
     const minmatch = splitted.find((s) => s.match(minpattern))
+    const maxRatioMatch = splitted.find((s) => s.match(maxAspectPattern))
+    const minRatioMatch = splitted.find((s) => s.match(minAspectPattern))
 
-    if (maxmatch) {
-      this.#queryPx = parseInt(maxmatch)
+    if (maxRatioMatch) {
+      this.#queryValue = parseInt(maxRatioMatch)
       this.#queryType = 'max'
-      this.#query = `(max-width: ${this.#queryPx}px)`
+      this.#query = `(max-aspect-ratio: ${this.#queryValue})`
+    } else if (minRatioMatch) {
+      this.#queryValue = parseInt(minRatioMatch)
+      this.#queryType = 'max'
+      this.#query = `(min-aspect-ratio: ${this.#queryValue})`
+    } else if (maxmatch) {
+      this.#queryValue = parseInt(maxmatch)
+      this.#queryType = 'max'
+      this.#query = `(max-width: ${this.#queryValue}px)`
     } else if (minmatch) {
-      this.#queryPx = parseInt(minmatch)
-      this.#query = `(min-width: ${this.#queryPx}px)`
+      this.#queryValue = parseInt(minmatch)
+      this.#query = `(min-width: ${this.#queryValue}px)`
       this.#queryType = 'min'
     } else {
-      this.#queryPx = 0
-      this.#query = `(min-width: ${this.#queryPx}px)`
+      this.#queryValue = 0
+      this.#query = `(min-width: ${this.#queryValue}px)`
       this.#queryType = 'min'
     }
 
@@ -71,7 +83,7 @@ export class Source {
     return this.#queryType
   }
 
-  public get queryPx() {
-    return this.#queryPx
+  public get queryValue() {
+    return this.#queryValue
   }
 }
