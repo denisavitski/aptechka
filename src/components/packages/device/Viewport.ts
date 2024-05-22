@@ -29,21 +29,8 @@ class Viewport {
 
   constructor() {
     if (isBrowser) {
-      windowResizer.subscribe(() => {
-        this.#width = document.documentElement.clientWidth
-        this.#height = innerHeight
-        this.#pixelRatio = devicePixelRatio
-
-        if (matchMedia(ViewportMediaRules['<=mobile']).matches) {
-          this.#type.current = 'mobile'
-        } else if (matchMedia(ViewportMediaRules['<=tablet']).matches) {
-          this.#type.current = 'tablet'
-        } else if (matchMedia(ViewportMediaRules['<=notebook']).matches) {
-          this.#type.current = 'notebook'
-        } else if (matchMedia(ViewportMediaRules['>=desktop']).matches) {
-          this.#type.current = 'desktop'
-        }
-      }, RESIZE_ORDER.DEVICE)
+      this.resize()
+      windowResizer.subscribe(this.resize, RESIZE_ORDER.DEVICE)
     }
   }
 
@@ -61,6 +48,22 @@ class Viewport {
 
   public get pixelRatio() {
     return this.#pixelRatio
+  }
+
+  public resize = () => {
+    this.#width = document.documentElement.clientWidth
+    this.#height = innerHeight
+    this.#pixelRatio = devicePixelRatio
+
+    if (matchMedia(ViewportMediaRules['<=mobile']).matches) {
+      this.#type.current = 'mobile'
+    } else if (matchMedia(ViewportMediaRules['<=tablet']).matches) {
+      this.#type.current = 'tablet'
+    } else if (matchMedia(ViewportMediaRules['<=notebook']).matches) {
+      this.#type.current = 'notebook'
+    } else if (matchMedia(ViewportMediaRules['>=desktop']).matches) {
+      this.#type.current = 'desktop'
+    }
   }
 }
 

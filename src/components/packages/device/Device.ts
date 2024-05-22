@@ -31,16 +31,8 @@ class Device {
         this.#gpuTier = v.tier
       })
 
-      windowResizer.subscribe(() => {
-        this.#isMobile = /Mobi|Android/i.test(navigator.userAgent)
-
-        this.#isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
-
-        setTimeout(() => {
-          this.#isTouch =
-            'ontouchstart' in window || navigator.maxTouchPoints > 0
-        }, 0)
-      }, RESIZE_ORDER.DEVICE)
+      this.resize()
+      windowResizer.subscribe(this.resize, RESIZE_ORDER.DEVICE)
 
       {
         const canvas = document.createElement('canvas')
@@ -123,6 +115,16 @@ class Device {
 
   public get isApple() {
     return this.#isApple
+  }
+
+  public resize = () => {
+    this.#isMobile = /Mobi|Android/i.test(navigator.userAgent)
+
+    this.#isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
+    setTimeout(() => {
+      this.#isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    }, 0)
   }
 }
 
