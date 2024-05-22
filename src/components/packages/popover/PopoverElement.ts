@@ -26,7 +26,7 @@ export class PopoverElement extends CustomElement {
     return this.#opened
   }
 
-  public open = () => {
+  public open = (useTransition = true) => {
     if (this.#opened.current) {
       return
     }
@@ -51,14 +51,20 @@ export class PopoverElement extends CustomElement {
     this.style.display = 'block'
     this.dispatchEvent(new CustomEvent('popoverTriggered'))
 
-    setTimeout(() => {
+    const opened = () => {
       addEventListener('click', this.#clickOutsideListener)
       addEventListener('keydown', this.#keydownListener)
 
       this.style.opacity = '1'
       this.classList.add('opened')
       this.dispatchEvent(new CustomEvent('popoverOpened'))
-    })
+    }
+
+    if (useTransition) {
+      setTimeout(opened)
+    } else {
+      opened()
+    }
   }
 
   public close = () => {
@@ -107,6 +113,8 @@ export class PopoverElement extends CustomElement {
   protected disconnectedCallback() {
     this.#history.unobserve()
     this.#single.unobserve()
+
+    PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
     clearTimeout(this.#closeTimeoutId)
 
