@@ -7,7 +7,6 @@ import {
   element,
 } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
-import { StoreEntry } from '@packages/store'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
 
