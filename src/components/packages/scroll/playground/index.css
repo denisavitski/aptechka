@@ -8,9 +8,10 @@
 .reviews {
   --gap: 5rem;
   --infinite: true;
-  --autoplay: 0.01;
-  --autoplay-user-direction: true;
   --sections-in-view: 5;
+  --axis: y;
+  --sectional: true;
+  --current-index-offset: 1;
 
   width: 60vw;
 

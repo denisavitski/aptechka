@@ -237,6 +237,11 @@ export class ScrollElement extends CustomElement {
     '--autoplay-user-direction',
     false
   )
+  #currentIndexOffsetCSSProperty = new CSSProperty<number>(
+    this,
+    '--current-index-offset',
+    0
+  )
 
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
@@ -455,6 +460,12 @@ export class ScrollElement extends CustomElement {
         }
       })
 
+      this.#currentIndexOffsetCSSProperty.subscribe((e) => {
+        if (this.isConnected) {
+          this.#updateMarks()
+        }
+      })
+
       this.#damped.isRunning.subscribe((e) => {
         this.classList.toggle('active', e.current)
       })
@@ -533,6 +544,10 @@ export class ScrollElement extends CustomElement {
 
   public get autoplayUserDirectionCSSProperty() {
     return this.#autoplayUserDirectionCSSProperty
+  }
+
+  public get currentIndexOffsetCSSProperty() {
+    return this.#currentIndexOffsetCSSProperty
   }
 
   public get disabledCSSProperty() {
@@ -739,6 +754,7 @@ export class ScrollElement extends CustomElement {
     this.#autoplayCSSProperty.observe()
     this.#autoplayPauseDurationCSSProperty.observe()
     this.#autoplayUserDirectionCSSProperty.observe()
+    this.#currentIndexOffsetCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -762,6 +778,7 @@ export class ScrollElement extends CustomElement {
     this.#autoplayCSSProperty.unobserve()
     this.#autoplayPauseDurationCSSProperty.unobserve()
     this.#autoplayUserDirectionCSSProperty.unobserve()
+    this.#currentIndexOffsetCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
@@ -1078,7 +1095,8 @@ export class ScrollElement extends CustomElement {
 
   #updateMarks() {
     if (this.#sections.length) {
-      const counter = this.#counter.current
+      const counter =
+        this.#counter.current + this.#currentIndexOffsetCSSProperty.current
 
       if (counter === 0) {
         this.classList.add('start')
