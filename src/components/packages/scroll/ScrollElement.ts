@@ -239,9 +239,14 @@ export class ScrollElement extends CustomElement {
     false
   )
   #classesCSSProperty = new CSSProperty<number>(this, '--classes', 0)
-  #currentIndexOffsetCSSProperty = new CSSProperty<number>(
+  #currentIndexStartOffsetCSSProperty = new CSSProperty<number>(
     this,
-    '--current-index-offset',
+    '--current-index-start-offset',
+    0
+  )
+  #currentIndexEndOffsetCSSProperty = new CSSProperty<number>(
+    this,
+    '--current-index-end-offset',
     0
   )
 
@@ -468,7 +473,13 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#currentIndexOffsetCSSProperty.subscribe((e) => {
+      this.#currentIndexStartOffsetCSSProperty.subscribe((e) => {
+        if (this.isConnected && this.#classesCSSProperty.current) {
+          this.#updateMarks()
+        }
+      })
+
+      this.#currentIndexEndOffsetCSSProperty.subscribe((e) => {
         if (this.isConnected && this.#classesCSSProperty.current) {
           this.#updateMarks()
         }
@@ -562,8 +573,12 @@ export class ScrollElement extends CustomElement {
     return this.#classesCSSProperty
   }
 
-  public get currentIndexOffsetCSSProperty() {
-    return this.#currentIndexOffsetCSSProperty
+  public get currentIndexStartOffsetCSSProperty() {
+    return this.#currentIndexStartOffsetCSSProperty
+  }
+
+  public get currentIndexEndOffsetCSSProperty() {
+    return this.#currentIndexEndOffsetCSSProperty
   }
 
   public get disabledCSSProperty() {
@@ -772,7 +787,8 @@ export class ScrollElement extends CustomElement {
     this.#autoplayPauseDurationCSSProperty.observe()
     this.#autoplayUserDirectionCSSProperty.observe()
     this.#classesCSSProperty.observe()
-    this.#currentIndexOffsetCSSProperty.observe()
+    this.#currentIndexStartOffsetCSSProperty.observe()
+    this.#currentIndexEndOffsetCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -798,7 +814,8 @@ export class ScrollElement extends CustomElement {
     this.#autoplayPauseDurationCSSProperty.unobserve()
     this.#autoplayUserDirectionCSSProperty.unobserve()
     this.#classesCSSProperty.unobserve()
-    this.#currentIndexOffsetCSSProperty.unobserve()
+    this.#currentIndexStartOffsetCSSProperty.unobserve()
+    this.#currentIndexEndOffsetCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
@@ -1118,7 +1135,7 @@ export class ScrollElement extends CustomElement {
   #updateMarks() {
     if (this.#classesCSSProperty.current && this.#sections.length) {
       const counter =
-        this.#counter.current + this.#currentIndexOffsetCSSProperty.current
+        this.#counter.current + this.#currentIndexStartOffsetCSSProperty.current
 
       if (counter === 0) {
         this.classList.add('start')
@@ -1132,10 +1149,18 @@ export class ScrollElement extends CustomElement {
         this.classList.remove('end')
       }
 
-      this.#sections.forEach((section, index) => {
-        const overflow = counter - this.limit - 1
+      const sectionsInView =
+        this.#sectionsInViewCSSProperty.current +
+        this.#currentIndexEndOffsetCSSProperty.current
 
-        const currentRange = counter + this.#sectionsInViewCSSProperty.current
+      this.#sections.forEach((section, index) => {
+        const overflow =
+          counter -
+          this.limit -
+          1 +
+          this.#currentIndexEndOffsetCSSProperty.current
+
+        const currentRange = counter + sectionsInView
 
         const vv = this.sections.length - currentRange
 
@@ -1143,7 +1168,7 @@ export class ScrollElement extends CustomElement {
           section.mark('current')
         } else if (
           (index >= currentRange && index < currentRange + vv / 2) ||
-          index <= overflow + this.#sectionsInViewCSSProperty.current
+          index <= overflow + sectionsInView
         ) {
           section.mark('next')
         } else {

@@ -11,9 +11,11 @@
   --sections-in-view: 5;
   --axis: y;
   --sectional: true;
-  --current-index-offset: 1;
   --controls: false;
-  --autoplay: 1000;
+  --autoplay: 500;
+  --classes: true;
+  --current-index-start-offset: 1;
+  --current-index-end-offset: -1;
 
   width: 60vw;
 
