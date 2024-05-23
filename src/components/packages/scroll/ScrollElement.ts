@@ -237,6 +237,7 @@ export class ScrollElement extends CustomElement {
     '--autoplay-user-direction',
     false
   )
+  #classesCSSProperty = new CSSProperty<number>(this, '--classes', 0)
   #currentIndexOffsetCSSProperty = new CSSProperty<number>(
     this,
     '--current-index-offset',
@@ -460,8 +461,14 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#currentIndexOffsetCSSProperty.subscribe((e) => {
+      this.#classesCSSProperty.subscribe((e) => {
         if (this.isConnected) {
+          this.#updateMarks()
+        }
+      })
+
+      this.#currentIndexOffsetCSSProperty.subscribe((e) => {
+        if (this.isConnected && this.#classesCSSProperty.current) {
           this.#updateMarks()
         }
       })
@@ -544,6 +551,10 @@ export class ScrollElement extends CustomElement {
 
   public get autoplayUserDirectionCSSProperty() {
     return this.#autoplayUserDirectionCSSProperty
+  }
+
+  public get classesCSSProperty() {
+    return this.#classesCSSProperty
   }
 
   public get currentIndexOffsetCSSProperty() {
@@ -754,6 +765,7 @@ export class ScrollElement extends CustomElement {
     this.#autoplayCSSProperty.observe()
     this.#autoplayPauseDurationCSSProperty.observe()
     this.#autoplayUserDirectionCSSProperty.observe()
+    this.#classesCSSProperty.observe()
     this.#currentIndexOffsetCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
@@ -778,6 +790,7 @@ export class ScrollElement extends CustomElement {
     this.#autoplayCSSProperty.unobserve()
     this.#autoplayPauseDurationCSSProperty.unobserve()
     this.#autoplayUserDirectionCSSProperty.unobserve()
+    this.#classesCSSProperty.unobserve()
     this.#currentIndexOffsetCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
@@ -1094,7 +1107,7 @@ export class ScrollElement extends CustomElement {
   }
 
   #updateMarks() {
-    if (this.#sections.length) {
+    if (this.#classesCSSProperty.current && this.#sections.length) {
       const counter =
         this.#counter.current + this.#currentIndexOffsetCSSProperty.current
 
