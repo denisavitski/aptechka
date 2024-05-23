@@ -199,6 +199,7 @@ const stylesheet = createStylesheet({
 export class ScrollElement extends CustomElement {
   #damped: Damped = null!
 
+  #controlsCSSProperty = new CSSProperty<boolean>(this, '--controls', true)
   #axisCSSProperty = new CSSProperty<Axes2D>(this, '--axis', 'y')
   #pagesCSSProperty = new CSSProperty<number>(this, '--pages', 0, {
     validate: (v) => Math.max(0, v - 1),
@@ -489,6 +490,10 @@ export class ScrollElement extends CustomElement {
     return this.#damped
   }
 
+  public get controlsCSSProperty() {
+    return this.#controlsCSSProperty
+  }
+
   public get axisCSSProperty() {
     return this.#axisCSSProperty
   }
@@ -748,6 +753,7 @@ export class ScrollElement extends CustomElement {
   }
 
   protected connectedCallback() {
+    this.#controlsCSSProperty.observe()
     this.#axisCSSProperty.observe()
     this.#pagesCSSProperty.observe()
     this.#splitCSSProperty.observe()
@@ -774,6 +780,7 @@ export class ScrollElement extends CustomElement {
   }
 
   protected disconnectedCallback() {
+    this.#controlsCSSProperty.unobserve()
     this.#axisCSSProperty.unobserve()
     this.#pagesCSSProperty.unobserve()
     this.#splitCSSProperty.unobserve()
@@ -1059,15 +1066,17 @@ export class ScrollElement extends CustomElement {
   }
 
   #notAutoplayControlListener = (type: string, value: number) => {
-    this.#autoplayControls.pauseAndContinue(
-      this.#autoplayPauseDurationCSSProperty.current
-    )
+    if (this.#controlsCSSProperty.current) {
+      this.#autoplayControls.pauseAndContinue(
+        this.#autoplayPauseDurationCSSProperty.current
+      )
 
-    if (this.#autoplayUserDirectionCSSProperty.current) {
-      this.#autoplayControls.direction = Math.sign(value) || 1
+      if (this.#autoplayUserDirectionCSSProperty.current) {
+        this.#autoplayControls.direction = Math.sign(value) || 1
+      }
+
+      this.#controlsListener(type, value)
     }
-
-    this.#controlsListener(type, value)
   }
 
   #controlsListener = (type: string, value: number) => {

@@ -12,6 +12,8 @@
   --axis: y;
   --sectional: true;
   --current-index-offset: 1;
+  --controls: false;
+  --autoplay: 1000;
 
   width: 60vw;
 
