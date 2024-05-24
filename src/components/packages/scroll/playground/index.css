@@ -1,23 +1,24 @@
 .wrap {
   width: 100%;
   height: 100%;
-
-  padding: 10vmin;
 }
 
 .reviews {
   --gap: 5rem;
   --infinite: true;
-  --sections-in-view: 5;
+  --sections-in-view: 1;
   --axis: y;
-  --sectional: true;
-  --controls: false;
-  --autoplay: 500;
+  /* --sectional: true; */
+  --controls: true;
+  /* --autoplay: 500; */
   --classes: true;
   --current-index-start-offset: 1;
   --current-index-end-offset: -1;
+  --auto-size: true;
+  --direction: -1;
 
-  width: 60vw;
+  width: 100%;
+  height: 100%;
 
   border: 0.1rem solid red;
 

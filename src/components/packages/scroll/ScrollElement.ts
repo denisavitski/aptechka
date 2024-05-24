@@ -201,6 +201,7 @@ export class ScrollElement extends CustomElement {
 
   #controlsCSSProperty = new CSSProperty<boolean>(this, '--controls', true)
   #axisCSSProperty = new CSSProperty<Axes2D>(this, '--axis', 'y')
+  #directionCSSProperty = new CSSProperty<number>(this, '--direction', 0)
   #pagesCSSProperty = new CSSProperty<number>(this, '--pages', 0, {
     validate: (v) => Math.max(0, v - 1),
   })
@@ -508,6 +509,9 @@ export class ScrollElement extends CustomElement {
   public get axisCSSProperty() {
     return this.#axisCSSProperty
   }
+  public get directionCSSProperty() {
+    return this.#directionCSSProperty
+  }
 
   public get pagesCSSProperty() {
     return this.#pagesCSSProperty
@@ -770,6 +774,7 @@ export class ScrollElement extends CustomElement {
   protected connectedCallback() {
     this.#controlsCSSProperty.observe()
     this.#axisCSSProperty.observe()
+    this.#directionCSSProperty.observe()
     this.#pagesCSSProperty.observe()
     this.#splitCSSProperty.observe()
     this.#sectionalCSSProperty.observe()
@@ -798,6 +803,7 @@ export class ScrollElement extends CustomElement {
   protected disconnectedCallback() {
     this.#controlsCSSProperty.unobserve()
     this.#axisCSSProperty.unobserve()
+    this.#directionCSSProperty.unobserve()
     this.#pagesCSSProperty.unobserve()
     this.#splitCSSProperty.unobserve()
     this.#sectionalCSSProperty.unobserve()
@@ -1097,6 +1103,14 @@ export class ScrollElement extends CustomElement {
   }
 
   #controlsListener = (type: string, value: number) => {
+    if (this.#directionCSSProperty.current) {
+      if (this.#directionCSSProperty.current < 0 && value > 0) {
+        return
+      } else if (this.#directionCSSProperty.current > 0 && value < 0) {
+        return
+      }
+    }
+
     if (
       type === 'drag' &&
       !device.isMobile &&
