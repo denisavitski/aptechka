@@ -6,6 +6,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault()
 
   const formData = new FormData(form)
+  console.log('SUBMIT')
 
   // Display the key/value pairs
   for (var pair of formData.entries()) {

@@ -1,6 +1,6 @@
-.select {
+e-select {
   --duration: 0.1s;
-  width: 10vw;
+  width: 20vw;
   display: block;
 }
 
@@ -20,4 +20,8 @@
   transition: height 0.3s;
   height: 0px;
   overflow: hidden;
+}
+
+e-select-option {
+  --color-outline: red;
 }

@@ -18,7 +18,16 @@ const stylesheet = createStylesheet({
   },
 
   button: {
-    all: 'inherit',
+    background: 'inherit',
+    width: 'inherit',
+    height: 'inherit',
+    color: 'inherit',
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
+    border: 'inherit',
+    textAlign: 'inherit',
+    padding: 0,
+    boxSizing: 'border-box',
   },
 })
 
