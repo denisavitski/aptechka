@@ -16,19 +16,6 @@ const stylesheet = createStylesheet({
     display: 'inline-flex',
     alignItems: 'center',
   },
-
-  button: {
-    background: 'inherit',
-    width: 'inherit',
-    height: 'inherit',
-    color: 'inherit',
-    fontFamily: 'inherit',
-    fontSize: 'inherit',
-    border: 'inherit',
-    textAlign: 'inherit',
-    padding: 0,
-    boxSizing: 'border-box',
-  },
 })
 
 @define('e-select-option')
@@ -40,14 +27,16 @@ export class SelectOptionElement extends SelectUserElement {
       this.openShadow(stylesheet)
 
       element(this, {
-        children: [
-          button({
-            onClick: () => {
-              this.#pick()
-            },
-            children: slot(),
-          }),
-        ],
+        tabindex: 0,
+        onClick: () => {
+          this.#pick()
+        },
+        onKeydown: (e) => {
+          if (e.code === 'Space') {
+            this.#pick()
+          }
+        },
+        children: slot(),
       })
     }
   }

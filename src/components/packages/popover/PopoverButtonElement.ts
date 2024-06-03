@@ -27,28 +27,30 @@ export class PopoverButtonElement extends CustomElement {
 
     if (isBrowser) {
       element(this, {
-        children: [
-          button({
-            onClick: () => {
-              if (this.#popoverElement) {
-                const type = this.getAttribute('type') || 'open'
+        tabindex: this.getAttribute('tabindex') || '0',
+        onClick: () => {
+          if (this.#popoverElement) {
+            const type = this.getAttribute('type') || 'open'
 
-                if (
-                  type === 'open' ||
-                  (type === 'toggle' && !this.#popoverElement.opened.current)
-                ) {
-                  this.#popoverElement.open()
-                } else if (
-                  type === 'close' ||
-                  (type === 'toggle' && this.#popoverElement.opened.current)
-                ) {
-                  this.#popoverElement.close()
-                }
-              }
-            },
-            children: [slot()],
-          }),
-        ],
+            if (
+              type === 'open' ||
+              (type === 'toggle' && !this.#popoverElement.opened.current)
+            ) {
+              this.#popoverElement.open()
+            } else if (
+              type === 'close' ||
+              (type === 'toggle' && this.#popoverElement.opened.current)
+            ) {
+              this.#popoverElement.close()
+            }
+          }
+        },
+        onKeydown: (e) => {
+          if (e.code === 'Space') {
+            ;(e.currentTarget as HTMLElement).click()
+          }
+        },
+        children: [slot()],
       })
     }
   }
