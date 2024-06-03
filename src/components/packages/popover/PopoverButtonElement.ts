@@ -1,20 +1,9 @@
 import { CustomElement, define } from '@packages/custom-element'
 import { PopoverElement } from './PopoverElement'
-import {
-  createStylesheet,
-  button,
-  slot,
-  element,
-} from '@packages/element-constructor'
+import { element } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
-
-const stylesheet = createStylesheet({
-  button: {
-    all: 'inherit',
-  },
-})
 
 @define('e-popover-button')
 export class PopoverButtonElement extends CustomElement {
@@ -22,8 +11,6 @@ export class PopoverButtonElement extends CustomElement {
 
   constructor() {
     super()
-
-    this.openShadow(stylesheet)
 
     if (isBrowser) {
       element(this, {
@@ -50,7 +37,6 @@ export class PopoverButtonElement extends CustomElement {
             ;(e.currentTarget as HTMLElement).click()
           }
         },
-        children: [slot()],
       })
     }
   }
