@@ -1,4 +1,4 @@
-import { Dot2D } from './ts-shape'
+import { Dot2D } from '@packages/utils'
 import '@packages/libs/path-data-polyfill'
 
 export interface GenerateSVGPathDataOptions {
