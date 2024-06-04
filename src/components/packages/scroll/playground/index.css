@@ -8,14 +8,13 @@
   --infinite: true;
   --sections-in-view: 1;
   --axis: y;
-  /* --sectional: true; */
+  --sectional: true;
   --controls: true;
-  /* --autoplay: 500; */
+  --autoplay: 2000;
   --classes: true;
   --current-index-start-offset: 1;
   --current-index-end-offset: -1;
   --auto-size: true;
-  --direction: -1;
 
   width: 100%;
   height: 100%;

@@ -47,6 +47,11 @@ export class AutoplayControls extends Controls {
     } else {
       ticker.subscribe(this.#animationFrameCallback, this.#options)
     }
+
+    document.addEventListener(
+      'visibilitychange',
+      this.#documentVisibilityChangeListener
+    )
   }
 
   public disconnect() {
@@ -55,6 +60,11 @@ export class AutoplayControls extends Controls {
 
     clearInterval(this.#pauseTimeoutId)
     this.#paused = false
+
+    document.removeEventListener(
+      'visibilitychange',
+      this.#documentVisibilityChangeListener
+    )
   }
 
   public pauseAndContinue(duration: number) {
@@ -84,6 +94,16 @@ export class AutoplayControls extends Controls {
         'autoplay',
         Math.sign(this.#speed) * this.direction
       )
+    }
+  }
+
+  #documentVisibilityChangeListener = () => {
+    if (this.#interval) {
+      if (document.hidden) {
+        this.#paused = true
+      } else {
+        this.#paused = false
+      }
     }
   }
 }

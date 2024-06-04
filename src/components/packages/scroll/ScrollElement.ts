@@ -36,6 +36,8 @@ export type SectionmarkChangeEvent = CustomEvent<{
   mark: SectionMark
 }>
 
+let index = 0
+
 class Section {
   #element: HTMLElement
   #scrollElement: ScrollElement
