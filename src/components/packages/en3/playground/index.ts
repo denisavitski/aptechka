@@ -1,21 +1,17 @@
-import { DirectionalLight, MeshBasicMaterial } from 'three'
-import { En3GLTF, En3Image, en3 } from '..'
-import '@packages/scroll'
-
-console.log('Playground')
-
-en3.setup({})
-
-const dl = new DirectionalLight()
-dl.intensity = 10
-dl.position.z = 1000
-
-en3.view.add(dl)
-
-const gltf = new En3GLTF({
-  srcset: '/horse.glb',
+import '@packages/tweaker'
+import { En3FluidElement, en3 } from '../index'
+import { ACESFilmicToneMapping } from 'three'
+en3.setup({
+  webGLRendererParameters: {
+    alpha: true,
+  },
 })
 
-gltf.scale.setScalar(100)
+en3.webglRenderer.toneMapping = ACESFilmicToneMapping
+en3.webglRenderer.toneMappingExposure = 1.4
 
-en3.view.add(gltf)
+en3.webglRenderer.autoClear = false
+en3.webglRenderer.setClearColor(0x000000)
+en3.webglRenderer.localClippingEnabled = true
+
+document.body.appendChild(new En3FluidElement())

@@ -1,4 +1,5 @@
 export { en3 } from './core/en3'
+
 export {
   En3View,
   type En3ViewOptions,
@@ -16,6 +17,7 @@ export { En3Clip } from './objects/En3Clip'
 export { En3ClipHelpers } from './objects/En3ClipHelpers'
 
 export { En3GLTF } from './objects/En3GLTF'
+export { En3Fluid, En3FluidElement, en3FluidPointer } from './objects/fluid'
 
 export {
   En3ImageLike,
