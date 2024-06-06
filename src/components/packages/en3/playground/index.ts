@@ -1,6 +1,6 @@
 import '@packages/tweaker'
-import { En3FluidElement, en3 } from '../index'
-import { ACESFilmicToneMapping } from 'three'
+import { En3FluidElement, En3ModifiedMaterial, en3 } from '../index'
+import { ACESFilmicToneMapping, MeshStandardMaterial } from 'three'
 en3.setup({
   webGLRendererParameters: {
     alpha: true,

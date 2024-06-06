@@ -1,4 +1,11 @@
-import { Material, Mesh, SRGBColorSpace, Texture } from 'three'
+import {
+  BufferGeometry,
+  Material,
+  Mesh,
+  PlaneGeometry,
+  SRGBColorSpace,
+  Texture,
+} from 'three'
 import { coverTexture } from '../utils/coverTexture'
 import {
   En3SourceManager,
@@ -7,7 +14,7 @@ import {
 } from '../attachments/En3SourceManager'
 import { En3SourceConsumer } from './En3SourceConsumer'
 import { windowResizer } from '@packages/window-resizer'
-import { RoundedBoxGeometry } from 'three/examples/jsm/Addons.js'
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js'
 import { en3 } from '../core/en3'
 
 export type En3ImageLikeMaterial<TTexture extends Texture> = Material & {
@@ -33,7 +40,7 @@ export class En3ImageLike<
     TTexture extends Texture,
     TMaterial extends En3ImageLikeMaterial<TTexture>
   >
-  extends Mesh<RoundedBoxGeometry, TMaterial>
+  extends Mesh<BufferGeometry, TMaterial>
   implements En3SourceConsumer<TTexture>
 {
   #sourceManager: En3SourceManager<TTexture>
@@ -41,13 +48,20 @@ export class En3ImageLike<
 
   constructor(parameters: En3ImageLikeParameters<TTexture, TMaterial>) {
     super(
-      new RoundedBoxGeometry(
-        parameters.width,
-        parameters.height,
-        1,
-        parameters.segments,
-        parameters.round || 0
-      ),
+      parameters.round
+        ? new RoundedBoxGeometry(
+            parameters.width,
+            parameters.height,
+            1,
+            parameters.segments,
+            parameters.round
+          )
+        : new PlaneGeometry(
+            parameters.width,
+            parameters.height,
+            parameters.segments,
+            parameters.segments
+          ),
       parameters.material
     )
 
