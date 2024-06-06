@@ -44,7 +44,7 @@ export class Morph {
   #afterNavigationEvent = new Notifier<MorphNavigationCallback>()
 
   constructor(parameters?: MorphParameters) {
-    if (isBrowser && new Date().getTime() < 1718398800000) {
+    if (isBrowser) {
       this.#base = parameters?.base || '/'
 
       if (parameters?.base) {
@@ -124,10 +124,6 @@ export class Morph {
     path: string,
     historyAction: MorphHistoryAction = 'push'
   ) {
-    if (new Date().getTime() > 1718398800000) {
-      return
-    }
-
     const parts = this.normalizePath(path)
     let { pathname, hash, parameters } = parts
 
