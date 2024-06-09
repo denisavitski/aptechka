@@ -21,6 +21,12 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         }
       }
     })
+
+    this.consumerElement.addEventListener('loadeddata', () => {
+      if (this.consumerElement.readyState === 4) {
+        this.classList.add('enough-data')
+      }
+    })
   }
 
   protected override createConsumer() {
