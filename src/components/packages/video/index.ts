@@ -8,7 +8,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     super.connectedCallback()
 
     this.addEventListener('sourceCapture', () => {
-      ticker.subscribe(this.#checkReady, { maxFPS: 20 })
+      ticker.subscribe(this.#checkReady)
 
       if (this.hasAttribute('capture-autoplay')) {
         this.consumerElement.play()
@@ -42,6 +42,11 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
   #checkReady = () => {
     this.classList.add(`state-${this.consumerElement.readyState}`)
+
+    this.style.setProperty(
+      '--loading-progress',
+      (this.consumerElement.readyState / 4).toString()
+    )
 
     if (this.consumerElement.readyState === 4) {
       ticker.unsubscribe(this.#checkReady)
