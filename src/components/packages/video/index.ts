@@ -1,5 +1,6 @@
 import { define } from '@packages/custom-element'
 import { SourceElement } from '@packages/source'
+import { ticker } from '@packages/ticker'
 
 @define('e-video')
 export class VideoElement extends SourceElement<HTMLVideoElement> {
@@ -7,6 +8,8 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     super.connectedCallback()
 
     this.addEventListener('sourceCapture', () => {
+      ticker.subscribe(this.#checkReady, { maxFPS: 20 })
+
       if (this.hasAttribute('capture-autoplay')) {
         this.consumerElement.play()
       }
@@ -21,12 +24,12 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         }
       }
     })
+  }
 
-    this.consumerElement.addEventListener('loadeddata', () => {
-      if (this.consumerElement.readyState === 4) {
-        this.classList.add('enough-data')
-      }
-    })
+  protected override disconnectedCallback() {
+    super.disconnectedCallback()
+
+    ticker.unsubscribe(this.#checkReady)
   }
 
   protected override createConsumer() {
@@ -35,6 +38,14 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
   protected override consumeSource(url: string | null) {
     this.consumerElement.src = url || ''
+  }
+
+  #checkReady = () => {
+    this.classList.add(`state-${this.consumerElement.readyState}`)
+
+    if (this.consumerElement.readyState === 4) {
+      ticker.unsubscribe(this.#checkReady)
+    }
   }
 }
 
