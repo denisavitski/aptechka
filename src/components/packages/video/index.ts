@@ -1,9 +1,14 @@
+import { Damped } from '@packages/animation'
 import { define } from '@packages/custom-element'
 import { SourceElement } from '@packages/source'
 import { ticker } from '@packages/ticker'
 
 @define('e-video')
 export class VideoElement extends SourceElement<HTMLVideoElement> {
+  #loading = new Damped(0, {
+    damping: 15,
+  })
+
   protected override connectedCallback() {
     super.connectedCallback()
 
@@ -26,10 +31,16 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     })
   }
 
+  public get loading() {
+    return this.#loading
+  }
+
   protected override disconnectedCallback() {
     super.disconnectedCallback()
 
     ticker.unsubscribe(this.#checkReady)
+
+    this.#loading.close()
   }
 
   protected override createConsumer() {
@@ -43,10 +54,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   #checkReady = () => {
     this.classList.add(`state-${this.consumerElement.readyState}`)
 
-    this.style.setProperty(
-      '--loading-progress',
-      (this.consumerElement.readyState / 4).toString()
-    )
+    this.#loading.set(this.consumerElement.readyState / 4)
 
     if (this.consumerElement.readyState === 4) {
       ticker.unsubscribe(this.#checkReady)
