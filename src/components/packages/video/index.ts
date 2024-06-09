@@ -1,13 +1,17 @@
-import { Damped } from '@packages/animation'
 import { define } from '@packages/custom-element'
 import { SourceElement } from '@packages/source'
 import { ticker } from '@packages/ticker'
 
+export interface ReadyStateChangeEventDetail {
+  readyState: number
+  progress: number
+}
+
+export type ReadyStateChangeEvent = CustomEvent<ReadyStateChangeEventDetail>
+
 @define('e-video')
 export class VideoElement extends SourceElement<HTMLVideoElement> {
-  #loading = new Damped(0, {
-    damping: 15,
-  })
+  #progress = 0
 
   protected override connectedCallback() {
     super.connectedCallback()
@@ -31,16 +35,12 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     })
   }
 
-  public get loading() {
-    return this.#loading
-  }
-
   protected override disconnectedCallback() {
     super.disconnectedCallback()
 
     ticker.unsubscribe(this.#checkReady)
 
-    this.#loading.close()
+    this.#progress = 0
   }
 
   protected override createConsumer() {
@@ -54,7 +54,20 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   #checkReady = () => {
     this.classList.add(`state-${this.consumerElement.readyState}`)
 
-    this.#loading.set(this.consumerElement.readyState / 4)
+    const newProgress = this.consumerElement.readyState / 4
+
+    if (newProgress > this.#progress) {
+      this.#progress = newProgress
+    }
+
+    this.dispatchEvent(
+      new CustomEvent<ReadyStateChangeEventDetail>('readyStateChange', {
+        detail: {
+          readyState: this.consumerElement.readyState,
+          progress: this.#progress,
+        },
+      })
+    )
 
     if (this.consumerElement.readyState === 4) {
       ticker.unsubscribe(this.#checkReady)
@@ -65,5 +78,9 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 declare global {
   interface HTMLElementTagNameMap {
     'e-video': VideoElement
+  }
+
+  interface HTMLElementEventMap {
+    readyStateChange: ReadyStateChangeEvent
   }
 }
