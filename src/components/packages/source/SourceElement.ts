@@ -73,10 +73,10 @@ export abstract class SourceElement<
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
         const value = attr.nodeValue || ''
-        const camelCases = kebabToCamel(attr.name)
+        const camelCased = kebabToCamel(attr.name)
 
-        if (camelCases in this.#consumerElement) {
-          ;(this.#consumerElement as any)[camelCases] = value ? value : true
+        if (camelCased in this.#consumerElement) {
+          ;(this.#consumerElement as any)[camelCased] = value ? value : true
         }
       }
     })
