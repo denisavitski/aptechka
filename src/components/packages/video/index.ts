@@ -32,6 +32,16 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
           this.consumerElement.currentTime = 0
         }
       }
+
+      if (this.hasAttribute('reload-source')) {
+        this.classList.remove(
+          'state-0',
+          'state-1',
+          'state-2',
+          'state-3',
+          'state-4'
+        )
+      }
     })
   }
 

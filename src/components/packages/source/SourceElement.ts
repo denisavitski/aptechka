@@ -40,6 +40,10 @@ export abstract class SourceElement<
     return this.#consumerElement
   }
 
+  public get sourceManager() {
+    return this.#sourceManager
+  }
+
   public get status() {
     return this.#status
   }
@@ -114,11 +118,13 @@ export abstract class SourceElement<
     this.#consumerElement.onload = null
     this.#consumerElement.onerror = null
 
+    this.#status.set('loaded', false)
+    this.#status.set('error', false)
+    this.#status.set('loading', false)
+
     if (source) {
       const isKeepSourceParameters = this.hasAttribute('keep-source-parameters')
 
-      this.#status.set('loaded', false)
-      this.#status.set('error', false)
       this.#status.set('loading', true)
 
       const url = isKeepSourceParameters
@@ -151,7 +157,10 @@ export abstract class SourceElement<
     const entry = entries[0]
 
     if (this.#isLazy) {
-      if (!this.#intersectionHappened && entry.isIntersecting) {
+      if (
+        (!this.#intersectionHappened || this.hasAttribute('reload-source')) &&
+        entry.isIntersecting
+      ) {
         if (
           this.#sourceManager.current &&
           this.#sourceManager.current !== this.#sourceManager.previous
@@ -166,6 +175,10 @@ export abstract class SourceElement<
     if (entry.isIntersecting) {
       this.dispatchEvent(new CustomEvent('sourceCapture'))
     } else {
+      if (this.hasAttribute('reload-source')) {
+        this.#loadSource(undefined)
+      }
+
       this.dispatchEvent(new CustomEvent('sourceRelease'))
     }
   }
