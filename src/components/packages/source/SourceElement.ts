@@ -3,7 +3,7 @@ import { loading } from '@packages/loading'
 import type { Source } from './SourceClass'
 import { SourceManager } from './SourceManager'
 import { ClassLinkedStatus } from '@packages/class-linked-status'
-import { isBrowser } from '@packages/utils'
+import { isBrowser, kebabToCamel } from '@packages/utils'
 
 let id = 0
 
@@ -73,9 +73,10 @@ export abstract class SourceElement<
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
         const value = attr.nodeValue || ''
+        const camelCases = kebabToCamel(attr.name)
 
-        if (attr.name in this.#consumerElement) {
-          ;(this.#consumerElement as any)[attr.name] = value ? value : true
+        if (camelCases in this.#consumerElement) {
+          ;(this.#consumerElement as any)[camelCases] = value ? value : true
         }
       }
     })
