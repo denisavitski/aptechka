@@ -42,7 +42,7 @@ const stylesheet = createStylesheet({
     width: '100%',
 
     overflow: 'hidden',
-    transitionDuration: `var(--duration, ${aptechkaTheme.durationShort.var})`,
+    transitionDuration: `var(--duration, ${'var(--duration-short)'})`,
     transitionProperty: 'height',
     cursor: 'default',
   },

@@ -3,34 +3,12 @@ import { isBrowser } from '@packages/utils'
 
 export const aptechkaTheme = createTheme(
   {
-    colorDark: '#1c1c1c',
-    colorDarkAux: '#282828',
-    colorLight: '#ffffff',
+    colorMain: '#1c1c1c',
+    colorMainAux: '#282828',
+    colorFont: '#ffffff',
     colorActive: '#00E5B0',
-
-    tweakerWidth: '500px',
-    tweakerOffset: '20px',
-    tweakerFolderHeight: '40px',
-
-    timelineWidth: '50vw',
-    timelineHeight: '30vh',
-    timelineOffset: '20px',
-
-    heightInput: '30px',
-
     borderRadius: '12px',
     borderRadiusSmall: '4px',
-
-    gapLarge: '16px',
-    gapMedium: '12px',
-    gapSmall: '8px',
-    gapExtraSmall: '4px',
-
-    fontSizeLarge: '20px',
-    fontSizeMedium: '16px',
-    fontSizeSmall: '14px',
-
-    durationShort: '0.2s',
   } as const,
   { prefix: 'aptechka-' }
 )

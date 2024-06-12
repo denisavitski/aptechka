@@ -2,7 +2,7 @@ import '@packages/checkbox'
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'
-import { createStylesheet, element, input } from '@packages/element-constructor'
+import { createStylesheet, element } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
@@ -11,15 +11,10 @@ const stylesheet = createStylesheet({
     display: 'inline-flex',
     height: 'max-content',
   },
-
-  input: {
-    padding: '0',
-    margin: '0',
-    width: `calc(${aptechkaTheme.heightInput.var} * 0.5)`,
-    height: `calc(${aptechkaTheme.heightInput.var} * 0.5)`,
-    borderRadius: aptechkaTheme.borderRadius.var,
-    overflow: 'hidden',
-    accentColor: aptechkaTheme.colorLight.var,
+  'e-checkbox': {
+    width: 'var(--height-input)',
+    height: 'var(--height-input)',
+    borderRadius: aptechkaTheme.borderRadiusSmall.var,
   },
 })
 

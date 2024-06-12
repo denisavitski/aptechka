@@ -27,8 +27,8 @@ const stylesheet = createStylesheet({
     gridAutoFlow: 'column',
     gridTemplateColumns: '0.4fr 1fr',
     alignItems: 'center',
-    color: aptechkaTheme.colorLight.var,
-    gap: aptechkaTheme.gapMedium.var,
+    color: aptechkaTheme.colorFont.var,
+    gap: 'var(--gap-medium)',
   },
 
   ':host(.disabled)': {
@@ -37,10 +37,10 @@ const stylesheet = createStylesheet({
   },
 
   '.head': {
-    fontSize: aptechkaTheme.fontSizeMedium.var,
+    fontSize: 'var(--font-size-medium)',
     display: 'flex',
     alignItems: 'center',
-    gap: aptechkaTheme.gapExtraSmall.var,
+    gap: 'var(--gap-extra-small)',
   },
 
   '.head-buttons': {
@@ -56,8 +56,8 @@ const stylesheet = createStylesheet({
     border: 'none',
     background: 'none',
 
-    fill: aptechkaTheme.colorLight.var,
-    transitionDuration: aptechkaTheme.durationShort.var,
+    fill: aptechkaTheme.colorFont.var,
+    transitionDuration: 'var(--duration-short)',
     transitionProperty: `fill, opacity`,
     opacity: '0',
   },

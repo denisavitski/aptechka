@@ -13,7 +13,7 @@ const stylesheet = createStylesheet({
 
   input: {
     width: '100%',
-    height: aptechkaTheme.heightInput.var,
+    height: 'var(--height-input)',
     padding: '0',
     background: 'none',
     borderRadius: aptechkaTheme.borderRadius.var,
@@ -26,7 +26,7 @@ const stylesheet = createStylesheet({
     padding: '0px',
     border: 'none',
     borderRadius: aptechkaTheme.borderRadius.var,
-    height: `calc(${aptechkaTheme.heightInput.var} * 0.93)`,
+    height: `calc(var(--height-input) * 0.93)`,
   },
 })
 

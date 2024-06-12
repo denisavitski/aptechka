@@ -24,7 +24,7 @@ const stylesheet = createStylesheet({
     height: '100%',
 
     transitionProperty: 'opacity',
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
   },
 
   ':host::before': {
@@ -79,7 +79,7 @@ const stylesheet = createStylesheet({
     justifyContent: 'center',
 
     transitionProperty: 'transform',
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
     willChange: 'transform',
   },
 
@@ -99,7 +99,7 @@ const stylesheet = createStylesheet({
     width: 'var(--close-button-thickness, 0.1em)',
     height: '100%',
 
-    backgroundColor: `var(--close-button-color, ${aptechkaTheme.colorDark.var})`,
+    backgroundColor: `var(--close-button-color, ${aptechkaTheme.colorMain.var})`,
   },
 
   '.close-button-default::before': {

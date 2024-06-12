@@ -16,7 +16,7 @@ const stylesheet = createStylesheet({
   ':host': {
     display: 'inline-block',
     zIndex: '1',
-    backgroundColor: aptechkaTheme.colorLight.var,
+    backgroundColor: aptechkaTheme.colorFont.var,
   },
 
   ':host([axis="y"])': {
@@ -36,7 +36,7 @@ const stylesheet = createStylesheet({
   },
 
   '.default-thumb': {
-    backgroundColor: aptechkaTheme.colorDark.var,
+    backgroundColor: aptechkaTheme.colorMain.var,
     borderRadius: '1vmin',
     touchAction: 'none',
   },

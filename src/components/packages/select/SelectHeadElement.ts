@@ -9,7 +9,7 @@ import { isBrowser } from '@packages/utils'
 const stylesheet = createStylesheet({
   ':host': {
     width: '100%',
-    height: aptechkaTheme.heightInput.var,
+    height: '40px',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -19,9 +19,9 @@ const stylesheet = createStylesheet({
     flexShrink: '0',
     width: 'var(--arrow-size, 1em)',
     height: 'var(--arrow-size, 1em)',
-    fill: `var(--arrow-color, ${aptechkaTheme.colorDark.var})`,
+    fill: `var(--arrow-color, ${aptechkaTheme.colorMain.var})`,
     transitionProperty: 'transform',
-    transitionDuration: `var(--duration, ${aptechkaTheme.durationShort.var})`,
+    transitionDuration: `var(--duration, ${'var(--duration-short)'})`,
   },
 
   ':host(.opened) .default-arrow': {

@@ -21,15 +21,28 @@ import { tweakerStorage } from './tweakerStorage'
 
 const stylesheet = createStylesheet({
   ':host': {
+    '--tweaker-width': '500px',
+    '--tweaker-offset': '20px',
+    '--tweaker-folder-height': '40px',
+    '--height-input': '30px',
+    '--gap-large': '16px',
+    '--gap-medium': '12px',
+    '--gap-small': '8px',
+    '--gap-extra-small': '4px',
+    '--font-size-large': '20px',
+    '--font-size-medium': '16px',
+    '--font-size-small': '14px',
+    '--duration-short': '0.2s',
+
     fontFamily: 'sans-serif',
 
     position: 'absolute',
-    top: aptechkaTheme.tweakerOffset.var,
-    right: aptechkaTheme.tweakerOffset.var,
+    top: 'var(--tweaker-offset)',
+    right: 'var(--tweaker-offset)',
 
-    width: aptechkaTheme.tweakerWidth.var,
+    width: 'var(--tweaker-width)',
 
-    backgroundColor: aptechkaTheme.colorDark.var,
+    backgroundColor: aptechkaTheme.colorMain.var,
     borderRadius: aptechkaTheme.borderRadius.var,
 
     transition: 'opacity 0.2s',
@@ -46,7 +59,7 @@ const stylesheet = createStylesheet({
   '.tweaker-buttons': {
     display: 'flex',
     alignItems: 'center',
-    gap: aptechkaTheme.gapExtraSmall.var,
+    gap: 'var(--gap-extra-small)',
   },
 
   '.tweaker-button': {
@@ -59,9 +72,9 @@ const stylesheet = createStylesheet({
     background: 'none',
     border: 'none',
 
-    fill: aptechkaTheme.colorLight.var,
+    fill: aptechkaTheme.colorFont.var,
     transitionProperty: `fill`,
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
   },
 
   '.tweaker-button:hover': {
@@ -77,8 +90,8 @@ const stylesheet = createStylesheet({
     maxHeight: `calc(
       100dvh - 
       (
-        ${aptechkaTheme.tweakerOffset.var} * 2 + 
-        ${aptechkaTheme.tweakerFolderHeight.var}
+        var(--tweaker-offset) * 2 + 
+        var(--tweaker-folder-height)
       )
     )`,
     overflow: 'hidden auto',
@@ -106,7 +119,7 @@ const stylesheet = createStylesheet({
     ':host .body-content': {
       maxHeight: `calc(
         100dvh - 
-        ${aptechkaTheme.tweakerFolderHeight.var}
+        var(--tweaker-folder-height)
       )`,
     },
   },

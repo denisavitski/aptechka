@@ -12,7 +12,7 @@ const stylesheet = createStylesheet({
 
   '.text-input': {
     width: '60px',
-    marginRight: aptechkaTheme.gapLarge.var,
+    marginRight: 'var(--gap-large)',
     textAlign: 'center',
   },
 
@@ -33,13 +33,13 @@ const stylesheet = createStylesheet({
   '.range-input::-webkit-slider-thumb': {
     '-webkit-appearance': 'none',
 
-    height: `calc(${aptechkaTheme.heightInput.var} * 0.7)`,
+    height: `calc(var(--height-input) * 0.7)`,
     width: aptechkaTheme.borderRadius.var,
     borderRadius: aptechkaTheme.borderRadius.var,
 
-    backgroundColor: aptechkaTheme.colorLight.var,
+    backgroundColor: aptechkaTheme.colorFont.var,
     transitionProperty: 'background-color',
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
   },
 
   '.range-input:focus::-webkit-slider-thumb': {

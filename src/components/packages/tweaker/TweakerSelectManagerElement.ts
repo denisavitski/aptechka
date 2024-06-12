@@ -11,7 +11,7 @@ import { aptechkaTheme } from '@packages/theme'
 const stylesheet = createStylesheet({
   'e-select': {
     width: '100%',
-    '--arrow-color': aptechkaTheme.colorLight.var,
+    '--arrow-color': aptechkaTheme.colorFont.var,
   },
 
   'e-select-head': {
@@ -22,7 +22,7 @@ const stylesheet = createStylesheet({
   },
 
   'e-select-option': {
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
     transitionProperty: 'color',
   },
 
@@ -33,9 +33,9 @@ const stylesheet = createStylesheet({
   svg: {
     width: '16px',
     height: '16px',
-    fill: aptechkaTheme.colorLight.var,
+    fill: aptechkaTheme.colorFont.var,
     transitionProperty: 'transform',
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
   },
 
   '.opened svg': {

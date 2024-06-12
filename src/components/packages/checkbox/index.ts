@@ -14,8 +14,8 @@ const stylesheet = createStylesheet({
   ':host': {
     position: 'relative',
     display: 'inline-block',
-    width: aptechkaTheme.heightInput.var,
-    height: aptechkaTheme.heightInput.var,
+    width: '30px',
+    height: '30px',
     borderRadius: aptechkaTheme.borderRadiusSmall.var,
     overflow: 'hidden',
   },
@@ -43,15 +43,15 @@ const stylesheet = createStylesheet({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: aptechkaTheme.colorDarkAux.var,
+    backgroundColor: aptechkaTheme.colorMainAux.var,
   },
 
   '.default svg': {
     width: '60%',
     height: '60%',
-    fill: aptechkaTheme.colorLight.var,
+    fill: aptechkaTheme.colorFont.var,
     opacity: 0,
-    transition: aptechkaTheme.durationShort.var,
+    transition: 'var(--duration-short)',
   },
 
   ':host(.checked) .default svg': {

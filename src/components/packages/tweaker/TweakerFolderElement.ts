@@ -22,44 +22,44 @@ const stylesheet = createStylesheet({
     boxSizing: 'border-box',
 
     width: '100%',
-    height: aptechkaTheme.tweakerFolderHeight.var,
+    height: 'var(--tweaker-folder-height)',
 
-    paddingLeft: aptechkaTheme.gapMedium.var,
-    paddingRight: aptechkaTheme.gapMedium.var,
+    paddingLeft: 'var(--gap-medium)',
+    paddingRight: 'var(--gap-medium)',
 
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
 
-    backgroundColor: aptechkaTheme.colorDarkAux.var,
+    backgroundColor: aptechkaTheme.colorMainAux.var,
     borderRadius: aptechkaTheme.borderRadius.var,
   },
 
   '.name': {
-    fontSize: aptechkaTheme.fontSizeLarge.var,
-    color: aptechkaTheme.colorLight.var,
+    fontSize: 'var(--font-size-large)',
+    color: aptechkaTheme.colorFont.var,
   },
 
   '.body': {
     transitionProperty: 'height',
-    transitionDuration: aptechkaTheme.durationShort.var,
+    transitionDuration: 'var(--duration-short)',
     overflow: 'hidden',
     height: '0px',
   },
 
   '.body-content': {
     boxSizing: 'border-box',
-    padding: aptechkaTheme.gapLarge.var,
+    padding: 'var(--gap-large)',
 
     display: 'grid',
-    gap: aptechkaTheme.gapMedium.var,
+    gap: 'var(--gap-medium)',
   },
 
   '.arrow': {
     width: '20px',
     height: '20px',
-    fill: aptechkaTheme.colorLight.var,
-    transition: `transform ${aptechkaTheme.durationShort.var}`,
+    fill: aptechkaTheme.colorFont.var,
+    transition: `transform ${'var(--duration-short)'}`,
   },
 
   '.opened .arrow': {

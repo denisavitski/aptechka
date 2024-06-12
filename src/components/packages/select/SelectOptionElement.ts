@@ -12,7 +12,7 @@ import { isBrowser } from '@packages/utils'
 const stylesheet = createStylesheet({
   ':host': {
     width: '100%',
-    height: aptechkaTheme.heightInput.var,
+    height: '40px',
     display: 'inline-flex',
     alignItems: 'center',
   },
