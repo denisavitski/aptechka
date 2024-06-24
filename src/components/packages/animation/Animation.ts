@@ -55,6 +55,7 @@ export abstract class Animation<
 
   constructor(initial?: number, options?: StoreOptions<number, 'number'>) {
     super(initial || 0, options)
+    this.#target = this.current
   }
 
   public get linked() {

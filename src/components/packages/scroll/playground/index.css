@@ -8,13 +8,13 @@
   --infinite: true;
   --sections-in-view: 1;
   --axis: y;
-  --sectional: true;
   --controls: true;
-  --autoplay: 2000;
+  --autoplay: 0.1;
   --classes: true;
   --current-index-start-offset: 1;
   --current-index-end-offset: -1;
   --auto-size: true;
+  --autoplay-pause-duration: 3000;
 
   width: 100%;
   height: 100%;

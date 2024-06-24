@@ -1,5 +1,7 @@
 import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 import { Controls } from './Controls'
+import { Tweened } from '@packages/animation'
+import { easeInOutQuad } from '@packages/utils'
 
 export interface AutoplayControlsOptions extends TickerAddOptions {
   speed?: number
@@ -14,7 +16,7 @@ export class AutoplayControls extends Controls {
 
   #options: TickerAddOptions | undefined
   #intervalId: ReturnType<typeof setInterval> | undefined
-  #paused = false
+  #paused = new Tweened(0, { easing: easeInOutQuad })
   #pauseTimeoutId: ReturnType<typeof setInterval> | undefined
 
   constructor(options?: AutoplayControlsOptions) {
@@ -59,7 +61,7 @@ export class AutoplayControls extends Controls {
     ticker.unsubscribe(this.#animationFrameCallback)
 
     clearInterval(this.#pauseTimeoutId)
-    this.#paused = false
+    this.#paused.close()
 
     document.removeEventListener(
       'visibilitychange',
@@ -68,31 +70,34 @@ export class AutoplayControls extends Controls {
   }
 
   public pauseAndContinue(duration: number) {
-    if (duration && !this.#paused) {
+    if (duration && !this.#paused.target) {
       clearInterval(this.#pauseTimeoutId)
 
-      this.#paused = true
+      this.#paused.set(1, { duration: Math.min(duration, 1000) })
 
       this.#pauseTimeoutId = setTimeout(() => {
-        this.#paused = false
-      }, 3000)
+        this.#paused.set(0, { duration: Math.min(duration, 5000) })
+      }, duration)
     }
   }
 
   #animationFrameCallback: TickerCallback = (e) => {
-    if (!this.#paused) {
+    if (this.#paused.current !== 1) {
       this.changeEvent.notify(
         'autoplay',
-        e.timeBetweenFrames * this.#speed * this.direction
+        e.timeBetweenFrames *
+          this.#speed *
+          this.direction *
+          (1 - this.#paused.current)
       )
     }
   }
 
   #intervalCallback = () => {
-    if (!this.#paused) {
+    if (this.#paused.current !== 1) {
       this.changeEvent.notify(
         'autoplay',
-        Math.sign(this.#speed) * this.direction
+        Math.sign(this.#speed) * this.direction * (1 - this.#paused.current)
       )
     }
   }
@@ -100,9 +105,9 @@ export class AutoplayControls extends Controls {
   #documentVisibilityChangeListener = () => {
     if (this.#interval) {
       if (document.hidden) {
-        this.#paused = true
+        this.#paused.set(1, { equalize: true })
       } else {
-        this.#paused = false
+        this.#paused.set(0, { equalize: true })
       }
     }
   }
