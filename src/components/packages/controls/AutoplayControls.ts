@@ -1,7 +1,12 @@
 import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 import { Controls } from './Controls'
 import { Tweened } from '@packages/animation'
-import { easeInOutQuad } from '@packages/utils'
+import {
+  easeInCubic,
+  easeInExpo,
+  easeInOutQuad,
+  easeInQuad,
+} from '@packages/utils'
 
 export interface AutoplayControlsOptions extends TickerAddOptions {
   speed?: number
@@ -16,8 +21,10 @@ export class AutoplayControls extends Controls {
 
   #options: TickerAddOptions | undefined
   #intervalId: ReturnType<typeof setInterval> | undefined
-  #paused = new Tweened(0, { easing: easeInOutQuad })
+  #paused = new Tweened(0, { easing: easeInQuad })
   #pauseTimeoutId: ReturnType<typeof setInterval> | undefined
+
+  #connected = false
 
   constructor(options?: AutoplayControlsOptions) {
     super()
@@ -30,16 +37,48 @@ export class AutoplayControls extends Controls {
 
   public set interval(value: boolean) {
     this.#interval = value
-    this.connect()
+
+    if (this.#connected) {
+      this.#setup()
+    }
   }
 
   public set speed(value: number) {
     this.#speed = value
-    this.connect()
+
+    if (this.#connected) {
+      this.#setup()
+    }
   }
 
   public connect() {
-    this.disconnect()
+    if (!this.#connected) {
+      this.#connected = true
+      this.#setup()
+    }
+  }
+
+  public disconnect() {
+    if (this.#connected) {
+      this.#connected = false
+      this.#clear()
+    }
+  }
+
+  public pauseAndContinue(duration: number) {
+    if (duration && !this.#paused.target) {
+      clearInterval(this.#pauseTimeoutId)
+
+      this.#paused.set(1, { duration: Math.min(duration, 1000) })
+
+      this.#pauseTimeoutId = setTimeout(() => {
+        this.#paused.set(0, { duration: Math.min(duration, 5000) })
+      }, duration)
+    }
+  }
+
+  #setup() {
+    this.#clear()
 
     if (this.#interval) {
       this.#intervalId = setInterval(
@@ -56,7 +95,7 @@ export class AutoplayControls extends Controls {
     )
   }
 
-  public disconnect() {
+  #clear() {
     clearInterval(this.#intervalId)
     ticker.unsubscribe(this.#animationFrameCallback)
 
@@ -67,18 +106,6 @@ export class AutoplayControls extends Controls {
       'visibilitychange',
       this.#documentVisibilityChangeListener
     )
-  }
-
-  public pauseAndContinue(duration: number) {
-    if (duration && !this.#paused.target) {
-      clearInterval(this.#pauseTimeoutId)
-
-      this.#paused.set(1, { duration: Math.min(duration, 1000) })
-
-      this.#pauseTimeoutId = setTimeout(() => {
-        this.#paused.set(0, { duration: Math.min(duration, 5000) })
-      }, duration)
-    }
   }
 
   #animationFrameCallback: TickerCallback = (e) => {

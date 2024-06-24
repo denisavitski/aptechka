@@ -1,4 +1,4 @@
-import { Damped } from '@packages/animation'
+import { Damped, Tweened } from '@packages/animation'
 import {
   WheelControls,
   KeyboardControls,
@@ -16,6 +16,8 @@ import {
   Axes2D,
   isBrowser,
   clamp,
+  EasingFunction,
+  easeInOutExpo,
 } from '@packages/utils'
 import {
   createStylesheet,
@@ -30,6 +32,14 @@ import { elementResizer } from '@packages/element-resizer'
 
 export type ScrollBehaviour = 'smooth' | 'instant'
 
+export interface ScrollSetOptions {
+  behaviour?: ScrollBehaviour
+  tween?: {
+    easing?: EasingFunction
+    duration: number
+  }
+}
+
 export type SectionMark = 'current' | 'previous' | 'next' | null
 
 export type SectionmarkChangeEvent = CustomEvent<{
@@ -38,17 +48,27 @@ export type SectionmarkChangeEvent = CustomEvent<{
 
 class Section {
   #element: HTMLElement
+  #index: number
   #scrollElement: ScrollElement
 
   #size = 0
   #position = 0
   #currentMark: SectionMark = null
 
-  constructor(element: HTMLElement, scrollElement: ScrollElement) {
+  constructor(
+    element: HTMLElement,
+    index: number,
+    scrollElement: ScrollElement
+  ) {
     this.#element = element
+    this.#index = index
     this.#scrollElement = scrollElement
 
     scrollEntries.register(this.#element)
+  }
+
+  public get index() {
+    return this.#index
   }
 
   public get size() {
@@ -250,6 +270,12 @@ export class ScrollElement extends CustomElement {
     '--current-index-end-offset',
     0
   )
+  #focusDelayCSSProperty = new CSSProperty<number>(this, '--focus-delay', 0)
+  #focusDurationCSSProperty = new CSSProperty<number>(
+    this,
+    '--focus-duration',
+    3000
+  )
 
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
@@ -276,6 +302,10 @@ export class ScrollElement extends CustomElement {
 
   #disabled = true
   #hibernated = true
+
+  #focusTimeoutId: ReturnType<typeof setTimeout> | undefined
+
+  #setTween = new Tweened()
 
   constructor() {
     super()
@@ -495,6 +525,12 @@ export class ScrollElement extends CustomElement {
           this.#updateMarks()
         }
       })
+
+      this.#setTween.subscribe((e) => {
+        if (this.#setTween.isRunning.current) {
+          this.#damped.set(e.current)
+        }
+      })
     }
   }
 
@@ -583,6 +619,14 @@ export class ScrollElement extends CustomElement {
 
   public get currentIndexEndOffsetCSSProperty() {
     return this.#currentIndexEndOffsetCSSProperty
+  }
+
+  public get focusDelayCSSProperty() {
+    return this.#focusDelayCSSProperty
+  }
+
+  public get focusDurationCSSProperty() {
+    return this.#focusDurationCSSProperty
   }
 
   public get disabledCSSProperty() {
@@ -700,10 +744,7 @@ export class ScrollElement extends CustomElement {
     return this.currentProgress >= start && this.currentProgress <= end
   }
 
-  public scrollToSection(
-    sectionIndex: number,
-    behaviour: ScrollBehaviour = 'smooth'
-  ) {
+  public scrollToSection(sectionIndex: number, options?: ScrollSetOptions) {
     if (!this.#sections.length) {
       return
     }
@@ -748,27 +789,31 @@ export class ScrollElement extends CustomElement {
         shiftValue = currentSection.position - previousSection.position
       }
 
-      this.#damped.shift(shiftValue - scrolledFromNearestSection, {
-        equalize: behaviour === 'instant',
-      })
+      this.shiftPosition(shiftValue - scrolledFromNearestSection, options)
     }
   }
 
-  public shiftSections(step: number, behaviour: ScrollBehaviour = 'smooth') {
+  public shiftSections(step: number, options?: ScrollSetOptions) {
     if (!this.#sections.length) {
       return
     }
 
-    this.scrollToSection(this.#counter.current + step, behaviour)
+    this.scrollToSection(this.#counter.current + step, options)
   }
 
-  public setPosition(
-    value: number,
-    behaviour: 'smooth' | 'instant' = 'smooth'
-  ) {
-    this.#damped.set(value, {
-      equalize: behaviour === 'instant',
-    })
+  public setPosition(value: number, options?: ScrollSetOptions) {
+    if (!options?.tween) {
+      this.#damped.set(value, {
+        equalize: options?.behaviour === 'instant',
+      })
+    } else {
+      this.#setTween.set(this.#damped.current, { equalize: true })
+      this.#setTween.set(value, { ...options.tween })
+    }
+  }
+
+  public shiftPosition(value: number, options?: ScrollSetOptions) {
+    this.setPosition(this.#damped.target + value, options)
   }
 
   protected connectedCallback() {
@@ -794,6 +839,8 @@ export class ScrollElement extends CustomElement {
     this.#classesCSSProperty.observe()
     this.#currentIndexStartOffsetCSSProperty.observe()
     this.#currentIndexEndOffsetCSSProperty.observe()
+    this.#focusDelayCSSProperty.observe()
+    this.#focusDurationCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -822,6 +869,8 @@ export class ScrollElement extends CustomElement {
     this.#classesCSSProperty.unobserve()
     this.#currentIndexStartOffsetCSSProperty.unobserve()
     this.#currentIndexEndOffsetCSSProperty.unobserve()
+    this.#focusDelayCSSProperty.unobserve()
+    this.#focusDurationCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
@@ -831,9 +880,9 @@ export class ScrollElement extends CustomElement {
   #split() {
     this.#unsplit()
 
-    this.#slotElement.assignedElements().forEach((element) => {
+    this.#slotElement.assignedElements().forEach((element, i) => {
       if (element instanceof HTMLElement) {
-        this.#sections.push(new Section(element, this))
+        this.#sections.push(new Section(element, i, this))
       }
     })
 
@@ -877,6 +926,10 @@ export class ScrollElement extends CustomElement {
       this.#keyboardControls.disconnect()
       this.#dragControls.disconnect()
       this.#autoplayControls.disconnect()
+
+      clearInterval(this.#focusTimeoutId)
+
+      this.#setTween.unlistenAnimationFrame()
     }
   }
 
@@ -1090,11 +1143,11 @@ export class ScrollElement extends CustomElement {
 
   #notAutoplayControlListener = (type: string, value: number) => {
     if (this.#controlsCSSProperty.current) {
-      this.#autoplayControls.pauseAndContinue(
-        this.#autoplayPauseDurationCSSProperty.current
-      )
-
       if (this.#autoplayUserDirectionCSSProperty.current) {
+        this.#autoplayControls.pauseAndContinue(
+          this.#autoplayPauseDurationCSSProperty.current
+        )
+
         this.#autoplayControls.direction = Math.sign(value) || 1
       }
 
@@ -1109,6 +1162,28 @@ export class ScrollElement extends CustomElement {
       } else if (this.#directionCSSProperty.current > 0 && value < 0) {
         return
       }
+    }
+
+    this.#setTween.unlistenAnimationFrame()
+
+    if (
+      !this.#autoplayCSSProperty.current &&
+      this.#focusDelayCSSProperty.current
+    ) {
+      clearInterval(this.#focusTimeoutId)
+
+      this.#focusTimeoutId = setTimeout(() => {
+        const section = this.#findNearestSection()
+
+        if (section) {
+          this.scrollToSection(section.index, {
+            tween: {
+              duration: this.#focusDurationCSSProperty.current,
+              easing: easeInOutExpo,
+            },
+          })
+        }
+      }, this.#focusDelayCSSProperty.current)
     }
 
     if (

@@ -35,7 +35,9 @@ class BulletButton {
   }
 
   #clickListener = () => {
-    this.#scrollElement.scrollToSection(this.#index, this.#behaviour)
+    this.#scrollElement.scrollToSection(this.#index, {
+      behaviour: this.#behaviour,
+    })
   }
 
   #counterChangeListener = () => {

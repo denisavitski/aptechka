@@ -8,7 +8,7 @@ export class ScrollSetButtonElement extends ScrollButtonElement {
     const index = this.getAttribute('index')
     const behaviour = this.getAttribute('behaviour') as ScrollBehaviour
 
-    this.scrollElement.scrollToSection(parseInt(index || '0'), behaviour)
+    this.scrollElement.scrollToSection(parseInt(index || '0'), { behaviour })
   }
 }
 
