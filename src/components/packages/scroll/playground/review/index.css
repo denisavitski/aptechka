@@ -5,65 +5,6 @@
   height: 100vh;
 
   will-change: transform;
-}
 
-.review__inner {
-  width: 100%;
-  height: 100%;
-
-  padding: 3vmin 1vmin;
-
-  display: flex;
-  flex-direction: column;
-
-  background-color: var(--backgroundi, lightblue);
-  border-radius: 5vmin;
-
-  opacity: 1;
-
-  transition-property: transform, opacity;
-
-  will-change: transform;
-
-  transition-duration: 0.5s;
-}
-
-.review.current .review__inner {
-  opacity: 1;
-  transform: translateY(0%) scale(1);
-}
-
-.review__author {
-  font-size: 1.261vmin;
-  text-transform: uppercase;
-  font-weight: 700;
-
-  margin-bottom: 1.16vmin;
-  margin-left: auto;
-
-  color: var(--color, black);
-}
-
-.review__description {
-  font-size: 0.962rem;
-  font-weight: 400;
-  text-wrap: balance;
-
-  color: var(--color, black);
-}
-
-.review__logo {
-  position: absolute;
-
-  width: 4.4rem;
-  height: 4.4rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.review__logo :global(img) {
-  width: 70%;
-  height: 70%;
+  background-color: lightblue;
 }

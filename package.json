@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.5.42",
+  "version": "0.5.44",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -162,11 +162,6 @@
       "require": "./lib/popover/index.cjs",
       "default": "./lib/popover/index.js",
       "types": "./lib/popover/index.d.ts"
-    },
-    "./resized": {
-      "require": "./lib/resized/index.cjs",
-      "default": "./lib/resized/index.js",
-      "types": "./lib/resized/index.d.ts"
     },
     "./router": {
       "require": "./lib/router/index.cjs",
@@ -336,9 +331,6 @@
       "popover": [
         "lib/popover/index.d.ts"
       ],
-      "resized": [
-        "lib/resized/index.d.ts"
-      ],
       "router": [
         "lib/router/index.d.ts"
       ],
@@ -394,19 +386,19 @@
   },
   "devDependencies": {
     "@types/node": "^20.12.5",
-    "@types/three": "^0.163.0",
+    "@types/three": "^0.165.0",
     "vite": "5.2.8",
     "vite-plugin-dts": "^3.8.1",
     "vite-plugin-htmc": "^0.1.9"
   },
   "dependencies": {
     "detect-gpu": "^5.0.38",
-    "three": "^0.163.0",
+    "three": "^0.165.0",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.38",
-    "three": "^0.163.0",
+    "three": "^0.165.0",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

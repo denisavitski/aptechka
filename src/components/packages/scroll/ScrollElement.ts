@@ -123,7 +123,7 @@ class Section {
       this.#scrollElement.sectionDistanceScaleCSSProperty.current
 
     if (
-      this.#scrollElement.infiniteCSSProperty.current &&
+      this.#scrollElement.loopCSSProperty.current &&
       this.#scrollElement.overscroll &&
       this.#position + this.#size < this.#scrollElement.currentScrollValue
     ) {
@@ -238,7 +238,7 @@ export class ScrollElement extends CustomElement {
     '--sections-in-view',
     1
   )
-  #infiniteCSSProperty = new CSSProperty<boolean>(this, '--infinite', false)
+  #loopCSSProperty = new CSSProperty<boolean>(this, '--loop', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
   #stiffnessCSSProperty = new CSSProperty<number>(this, '--stiffness', 0)
@@ -435,7 +435,7 @@ export class ScrollElement extends CustomElement {
         }
       })
 
-      this.#infiniteCSSProperty.subscribe((e) => {
+      this.#loopCSSProperty.subscribe((e) => {
         if (!e.current) {
           this.#overscroll = 0
           this.#damped.max = this.#scrollSize
@@ -573,8 +573,8 @@ export class ScrollElement extends CustomElement {
     return this.#sectionsInViewCSSProperty
   }
 
-  public get infiniteCSSProperty() {
-    return this.#infiniteCSSProperty
+  public get loopCSSProperty() {
+    return this.#loopCSSProperty
   }
 
   public get dampingCSSProperty() {
@@ -685,8 +685,8 @@ export class ScrollElement extends CustomElement {
     return this.#distance
   }
 
-  public get infiniteDistance() {
-    return this.#infiniteCSSProperty.current
+  public get loopDistance() {
+    return this.#loopCSSProperty.current
       ? this.#distance + this.#gap
       : this.#distance
   }
@@ -700,11 +700,11 @@ export class ScrollElement extends CustomElement {
   }
 
   public get currentProgress() {
-    return this.currentScrollValue / this.infiniteDistance || 0
+    return this.currentScrollValue / this.loopDistance || 0
   }
 
   public get targetProgress() {
-    return this.targetScrollValue / this.infiniteDistance || 0
+    return this.targetScrollValue / this.loopDistance || 0
   }
 
   public override get scrollWidth(): number {
@@ -765,7 +765,7 @@ export class ScrollElement extends CustomElement {
         ? this.targetScrollValue - nearestSection.position
         : 0
 
-      if (this.#infiniteCSSProperty.current) {
+      if (this.#loopCSSProperty.current) {
         if (
           this.#counter.current === 0 &&
           previousCounter === this.#sections.length - 1
@@ -826,7 +826,7 @@ export class ScrollElement extends CustomElement {
     this.#autoSizeCSSProperty.observe()
     this.#wheelMaxDeltaCSSProperty.observe()
     this.#sectionsInViewCSSProperty.observe()
-    this.#infiniteCSSProperty.observe()
+    this.#loopCSSProperty.observe()
     this.#dampingCSSProperty.observe()
     this.#massCSSProperty.observe()
     this.#stiffnessCSSProperty.observe()
@@ -857,7 +857,7 @@ export class ScrollElement extends CustomElement {
     this.#autoSizeCSSProperty.unobserve()
     this.#wheelMaxDeltaCSSProperty.unobserve()
     this.#sectionsInViewCSSProperty.unobserve()
-    this.#infiniteCSSProperty.unobserve()
+    this.#loopCSSProperty.unobserve()
     this.#dampingCSSProperty.unobserve()
     this.#massCSSProperty.unobserve()
     this.#stiffnessCSSProperty.unobserve()
@@ -1054,7 +1054,7 @@ export class ScrollElement extends CustomElement {
       }
     }
 
-    if (!this.#infiniteCSSProperty.current) {
+    if (!this.#loopCSSProperty.current) {
       const cs = getComputedStyle(this)
 
       const padding = this.vertical
@@ -1066,7 +1066,7 @@ export class ScrollElement extends CustomElement {
       this.#damped.max = this.#scrollSize
     }
 
-    if (this.#infiniteCSSProperty.current && this.#sections.length) {
+    if (this.#loopCSSProperty.current && this.#sections.length) {
       const lastSection = this.#sections[this.#sections.length - 1]
       const lastSectionMax =
         lastSection.position + lastSection.size - this.#viewportSize
@@ -1130,7 +1130,7 @@ export class ScrollElement extends CustomElement {
   }
 
   #setCounter(value: number) {
-    if (this.#infiniteCSSProperty.current) {
+    if (this.#loopCSSProperty.current) {
       this.#counter.current = value % this.#sections.length
       this.#counter.current =
         this.#counter.current < 0
@@ -1208,7 +1208,7 @@ export class ScrollElement extends CustomElement {
   }
 
   #getScrollValue(type: 'target' | 'current' = 'current') {
-    if (this.#infiniteCSSProperty.current && this.#sections.length) {
+    if (this.#loopCSSProperty.current && this.#sections.length) {
       const mod =
         this.#damped[type] % (this.#scrollSize + this.#viewportSize + this.#gap)
 
