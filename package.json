@@ -393,6 +393,7 @@
   },
   "dependencies": {
     "detect-gpu": "^5.0.38",
+    "postprocessing": "^6.35.5",
     "three": "^0.165.0",
     "urlpattern-polyfill": "^10.0.0"
   },

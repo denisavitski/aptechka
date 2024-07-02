@@ -5,7 +5,6 @@ import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 import { en3Cache } from '../loaders/en3Cache'
-import { dispose } from '../utils/dispose'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters

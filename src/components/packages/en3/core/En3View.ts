@@ -2,12 +2,7 @@ import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
 import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three'
 import { en3 } from './en3'
 import { dispose } from '../utils/dispose'
-import {
-  ElementOrSelector,
-  getCumulativeOffsetLeft,
-  getCumulativeOffsetTop,
-  getElement,
-} from '@packages/utils'
+import { ElementOrSelector, getElement } from '@packages/utils'
 
 export interface En3ViewOptions {
   cameraType?: 'perspective' | 'orthographic'
@@ -75,7 +70,7 @@ export class En3View {
 
     this.#box = new LayoutBox(this.#sizeElement)
 
-    this.#box.onScale(() => {
+    this.#box.onResize(() => {
       this.resize()
     })
   }

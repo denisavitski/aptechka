@@ -15,6 +15,7 @@ import {
 } from '@packages/utils'
 import { elementResizer } from '@packages/element-resizer'
 import { windowResizer } from '@packages/window-resizer'
+import { Notifier } from '@packages/notifier'
 
 export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
   const scaleX = Math.sqrt(
@@ -121,6 +122,8 @@ export class LayoutBox {
   #scrollValue: LayoutBoxXYZ = { x: 0, y: 0, z: 0 }
 
   #scrollEntries: Map<ScrollEntry, LayoutBoxScrollStepCallback> = new Map()
+
+  #resizeNotifier = new Notifier()
 
   constructor(
     element: ElementOrSelector<HTMLElement>,
@@ -368,6 +371,14 @@ export class LayoutBox {
     this.#rotation.unsubscribe(...args)
   }
 
+  public onResize(...args: Parameters<Notifier['subscribe']>) {
+    return this.#resizeNotifier.subscribe(...args)
+  }
+
+  public offResize(...args: Parameters<Notifier['unsubscribe']>) {
+    return this.#resizeNotifier.unsubscribe(...args)
+  }
+
   #recalculate() {
     this.#scale.calculate()
     this.#position.calculate()
@@ -502,6 +513,7 @@ export class LayoutBox {
 
     this.#composeSteps()
     this.#recalculate()
+    this.#resizeNotifier.notify()
   }
 
   #updateScrollPosition() {
