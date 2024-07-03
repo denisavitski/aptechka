@@ -1,12 +1,17 @@
 import { storeRegistry } from '@packages/store'
 
+export type TweakerOpenedPanels = Array<string>
+export type TweakerChangedSizes = { [key: string]: number }
+
 export interface TweakerStorageState {
-  openedPanels: Array<string>
+  openedPanels: TweakerOpenedPanels
+  changedSizes: TweakerChangedSizes
 }
 
 class TweakerStorage {
   #localStorageStudioName = ''
-  #openedPanels: Array<string> = []
+  #openedPanels: TweakerOpenedPanels = []
+  #changedSizes: TweakerChangedSizes = {}
 
   constructor() {
     this.#localStorageStudioName = storeRegistry.projectName + '-studio'
@@ -26,9 +31,22 @@ class TweakerStorage {
     return this.#openedPanels.includes(key)
   }
 
+  public changedSizes(key: string) {
+    return this.#changedSizes[key]
+  }
+
+  public changeSize(key: string, value?: number | undefined | null) {
+    if (value) {
+      this.#changedSizes[key] = value
+    } else {
+      delete this.#changedSizes[key]
+    }
+  }
+
   public save() {
     const state: TweakerStorageState = {
       openedPanels: this.#openedPanels,
+      changedSizes: this.#changedSizes,
     }
 
     localStorage.setItem(this.#localStorageStudioName, JSON.stringify(state))
@@ -46,6 +64,10 @@ class TweakerStorage {
 
         if (state.openedPanels) {
           this.#openedPanels = state.openedPanels
+        }
+
+        if (state.changedSizes) {
+          this.#changedSizes = state.changedSizes
         }
       } catch (e) {
         console.error(e)

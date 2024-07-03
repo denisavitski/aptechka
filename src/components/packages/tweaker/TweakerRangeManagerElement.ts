@@ -55,7 +55,9 @@ const stylesheet = createStylesheet({
 })
 
 @define('e-tweaker-range-manager')
-export class TweakerRangeManagerElement extends TweakerNumberManagerElement<'range'> {
+export class TweakerRangeManagerElement extends TweakerNumberManagerElement<
+  Store<number, 'range'>
+> {
   constructor(...stores: Array<Store<number, 'range'>>) {
     super(...stores)
 

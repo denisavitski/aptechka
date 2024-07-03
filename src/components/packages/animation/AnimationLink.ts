@@ -55,7 +55,10 @@ export class AnimationLink<
     this.#options = options
 
     this.#triggerAnimation.subscribe(this.#progressListener)
-    this.#triggerAnimation.linked.add(this)
+    this.#triggerAnimation.linked.current = [
+      ...this.#triggerAnimation.linked.current,
+      this,
+    ]
   }
 
   public get targetAnimation() {
@@ -70,7 +73,8 @@ export class AnimationLink<
     this.#setValue.close()
     this.#startValue.close()
     this.#triggerAnimation.unsubscribe(this.#progressListener)
-    this.#triggerAnimation.linked.delete(this)
+    this.#triggerAnimation.linked.current =
+      this.#triggerAnimation.linked.current.filter((l) => l !== this)
   }
 
   #startForward() {

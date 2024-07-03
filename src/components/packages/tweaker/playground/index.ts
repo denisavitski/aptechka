@@ -1,3 +1,4 @@
+import { Animation, Tweened } from '@packages/animation'
 import { Store } from '@packages/store'
 
 new Store(false, {
@@ -63,3 +64,27 @@ new Store('xx', {
     },
   },
 }).subscribe(() => {})
+
+const tween = new Tweened(0, {
+  min: 0,
+  max: 100,
+  passport: {
+    name: 'xxx.animation',
+  },
+})
+
+tween.subscribe((e) => {
+  console.log(e)
+})
+
+const tween2 = new Tweened(0, {})
+
+tween2.linkTo(tween, 0.5, 10)
+
+// addEventListener('keydown', (e) => {
+//   if (e.key === '1') {
+//     tween.set(0)
+//   } else if (e.key === '2') {
+//     tween.set(100)
+//   }
+// })

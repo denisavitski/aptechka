@@ -1,4 +1,4 @@
-import { StoreManagerType } from '@packages/store'
+import { Store, StoreManagerType } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { TweakerBooleanManagerElement } from './TweakerBooleanManagerElement'
 import { TweakerColorManagerElement } from './TweakerColorManagerElement'
@@ -9,7 +9,9 @@ import { TweakerSelectManagerElement } from './TweakerSelectManagerElement'
 import { TweakerStringManagerElement } from './TweakerStringManagerElement'
 
 export const tweakerManagerConstructors: {
-  [key in StoreManagerType]: typeof TweakerStoreManagerElement<any, any>
+  [key in StoreManagerType]: typeof TweakerStoreManagerElement<
+    Store<any, any, any>
+  >
 } = {
   boolean: TweakerBooleanManagerElement,
   color: TweakerColorManagerElement,

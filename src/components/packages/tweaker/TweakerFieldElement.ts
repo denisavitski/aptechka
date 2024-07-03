@@ -86,7 +86,7 @@ export class TweakerFieldElement extends CustomElement {
   #key: string
   #name: string
   #pointerEnter = false
-  #storeManager: TweakerStoreManagerElement<any, any>
+  #storeManager: TweakerStoreManagerElement<any>
 
   constructor(parameters: TweakerFieldParameters) {
     super()

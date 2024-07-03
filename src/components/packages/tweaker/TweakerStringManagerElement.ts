@@ -1,5 +1,5 @@
 import { aptechkaTheme } from '@packages/theme'
-import { Store, StoreManagerType } from '@packages/store/Store'
+import { Store } from '@packages/store/Store'
 import { define } from '@packages/custom-element'
 import { createStylesheet, element, input } from '@packages/element-constructor'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
@@ -35,15 +35,11 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-string-manager')
 export class TweakerStringManagerElement<
-  T extends string | number = string,
-  M extends Extract<
-    StoreManagerType,
-    'string' | 'number' | 'range' | 'link'
-  > = 'string'
-> extends TweakerStoreManagerElement<T, M> {
+  S extends Store<any, any> = Store<string, 'string'>
+> extends TweakerStoreManagerElement<S> {
   #content = new Store<Array<any>>([])
 
-  constructor(...stores: Array<Store<T, M>>) {
+  constructor(...stores: Array<S>) {
     super(...stores)
 
     this.openShadow(stylesheet)

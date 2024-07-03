@@ -41,7 +41,7 @@ export abstract class Animation<
 
   #isRunning = new Store(false)
 
-  #linked: Set<AnimationLink> = new Set()
+  #linked = new Store<Array<AnimationLink>>([])
   #animationLink: AnimationLink | null = null
 
   #direction = 0
@@ -181,7 +181,7 @@ export abstract class Animation<
 
     super.reset()
 
-    this.#linked.forEach((link) => {
+    this.#linked.current.forEach((link) => {
       link.targetAnimation.reset()
     })
   }
@@ -193,7 +193,8 @@ export abstract class Animation<
 
     this.unlink()
 
-    this.#linked.clear()
+    this.#linked.reset()
+    this.#linked.close()
   }
 
   public listenAnimationFrame() {
@@ -214,7 +215,7 @@ export abstract class Animation<
 
       ticker.unsubscribe(this.#animationFrameListener)
 
-      this.#linked.forEach((link) => {
+      this.#linked.current.forEach((link) => {
         link.targetAnimation.unlistenAnimationFrame()
       })
     }

@@ -45,8 +45,7 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-select-manager')
 export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
-  string,
-  'select'
+  Store<string, 'select'>
 > {
   constructor(...stores: Array<Store<string, 'select'>>) {
     super(...stores)

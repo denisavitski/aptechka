@@ -1,4 +1,3 @@
-import '@packages/tweaker'
 import { En3GLTF, en3, en3GLTFLoader } from '../index'
 import { ACESFilmicToneMapping, DirectionalLight } from 'three'
 en3.setup({

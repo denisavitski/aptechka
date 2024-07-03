@@ -20,8 +20,7 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-boolean-manager')
 export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
-  boolean,
-  'boolean'
+  Store<boolean, 'boolean'>
 > {
   constructor(...stores: Array<Store<boolean, 'boolean'>>) {
     super(...stores)

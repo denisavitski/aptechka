@@ -1,17 +1,17 @@
-import { Store, StoreManagerType, StoreMiddleware } from '@packages/store'
+import { Store, StoreMiddleware } from '@packages/store'
 import { define } from '@packages/custom-element'
 import { TweakerStringManagerElement } from './TweakerStringManagerElement'
 import { clamp } from '@packages/utils'
 
 @define('e-tweaker-number-manager')
 export class TweakerNumberManagerElement<
-  M extends Extract<StoreManagerType, 'number' | 'range'> = 'number'
-> extends TweakerStringManagerElement<number, M> {
+  S extends Store<number, any> = Store<number, 'number'>
+> extends TweakerStringManagerElement<S> {
   #step: number
   #min: number
   #max: number
 
-  constructor(...stores: Array<Store<number, M>>) {
+  constructor(...stores: Array<S>) {
     super(...stores)
 
     this.#min = this.firstStore.passport?.manager?.min || 0

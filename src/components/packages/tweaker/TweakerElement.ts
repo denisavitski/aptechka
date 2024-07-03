@@ -3,11 +3,12 @@ import {
   button,
   createStylesheet,
   div,
+  element,
   input,
   label,
 } from '@packages/element-constructor'
 import { Store, activeStores, storeRegistry } from '@packages/store'
-import { createJSONAndSave, debounce } from '@packages/utils'
+import { createJSONAndSave, debounce, setupDrag } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
 import { aptechkaTheme } from '@packages/theme'
 
@@ -54,6 +55,16 @@ const stylesheet = createStylesheet({
 
   ':host(:hover)': {
     opacity: '1 !important',
+  },
+
+  '.resize': {
+    position: 'absolute',
+    left: '0',
+    top: '0',
+    width: 'calc(var(--tweaker-width) * 0.025)',
+    height: '100%',
+    zIndex: '1',
+    cursor: 'ew-resize',
   },
 
   '.tweaker-buttons': {
@@ -110,7 +121,7 @@ const stylesheet = createStylesheet({
       top: '0',
       right: '0',
 
-      width: '100%',
+      width: '100% !important',
 
       borderTopLeftRadius: '0',
       borderTopRightRadius: '0',
@@ -208,6 +219,32 @@ export class TweakerElement extends TweakerFolderElement {
       }),
     ]
 
+    element(this.bodyElement, {
+      children: [
+        div({
+          class: 'resize',
+          onPointerdown: (grabEvent) => {
+            const rect = this.getBoundingClientRect()
+
+            setupDrag((moveEvent) => {
+              const dx = grabEvent.x - moveEvent.x
+
+              const newSize = Math.max(300, rect.width + dx)
+
+              this.style.width = newSize + 'px'
+
+              tweakerStorage.changeSize('tweaker', newSize)
+            })
+          },
+          onDblclick: () => {
+            this.style.width = ''
+
+            tweakerStorage.changeSize('tweaker', null)
+          },
+        }),
+      ],
+    })
+
     this.addEventListener('accordionItemToggle', (e) => {
       if (e.detail.opened) {
         this.style.opacity = '1'
@@ -222,6 +259,10 @@ export class TweakerElement extends TweakerFolderElement {
 
     window.addEventListener('beforeunload', this.#unloadListener)
     activeStores.subscribe(this.#storesChangeListener)
+
+    if (tweakerStorage.changedSizes('tweaker')) {
+      this.style.width = tweakerStorage.changedSizes('tweaker') + 'px'
+    }
   }
 
   protected override disconnectedCallback() {

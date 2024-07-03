@@ -11,8 +11,7 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-link-manager')
 export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
-  string,
-  'link'
+  Store<string, 'link'>
 > {
   constructor(...stores: Array<Store<string, 'link'>>) {
     super(...stores)

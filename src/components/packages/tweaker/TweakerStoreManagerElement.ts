@@ -1,19 +1,18 @@
 import { CustomElement } from '@packages/custom-element'
-import { Store, StoreManagerType } from '@packages/store'
+import { Store } from '@packages/store'
 
 export class TweakerStoreManagerElement<
-  T,
-  K extends StoreManagerType
+  S extends Store<any, any, any>
 > extends CustomElement {
-  #stores: Array<Store<T, K>>
+  #stores: Array<S>
 
-  constructor(...stores: Array<Store<T, K>>) {
+  constructor(...stores: Array<S>) {
     super()
 
     this.#stores = stores
   }
 
-  public addStore(store: Store<T, K>) {
+  public addStore(store: S) {
     this.#stores.push(store)
   }
 
@@ -25,7 +24,7 @@ export class TweakerStoreManagerElement<
     return this.#stores
   }
 
-  protected updateStores(value: T) {
+  protected updateStores(value: S['current']) {
     this.#stores.forEach((store) => {
       store.current = value
     })

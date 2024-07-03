@@ -78,7 +78,8 @@ export class TweakerFolderElement extends AccordionElement {
   #head = new Store<any>(null)
   #content = new Store<Array<TweakerFolderElement | TweakerFieldElement>>([])
   #mutationObserver: MutationObserver
-  #contentWrapperElement: HTMLElement = null!
+  #bodyElement: HTMLElement = null!
+  #contentElement: HTMLElement = null!
 
   constructor(parameters: TweakerFolderParameters) {
     super()
@@ -119,12 +120,15 @@ export class TweakerFolderElement extends AccordionElement {
             }),
             div({
               class: 'body',
+              ref: (e) => {
+                this.#bodyElement = e
+              },
               children: div({
                 class: 'body-content',
                 children: this.#content,
-                ref: (e) =>
-                  (this.#contentWrapperElement =
-                    e.firstElementChild as HTMLElement),
+                ref: (e) => {
+                  this.#contentElement = e.firstElementChild as HTMLElement
+                },
               }),
             }),
           ],
@@ -149,6 +153,10 @@ export class TweakerFolderElement extends AccordionElement {
     return this.#content
   }
 
+  public get bodyElement() {
+    return this.#bodyElement
+  }
+
   protected override connectedCallback() {
     super.connectedCallback()
 
@@ -158,7 +166,7 @@ export class TweakerFolderElement extends AccordionElement {
       }
     }, 50)
 
-    this.#mutationObserver.observe(this.#contentWrapperElement, {
+    this.#mutationObserver.observe(this.#contentElement, {
       childList: true,
     })
   }

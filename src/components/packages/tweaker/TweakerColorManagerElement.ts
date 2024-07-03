@@ -32,8 +32,7 @@ const stylesheet = createStylesheet({
 
 @define('e-tweaker-color-manager')
 export class TweakerColorManagerElement extends TweakerStoreManagerElement<
-  string,
-  'color'
+  Store<string, 'color'>
 > {
   constructor(...stores: Array<Store<string, 'color'>>) {
     super(...stores)
