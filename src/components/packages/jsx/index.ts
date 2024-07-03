@@ -1,4 +1,6 @@
+export * from './type'
 export { h, Fragment } from './h'
+export { render } from './render'
 export { register } from './register'
 export { _createStore } from './hooks/_createStore'
 export { onConnect } from './hooks/onConnect'
@@ -8,5 +10,3 @@ export { onDisconnect } from './hooks/onDisconnect'
 export { attachInternals } from './hooks/attachInternals'
 export { attachShadow } from './hooks/attachShadow'
 export { attachStylesheet } from './hooks/attachStylesheet'
-
-export * from './type'

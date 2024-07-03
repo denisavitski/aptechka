@@ -106,6 +106,8 @@ export class Router {
       (r) => !activeRoutes.includes(r) && r.testPathname(pathname)
     )
 
+    console.log(newRoutes)
+
     const oldRoutes = activeRoutes.filter((r) => !r.testPathname(pathname))
     const keepRoutes = activeRoutes.filter((r) => r.testPathname(pathname))
 

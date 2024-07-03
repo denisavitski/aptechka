@@ -1,3 +1,4 @@
+import { instantiate } from '@packages/jsx/instantiate'
 import { isBrowser, isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<any>
@@ -18,7 +19,10 @@ export class Route {
   #pattern: string
   #module: RouteModule
   #urlPattern: URLPattern
-  #elementConstructor: CustomElementConstructor | null
+  #elementConstructor:
+    | CustomElementConstructor
+    | null
+    | ((parameters: RouteParameters) => any)
   #element: HTMLElement | null
   #isActive: boolean
   #nest: HTMLElement | ShadowRoot | null
@@ -119,7 +123,14 @@ export class Route {
         searchParams,
       }
 
-      this.#element = new this.#elementConstructor(routeParameters)
+      if (isESClass(this.#elementConstructor)) {
+        this.#element = new (this
+          .#elementConstructor as CustomElementConstructor)(routeParameters)
+      } else {
+        this.#element = instantiate(this.#elementConstructor as any, {
+          attributes: routeParameters,
+        })
+      }
 
       containerElement.appendChild(this.#element!)
 
