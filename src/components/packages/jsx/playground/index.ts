@@ -1,7 +1,7 @@
 import { Router } from '@packages/router'
 
 const router = new Router({
-  base: '/components/packages/jsx/playground',
+  base: '/components/packages/jsx/playground/',
 })
 
 router.defineRoute('*', () => import('./routes/Layout'))

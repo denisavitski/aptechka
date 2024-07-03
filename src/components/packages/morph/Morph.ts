@@ -1,8 +1,12 @@
 import { Notifier } from '@packages/notifier'
-import { isBrowser } from '@packages/utils'
+import {
+  ChangeHistoryAction,
+  changeHistory,
+  isBrowser,
+  normalizeBase,
+  splitPath,
+} from '@packages/utils'
 import { Link } from './Link'
-
-export type MorphHistoryAction = 'replace' | 'push' | 'none'
 
 export interface MorphParameters {
   base?: string
@@ -45,14 +49,8 @@ export class Morph {
 
   constructor(parameters?: MorphParameters) {
     if (isBrowser) {
-      this.#base = parameters?.base || '/'
-
       if (parameters?.base) {
-        this.#base = parameters.base
-
-        if (!parameters.base.endsWith('/')) {
-          this.#base += '/'
-        }
+        this.#base = normalizeBase(parameters.base)
       } else {
         this.#base = '/'
       }
@@ -85,26 +83,7 @@ export class Morph {
   }
 
   public normalizePath(path: string) {
-    path = path.replace(this.#base, '')
-
-    if (path.startsWith('/')) {
-      path = path.slice(1)
-    }
-
-    const split1 = path.split('#')
-    const split2 = split1[0].split('?')
-
-    const leaf = split2[0].endsWith('/') ? split2[0].slice(0, -1) : split2[0]
-    const pathname = this.#base + leaf
-    const parameters = split2?.[1]
-    const hash = split1?.[1]
-
-    return {
-      leaf,
-      pathname,
-      parameters,
-      hash,
-    }
+    return splitPath(path, this.#base)
   }
 
   public beforeNavigationEvent(callback: MorphNavigationCallback) {
@@ -122,7 +101,7 @@ export class Morph {
 
   public async navigate(
     path: string,
-    historyAction: MorphHistoryAction = 'push'
+    historyAction: ChangeHistoryAction = 'push'
   ) {
     const parts = this.normalizePath(path)
     let { pathname, hash, parameters } = parts
@@ -237,18 +216,7 @@ export class Morph {
 
       this.#currentPathname = pathname
 
-      const por = parameters || location.search
-
-      const h = hash ? (hash.startsWith('#') ? hash : '#' + hash) : ''
-      const p = por ? (por.startsWith('?') ? por : '?' + por) : ''
-
-      const pathPlus = `${pathname}${h}${p}`
-
-      if (historyAction === 'push') {
-        history.pushState(pathname, '', pathPlus)
-      } else if (historyAction === 'replace') {
-        history.replaceState(pathname, '', pathPlus)
-      }
+      changeHistory(historyAction, pathname, parameters, hash)
 
       const newMorphElements = this.#getMorphElements(
         newDocument.body.cloneNode(true) as HTMLElement

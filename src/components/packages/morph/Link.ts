@@ -1,10 +1,11 @@
-import { Morph, MorphHistoryAction } from './Morph'
+import { ChangeHistoryAction } from '@packages/utils'
+import { Morph } from './Morph'
 
 export class Link {
   #morph: Morph
   #element: HTMLAnchorElement
   #pathname: string
-  #historyAction: MorphHistoryAction
+  #historyAction: ChangeHistoryAction
   #matchPaths: Array<string> | undefined
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
@@ -16,7 +17,7 @@ export class Link {
     this.#historyAction =
       (this.#element.getAttribute(
         'data-history-action'
-      ) as MorphHistoryAction) || 'push'
+      ) as ChangeHistoryAction) || 'push'
 
     this.#element.addEventListener('click', this.#clickListener)
 

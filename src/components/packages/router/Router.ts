@@ -1,6 +1,13 @@
 import { URLPattern } from 'urlpattern-polyfill'
 import { Notifier } from '@packages/notifier'
-import { isBrowser, debounce } from '@packages/utils'
+import {
+  isBrowser,
+  debounce,
+  splitPath,
+  normalizeBase,
+  changeHistory,
+  ChangeHistoryAction,
+} from '@packages/utils'
 import { Route, RouteModule } from './Route'
 import { Link } from './Link'
 
@@ -8,7 +15,7 @@ import { Link } from './Link'
 globalThis.URLPattern = URLPattern
 
 export interface RouterPreprocessorEntry {
-  pathname: string
+  path: ReturnType<typeof splitPath>
   resolve: () => void
   reject: () => void
 }
@@ -29,8 +36,6 @@ export type RouterAfterNavigationCallback = (
   entry: RouterAfterNavigationEntry
 ) => void
 
-export type RouterHistoryAction = 'push' | 'replace' | 'none'
-
 export interface RouterParameters {
   rootElement?: HTMLElement
   base?: string
@@ -40,7 +45,7 @@ export class Router {
   public static active: Router
 
   #rootElement: HTMLElement = null!
-  #base: string
+  #base: string = null!
   #routes: Array<Route> = []
   #lastRoute: Route | null = null
   #links: Array<Link> = []
@@ -53,11 +58,15 @@ export class Router {
   public postprocessor?: RouterPostprocessor
 
   constructor(parameters?: RouterParameters) {
-    this.#base = parameters?.base || ''
-
-    Router.active = this
-
     if (isBrowser) {
+      if (parameters?.base) {
+        this.#base = normalizeBase(parameters.base)
+      } else {
+        this.#base = '/'
+      }
+
+      Router.active = this
+
       this.#rootElement = parameters?.rootElement || document.body
       addEventListener('popstate', this.#popStateListener)
     }
@@ -75,6 +84,10 @@ export class Router {
     return this.#routes
   }
 
+  public get links() {
+    return this.#links
+  }
+
   public navigationEvent(callback: RouterAfterNavigationCallback) {
     return this.#navigationEvent.subscribe(callback)
   }
@@ -85,10 +98,10 @@ export class Router {
     this.#start()
   }
 
-  public async navigate(
-    pathname: string,
-    action: RouterHistoryAction = 'push'
-  ) {
+  public async navigate(path: string, action: ChangeHistoryAction = 'push') {
+    const parts = this.normalizePath(path)
+    let { pathname, hash, parameters, leaf } = parts
+
     if (
       this.#candidatePathname === pathname ||
       this.#currentPathname === pathname
@@ -103,20 +116,18 @@ export class Router {
     const activeRoutes = this.#routes.filter((r) => r.isActive)
 
     const newRoutes = this.#routes.filter(
-      (r) => !activeRoutes.includes(r) && r.testPathname(pathname)
+      (r) => !activeRoutes.includes(r) && r.testPathname(leaf)
     )
 
-    console.log(newRoutes)
-
-    const oldRoutes = activeRoutes.filter((r) => !r.testPathname(pathname))
-    const keepRoutes = activeRoutes.filter((r) => r.testPathname(pathname))
+    const oldRoutes = activeRoutes.filter((r) => !r.testPathname(leaf))
+    const keepRoutes = activeRoutes.filter((r) => r.testPathname(leaf))
 
     let isOkToSwitch = true
 
     if (this.preprocessor) {
       try {
         await new Promise<void>((resolve, reject) => {
-          this.preprocessor?.({ pathname, resolve, reject })
+          this.preprocessor?.({ path: parts, resolve, reject })
         })
       } catch (e: any) {
         if (e) {
@@ -142,19 +153,17 @@ export class Router {
         this.#lastRoute = route
       }
 
-      const fullPathname = this.#base + pathname + location.search
-
-      if (action === 'push') {
-        history.pushState(fullPathname, '', fullPathname)
-      } else if (action === 'replace') {
-        history.replaceState(fullPathname, '', fullPathname)
-      }
+      changeHistory(action, pathname, parameters, hash)
 
       this.#updateLinks()
 
       this.postprocessor?.({ pathname })
       this.#navigationEvent.notify({ pathname })
     }
+  }
+
+  public normalizePath(path: string) {
+    return splitPath(path, this.#base)
   }
 
   #start = debounce(() => {
@@ -166,7 +175,7 @@ export class Router {
       return slashesLength(a.pattern) - slashesLength(b.pattern)
     })
 
-    this.navigate(location.pathname.replace(this.#base, ''))
+    this.navigate(location.pathname)
   }, 0)
 
   #updateLinks() {
