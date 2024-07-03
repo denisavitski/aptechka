@@ -1,4 +1,9 @@
 import { ElementConstructor } from '@packages/element-constructor'
+import {
+  contextStack,
+  currentComponentElement,
+  nextComponentAttributes,
+} from './globals'
 
 export interface ComponentElementParameters {
   tag: Function
@@ -13,15 +18,6 @@ export type ComponentConnectCallback = (
 
 export type ComponentDisconnectCallback = (e: ComponentElement) => void
 
-export let currentComponentElement: ComponentElement = null!
-
-export const nextComponentAttributes: { value: { [key: string]: any } | null } =
-  {
-    value: null,
-  }
-
-export let contextStack: Array<Map<string, any>> = []
-
 export class ComponentElement extends HTMLElement {
   #connectCallbacks: Set<ComponentConnectCallback> = new Set()
   #disconnectCallbacks: Set<ComponentDisconnectCallback> = new Set()
@@ -30,8 +26,8 @@ export class ComponentElement extends HTMLElement {
   constructor(parameters?: ComponentElementParameters) {
     super()
 
-    const prevComponentElement = currentComponentElement
-    currentComponentElement = this
+    const prevComponentElement = currentComponentElement.value
+    currentComponentElement.value = this
 
     this.#shareContext()
 
@@ -48,7 +44,7 @@ export class ComponentElement extends HTMLElement {
       [childrenType]: res,
     })
 
-    currentComponentElement = prevComponentElement
+    currentComponentElement.value = prevComponentElement
     nextComponentAttributes.value = null
 
     this.#unshareContext()
@@ -67,7 +63,7 @@ export class ComponentElement extends HTMLElement {
   }
 
   protected connectedCallback() {
-    currentComponentElement = this
+    currentComponentElement.value = this
 
     this.#connectCallbacks.forEach((callback) => {
       const disconnectCallback = callback(this)
@@ -77,7 +73,7 @@ export class ComponentElement extends HTMLElement {
       }
     })
 
-    currentComponentElement = null!
+    currentComponentElement.value = null!
 
     this.addEventListener('beforeChildrenChange', this.#shareContext)
     this.addEventListener('afterChildrenChange', this.#unshareContext)
@@ -93,10 +89,12 @@ export class ComponentElement extends HTMLElement {
   }
 
   #shareContext = () => {
-    contextStack.push(this.#contextMap)
+    contextStack.value.push(this.#contextMap)
   }
 
   #unshareContext = () => {
-    contextStack = contextStack.filter((cs) => cs !== this.#contextMap)
+    contextStack.value = contextStack.value.filter(
+      (cs) => cs !== this.#contextMap
+    )
   }
 }

@@ -3,8 +3,8 @@ import { camelToKebab } from '@packages/utils'
 import {
   ComponentElement,
   ComponentElementParameters,
-  nextComponentAttributes,
 } from './ComponentElement'
+import { nextComponentAttributes } from './globals'
 
 export function h(
   tag: string | JSX.Component,

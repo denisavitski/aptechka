@@ -4,7 +4,6 @@ export {
   type RouterPreprocessor,
   type RouterPostprocessor,
   type RouterAfterNavigationCallback,
-  type RouterHistoryAction,
   type RouterParameters,
 } from './Router'
 

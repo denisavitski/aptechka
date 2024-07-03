@@ -1,3 +1,5 @@
+import { onAnimationFrame } from '@packages/jsx/hooks/onAnimationFrame'
+
 const About: JSX.Component = () => {
   return (
     <component>

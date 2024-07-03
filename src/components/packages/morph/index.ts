@@ -6,5 +6,4 @@ export {
   type MorphPreprocessorEntry,
   type MorphNavigationEntry,
   type MorphParameters,
-  type MorphHistoryAction,
 } from './Morph'

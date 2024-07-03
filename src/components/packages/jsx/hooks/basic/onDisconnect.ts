@@ -1,5 +1,5 @@
+import { ComponentDisconnectCallback } from '@packages/jsx/ComponentElement'
 import { withCurrentComponent } from './withCurrentComponent'
-import { ComponentDisconnectCallback } from '../ComponentElement'
 
 export function onDisconnect(callback: ComponentDisconnectCallback) {
   withCurrentComponent((e) => {

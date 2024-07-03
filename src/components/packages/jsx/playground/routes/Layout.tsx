@@ -1,5 +1,5 @@
-import { attachShadow } from '@packages/jsx/hooks/attachShadow'
-import { attachStylesheet } from '@packages/jsx/hooks/attachStylesheet'
+import { attachShadow } from '@packages/jsx/hooks/basic/attachShadow'
+import { attachStylesheet } from '@packages/jsx/hooks/basic/attachStylesheet'
 
 const Layout: JSX.Component = () => {
   attachShadow()
@@ -18,24 +18,9 @@ const Layout: JSX.Component = () => {
   return (
     <component>
       <nav>
-        <a
-          data-nav
-          href="/"
-        >
-          HOME
-        </a>
-        <a
-          data-nav
-          href="/about"
-        >
-          ABOUT
-        </a>
-        <a
-          data-nav
-          href="/about/news"
-        >
-          NEWS
-        </a>
+        <a href="/">HOME</a>
+        <a href="/about">ABOUT</a>
+        <a href="/about/news">NEWS</a>
       </nav>
 
       <div data-nest></div>
