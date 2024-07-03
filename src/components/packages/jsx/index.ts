@@ -1,6 +1,7 @@
 export * from './type'
 export { h, Fragment } from './h'
 export { render } from './render'
+export { instantiate } from './instantiate'
 export { register } from './register'
 export { _createStore } from './hooks/_createStore'
 export { onConnect } from './hooks/onConnect'
