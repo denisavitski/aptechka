@@ -12,7 +12,7 @@ export function createDerivedComponents<
   const [store, callback, options] = parameters
 
   return _createStore(
-    new DerivedArray(
+    new DerivedArray<DerivedType, StoreType>(
       store,
       (value, index) => (() => callback(value, index)) as any,
       options

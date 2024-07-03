@@ -1,3 +1,5 @@
+export { ArrayStore } from './ArrayStore'
+
 export {
   Store,
   activeStores,

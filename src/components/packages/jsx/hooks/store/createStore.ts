@@ -10,5 +10,5 @@ export function createStore<
     typeof Store<StoreType, StoreManager, Entry>
   >
 ) {
-  return _createStore(new Store(...parameters))
+  return _createStore(new Store<StoreType, StoreManager, Entry>(...parameters))
 }

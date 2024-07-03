@@ -9,5 +9,5 @@ export function createDerivedArray<
     typeof DerivedArray<DerivedType, StoreType>
   >
 ) {
-  return _createStore(new DerivedArray(...parameters))
+  return _createStore(new DerivedArray<DerivedType, StoreType>(...parameters))
 }

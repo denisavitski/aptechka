@@ -7,6 +7,10 @@ export function createDerivedComponent<DerivedType, StoreType>(
   const [store, callback, options] = parameters
 
   return _createStore(
-    new Derived(store, (v) => (() => callback(v)) as any, options)
+    new Derived<DerivedType, StoreType>(
+      store,
+      (v) => (() => callback(v)) as any,
+      options
+    )
   )
 }
