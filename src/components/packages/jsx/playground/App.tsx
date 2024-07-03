@@ -1,55 +1,88 @@
-import { Store } from '@packages/store'
-import { createContext } from '../hooks/createContext'
-import { attachShadow, onConnect } from '../hooks'
+import {
+  createDerived,
+  createDerivedComponents,
+  createStore,
+} from '../hooks/createStore'
 
-const items = ['a', 'b', 'c']
-
-const Inner: JSX.Component<{ name: string }> = (e) => {
-  onConnect((e) => {
-    console.log('Inner', e)
-  })
-
-  return <div>{e.children}</div>
+interface Todo {
+  id: number
+  value: string
 }
 
-Inner.noCustomElement = true
+function createGlobalTodoStore() {
+  const store = createStore<Array<Todo>>([])
 
-const Item: JSX.Component<{ name: string }> = (e) => {
-  attachShadow()
+  let id = 0
 
-  createContext(e.name, e.name)
+  return {
+    store,
+    create(value: string) {
+      store.current = [
+        ...store.current,
+        {
+          id: id++,
+          value,
+        },
+      ]
+    },
+    delete(id: number) {
+      store.current = store.current.filter((v) => v.id !== id)
+    },
+  }
+}
 
-  onConnect((e) => {
-    console.log('Item', e)
-  })
+const todos = createGlobalTodoStore()
+
+export const Todo: JSX.Component<Todo> = (props) => {
+  const completed = createStore(false)
 
   return (
-    <component
-      lightChildren
-      class="item"
+    <li
+      style={{
+        textDecoration: createDerived(completed, (v) =>
+          v ? 'line-through' : ''
+        ),
+      }}
     >
-      <div>
-        <Inner name={e.name}>{e.children}</Inner>
-      </div>
+      <span onClick={() => (completed.current = !completed.current)}>
+        {props.value}
+      </span>
+
+      <button onClick={() => todos.delete(props.id)}>delete</button>
+    </li>
+  )
+}
+
+export const List: JSX.Component = () => {
+  return (
+    <ul>
+      {createDerivedComponents(todos.store, (v) => (
+        <Todo {...v}></Todo>
+      ))}
+    </ul>
+  )
+}
+
+export const Form: JSX.Component = () => {
+  const value = createStore('')
+
+  return (
+    <component>
+      <input
+        onInput={(e) =>
+          (value.current = (e.currentTarget as HTMLInputElement).value)
+        }
+      />
+      <button onClick={() => todos.create(value.current)}>Add</button>
     </component>
   )
 }
 
 export const App: JSX.Component = () => {
-  const children = items.map((item) => {
-    return <Item name={item}>{item}</Item>
-  })
-
-  const store = new Store('xx')
-
-  onConnect((e) => {
-    console.log('APP', e)
-  })
-
   return (
-    <component class={store}>
-      <h1>Hi!</h1>
-      {children}
+    <component>
+      <Form></Form>
+      <List></List>
     </component>
   )
 }

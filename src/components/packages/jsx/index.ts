@@ -1,3 +1,12 @@
 export { h, Fragment } from './h'
 export { register } from './register'
+export { _createStore } from './hooks/_createStore'
+export { onConnect } from './hooks/onConnect'
+export { getContext, createContext } from './hooks/createContext'
+export { withCurrentComponent } from './hooks/withCurrentComponent'
+export { onDisconnect } from './hooks/onDisconnect'
+export { attachInternals } from './hooks/attachInternals'
+export { attachShadow } from './hooks/attachShadow'
+export { attachStylesheet } from './hooks/attachStylesheet'
+
 export * from './type'

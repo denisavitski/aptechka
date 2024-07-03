@@ -6,9 +6,11 @@ export interface ComponentElementParameters {
 }
 
 export type ComponentCreateCallback<T = void> = (e: ComponentElement) => T
+
 export type ComponentConnectCallback = (
   e: ComponentElement
 ) => void | (() => void)
+
 export type ComponentDisconnectCallback = (e: ComponentElement) => void
 
 export let currentComponentElement: ComponentElement = null!
@@ -19,6 +21,7 @@ export const nextComponentAttributes: { value: { [key: string]: any } | null } =
   }
 
 export let contextStack: Array<Map<string, any>> = []
+
 export class ComponentElement extends HTMLElement {
   #connectCallbacks: Set<ComponentConnectCallback> = new Set()
   #disconnectCallbacks: Set<ComponentDisconnectCallback> = new Set()
