@@ -20,14 +20,13 @@ const stylesheet = createStylesheet({
     color: 'inherit',
     border: 'none',
     fontSize: 'var(--font-size-small)',
-  },
 
-  '.text-input': {
     height: 'var(--height-input)',
     width: '100%',
 
     margin: '0',
     padding: `0 var(--gap-small)`,
+
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: aptechkaTheme.borderRadius.var,
   },

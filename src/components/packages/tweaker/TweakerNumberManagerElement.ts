@@ -14,8 +14,8 @@ export class TweakerNumberManagerElement<
   constructor(...stores: Array<S>) {
     super(...stores)
 
-    this.#min = this.firstStore.passport?.manager?.min || 0
-    this.#max = this.firstStore.passport?.manager?.max || 1
+    this.#min = this.firstStore.passport?.manager?.min || -Infinity
+    this.#max = this.firstStore.passport?.manager?.max || Infinity
     this.#step = this.firstStore.passport?.manager?.step || 0.01
   }
 

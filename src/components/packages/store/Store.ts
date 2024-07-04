@@ -30,6 +30,13 @@ export interface StoreNumberManager extends StoreManager {
   step?: number
 }
 
+export interface StoreNumbersManager extends StoreManager {
+  type: 'numbers'
+  min?: number
+  max?: number
+  step?: number
+}
+
 export interface StoreRangeManager extends StoreManager {
   type: 'range'
   min?: number
@@ -63,6 +70,7 @@ export interface StoreManagers {
   range: StoreRangeManager
   number: StoreNumberManager
   string: StoreStringManager
+  numbers: StoreNumbersManager
 }
 
 export type StoreManagerType = keyof StoreManagers

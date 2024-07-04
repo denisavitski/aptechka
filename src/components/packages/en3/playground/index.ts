@@ -1,3 +1,4 @@
+import '@packages/tweaker'
 import { en3, en3GLTFLoader } from '../index'
 import {
   ACESFilmicToneMapping,
@@ -6,12 +7,15 @@ import {
   Mesh,
   MeshBasicMaterial,
 } from 'three'
+import { En3Controls } from '../test/En3Controls'
 
 en3.setup({
   webGLRendererParameters: {
     alpha: true,
   },
 })
+
+new En3Controls()
 
 en3.webglRenderer.toneMapping = ACESFilmicToneMapping
 en3.webglRenderer.toneMappingExposure = 1.4
@@ -26,6 +30,7 @@ for (let index = 0; index < 10; index++) {
   const geo = new BoxGeometry()
   const mat = new MeshBasicMaterial({ color: 'lightblue' })
   const mesh = new Mesh(geo, mat)
+  mesh.name = `Objects.Object-${index + 1}`
   mesh.scale.setScalar(200)
   mesh.position.z = 250 * index * -1
   mesh.position.x = 60 * index

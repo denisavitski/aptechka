@@ -63,6 +63,8 @@ export class En3View {
     this.#camera.far = options?.cameraFar || 11000
     this.#cameraFov = options?.cameraFov || 'auto'
 
+    this.#camera.name = `${this.#name} camera`
+
     this.#sizeElement =
       getElement<HTMLElement>(options?.sizeElement) || document.documentElement
 
@@ -111,7 +113,9 @@ export class En3View {
   public resize() {
     const { width, height } = this.#box
 
-    this.#camera.position.z = this.#cameraDistance
+    if (!this.#camera.userData.controlled) {
+      this.#camera.position.z = this.#cameraDistance
+    }
 
     if (this.#camera instanceof PerspectiveCamera) {
       this.#camera.aspect = width / height

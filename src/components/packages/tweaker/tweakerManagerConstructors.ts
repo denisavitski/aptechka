@@ -7,6 +7,7 @@ import { TweakerNumberManagerElement } from './TweakerNumberManagerElement'
 import { TweakerRangeManagerElement } from './TweakerRangeManagerElement'
 import { TweakerSelectManagerElement } from './TweakerSelectManagerElement'
 import { TweakerStringManagerElement } from './TweakerStringManagerElement'
+import { TweakerNumbersManagerElement } from './TweakerNumbersManagerElement'
 
 export const tweakerManagerConstructors: {
   [key in StoreManagerType]: typeof TweakerStoreManagerElement<
@@ -20,4 +21,5 @@ export const tweakerManagerConstructors: {
   range: TweakerRangeManagerElement,
   select: TweakerSelectManagerElement,
   string: TweakerStringManagerElement,
+  numbers: TweakerNumbersManagerElement,
 }

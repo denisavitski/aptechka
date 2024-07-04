@@ -13,6 +13,7 @@ export interface En3Options {
   containerElement?: ElementOrSelector<HTMLElement>
   view?: En3ViewOptions
   cacheAssets?: boolean
+  zIndex?: number
 }
 
 class En3 {
@@ -104,7 +105,7 @@ class En3 {
       top: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
+      z-index: ${options?.zIndex || 0};
     `
 
     const parentElement =
