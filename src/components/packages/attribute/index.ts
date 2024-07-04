@@ -14,6 +14,7 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
   #element: Element = null!
   #name: string
   #mutationObserver: MutationObserver = null!
+  #active = false
 
   constructor(
     elementOrSelector: ElementOrSelector,
@@ -48,23 +49,25 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
   }
 
   public override subscribe(callback: StoreCallback<StoreEntry<T>>) {
-    const unsub = super.subscribe(callback)
+    if (!this.subscribers.size) {
+      this.observe()
+    }
 
-    this.observe()
-
-    return unsub
+    return super.subscribe(callback)
   }
 
   public override unsubscribe(callback: StoreCallback<StoreEntry<T>>) {
     super.unsubscribe(callback)
 
-    this.unobserve()
+    if (!this.subscribers.size) {
+      this.unobserve()
+    }
   }
 
   public observe() {
-    const observe = !this.subscribers.size
+    if (!this.#active) {
+      this.#active = true
 
-    if (observe) {
       this.#mutationObserver.observe(this.#element, {
         attributes: true,
       })
@@ -74,7 +77,9 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
   }
 
   public unobserve() {
-    if (!this.subscribers.size) {
+    if (this.#active) {
+      this.#active = false
+
       this.#mutationObserver.disconnect()
     }
   }

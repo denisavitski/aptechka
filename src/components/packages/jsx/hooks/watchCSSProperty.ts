@@ -5,7 +5,7 @@ import { ElementOrSelector } from '@packages/utils'
 import { currentComponentElement } from '../globals'
 import { onConnect } from './basic/onConnect'
 
-export function useCSSProperty<
+export function watchCSSProperty<
   StoreType extends number | boolean | string,
   StoreManager extends StoreManagerType = StoreManagerType
 >(
@@ -26,7 +26,7 @@ export function useCSSProperty<
     cssProperty.observe()
 
     return () => {
-      cssProperty.unobserve()
+      cssProperty.close()
     }
   })
 

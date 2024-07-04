@@ -1,18 +1,11 @@
-import { attachStylesheet } from '@packages/jsx/hooks/basic/attachStylesheet'
-import { useCSSProperty } from '@packages/jsx/hooks/useCSSProperty'
+import { watchAttribute } from '@packages/jsx/hooks/watchAttribute'
 
 const Home: JSX.Component = () => {
-  const cssProperty = useCSSProperty('--color', 'blue')
-
-  attachStylesheet({
-    ':host': {
-      '--color': 'red',
-    },
-  })
+  const attribute = watchAttribute('damping', 0)
 
   return (
-    <component>
-      <h1>{cssProperty}</h1>
+    <component damping="10">
+      <h1>{attribute}</h1>
     </component>
   )
 }

@@ -25,6 +25,7 @@ export class CSSProperty<
   #property: string
   #currentRawValue: string
   #rawValueCheck: boolean
+  #active = false
 
   constructor(
     elementOrSelector: ElementOrSelector<HTMLElement>,
@@ -45,19 +46,23 @@ export class CSSProperty<
   }
 
   public observe() {
-    if (!this.subscribers.size) {
+    if (!this.#active) {
+      this.#active = true
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.CSS_VARIABLE)
     }
   }
 
   public unobserve() {
-    if (!this.subscribers.size) {
+    if (this.#active) {
+      this.#active = false
       windowResizer.unsubscribe(this.#resizeListener)
     }
   }
 
   public override subscribe(callback: StoreCallback<StoreEntry<StoreType>>) {
-    this.observe()
+    if (!this.subscribers.size) {
+      this.observe()
+    }
 
     return super.subscribe(callback)
   }
@@ -65,7 +70,14 @@ export class CSSProperty<
   public override unsubscribe(callback: StoreCallback<StoreEntry<StoreType>>) {
     super.unsubscribe(callback)
 
+    if (!this.subscribers.size) {
+      this.unobserve()
+    }
+  }
+
+  public override close() {
     this.unobserve()
+    super.close()
   }
 
   public check() {
