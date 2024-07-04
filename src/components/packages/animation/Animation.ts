@@ -11,14 +11,13 @@ import {
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
-import { AnimationLink, AnimationLinkOptions } from './AnimationLink'
 import { TICK_ORDER } from '@packages/order'
 
 export interface AnimationEntry extends StoreEntry<number> {
-  currentDistance: number
+  delta: number
   distance: number
-  currentProgress: number
-  progress: number
+  deltaProgress: number
+  distanceProgress: number
   direction: number
 }
 
@@ -26,6 +25,7 @@ export interface AnimationOptions extends TickerAddOptions {
   min?: number
   max?: number
   equalize?: boolean
+  restart?: boolean
 }
 
 export type AnimationConstructorOptions<Options extends AnimationOptions> =
@@ -41,9 +41,6 @@ export abstract class Animation<
 
   #isRunning = new Store(false)
 
-  #linked = new Store<Array<AnimationLink>>([])
-  #animationLink: AnimationLink | null = null
-
   #direction = 0
   #target = 0
 
@@ -51,19 +48,10 @@ export abstract class Animation<
   #max = Infinity
 
   #from = 0
-  #to = 1
 
   constructor(initial?: number, options?: StoreOptions<number, 'number'>) {
     super(initial || 0, options)
     this.#target = this.current
-  }
-
-  public get linked() {
-    return this.#linked
-  }
-
-  public get animationLink() {
-    return this.#animationLink
   }
 
   public get direction() {
@@ -104,32 +92,25 @@ export abstract class Animation<
     return this.#from
   }
 
-  public get to() {
-    return this.#to
-  }
-
   public get isRunning() {
     return this.#isRunning
   }
 
-  public get currentDistance() {
-    return Math.abs(this.#to - this.#from)
+  public get delta() {
+    return Math.abs(this.#target - this.#from)
+  }
+
+  public get deltaProgress() {
+    return this.delta
+      ? preciseNumber(Math.abs(this.current - this.#from) / this.delta, 6)
+      : 0
   }
 
   public get distance() {
     return Math.abs(this.#max - this.#min)
   }
 
-  public get currentProgress() {
-    return this.currentDistance
-      ? preciseNumber(
-          Math.abs(this.current - this.#from) / this.currentDistance,
-          6
-        )
-      : 0
-  }
-
-  public get progress() {
+  public get distanceProgress() {
     return this.distance
       ? preciseNumber(Math.abs(this.current - this.#min) / this.distance, 6)
       : 0
@@ -139,31 +120,21 @@ export abstract class Animation<
     return {
       ...super.entry,
       from: this.#from,
-      to: this.#to,
-      currentDistance: this.currentDistance,
+      delta: this.delta,
       distance: this.distance,
       direction: this.direction,
-      currentProgress: this.currentProgress,
-      progress: this.progress,
+      deltaProgress: this.deltaProgress,
+      distanceProgress: this.distanceProgress,
     }
   }
 
-  public setTarget(value: number) {
-    this.#direction = Math.sign(value - this.#target)
-
-    this.#target = clamp(value, this.#min, this.#max)
-
-    this.#from = this.current
-    this.#to = value
-  }
-
   public set(value: number, options?: Options) {
-    if (this.#target !== value) {
-      this.setTarget(value)
-
+    if (this.#target !== value || options?.restart) {
       if (options) {
         this.updateOptions(options)
       }
+
+      this.#setTarget(value)
 
       if (this.#target !== this.current) {
         this.start()
@@ -176,25 +147,16 @@ export abstract class Animation<
   }
 
   public override reset() {
-    //@ts-ignore
-    this.set(this.initial, { equalize: true })
-
     super.reset()
 
-    this.#linked.current.forEach((link) => {
-      link.targetAnimation.reset()
-    })
+    //@ts-ignore
+    this.set(this.initial, { equalize: true })
   }
 
   public override close() {
     super.close()
-
+    this.reset()
     this.unlistenAnimationFrame()
-
-    this.unlink()
-
-    this.#linked.reset()
-    this.#linked.close()
   }
 
   public listenAnimationFrame() {
@@ -214,10 +176,6 @@ export abstract class Animation<
       this.#isRunning.current = false
 
       ticker.unsubscribe(this.#animationFrameListener)
-
-      this.#linked.current.forEach((link) => {
-        link.targetAnimation.unlistenAnimationFrame()
-      })
     }
   }
 
@@ -232,29 +190,10 @@ export abstract class Animation<
       this.unlistenAnimationFrame()
       this.current = this.#target
     }
-  }
 
-  public linkTo<A extends Animation<any>>(
-    animation: A,
-    startValue: number,
-    setValue: number,
-    options?: Parameters<A['updateOptions']>[0] & AnimationLinkOptions
-  ) {
-    this.unlink()
-
-    this.#animationLink = new AnimationLink(
-      animation,
-      this,
-      startValue,
-      setValue,
-      options
-    )
-  }
-
-  public unlink() {
-    if (this.#animationLink) {
-      this.#animationLink.destroy()
-      this.#animationLink = null
+    if (options?.restart) {
+      this.unlistenAnimationFrame()
+      this.current = this.initial
     }
   }
 
@@ -263,7 +202,14 @@ export abstract class Animation<
   }
 
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void
-  protected abstract updateManually(...args: any[]): any
+
+  #setTarget(value: number) {
+    this.#direction = Math.sign(value - this.#target)
+
+    this.#target = clamp(value, this.#min, this.#max)
+
+    this.#from = this.current
+  }
 
   #animationFrameListener: TickerCallback = (e) => {
     this.handleAnimationFrame(e)

@@ -16,7 +16,6 @@ import {
 export interface TweenedOptions extends AnimationOptions {
   easing?: EasingFunction
   duration?: number
-  restart?: boolean
 }
 
 export class Tweened extends Animation<AnimationEntry, TweenedOptions> {
@@ -37,23 +36,15 @@ export class Tweened extends Animation<AnimationEntry, TweenedOptions> {
 
     this.#easing = nullishCoalescing(options?.easing, this.#easing)
     this.#duration = nullishCoalescing(options?.duration, this.#duration)
-
-    if (options?.restart) {
-      this.current = this.initial
-    }
-  }
-
-  public updateManually(elapsed: number) {
-    const t = elapsed / 1000 / (this.#duration / 1000)
-    const et = this.#easing(clamp(t, 0, 1))
-
-    this.current = preciseNumber(this.from + (this.to - this.from) * et, 6)
-
-    return t
   }
 
   protected override handleAnimationFrame(e: TickerCallbackEntry): void {
-    if (this.updateManually(e.timeElapsedSinceSubscription) > 1) {
+    const t = e.timeElapsedSinceSubscription / 1000 / (this.#duration / 1000)
+    const et = this.#easing(clamp(t, 0, 1))
+
+    this.current = preciseNumber(this.from + (this.target - this.from) * et, 6)
+
+    if (t > 1) {
       this.unlistenAnimationFrame()
     }
   }

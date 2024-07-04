@@ -59,11 +59,6 @@ export class Damped extends Animation<DampedEntry, DampedOptions> {
     super.updateOptions(options)
   }
 
-  public updateManually(value: number) {
-    this.setTarget(value)
-    this.current = this.target
-  }
-
   protected override handleAnimationFrame(e: TickerCallbackEntry) {
     if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
       this.unlistenAnimationFrame()

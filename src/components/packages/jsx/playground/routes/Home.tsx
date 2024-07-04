@@ -1,10 +1,11 @@
+import '@packages/canvas'
 import { watchAttribute } from '@packages/jsx/hooks/watchAttribute'
 
 const Home: JSX.Component = () => {
   const attribute = watchAttribute('damping', 0)
 
   return (
-    <component damping="10">
+    <component>
       <h1>{attribute}</h1>
     </component>
   )

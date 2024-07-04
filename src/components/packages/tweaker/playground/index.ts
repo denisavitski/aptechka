@@ -79,8 +79,6 @@ tween.subscribe((e) => {
 
 const tween2 = new Tweened(0, {})
 
-tween2.linkTo(tween, 0.5, 10)
-
 // addEventListener('keydown', (e) => {
 //   if (e.key === '1') {
 //     tween.set(0)
