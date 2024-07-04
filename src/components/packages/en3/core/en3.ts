@@ -5,6 +5,7 @@ import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 import { en3Cache } from '../loaders/en3Cache'
+import { En3Raycaster } from './En3Raycaster'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
@@ -21,6 +22,8 @@ class En3 {
 
   #webglRenderer: WebGLRenderer = null!
 
+  #raycaster: En3Raycaster = null!
+
   #views: Map<string, En3View> = new Map()
 
   #width = 0
@@ -31,6 +34,8 @@ class En3 {
 
   #isCreated = false
   #cacheAssets = false
+
+  public activeView = 'default'
 
   public get CDNVersion() {
     return this.#CDNVersion
@@ -44,12 +49,24 @@ class En3 {
     return this.#webglRenderer
   }
 
+  public get raycaster() {
+    return this.#raycaster
+  }
+
   public get views() {
     return this.#views
   }
 
   public get view() {
-    return this.getView('default')
+    return this.getView(this.activeView)
+  }
+
+  public get camera() {
+    return this.getView(this.activeView).camera
+  }
+
+  public get scene() {
+    return this.getView(this.activeView).scene
   }
 
   public get width() {
@@ -90,7 +107,10 @@ class En3 {
       z-index: -1;
     `
 
-    this.#containerElement.append(this.#webglRenderer.domElement)
+    const parentElement =
+      this.#containerElement.shadowRoot || this.#containerElement
+
+    parentElement.append(this.#webglRenderer.domElement)
 
     this.#views.set(
       'default',
@@ -99,6 +119,8 @@ class En3 {
         ...options?.view,
       })
     )
+
+    this.#raycaster = new En3Raycaster()
 
     this.#cacheAssets = options?.cacheAssets || false
 
@@ -118,6 +140,8 @@ class En3 {
 
     windowResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
+
+    this.#raycaster.destroy()
 
     this.#views.forEach((view) => {
       view.destroy()
