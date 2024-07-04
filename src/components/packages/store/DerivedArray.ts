@@ -35,7 +35,7 @@ export class DerivedArray<
         }
       })
 
-      this.#keyMap.forEach((v, k) => {
+      this.#keyMap.forEach((_, k) => {
         if (!e.current.includes(k)) {
           this.#keyMap.delete(k)
         }

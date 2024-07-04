@@ -7,14 +7,14 @@ const Item: JSX.Component = (props) => {
 }
 
 const Home: JSX.Component = () => {
-  const data = createArrayStore<number>([])
+  const data = createArrayStore<{ value: number }>([])
 
   onConnect(() => {
     const keydownListener = (e: KeyboardEvent) => {
       if (e.key === '1') {
-        data.push(Math.random())
+        data.add({ value: Math.floor(Math.random() * 100) })
       } else if (e.key === '2') {
-        data.shift()
+        data.slice(0, 5)
       }
     }
 
@@ -28,7 +28,7 @@ const Home: JSX.Component = () => {
   return (
     <component>
       {createDerivedComponents(data, (v) => {
-        return <Item>{v}</Item>
+        return <Item>{v.value}</Item>
       })}
     </component>
   )

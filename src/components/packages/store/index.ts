@@ -25,10 +25,6 @@ export { Derived, type DerivedCallback } from './Derived'
 
 export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
 
-export {
-  CumulativeResource,
-  type CumulativeResourceOptions,
-} from './CumulativeResource'
 export { Resource, type ResourceFetcher } from './Resource'
 
 export { Composed, type ComposedCallback } from './Composed'

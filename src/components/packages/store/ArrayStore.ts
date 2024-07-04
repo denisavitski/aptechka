@@ -52,15 +52,23 @@ export class ArrayStore<
     this.current = this.current.filter((v) => v !== value)
   }
 
-  public splice(...parameters: Parameters<Array<any>['slice']>) {
+  public slice(...parameters: Parameters<Array<any>['slice']>) {
     this.current = this.current.slice(...parameters)
+  }
+
+  public splice(...parameters: Parameters<Array<any>['splice']>) {
+    const copy = [...this.current]
+
+    copy.splice(...parameters)
+
+    this.current = copy
   }
 
   public pop() {
     const last = this.current[this.current.length - 1]
 
     if (last) {
-      this.splice(0, -1)
+      this.slice(0, -1)
     }
 
     return last
@@ -70,7 +78,7 @@ export class ArrayStore<
     const first = this.current[0]
 
     if (first) {
-      this.splice(1)
+      this.slice(1)
     }
 
     return first
