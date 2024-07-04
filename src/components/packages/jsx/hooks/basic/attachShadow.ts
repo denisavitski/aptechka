@@ -1,7 +1,5 @@
-import { withCurrentComponent } from './withCurrentComponent'
+import { currentComponentElement } from '@packages/jsx/globals'
 
 export function attachShadow(init?: ShadowRootInit) {
-  return withCurrentComponent((e) => {
-    return e.attachShadow({ mode: 'open', ...init })
-  })
+  return currentComponentElement.value.attachShadow({ mode: 'open', ...init })
 }

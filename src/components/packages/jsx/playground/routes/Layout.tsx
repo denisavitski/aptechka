@@ -12,6 +12,11 @@ const Layout: JSX.Component = () => {
       display: 'flex',
       gap: '1vmin',
       fontSize: '2vmin',
+      color: 'var(--color)',
+    },
+
+    a: {
+      color: 'inherit',
     },
   })
 

@@ -1,8 +1,6 @@
 import { ComponentConnectCallback } from '@packages/jsx/ComponentElement'
-import { withCurrentComponent } from './withCurrentComponent'
+import { currentComponentElement } from '@packages/jsx/globals'
 
 export function onConnect(callback: ComponentConnectCallback) {
-  withCurrentComponent((e) => {
-    e.addConnectCallback(callback)
-  })
+  currentComponentElement.value.addConnectCallback(callback)
 }

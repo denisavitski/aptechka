@@ -1,7 +1,5 @@
-import { withCurrentComponent } from './withCurrentComponent'
+import { currentComponentElement } from '@packages/jsx/globals'
 
 export function attachInternals() {
-  return withCurrentComponent((e) => {
-    return e.attachInternals()
-  })
+  return currentComponentElement.value.attachInternals()
 }

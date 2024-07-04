@@ -1,35 +1,18 @@
-import { onConnect } from '@packages/jsx/hooks/basic/onConnect'
-import { createDerivedComponents } from '@packages/jsx/hooks/store'
-import { createArrayStore } from '@packages/jsx/hooks/store/createArrayStore'
-
-const Item: JSX.Component = (props) => {
-  return <component>{props.children}</component>
-}
+import { attachStylesheet } from '@packages/jsx/hooks/basic/attachStylesheet'
+import { useCSSProperty } from '@packages/jsx/hooks/useCSSProperty'
 
 const Home: JSX.Component = () => {
-  const data = createArrayStore<{ value: number }>([])
+  const cssProperty = useCSSProperty('--color', 'blue')
 
-  onConnect(() => {
-    const keydownListener = (e: KeyboardEvent) => {
-      if (e.key === '1') {
-        data.add({ value: Math.floor(Math.random() * 100) })
-      } else if (e.key === '2') {
-        data.slice(0, 5)
-      }
-    }
-
-    addEventListener('keydown', keydownListener)
-
-    return () => {
-      removeEventListener('keydown', keydownListener)
-    }
+  attachStylesheet({
+    ':host': {
+      '--color': 'red',
+    },
   })
 
   return (
     <component>
-      {createDerivedComponents(data, (v) => {
-        return <Item>{v.value}</Item>
-      })}
+      <h1>{cssProperty}</h1>
     </component>
   )
 }

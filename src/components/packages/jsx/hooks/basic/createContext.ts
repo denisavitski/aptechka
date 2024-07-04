@@ -1,5 +1,4 @@
-import { contextStack } from '@packages/jsx/globals'
-import { withCurrentComponent } from './withCurrentComponent'
+import { contextStack, currentComponentElement } from '@packages/jsx/globals'
 
 export function getContext<T>(name: string) {
   const contextMap = contextStack.value.find((contextMap) =>
@@ -12,7 +11,5 @@ export function getContext<T>(name: string) {
 }
 
 export function createContext(name: string, value: any) {
-  withCurrentComponent((e) => {
-    e.createContext(name, value)
-  })
+  currentComponentElement.value.createContext(name, value)
 }

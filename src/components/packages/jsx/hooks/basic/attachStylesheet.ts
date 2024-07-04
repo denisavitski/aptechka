@@ -3,15 +3,15 @@ import {
   createStylesheet,
   style,
 } from '@packages/element-constructor'
-import { withCurrentComponent } from './withCurrentComponent'
 import { onConnect } from './onConnect'
+import { currentComponentElement } from '@packages/jsx/globals'
 
 export function attachStylesheet(object?: ElementConstructorJSS | undefined) {
-  withCurrentComponent((e) => {
-    if (e.shadowRoot) {
-      e.shadowRoot.adoptedStyleSheets.push(createStylesheet(object))
-    }
-  })
+  if (currentComponentElement.value.shadowRoot) {
+    currentComponentElement.value.shadowRoot.adoptedStyleSheets.push(
+      createStylesheet(object)
+    )
+  }
 
   onConnect((e) => {
     if (e.shadowRoot) {
@@ -34,6 +34,8 @@ export function attachStylesheet(object?: ElementConstructorJSS | undefined) {
     } else if (rootNode instanceof ShadowRoot) {
       const newStylesheet = createStylesheet(object)
 
+      const destroyCallbacks: Array<Function> = []
+
       rootNode.adoptedStyleSheets.filter((currentStylesheet) => {
         const currentRules = Array.from(currentStylesheet.cssRules)
 
@@ -46,9 +48,17 @@ export function attachStylesheet(object?: ElementConstructorJSS | undefined) {
         )
 
         newRules.forEach((newRule) => {
-          currentStylesheet.insertRule(newRule.cssText)
+          const index = currentStylesheet.insertRule(newRule.cssText)
+
+          destroyCallbacks.push(() => {
+            currentStylesheet.deleteRule(index)
+          })
         })
       })
+
+      return () => {
+        destroyCallbacks.forEach((callback) => callback())
+      }
     }
   })
 }
