@@ -7,7 +7,6 @@ import {
   En3SourceManager,
   En3SourceManagerParameters,
 } from '../misc/En3SourceManager'
-import { En3GLTFLoader } from '../loaders/En3GLTFLoader'
 import { loaders } from '../loaders/loaders'
 
 import { En3SourceConsumer } from './En3SourceConsumer'
@@ -17,10 +16,6 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
 
   constructor(parameters: En3SourceManagerParameters<GLTF>) {
     super()
-
-    if (!loaders.gltfLoader) {
-      loaders.gltfLoader = new En3GLTFLoader()
-    }
 
     this.#sourceManager = new En3SourceManager({
       loader: loaders.gltfLoader,
