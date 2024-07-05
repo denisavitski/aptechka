@@ -28,6 +28,7 @@ export interface StoreNumberManager extends StoreManager {
   min?: number
   max?: number
   step?: number
+  ease?: number
 }
 
 export interface StoreColorManager extends StoreManager {
@@ -211,7 +212,9 @@ export class Store<
   }
 
   public reset() {
-    this.current = this.initial
+    this.current = Array.isArray(this.initial)
+      ? [...this.initial]
+      : (this.initial as any)
   }
 
   public close() {

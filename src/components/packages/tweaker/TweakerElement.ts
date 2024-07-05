@@ -19,6 +19,7 @@ import uploadIcon from '@assets/icons/upload.svg?raw'
 
 import { TweakerFolderElement } from './TweakerFolderElement'
 import { tweakerStorage } from './tweakerStorage'
+import { ticker } from '@packages/ticker'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -158,6 +159,7 @@ export class TweakerElement extends TweakerFolderElement {
         onClick: (e) => {
           e.stopPropagation()
         },
+
         children: [
           button({
             class: 'tweaker-button',

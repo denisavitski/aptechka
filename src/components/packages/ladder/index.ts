@@ -55,7 +55,33 @@ export class Ladder<
   }
 
   public getStepValue(stepName: K) {
-    return this.steps.get(stepName)![1]
+    return this.steps.get(stepName)?.[1]!
+  }
+
+  public getExcludedStepsValue(...stepNames: Array<K>) {
+    const steps: LadderSteps<K, V> = new Map()
+
+    stepNames.map((name) => {
+      const step = this.steps.get(name)
+
+      if (step) {
+        steps.set(name, step)
+      }
+    })
+
+    return this.#calculate(steps)
+  }
+
+  public getIncludedStepsValue(...stepNames: Array<K>) {
+    const steps: LadderSteps<K, V> = new Map(this.steps)
+
+    stepNames.map((name) => {
+      if (this.steps.has(name)) {
+        steps.delete(name)
+      }
+    })
+
+    return this.#calculate(steps)
   }
 
   public setStep(stepName: K, action: LadderOperation, value: Partial<V>) {
@@ -66,16 +92,22 @@ export class Ladder<
     }
 
     this.steps.set(stepName, [action, readyValue])
+
+    this.calculate()
   }
 
   public calculate() {
+    this.current = this.#calculate(this.#steps)
+  }
+
+  #calculate(steps: LadderSteps<K, V>) {
     const calculated = {} as V
 
     for (const key in this.base) {
       calculated[key] = this.base[key]
     }
 
-    for (const item of this.steps) {
+    for (const item of steps) {
       const step = item[1]
 
       if (step[0] === '+') {
@@ -107,6 +139,6 @@ export class Ladder<
       }
     }
 
-    this.current = calculated
+    return calculated
   }
 }

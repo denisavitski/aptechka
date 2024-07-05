@@ -1,11 +1,11 @@
-export type ProviderCallback = (...args: any[]) => void
+export type NotifierCallback = (...args: any[]) => void
 
 interface NotifierSubscriber {
-  callback: ProviderCallback
+  callback: NotifierCallback
   order: number
 }
 
-export class Notifier<Callback extends ProviderCallback = ProviderCallback> {
+export class Notifier<Callback extends NotifierCallback = NotifierCallback> {
   #subscribers: Array<NotifierSubscriber> = []
 
   public close() {
@@ -13,7 +13,9 @@ export class Notifier<Callback extends ProviderCallback = ProviderCallback> {
   }
 
   public subscribe(callback: Callback, order: number = 0) {
-    if (this.#subscribers.find((subscriber) => subscriber.callback === callback)) {
+    if (
+      this.#subscribers.find((subscriber) => subscriber.callback === callback)
+    ) {
       return () => {}
     }
 
@@ -30,7 +32,9 @@ export class Notifier<Callback extends ProviderCallback = ProviderCallback> {
   }
 
   public unsubscribe(callback: Callback) {
-    this.#subscribers = this.#subscribers.filter((subscriber) => subscriber.callback !== callback)
+    this.#subscribers = this.#subscribers.filter(
+      (subscriber) => subscriber.callback !== callback
+    )
   }
 
   public notify(...parameters: Parameters<Callback>) {

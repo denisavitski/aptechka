@@ -6,6 +6,7 @@ import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 import { en3Cache } from '../loaders/en3Cache'
 import { En3Raycaster } from './En3Raycaster'
+import { Notifier, NotifierCallback } from '@packages/notifier'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
@@ -36,8 +37,6 @@ class En3 {
   #isCreated = false
   #cacheAssets = false
 
-  public activeView = 'default'
-
   public get CDNVersion() {
     return this.#CDNVersion
   }
@@ -59,15 +58,15 @@ class En3 {
   }
 
   public get view() {
-    return this.getView(this.activeView)
+    return this.getView('default')
   }
 
   public get camera() {
-    return this.getView(this.activeView).camera
+    return this.getView('default').camera
   }
 
   public get scene() {
-    return this.getView(this.activeView).scene
+    return this.getView('default').scene
   }
 
   public get width() {
@@ -220,8 +219,6 @@ class En3 {
     this.#webglRenderer.render(view.scene, view.camera)
   }
 
-  public onResize?(): void
-
   #resizeListener = () => {
     this.#width = this.#containerElement.clientWidth
     this.#height = this.#containerElement.clientHeight
@@ -229,8 +226,6 @@ class En3 {
     this.#pixelRatio = Math.min(this.#maxPixelRatio, devicePixelRatio || 1)
     this.#webglRenderer.setPixelRatio(this.#pixelRatio)
     this.#webglRenderer.setSize(this.#width, this.#height)
-
-    this.onResize?.()
   }
 
   #tickListener: TickerCallback = () => {

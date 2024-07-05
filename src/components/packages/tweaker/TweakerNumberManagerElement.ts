@@ -68,6 +68,7 @@ const stylesheet = createStylesheet({
     height: '1px',
 
     borderBottom: `1px solid ${aptechkaTheme.colorFont.var}`,
+
     transform: 'translateY(-50%)',
 
     opacity: '0.3',
@@ -109,6 +110,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   #step: number
   #min: number
   #max: number
+  #ease: number
 
   #type: 'number' | 'array'
   #isFinite: boolean
@@ -129,6 +131,8 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
     )
 
     this.#step = this.firstStore.passport?.manager?.step || 0.01
+
+    this.#ease = this.firstStore.passport?.manager?.ease || 1
 
     this.#type = Array.isArray(this.firstStore.current) ? 'array' : 'number'
     this.#isFinite = isFinite(this.#max) && isFinite(this.#min)
@@ -184,7 +188,8 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
                             ? knobParentElement.offsetWidth / (distance || 1)
                             : 1
 
-                          const newValue = startValue + delta / del
+                          const newValue =
+                            startValue + (delta / del) * this.#ease
 
                           arr[i] = newValue
 

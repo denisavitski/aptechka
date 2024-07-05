@@ -2,6 +2,7 @@ import { CustomElement, define } from '@packages/custom-element'
 import { Attribute } from '@packages/attribute'
 import {
   Axes2D,
+  getAllParentElements,
   getElementTransitionDurationMS,
   isBrowser,
 } from '@packages/utils'
@@ -30,6 +31,8 @@ class AccordionItem {
 
   #opened = false
 
+  #scrollWrapers: Array<{ element: HTMLElement; scroll: number }> = []
+
   constructor(accordionElement: AccordionElement, element: HTMLElement) {
     if (
       element.firstElementChild instanceof HTMLElement &&
@@ -42,17 +45,28 @@ class AccordionItem {
       this.#bodyElement = element.lastElementChild
 
       this.#headElement.style.cursor = 'default'
-      this.#bodyElement.style.height = '0px'
       this.#bodyElement.style.overflow = 'hidden'
+
+      if (this.#accordionElement.axisAttribute.current === 'y') {
+        this.#bodyElement.style.height = '0px'
+      } else {
+        this.#bodyElement.style.width = '0px'
+      }
 
       this.#resizeObserver = new ResizeObserver(this.#bodyResizeListener)
 
       addEventListener('resize', this.#windowResizeListener)
 
       this.#headElement.addEventListener('click', this.#headClickListener)
+
       this.#element.addEventListener(
         'sizeChange',
         this.#childrenSizeChangeListener
+      )
+
+      this.#element.addEventListener(
+        'beforeAccordionItemToggle',
+        this.#beforeToggleListener
       )
 
       if (this.#element.hasAttribute('data-opened')) {
@@ -71,15 +85,21 @@ class AccordionItem {
     if (this.#headElement) {
       this.#element.classList.remove('opened', 'triggered')
       this.#headElement.style.cursor = ''
-      this.#setScrollHeight(undefined)
+      this.#setScrollSize(undefined)
 
       this.#resizeObserver.disconnect()
       removeEventListener('resize', this.#windowResizeListener)
 
       this.#headElement.removeEventListener('click', this.#headClickListener)
+
       this.#element.removeEventListener(
         'sizeChange',
         this.#childrenSizeChangeListener
+      )
+
+      this.#element.removeEventListener(
+        'beforeAccordionItemToggle',
+        this.#beforeToggleListener
       )
 
       clearTimeout(this.#activeTimeoutId)
@@ -87,6 +107,8 @@ class AccordionItem {
   }
 
   public open(options?: Omit<AccordionToggleOptions, 'exclude'>) {
+    this.#dispatchEvent('before-toggle')
+
     if (options?.skipTransition) {
       this.#skipTransition()
     }
@@ -104,7 +126,7 @@ class AccordionItem {
     clearTimeout(this.#activeTimeoutId)
 
     this.#element.classList.add('triggered')
-    this.#setScrollHeight(this.#bodyElement.scrollHeight)
+    this.#setScrollSize(this.#scrollSize)
 
     setTimeout(() => {
       this.#element.classList.add('opened')
@@ -114,6 +136,8 @@ class AccordionItem {
   }
 
   public close(options?: Omit<AccordionToggleOptions, 'exclude'>) {
+    this.#dispatchEvent('before-toggle')
+
     if (options?.skipTransition) {
       this.#skipTransition()
     }
@@ -122,7 +146,7 @@ class AccordionItem {
 
     this.#element.classList.remove('opened')
 
-    this.#setScrollHeight(0)
+    this.#setScrollSize(0)
 
     this.#activeTimeoutId = setTimeout(() => {
       this.#element.classList.remove('triggered')
@@ -135,6 +159,12 @@ class AccordionItem {
     return this.#element.parentElement || this.#element.getRootNode()
   }
 
+  get #scrollSize() {
+    return this.#accordionElement.axisAttribute.current === 'x'
+      ? this.#bodyElement.scrollWidth
+      : this.#bodyElement.scrollHeight
+  }
+
   #headClickListener = () => {
     if (!this.#opened) {
       this.open()
@@ -145,8 +175,8 @@ class AccordionItem {
 
   #windowResizeListener = () => {
     if (this.#opened) {
-      this.#setScrollHeight(0, true)
-      this.#setScrollHeight(this.#bodyElement.scrollHeight)
+      this.#setScrollSize(0, true)
+      this.#setScrollSize(this.#scrollSize)
     }
   }
 
@@ -154,14 +184,28 @@ class AccordionItem {
     this.#dispatchEvent('size-change')
   }
 
-  #childrenSizeChangeListener = () => {
+  #childrenSizeChangeListener = (e: CustomEvent) => {
     if (this.#opened) {
-      this.#setScrollHeight(0, true)
-      this.#setScrollHeight(this.#bodyElement.scrollHeight)
+      this.#setScrollSize(0, true)
+
+      this.#setScrollSize(this.#scrollSize)
+
+      this.#scrollWrapers.forEach((wrapper) => {
+        wrapper.element.scroll({
+          left:
+            this.#accordionElement.axisAttribute.current === 'x'
+              ? wrapper.scroll
+              : 0,
+          top:
+            this.#accordionElement.axisAttribute.current === 'y'
+              ? wrapper.scroll
+              : 0,
+        })
+      })
     }
   }
 
-  #setScrollHeight(value: number | undefined, skipDuration = false) {
+  #setScrollSize(value: number | undefined, skipDuration = false) {
     if (skipDuration) {
       this.#bodyElement.style.transition = 'all 0s'
 
@@ -170,15 +214,31 @@ class AccordionItem {
       })
     }
 
+    const dim =
+      this.#accordionElement.axisAttribute.current === 'x' ? 'width' : 'height'
+
     if (value != undefined) {
-      this.#bodyElement.style.height = `${value}px`
+      this.#bodyElement.style[dim] = `${value}px`
     } else {
-      this.#bodyElement.style.height = ''
+      this.#bodyElement.style[dim] = ''
     }
   }
 
-  #dispatchEvent(name: 'toggle' | 'size-change') {
-    if (name === 'toggle') {
+  #dispatchEvent(name: 'before-toggle' | 'toggle' | 'size-change') {
+    if (name === 'before-toggle') {
+      this.#element.dispatchEvent(
+        new CustomEvent<AccordionItemToggleEventDetail>(
+          'beforeAccordionItemToggle',
+          {
+            bubbles: true,
+            composed: true,
+            detail: {
+              opened: this.#opened,
+            },
+          }
+        )
+      )
+    } else if (name === 'toggle') {
       this.#element.dispatchEvent(
         new CustomEvent<AccordionItemToggleEventDetail>('accordionItemToggle', {
           bubbles: true,
@@ -199,6 +259,20 @@ class AccordionItem {
     setTimeout(() => {
       this.#bodyElement.style.transition = ''
     }, 50)
+  }
+
+  #beforeToggleListener = () => {
+    const parents = getAllParentElements(this.#element)
+
+    this.#scrollWrapers = parents.map((v) => {
+      return {
+        element: v,
+        scroll:
+          this.#accordionElement.axisAttribute.current === 'y'
+            ? v.scrollTop
+            : v.scrollLeft,
+      }
+    })
   }
 }
 
@@ -302,5 +376,9 @@ declare global {
 
   interface HTMLElementEventMap {
     accordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
+  }
+
+  interface HTMLElementEventMap {
+    beforeAccordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
   }
 }

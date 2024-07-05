@@ -26,7 +26,7 @@ await en3GLTFLoader.setLoaders({
 
 const boxes: Array<Mesh<BoxGeometry, MeshBasicMaterial>> = []
 
-for (let index = 0; index < 10; index++) {
+for (let index = 0; index < 1; index++) {
   const geo = new BoxGeometry()
   const mat = new MeshBasicMaterial({ color: 'lightblue' })
   const mesh = new Mesh(geo, mat)
@@ -34,8 +34,13 @@ for (let index = 0; index < 10; index++) {
   mesh.scale.setScalar(200)
   mesh.position.z = 250 * index * -1
   mesh.position.x = 60 * index
-  en3.view.add(mesh)
   boxes.push(mesh)
+
+  if (index === 0) {
+    en3.view.add(mesh, '.box')
+  } else {
+    en3.view.add(mesh)
+  }
 }
 
 boxes.forEach((box) => {

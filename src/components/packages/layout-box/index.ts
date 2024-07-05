@@ -315,6 +315,18 @@ export class LayoutBox {
     return this.#rotation.getStepValue(...args)
   }
 
+  public getExcludedRotationSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getExcludedStepsValue']>
+  ) {
+    return this.#rotation.getExcludedStepsValue(...args)
+  }
+
+  public getIncludedRotationSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getIncludedStepsValue']>
+  ) {
+    return this.#rotation.getIncludedStepsValue(...args)
+  }
+
   public setScaleStep(...args: Parameters<Ladder<LayoutBoxLadder>['setStep']>) {
     this.#scale.setStep(...args)
   }
@@ -325,10 +337,34 @@ export class LayoutBox {
     return this.#scale.getStepValue(...args)
   }
 
+  public getExcludedScaleSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getExcludedStepsValue']>
+  ) {
+    return this.#scale.getExcludedStepsValue(...args)
+  }
+
+  public getIncludedScaleSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getIncludedStepsValue']>
+  ) {
+    return this.#scale.getIncludedStepsValue(...args)
+  }
+
   public deletePositionStep(
     ...args: Parameters<Ladder<LayoutBoxLadder>['deleteStep']>
   ) {
     this.#position.deleteStep(...args)
+  }
+
+  public getExcludedPositionSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getExcludedStepsValue']>
+  ) {
+    return this.#position.getExcludedStepsValue(...args)
+  }
+
+  public getIncludedPositionSteps(
+    ...args: Parameters<Ladder<LayoutBoxLadder>['getIncludedStepsValue']>
+  ) {
+    return this.#position.getIncludedStepsValue(...args)
   }
 
   public deleteRotationStep(

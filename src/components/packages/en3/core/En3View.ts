@@ -62,8 +62,9 @@ export class En3View {
     this.#camera.near = options?.cameraNear || 1
     this.#camera.far = options?.cameraFar || 11000
     this.#cameraFov = options?.cameraFov || 'auto'
+    this.#camera.position.z = this.#cameraDistance
 
-    this.#camera.name = `${this.#name} camera`
+    this.#camera.name = `Cameras.${this.#name}`
 
     this.#sizeElement =
       getElement<HTMLElement>(options?.sizeElement) || document.documentElement
@@ -193,11 +194,11 @@ export class En3View {
     const element = args[1] as ElementOrSelector<HTMLElement>
     const options = args[2] as En3AttachOptions
 
-    this.scene.add(object)
-
     if (element) {
-      return this.attachToHTMLElement<T>(element, object, options)
+      this.attachToHTMLElement<T>(element, object, options)
     }
+
+    this.scene.add(object)
 
     return object
   }
