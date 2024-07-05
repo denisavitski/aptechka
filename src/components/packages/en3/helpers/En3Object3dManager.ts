@@ -12,7 +12,7 @@ export interface En3Object3dManagerOptions {
 export class En3Object3dManager {
   #object3d: Object3D
 
-  #parametersManager: En3ParametersManager
+  #parametersManager: En3ParametersManager | null = null
 
   #position: Store<XYZ>
   #rotation: Store<XYZ>
@@ -23,11 +23,22 @@ export class En3Object3dManager {
   constructor(object3d: Object3D, options?: En3Object3dManagerOptions) {
     this.#object3d = object3d
 
+    let parameters = false
+
+    if (object3d.name.startsWith('T.')) {
+      object3d.name = object3d.name.slice(2)
+    }
+
+    if (object3d.name.includes('P.')) {
+      parameters = true
+      object3d.name = object3d.name.replace('P.', '')
+    }
+
+    const name = object3d.name
+
     this.#object3d.userData.controlled = true
 
     const step = options?.step || 0.0001
-
-    const name = (object3d.name = object3d.name || 'Unnamed')
 
     const ob = (object3d.userData?.box as LayoutBox) || object3d
 
@@ -78,7 +89,9 @@ export class En3Object3dManager {
       this.#updateController('scale', e.current)
     })
 
-    this.#parametersManager = new En3ParametersManager(this.#object3d)
+    if (parameters) {
+      this.#parametersManager = new En3ParametersManager(this.#object3d)
+    }
   }
 
   public get object3d() {
@@ -86,7 +99,7 @@ export class En3Object3dManager {
   }
 
   public destroy() {
-    this.#parametersManager.destroy()
+    this.#parametersManager?.destroy()
 
     this.#position.close()
     this.#rotation.close()

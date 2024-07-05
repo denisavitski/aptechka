@@ -5,6 +5,7 @@ import {
   StoreSelectManager,
 } from '@packages/store'
 import * as THREE from 'three'
+import { en3 } from '../core/en3'
 
 const blendingEquations = [
   'AddEquation',
@@ -223,6 +224,37 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
     max: 20,
     step: 0.0001,
   },
+  fov: {
+    type: 'number',
+    min: 0,
+    max: 180,
+    step: 1,
+  },
+  zoom: {
+    type: 'number',
+    min: 0,
+    step: 0.0001,
+  },
+  near: {
+    type: 'number',
+    min: 0,
+    step: 0.0001,
+  },
+  far: {
+    type: 'number',
+    min: 0,
+    step: 1,
+  },
+  filmGauge: {
+    type: 'number',
+    min: 0,
+    step: 0.0001,
+  },
+  filmOffset: {
+    type: 'number',
+    min: 0,
+    step: 0.0001,
+  },
 }
 
 const skipKeys = new Set([
@@ -233,6 +265,8 @@ const skipKeys = new Set([
   'position',
   'scale',
   'rotation',
+  'coordinateSystem',
+  'aspect',
 ])
 
 export class En3ParametersManager {
@@ -243,7 +277,15 @@ export class En3ParametersManager {
   constructor(subject: any) {
     this.#subject = subject
 
-    this.#manage(this.#subject, `${this.#subject.name}.Parameters`)
+    this.#manage(
+      this.#subject,
+      `${this.#subject.name}.Parameters`,
+      this.#subject instanceof THREE.Camera
+        ? () => {
+            en3.view.resize()
+          }
+        : undefined
+    )
 
     const material = this.#subject.material
 
@@ -284,7 +326,8 @@ export class En3ParametersManager {
             value,
             subject,
             key,
-            foundedManagerOptions
+            foundedManagerOptions,
+            afterChange
           )
         } else {
           this.#createNumberManager(
@@ -292,7 +335,8 @@ export class En3ParametersManager {
             value,
             subject,
             key,
-            foundedManagerOptions
+            foundedManagerOptions,
+            afterChange
           )
         }
       } else if (
@@ -304,7 +348,8 @@ export class En3ParametersManager {
           value,
           subject,
           key,
-          foundedManagerOptions
+          foundedManagerOptions,
+          afterChange
         )
       } else if (
         typeof value === 'boolean' &&
@@ -321,7 +366,8 @@ export class En3ParametersManager {
             value,
             subject,
             key,
-            foundedManagerOptions
+            foundedManagerOptions,
+            afterChange
           )
         }
       }

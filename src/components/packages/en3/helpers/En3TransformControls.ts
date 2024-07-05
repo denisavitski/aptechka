@@ -64,7 +64,7 @@ export class En3TransformControls {
 
   #childAddedListener = (e: ChildEvent) => {
     if (
-      e.child.name &&
+      e.child.name.startsWith('T.') &&
       !this.#objectControllers.find((v) => v.object3d === e.child)
     ) {
       this.#objectControllers.push(new En3Object3dManager(e.child))

@@ -123,7 +123,9 @@ export class En3View {
       this.#camera.fov =
         this.#cameraFov === 'auto'
           ? 2 * Math.atan(height / 2 / this.#cameraDistance) * (180 / Math.PI)
-          : this.#cameraFov
+          : !this.#camera.userData.controlled
+          ? this.#cameraFov
+          : this.#camera.fov
     } else if (this.#camera instanceof OrthographicCamera) {
       this.#camera.left = width / -2
       this.#camera.right = width / 2

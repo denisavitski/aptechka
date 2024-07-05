@@ -317,7 +317,7 @@ export class TweakerElement extends TweakerFolderElement {
         this.contentElement.addEventListener('scroll', () => {
           tweakerStorage.scrollValue = this.contentElement.scrollTop
         })
-      }, 100)
+      }, 150)
     }
   }, 10)
 }
