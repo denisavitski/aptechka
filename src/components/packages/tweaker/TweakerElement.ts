@@ -231,15 +231,26 @@ export class TweakerElement extends TweakerFolderElement {
 
             const rect = this.getBoundingClientRect()
 
-            setupDrag((moveEvent) => {
-              const dx = grabEvent.x - moveEvent.x
+            const scrollValue = this.contentElement.scrollTop
 
-              const newSize = Math.max(400, rect.width + dx)
+            setupDrag(
+              (moveEvent) => {
+                const dx = grabEvent.x - moveEvent.x
 
-              this.style.width = newSize + 'px'
+                const newSize = Math.max(400, rect.width + dx)
 
-              tweakerStorage.changeSize('tweaker', newSize)
-            })
+                this.style.width = newSize + 'px'
+
+                tweakerStorage.changeSize('tweaker', newSize)
+              },
+              () => {
+                setTimeout(() => {
+                  this.contentElement.scroll({
+                    top: scrollValue,
+                  })
+                }, 10)
+              }
+            )
           },
           onDblclick: () => {
             this.style.width = ''
