@@ -238,7 +238,7 @@ const skipKeys = new Set([
 export class En3ParametersManager {
   #subject: any
 
-  #managers: Array<Store> = []
+  #managers: Array<Store<any, any, any>> = []
 
   constructor(subject: any) {
     this.#subject = subject
@@ -350,6 +350,8 @@ export class En3ParametersManager {
       subject[key] = e.current
       afterChange?.()
     })
+
+    this.#managers.push(manager)
   }
 
   #createVectorManager(
@@ -384,6 +386,8 @@ export class En3ParametersManager {
       ;(subject[key] as any).set(...e.current)
       afterChange?.()
     })
+
+    this.#managers.push(manager)
   }
 
   #createBooleanManager(
@@ -406,6 +410,8 @@ export class En3ParametersManager {
       subject[key] = e.current
       afterChange?.()
     })
+
+    this.#managers.push(manager)
   }
 
   #createColorManager(
@@ -428,6 +434,8 @@ export class En3ParametersManager {
       subject[key] = new THREE.Color(e.current)
       afterChange?.()
     })
+
+    this.#managers.push(manager)
   }
 
   #createSelectManager(
@@ -467,5 +475,7 @@ export class En3ParametersManager {
       }
       afterChange?.()
     })
+
+    this.#managers.push(manager)
   }
 }
