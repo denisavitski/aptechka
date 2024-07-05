@@ -393,13 +393,12 @@
   },
   "dependencies": {
     "detect-gpu": "^5.0.38",
-    "postprocessing": "^6.35.5",
-    "three": "^0.165.0",
+    "three": "^0.166.1",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.38",
-    "three": "^0.165.0",
+    "three": "^0.166.1",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

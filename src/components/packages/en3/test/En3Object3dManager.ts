@@ -1,5 +1,5 @@
 import { LayoutBox, LayoutBoxLadder } from '@packages/layout-box'
-import { Store, StoreEntry } from '@packages/store'
+import { Store } from '@packages/store'
 import { Object3D, Vector3, Euler } from 'three'
 
 type XYZ = [number, number, number]

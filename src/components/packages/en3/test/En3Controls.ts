@@ -1,6 +1,3 @@
-// TODO: Учитывать FOV
-// TODO: Учитывать смену View
-
 import { en3 } from '../core/en3'
 import { En3Object3dManager } from './En3Object3dManager'
 import { En3OrbitControls } from './En3OrbitControls'

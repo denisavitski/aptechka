@@ -49,6 +49,8 @@ export abstract class Animation<
 
   #from = 0
 
+  #tmpSetValue: number | null = null
+
   constructor(initial?: number, options?: StoreOptions<number, 'number'>) {
     super(initial || 0, options)
     this.#target = this.current
@@ -130,11 +132,11 @@ export abstract class Animation<
 
   public set(value: number, options?: Options) {
     if (this.#target !== value || options?.restart) {
-      if (options) {
-        this.updateOptions(options)
-      }
+      this.#tmpSetValue = value
 
-      this.#setTarget(value)
+      this.updateOptions(options)
+
+      this.#tmpSetValue = null
 
       if (this.#target !== this.current) {
         this.start()
@@ -185,6 +187,8 @@ export abstract class Animation<
     this.#culling = nullishCoalescing(options?.culling, this.#culling)
     this.#min = nullishCoalescing(options?.min, this.#min)
     this.#max = nullishCoalescing(options?.max, this.#max)
+
+    this.#setTarget(this.#tmpSetValue || this.#target)
 
     if (options?.equalize) {
       this.unlistenAnimationFrame()
