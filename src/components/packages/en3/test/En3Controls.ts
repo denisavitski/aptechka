@@ -38,7 +38,7 @@ export class En3Controls {
       passport: {
         name: 'Controls.OrbitControls.Target',
         manager: {
-          type: 'numbers',
+          type: 'number',
           step: 0.0001,
         },
       },

@@ -29,7 +29,7 @@ export class En3ObjectController {
         passport: {
           name: `${name}.Position`,
           manager: {
-            type: 'numbers',
+            type: 'number',
             step: step,
           },
         },
@@ -42,7 +42,7 @@ export class En3ObjectController {
         passport: {
           name: `${name}.Rotation`,
           manager: {
-            type: 'numbers',
+            type: 'number',
             step: step,
           },
         },
@@ -55,7 +55,7 @@ export class En3ObjectController {
         passport: {
           name: `${name}.Scale`,
           manager: {
-            type: 'numbers',
+            type: 'number',
             step: step,
           },
         },

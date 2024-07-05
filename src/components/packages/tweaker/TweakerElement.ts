@@ -229,7 +229,7 @@ export class TweakerElement extends TweakerFolderElement {
             setupDrag((moveEvent) => {
               const dx = grabEvent.x - moveEvent.x
 
-              const newSize = Math.max(300, rect.width + dx)
+              const newSize = Math.max(400, rect.width + dx)
 
               this.style.width = newSize + 'px'
 

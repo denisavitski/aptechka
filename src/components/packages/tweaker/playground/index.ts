@@ -28,20 +28,22 @@ new Store('123', {
   },
 }).subscribe(() => {})
 
-new Store(123, {
+new Store(0, {
   passport: {
     name: 'xxx.number',
     manager: {
       type: 'number',
+      min: 0,
+      max: 100,
     },
   },
 }).subscribe(() => {})
 
-new Store(123, {
+new Store([1, 2, 3], {
   passport: {
-    name: 'xxx.range',
+    name: 'xxx.numbers',
     manager: {
-      type: 'range',
+      type: 'number',
     },
   },
 }).subscribe(() => {})
@@ -64,20 +66,6 @@ new Store('xx', {
     },
   },
 }).subscribe(() => {})
-
-const tween = new Tweened(0, {
-  min: 0,
-  max: 100,
-  passport: {
-    name: 'xxx.animation',
-  },
-})
-
-tween.subscribe((e) => {
-  console.log(e)
-})
-
-const tween2 = new Tweened(0, {})
 
 // addEventListener('keydown', (e) => {
 //   if (e.key === '1') {

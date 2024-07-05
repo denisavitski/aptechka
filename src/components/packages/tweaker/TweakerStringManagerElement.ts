@@ -36,8 +36,6 @@ const stylesheet = createStylesheet({
 export class TweakerStringManagerElement<
   S extends Store<any, any> = Store<string, 'string'>
 > extends TweakerStoreManagerElement<S> {
-  #content = new Store<Array<any>>([])
-
   constructor(...stores: Array<S>) {
     super(...stores)
 
@@ -55,13 +53,8 @@ export class TweakerStringManagerElement<
             )
           },
         }),
-        this.#content,
       ],
     })
-  }
-
-  protected appendContent(value: any) {
-    this.#content.current = [...this.#content.current, value]
   }
 }
 
