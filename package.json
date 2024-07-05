@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -137,6 +137,46 @@
       "require": "./lib/intersector/index.cjs",
       "default": "./lib/intersector/index.js",
       "types": "./lib/intersector/index.d.ts"
+    },
+    "./jsx": {
+      "require": "./lib/jsx/index.cjs",
+      "default": "./lib/jsx/index.js",
+      "types": "./lib/jsx/index.d.ts"
+    },
+    "./jsx/hooks/store": {
+      "require": "./lib/jsx/hooks/store/index.cjs",
+      "default": "./lib/jsx/hooks/store/index.js",
+      "types": "./lib/jsx/hooks/store/index.d.ts"
+    },
+    "./jsx/hooks/onAnimationFrame": {
+      "require": "./lib/jsx/hooks/onAnimationFrame.cjs",
+      "default": "./lib/jsx/hooks/onAnimationFrame.js",
+      "types": "./lib/jsx/hooks/onAnimationFrame.d.ts"
+    },
+    "./jsx/hooks/onElementResize": {
+      "require": "./lib/jsx/hooks/onElementResize.cjs",
+      "default": "./lib/jsx/hooks/onElementResize.js",
+      "types": "./lib/jsx/hooks/onElementResize.d.ts"
+    },
+    "./jsx/hooks/onIntersection": {
+      "require": "./lib/jsx/hooks/onIntersection.cjs",
+      "default": "./lib/jsx/hooks/onIntersection.js",
+      "types": "./lib/jsx/hooks/onIntersection.d.ts"
+    },
+    "./jsx/hooks/onWindowResize": {
+      "require": "./lib/jsx/hooks/onWindowResize.cjs",
+      "default": "./lib/jsx/hooks/onWindowResize.js",
+      "types": "./lib/jsx/hooks/onWindowResize.d.ts"
+    },
+    "./jsx/hooks/watchAttribute": {
+      "require": "./lib/jsx/hooks/watchAttribute.cjs",
+      "default": "./lib/jsx/hooks/watchAttribute.js",
+      "types": "./lib/jsx/hooks/watchAttribute.d.ts"
+    },
+    "./jsx/hooks/watchCSSProperty": {
+      "require": "./lib/jsx/hooks/watchCSSProperty.cjs",
+      "default": "./lib/jsx/hooks/watchCSSProperty.js",
+      "types": "./lib/jsx/hooks/watchCSSProperty.d.ts"
     },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
@@ -340,6 +380,30 @@
       ],
       "intersector": [
         "lib/intersector/index.d.ts"
+      ],
+      "jsx": [
+        "lib/jsx/index.d.ts"
+      ],
+      "jsx/hooks/store": [
+        "lib/jsx/hooks/store/index.d.ts"
+      ],
+      "jsx/hooks/onAnimationFrame": [
+        "lib/jsx/hooks/onAnimationFrame.d.ts"
+      ],
+      "jsx/hooks/onElementResize": [
+        "lib/jsx/hooks/onElementResize.d.ts"
+      ],
+      "jsx/hooks/onIntersection": [
+        "lib/jsx/hooks/onIntersection.d.ts"
+      ],
+      "jsx/hooks/onWindowResize": [
+        "lib/jsx/hooks/onWindowResize.d.ts"
+      ],
+      "jsx/hooks/watchAttribute": [
+        "lib/jsx/hooks/watchAttribute.d.ts"
+      ],
+      "jsx/hooks/watchCSSProperty": [
+        "lib/jsx/hooks/watchCSSProperty.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"

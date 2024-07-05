@@ -43,14 +43,37 @@ export function buildConfig() {
             './src/components/packages/element-constructor/index.ts',
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
+
+          // > EN3
           'en3/index': './src/components/packages/en3/index.ts',
           'en3/helpers/index': './src/components/packages/en3/helpers/index.ts',
           'en3/libs/index': './src/components/packages/en3/libs/index.ts',
           'en3/loaders/index': './src/components/packages/en3/loaders/index.ts',
           'en3/misc/index': './src/components/packages/en3/misc/index.ts',
           'en3/utils/index': './src/components/packages/en3/utils/index.ts',
+          // < EN3
+
           'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
+
+          // > JSX
+          'jsx/index': './src/components/packages/jsx/index.ts',
+          'jsx/hooks/store/index':
+            './src/components/packages/jsx/hooks/store/index.ts',
+          'jsx/hooks/onAnimationFrame':
+            './src/components/packages/jsx/hooks/onAnimationFrame.ts',
+          'jsx/hooks/onElementResize':
+            './src/components/packages/jsx/hooks/onElementResize.ts',
+          'jsx/hooks/onIntersection':
+            './src/components/packages/jsx/hooks/onIntersection.ts',
+          'jsx/hooks/onWindowResize':
+            './src/components/packages/jsx/hooks/onWindowResize.ts',
+          'jsx/hooks/watchAttribute':
+            './src/components/packages/jsx/hooks/watchAttribute.ts',
+          'jsx/hooks/watchCSSProperty':
+            './src/components/packages/jsx/hooks/watchCSSProperty.ts',
+          // < JSX
+
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
