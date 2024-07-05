@@ -1,10 +1,11 @@
 import { Texture } from 'three'
+
 import {
   En3ImageLike,
   En3ImageLikeMaterial,
   En3ImageLikeParameters,
 } from './En3ImageLike'
-import { en3TextureLoader } from '../loaders/en3TextureLoader'
+import { loaders } from '../loaders'
 
 export interface En3ImageParameters<
   TMaterial extends En3ImageLikeMaterial<Texture>
@@ -16,7 +17,7 @@ export class En3Image<
   constructor(parameters: En3ImageParameters<TMaterial>) {
     super({
       ...parameters,
-      loader: en3TextureLoader,
+      loader: loaders.textureLoader,
     })
   }
 }

@@ -4,9 +4,8 @@ import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
-import { en3Cache } from '../loaders/en3Cache'
+import { en3Cache } from './en3Cache'
 import { En3Raycaster } from './En3Raycaster'
-import { Notifier, NotifierCallback } from '@packages/notifier'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters

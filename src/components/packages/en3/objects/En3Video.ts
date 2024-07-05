@@ -1,9 +1,11 @@
 import { Loader, VideoTexture } from 'three'
+
 import {
   En3ImageLike,
   En3ImageLikeMaterial,
   En3ImageLikeParameters,
 } from './En3ImageLike'
+
 import { coverTexture } from '../utils/coverTexture'
 
 class En3VideoLoader<

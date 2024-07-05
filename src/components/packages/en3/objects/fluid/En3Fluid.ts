@@ -1,3 +1,7 @@
+/**
+ * Based on https://github.com/mnmxmx/fluid-three
+ */
+
 import { Color, Mesh, PlaneGeometry, RawShaderMaterial, Vector2 } from 'three'
 
 import { Store } from '@packages/store'
@@ -28,7 +32,9 @@ export class En3Fluid extends Mesh<PlaneGeometry, RawShaderMaterial> {
     passport: {
       name: 'Fluid.Цвета.Фон.Порог',
       manager: {
-        type: 'range',
+        type: 'number',
+        min: 0,
+        max: 1,
       },
     },
   })
@@ -37,7 +43,9 @@ export class En3Fluid extends Mesh<PlaneGeometry, RawShaderMaterial> {
     passport: {
       name: 'Fluid.Цвета.Фон.Прозрачность',
       manager: {
-        type: 'range',
+        type: 'number',
+        min: 0,
+        max: 1,
       },
     },
   })
@@ -55,7 +63,9 @@ export class En3Fluid extends Mesh<PlaneGeometry, RawShaderMaterial> {
     passport: {
       name: 'Fluid.Цвета.Жидкость.Прозрачность',
       manager: {
-        type: 'range',
+        type: 'number',
+        min: 0,
+        max: 1,
       },
     },
   })

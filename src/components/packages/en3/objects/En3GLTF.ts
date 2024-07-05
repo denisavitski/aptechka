@@ -3,12 +3,13 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { en3 } from '../core/en3'
 import { dispose } from '../utils/dispose'
-import { en3GLTFLoader } from '../loaders/en3GLTFLoader'
 import { En3SourceConsumer } from './En3SourceConsumer'
 import {
   En3SourceManager,
   En3SourceManagerParameters,
-} from '../attachments/En3SourceManager'
+} from '../misc/En3SourceManager'
+import { loaders } from '../loaders'
+import { En3GLTFLoader } from '../loaders/En3GLTFLoader'
 
 export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
   #sourceManager: En3SourceManager<GLTF>
@@ -16,8 +17,12 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
   constructor(parameters: En3SourceManagerParameters<GLTF>) {
     super()
 
+    if (!loaders.gltfLoader) {
+      loaders.gltfLoader = new En3GLTFLoader()
+    }
+
     this.#sourceManager = new En3SourceManager({
-      loader: en3GLTFLoader,
+      loader: loaders.gltfLoader,
       consumer: this,
       ...parameters,
     })
@@ -54,5 +59,10 @@ export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
 
   public get sourceManager() {
     return this.#sourceManager
+  }
+
+  public destroy() {
+    this.#sourceManager.close()
+    dispose(this)
   }
 }

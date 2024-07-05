@@ -12,7 +12,6 @@ export {
   type StoreManager,
   type StoreStringManager,
   type StoreNumberManager,
-  type StoreRangeManager,
   type StoreColorManager,
   type StoreBooleanManager,
   type StoreLinkManager,

@@ -1,9 +1,10 @@
 import { CustomElement } from '@packages/custom-element'
 import { type TickerCallback, ticker } from '@packages/ticker'
-import { En3Fluid } from './En3Fluid'
 import { windowResizer } from '@packages/window-resizer'
 import { define } from '@packages/custom-element'
 import { en3 } from '@packages/en3/core/en3'
+
+import { En3Fluid } from './En3Fluid'
 
 @define('en3-fluid')
 export class En3FluidElement extends CustomElement {

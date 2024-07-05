@@ -44,6 +44,11 @@ export function buildConfig() {
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
           'en3/index': './src/components/packages/en3/index.ts',
+          'en3/helpers/index': './src/components/packages/en3/helpers/index.ts',
+          'en3/libs/index': './src/components/packages/en3/libs/index.ts',
+          'en3/loaders/index': './src/components/packages/en3/loaders/index.ts',
+          'en3/misc/index': './src/components/packages/en3/misc/index.ts',
+          'en3/utils/index': './src/components/packages/en3/utils/index.ts',
           'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',

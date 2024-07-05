@@ -5,59 +5,48 @@
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { en3 } from '../core/en3'
-import { en3Cache } from './en3Cache'
+import { en3Cache } from '../core/en3Cache'
 import { dispose } from '../utils/dispose'
+import { loaders } from '.'
 
-class En3GLTFLoader {
-  readonly #gltfLoader = new GLTFLoader()
+export class En3GLTFLoader {
+  #gltfLoader: GLTFLoader = new GLTFLoader()
 
   public get gltfLoader() {
     return this.#gltfLoader
   }
 
-  public async setLoaders(options?: {
+  public setLoaders(options?: {
     draco?: boolean | string | null
     ktx2?: boolean | string | null
     meshopt?: boolean
   }) {
-    if (options?.draco) {
-      const { DRACOLoader } = await import(
-        'three/examples/jsm/loaders/DRACOLoader.js'
-      )
-      const dracoLoader = new DRACOLoader()
-
+    if (options?.draco && loaders.dracoLoader) {
       const path =
         typeof options.draco === 'boolean'
           ? `${en3.CDNVersion}/examples/jsm/libs/draco/gltf/`
           : options.draco
 
-      dracoLoader.setDecoderPath(path)
+      loaders.dracoLoader.setDecoderPath(path)
 
-      this.#gltfLoader.setDRACOLoader(dracoLoader)
+      this.#gltfLoader.setDRACOLoader(loaders.dracoLoader)
     }
 
-    if (options?.ktx2) {
-      const { KTX2Loader } = await import(
-        'three/examples/jsm/loaders/KTX2Loader.js'
-      )
-      const ktx2Loader = new KTX2Loader()
-
+    if (options?.ktx2 && loaders.ktx2Loader) {
       const path =
         typeof options.ktx2 === 'boolean'
           ? `${en3.CDNVersion}/examples/jsm/libs/basis/`
           : options.ktx2
 
-      ktx2Loader.setTranscoderPath(path)
+      loaders.ktx2Loader.setTranscoderPath(path)
 
       this.#gltfLoader.setKTX2Loader(
-        ktx2Loader.detectSupport(en3.webglRenderer)
+        loaders.ktx2Loader.detectSupport(en3.webglRenderer)
       )
     }
 
-    if (options?.meshopt) {
-      const { MeshoptDecoder } = await import('../libs/MeshoptDecoder')
-
-      this.#gltfLoader.setMeshoptDecoder(MeshoptDecoder())
+    if (options?.meshopt && loaders.meshoptDecoder) {
+      this.#gltfLoader.setMeshoptDecoder(loaders.meshoptDecoder)
     }
   }
 
@@ -91,5 +80,3 @@ class En3GLTFLoader {
     }
   }
 }
-
-export const en3GLTFLoader = new En3GLTFLoader()

@@ -1,48 +1,59 @@
 import { TextureLoader } from 'three'
-import { en3Cache } from './en3Cache'
+import { en3Cache } from '../core/en3Cache'
 import { en3 } from '../core/en3'
 
-export const en3TextureLoader = new TextureLoader()
+export class En3TextureLoader {
+  #loader = new TextureLoader()
 
-const load = en3TextureLoader.load.bind(en3TextureLoader)
-const loadSync = en3TextureLoader.loadAsync.bind(en3TextureLoader)
+  #load: TextureLoader['load']
+  #loadSync: TextureLoader['loadAsync']
 
-en3TextureLoader.load = (url, onLoad, ...rest) => {
-  if (en3.cacheAssets && en3Cache.has(url)) {
-    const cached = en3Cache.get(url)!
-    onLoad?.(cached.data)
-    return cached.data
+  constructor() {
+    this.#load = this.#loader.load.bind(this.#loader)
+    this.#loadSync = this.#loader.loadAsync.bind(this.#loader)
   }
 
-  return load(
-    url,
-    (e) => {
-      if (en3.cacheAssets) {
-        en3Cache.set(url, {
-          data: e,
-          dispose: () => e.dispose(),
-        })
-      }
+  public load(...parameters: Parameters<TextureLoader['load']>) {
+    const [url, onLoad, ...rest] = parameters
 
-      onLoad?.(e)
-    },
-    ...rest
-  )
-}
+    if (en3.cacheAssets && en3Cache.has(url)) {
+      const cached = en3Cache.get(url)!
+      onLoad?.(cached.data)
+      return cached.data
+    }
 
-en3TextureLoader.loadAsync = async (url, ...rest) => {
-  if (en3.cacheAssets && en3Cache.has(url)) {
-    return en3Cache.get(url)!.data
+    return this.#load(
+      url,
+      (e) => {
+        if (en3.cacheAssets) {
+          en3Cache.set(url, {
+            data: e,
+            dispose: () => e.dispose(),
+          })
+        }
+
+        onLoad?.(e)
+      },
+      ...rest
+    )
   }
 
-  const texture = await loadSync(url, ...rest)
+  public async loadSync(...parameters: Parameters<TextureLoader['loadAsync']>) {
+    const [url, ...rest] = parameters
 
-  if (en3.cacheAssets) {
-    en3Cache.set(url, {
-      data: texture,
-      dispose: () => texture.dispose(),
-    })
+    if (en3.cacheAssets && en3Cache.has(url)) {
+      return en3Cache.get(url)!.data
+    }
+
+    const texture = await this.#loadSync(url, ...rest)
+
+    if (en3.cacheAssets) {
+      en3Cache.set(url, {
+        data: texture,
+        dispose: () => texture.dispose(),
+      })
+    }
+
+    return texture
   }
-
-  return texture
 }

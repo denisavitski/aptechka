@@ -42,7 +42,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Вязкость.Величина',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 0,
           max: 500,
         },
@@ -53,7 +53,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Вязкость.Количество итераций',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 1,
           max: 32,
           step: 1,
@@ -65,7 +65,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Курсор.Сила',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 1,
           max: 200,
           step: 1,
@@ -77,7 +77,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Курсор.Размер',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 10,
           max: 200,
           step: 1,
@@ -89,7 +89,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Скорость',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 0.001,
           max: 0.1,
           step: 0.001,
@@ -101,7 +101,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Poisson',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 1,
           max: 32,
           step: 1,
@@ -113,7 +113,7 @@ export class Simulation {
       passport: {
         name: 'Fluid.Разрешение',
         manager: {
-          type: 'range',
+          type: 'number',
           min: 0.1,
           max: 1,
         },

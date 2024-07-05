@@ -1,5 +1,5 @@
 import '@packages/tweaker'
-import { en3, en3GLTFLoader } from '../index'
+import { en3 } from '../index'
 import {
   ACESFilmicToneMapping,
   BoxGeometry,
@@ -7,7 +7,7 @@ import {
   Mesh,
   MeshBasicMaterial,
 } from 'three'
-import { En3Controls } from '../test/En3Controls'
+import { En3Controls } from '../helpers/En3Controls'
 
 en3.setup({
   webGLRendererParameters: {
@@ -19,10 +19,6 @@ new En3Controls()
 
 en3.webglRenderer.toneMapping = ACESFilmicToneMapping
 en3.webglRenderer.toneMappingExposure = 1.4
-
-await en3GLTFLoader.setLoaders({
-  draco: true,
-})
 
 const boxes: Array<Mesh<BoxGeometry, MeshBasicMaterial>> = []
 
