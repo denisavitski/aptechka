@@ -1,12 +1,6 @@
 import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
-import {
-  button,
-  createStylesheet,
-  element,
-  slot,
-} from '@packages/element-constructor'
-import { aptechkaTheme } from '@packages/theme'
+import { createStylesheet, element, slot } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({

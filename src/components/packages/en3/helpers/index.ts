@@ -1,4 +1,4 @@
-export { En3Controls } from './En3Controls'
+export { En3Helpers } from './En3Helpers'
 
 export {
   En3Object3dManager,

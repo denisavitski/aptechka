@@ -4,7 +4,7 @@ import { En3OrbitControls } from './En3OrbitControls'
 import { En3GridHelper } from './En3GridHelper'
 import { En3TransformControls } from './En3TransformControls'
 
-export class En3Controls {
+export class En3Helpers {
   #gridHelper: En3GridHelper
   #cameraManager: En3Object3dManager
   #orbitControls: En3OrbitControls

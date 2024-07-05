@@ -6,8 +6,8 @@ import {
   element,
   slot,
 } from '@packages/element-constructor'
-import { aptechkaTheme } from '@packages/theme'
 import {
+  dispatchBeforeSizeChangeEvent,
   dispatchSizeChangeEvent,
   getElementTransitionDurationMS,
   isBrowser,
@@ -181,6 +181,8 @@ export class SelectElement extends CustomElement {
   }
 
   #dispatchToggleEvent() {
+    dispatchBeforeSizeChangeEvent(this)
+
     this.dispatchEvent(
       new CustomEvent<SelectToggleDetail>('selectToggle', {
         bubbles: true,

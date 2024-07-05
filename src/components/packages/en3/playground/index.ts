@@ -4,29 +4,29 @@ import {
   ACESFilmicToneMapping,
   BoxGeometry,
   Color,
+  DirectionalLight,
   Mesh,
   MeshBasicMaterial,
+  MeshStandardMaterial,
 } from 'three'
-import { En3Controls } from '../helpers/En3Controls'
+import { En3Helpers } from '../helpers/En3Helpers'
 
 en3.setup({
-  webGLRendererParameters: {
-    alpha: true,
-  },
+  webGLRendererParameters: {},
 })
 
-new En3Controls()
+new En3Helpers()
 
 en3.webglRenderer.toneMapping = ACESFilmicToneMapping
 en3.webglRenderer.toneMappingExposure = 1.4
 
-const boxes: Array<Mesh<BoxGeometry, MeshBasicMaterial>> = []
+const boxes: Array<Mesh<BoxGeometry, MeshStandardMaterial>> = []
 
 for (let index = 0; index < 1; index++) {
   const geo = new BoxGeometry()
-  const mat = new MeshBasicMaterial({ color: 'lightblue' })
+  const mat = new MeshStandardMaterial({ color: 'lightblue' })
   const mesh = new Mesh(geo, mat)
-  mesh.name = `Objects.Object-${index + 1}`
+  mesh.name = `Objects.XXX-${index + 1}`
   mesh.scale.setScalar(200)
   mesh.position.z = 250 * index * -1
   mesh.position.x = 60 * index
@@ -38,6 +38,11 @@ for (let index = 0; index < 1; index++) {
     en3.view.add(mesh)
   }
 }
+
+const directionalLight = new DirectionalLight()
+directionalLight.name = 'Lights.Directional'
+
+en3.view.add(directionalLight)
 
 boxes.forEach((box) => {
   en3.raycaster.add(box, {

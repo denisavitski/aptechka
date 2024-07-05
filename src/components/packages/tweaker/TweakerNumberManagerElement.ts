@@ -268,7 +268,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
       const inputElement = this.#inputElements[i]
 
       if (inputElement) {
-        inputElement.value = v.toString()
+        inputElement.value = (v || 0).toString()
       }
     })
 

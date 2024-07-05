@@ -6,9 +6,12 @@ export type TweakerChangedSizes = { [key: string]: number }
 export interface TweakerStorageState {
   openedPanels: TweakerOpenedPanels
   changedSizes: TweakerChangedSizes
+  scrollValue: number
 }
 
 class TweakerStorage {
+  public scrollValue = 0
+
   #localStorageStudioName = ''
   #openedPanels: TweakerOpenedPanels = []
   #changedSizes: TweakerChangedSizes = {}
@@ -47,6 +50,7 @@ class TweakerStorage {
     const state: TweakerStorageState = {
       openedPanels: this.#openedPanels,
       changedSizes: this.#changedSizes,
+      scrollValue: this.scrollValue,
     }
 
     localStorage.setItem(this.#localStorageStudioName, JSON.stringify(state))
@@ -68,6 +72,10 @@ class TweakerStorage {
 
         if (state.changedSizes) {
           this.#changedSizes = state.changedSizes
+        }
+
+        if (state.scrollValue) {
+          this.scrollValue = state.scrollValue
         }
       } catch (e) {
         console.error(e)

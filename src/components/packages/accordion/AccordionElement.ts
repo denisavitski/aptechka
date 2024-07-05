@@ -6,7 +6,10 @@ import {
   getElementTransitionDurationMS,
   isBrowser,
 } from '@packages/utils'
-import { dispatchSizeChangeEvent } from '@packages/utils/events'
+import {
+  dispatchBeforeSizeChangeEvent,
+  dispatchSizeChangeEvent,
+} from '@packages/utils/events'
 
 export interface AccordionItemToggleEventDetail {
   opened: boolean
@@ -60,13 +63,13 @@ class AccordionItem {
       this.#headElement.addEventListener('click', this.#headClickListener)
 
       this.#element.addEventListener(
-        'sizeChange',
-        this.#childrenSizeChangeListener
+        'beforeSizeChange',
+        this.#beforeToggleListener
       )
 
       this.#element.addEventListener(
-        'beforeAccordionItemToggle',
-        this.#beforeToggleListener
+        'sizeChange',
+        this.#childrenSizeChangeListener
       )
 
       if (this.#element.hasAttribute('data-opened')) {
@@ -93,13 +96,13 @@ class AccordionItem {
       this.#headElement.removeEventListener('click', this.#headClickListener)
 
       this.#element.removeEventListener(
-        'sizeChange',
-        this.#childrenSizeChangeListener
+        'beforeSizeChange',
+        this.#beforeToggleListener
       )
 
       this.#element.removeEventListener(
-        'beforeAccordionItemToggle',
-        this.#beforeToggleListener
+        'sizeChange',
+        this.#childrenSizeChangeListener
       )
 
       clearTimeout(this.#activeTimeoutId)
@@ -226,18 +229,7 @@ class AccordionItem {
 
   #dispatchEvent(name: 'before-toggle' | 'toggle' | 'size-change') {
     if (name === 'before-toggle') {
-      this.#element.dispatchEvent(
-        new CustomEvent<AccordionItemToggleEventDetail>(
-          'beforeAccordionItemToggle',
-          {
-            bubbles: true,
-            composed: true,
-            detail: {
-              opened: this.#opened,
-            },
-          }
-        )
-      )
+      dispatchBeforeSizeChangeEvent(this.#element)
     } else if (name === 'toggle') {
       this.#element.dispatchEvent(
         new CustomEvent<AccordionItemToggleEventDetail>('accordionItemToggle', {
@@ -376,9 +368,5 @@ declare global {
 
   interface HTMLElementEventMap {
     accordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
-  }
-
-  interface HTMLElementEventMap {
-    beforeAccordionItemToggle: CustomEvent<AccordionItemToggleEventDetail>
   }
 }

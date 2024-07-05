@@ -1,6 +1,7 @@
 import { LayoutBox, LayoutBoxLadder } from '@packages/layout-box'
 import { Store } from '@packages/store'
 import { Object3D, Vector3, Euler } from 'three'
+import { En3ParametersManager } from './En3ParametersManager'
 
 type XYZ = [number, number, number]
 
@@ -10,6 +11,8 @@ export interface En3Object3dManagerOptions {
 
 export class En3Object3dManager {
   #object3d: Object3D
+
+  #parametersManager: En3ParametersManager
 
   #position: Store<XYZ>
   #rotation: Store<XYZ>
@@ -24,13 +27,13 @@ export class En3Object3dManager {
 
     const step = options?.step || 0.0001
 
-    const name = object3d.name || 'Unnamed'
+    const name = (object3d.name = object3d.name || 'Unnamed')
 
     const ob = (object3d.userData?.box as LayoutBox) || object3d
 
     this.#position = new Store([ob.position.x, ob.position.y, ob.position.z], {
       passport: {
-        name: `${name}.Position`,
+        name: `${name}.Transformation.Position`,
         manager: {
           type: 'number',
           step: step,
@@ -40,7 +43,7 @@ export class En3Object3dManager {
 
     this.#rotation = new Store([ob.rotation.x, ob.rotation.y, ob.rotation.z], {
       passport: {
-        name: `${name}.Rotation`,
+        name: `${name}.Transformation.Rotation`,
         manager: {
           type: 'number',
           step: step,
@@ -51,7 +54,7 @@ export class En3Object3dManager {
 
     this.#scale = new Store([ob.scale.x, ob.scale.y, ob.scale.z], {
       passport: {
-        name: `${name}.Scale`,
+        name: `${name}.Transformation.Scale`,
         manager: {
           type: 'number',
           step: step,
@@ -74,6 +77,8 @@ export class En3Object3dManager {
     this.#scale.subscribe((e) => {
       this.#updateController('scale', e.current)
     })
+
+    this.#parametersManager = new En3ParametersManager(this.#object3d)
   }
 
   public get object3d() {
@@ -81,6 +86,8 @@ export class En3Object3dManager {
   }
 
   public destroy() {
+    this.#parametersManager.destroy()
+
     this.#position.close()
     this.#rotation.close()
     this.#scale.close()

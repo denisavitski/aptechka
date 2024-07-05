@@ -19,7 +19,6 @@ import uploadIcon from '@assets/icons/upload.svg?raw'
 
 import { TweakerFolderElement } from './TweakerFolderElement'
 import { tweakerStorage } from './tweakerStorage'
-import { ticker } from '@packages/ticker'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -144,6 +143,8 @@ export interface StoreBox {
 
 @define('e-tweaker')
 export class TweakerElement extends TweakerFolderElement {
+  #scrollRestored = false
+
   constructor() {
     super({
       key: '',
@@ -226,6 +227,8 @@ export class TweakerElement extends TweakerFolderElement {
         div({
           class: 'resize',
           onPointerdown: (grabEvent) => {
+            grabEvent.preventDefault()
+
             const rect = this.getBoundingClientRect()
 
             setupDrag((moveEvent) => {
@@ -291,6 +294,20 @@ export class TweakerElement extends TweakerFolderElement {
         })
       }
     })
+
+    if (!this.#scrollRestored) {
+      this.#scrollRestored = true
+
+      setTimeout(() => {
+        this.contentElement.scroll({
+          top: tweakerStorage.scrollValue,
+        })
+
+        this.contentElement.addEventListener('scroll', () => {
+          tweakerStorage.scrollValue = this.contentElement.scrollTop
+        })
+      }, 100)
+    }
   }, 10)
 }
 
