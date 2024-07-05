@@ -3,13 +3,14 @@ import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 import { en3 } from '../core/en3'
 import { dispose } from '../utils/dispose'
-import { En3SourceConsumer } from './En3SourceConsumer'
 import {
   En3SourceManager,
   En3SourceManagerParameters,
 } from '../misc/En3SourceManager'
-import { loaders } from '../loaders'
 import { En3GLTFLoader } from '../loaders/En3GLTFLoader'
+import { loaders } from '../loaders/loaders'
+
+import { En3SourceConsumer } from './En3SourceConsumer'
 
 export class En3GLTF extends Group implements En3SourceConsumer<GLTF> {
   #sourceManager: En3SourceManager<GLTF>

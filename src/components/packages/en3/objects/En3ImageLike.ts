@@ -22,7 +22,7 @@ import { En3SourceConsumer } from './En3SourceConsumer'
 import { en3 } from '../core/en3'
 import { dispose } from '../utils/dispose'
 import { coverTexture } from '../utils/coverTexture'
-import { loaders } from '../loaders'
+import { loaders } from '../loaders/loaders'
 import { En3TextureLoader } from '../loaders/En3TextureLoader'
 
 export type En3ImageLikeMaterial<TTexture extends Texture> = Material & {
