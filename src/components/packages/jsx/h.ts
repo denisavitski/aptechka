@@ -11,7 +11,7 @@ export function h(
   attributes?: null | { [key: string]: any },
   ...children: JSX.ComponentChildren
 ) {
-  children = children.flat()
+  children = children.flat().filter((c) => c != null)
 
   const stack: Array<any> = []
 

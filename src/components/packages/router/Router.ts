@@ -42,8 +42,6 @@ export interface RouterParameters {
 }
 
 export class Router {
-  public static active: Router
-
   #rootElement: HTMLElement = null!
   #base: string = null!
   #routes: Array<Route> = []
@@ -64,8 +62,6 @@ export class Router {
       } else {
         this.#base = '/'
       }
-
-      Router.active = this
 
       this.#rootElement = parameters?.rootElement || document.body
       addEventListener('popstate', this.#popStateListener)
@@ -109,8 +105,6 @@ export class Router {
       return
     }
 
-    Router.active = this
-
     this.#candidatePathname = pathname
 
     const activeRoutes = this.#routes.filter((r) => r.isActive)
@@ -148,12 +142,12 @@ export class Router {
 
       this.#currentPathname = pathname
 
+      changeHistory(action, pathname, parameters, hash)
+
       for await (const route of newRoutes) {
         await route.render(this.#lastRoute?.nest || this.#rootElement, pathname)
         this.#lastRoute = route
       }
-
-      changeHistory(action, pathname, parameters, hash)
 
       this.#updateLinks()
 
