@@ -12,6 +12,7 @@ export type En3RaycasterEventType =
 export type En3RaycasterEvent = {
   type: En3RaycasterEventType
   originalEvent: PointerEvent
+  target: Object3D
 } & Intersection<Object3D>
 
 export interface En3RaycasterOptions {

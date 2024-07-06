@@ -51,11 +51,27 @@ export class En3GridHelper {
     },
   })
 
+  #visible = new Store(true, {
+    passport: {
+      name: 'Helpers.Grid.Visible',
+      manager: {
+        type: 'boolean',
+      },
+    },
+  })
+
   #composed
 
   constructor() {
     this.#composed = new Composed(
-      [this.#size, this.#divisions, this.#color1, this.#color2, this.#vertical],
+      [
+        this.#size,
+        this.#divisions,
+        this.#color1,
+        this.#color2,
+        this.#vertical,
+        this.#visible,
+      ],
       () => {
         if (this.#helper) {
           en3.view.remove(this.#helper)
@@ -70,6 +86,8 @@ export class En3GridHelper {
         )
 
         this.#helper.rotation.x = this.#vertical.current ? Math.PI / 2 : 0
+
+        this.#helper.visible = this.#visible.current
 
         en3.view.add(this.#helper)
       }

@@ -1,7 +1,24 @@
 import { LayoutBox, LayoutBoxLadder } from '@packages/layout-box'
 import { Store } from '@packages/store'
-import { Object3D, Vector3, Euler } from 'three'
+import {
+  Object3D,
+  Vector3,
+  Euler,
+  PointLight,
+  PointLightHelper,
+  DirectionalLight,
+  DirectionalLightHelper,
+  SpotLightHelper,
+  SpotLight,
+  HemisphereLight,
+  HemisphereLightHelper,
+  Light,
+  Camera,
+  CameraHelper,
+} from 'three'
 import { En3ParametersManager } from './En3ParametersManager'
+import { en3 } from '../core/en3'
+import { ticker } from '@packages/ticker'
 
 type XYZ = [number, number, number]
 
@@ -19,6 +36,8 @@ export class En3Object3dManager {
   #scale: Store<XYZ>
 
   #isInitial = true
+
+  #helpers: Array<Object3D> = []
 
   constructor(object3d: Object3D, options?: En3Object3dManagerOptions) {
     this.#object3d = object3d
@@ -41,6 +60,34 @@ export class En3Object3dManager {
     const step = options?.step || 0.0001
 
     const ob = (object3d.userData?.box as LayoutBox) || object3d
+
+    if (this.#object3d instanceof Light) {
+      let lightHelper: any
+
+      if (this.#object3d instanceof PointLight) {
+        lightHelper = new PointLightHelper(this.#object3d, 100)
+      } else if (this.#object3d instanceof DirectionalLight) {
+        this.#object3d.scale.setScalar(100)
+        lightHelper = new DirectionalLightHelper(this.#object3d, 1)
+      } else if (this.#object3d instanceof SpotLight) {
+        lightHelper = new SpotLightHelper(this.#object3d)
+      } else if (this.#object3d instanceof HemisphereLight) {
+        lightHelper = new HemisphereLightHelper(this.#object3d, 100)
+      }
+
+      this.#helpers.push(lightHelper)
+
+      const camera = this.#object3d.shadow?.camera
+
+      if (camera instanceof Camera) {
+        const cameraHelper = new CameraHelper(camera)
+        this.#helpers.push(cameraHelper)
+      }
+    }
+
+    this.#helpers.forEach((helper) => {
+      en3.view.add(helper)
+    })
 
     this.#position = new Store([ob.position.x, ob.position.y, ob.position.z], {
       passport: {
@@ -92,10 +139,22 @@ export class En3Object3dManager {
     if (parameters) {
       this.#parametersManager = new En3ParametersManager(this.#object3d)
     }
+
+    if (this.#helpers.length) {
+      ticker.subscribe(this.#tickListener)
+    }
   }
 
   public get object3d() {
     return this.#object3d
+  }
+
+  public get helpers() {
+    return this.#helpers
+  }
+
+  public get raycasterTarget() {
+    return this.#helpers[0] || this.#object3d
   }
 
   public destroy() {
@@ -106,6 +165,17 @@ export class En3Object3dManager {
     this.#scale.close()
 
     this.#object3d.userData.controlled = false
+
+    this.#helpers.forEach((helper) => {
+      if (helper) {
+        if ('dispose' in helper) {
+          ;(helper.dispose as Function)()
+          en3.view.remove(helper)
+        }
+      }
+    })
+
+    ticker.unsubscribe(this.#tickListener)
   }
 
   public save() {
@@ -154,5 +224,13 @@ export class En3Object3dManager {
     } else {
       this.#object3d[name].set(...value)
     }
+  }
+
+  #tickListener = () => {
+    this.#helpers.forEach((helper) => {
+      if ('update' in helper) {
+        ;(helper.update as Function)()
+      }
+    })
   }
 }

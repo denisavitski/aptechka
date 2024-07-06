@@ -6,6 +6,7 @@ import {
 } from '@packages/store'
 import * as THREE from 'three'
 import { en3 } from '../core/en3'
+import { traverseMaterials } from '../utils'
 
 const blendingEquations = [
   'AddEquation',
@@ -82,6 +83,24 @@ const sides = ['FrontSide', 'BackSide', 'DoubleSide']
 const normalmapTypes = ['TangentSpaceNormalMap', 'ObjectSpaceNormalMap']
 
 const wireframeLinejoinTypes = ['round', 'bevel', 'miter']
+
+const toneMappingTypes = [
+  'NoToneMapping',
+  'LinearToneMapping',
+  'ReinhardToneMapping',
+  'CineonToneMapping',
+  'ACESFilmicToneMapping',
+  'AgXToneMapping',
+  'NeutralToneMapping',
+  'CustomToneMapping',
+]
+
+const shadowMapTypes = [
+  'BasicShadowMap',
+  'PCFShadowMap',
+  'PCFSoftShadowMap',
+  'VSMShadowMap',
+]
 
 const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
   intensity: {
@@ -275,8 +294,9 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
   bias: {
     type: 'number',
     min: 0,
-    max: 1,
+    max: 0.01,
     step: 0.000001,
+    ease: 0.01,
   },
   blurSamples: {
     type: 'number',
@@ -307,6 +327,36 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
     step: 0.001,
     ease: 0.01,
   },
+  angle: {
+    type: 'number',
+    min: 0,
+    step: 0.000001,
+    ease: 0.001,
+  },
+  toneMapping: {
+    type: 'select',
+    variants: toneMappingTypes,
+  },
+  toneMappingExposure: {
+    type: 'number',
+    min: 0,
+    step: 0.001,
+    ease: 0.1,
+  },
+  mapSize: {
+    type: 'number',
+    min: 0,
+    step: 1,
+  },
+}
+
+const shadowMapManagerOptions: {
+  [key: string]: StoreManagers[keyof StoreManagers]
+} = {
+  type: {
+    type: 'select',
+    variants: shadowMapTypes,
+  },
 }
 
 const skipKeys = new Set([
@@ -320,6 +370,7 @@ const skipKeys = new Set([
   'coordinateSystem',
   'aspect',
   'autoUpdate',
+  'up',
 ])
 
 export class En3ParametersManager {
@@ -334,6 +385,7 @@ export class En3ParametersManager {
       this.#manage(
         this.#subject,
         `${this.#subject.name}.Parameters`,
+        managerOptions,
         this.#subject instanceof THREE.Camera
           ? () => {
               en3.view.resize()
@@ -348,6 +400,7 @@ export class En3ParametersManager {
           this.#manage(
             material,
             `${this.#subject.name}.Parameters.Material`,
+            managerOptions,
             () => {
               material.needsUpdate = true
             }
@@ -356,14 +409,47 @@ export class En3ParametersManager {
       } else if (this.#subject instanceof THREE.Light) {
         const shadow = this.#subject.shadow
 
-        this.#manage(shadow, `${this.#subject.name}.Parameters.Shadow`)
+        if (shadow) {
+          this.#manage(
+            shadow,
+            `${this.#subject.name}.Parameters.Shadow`,
+            managerOptions,
+            () => {
+              shadow.needsUpdate = true
+            }
+          )
 
-        const camera = shadow.camera
+          const camera = shadow.camera
 
-        if (camera) {
-          this.#manage(camera, `${this.#subject.name}.Parameters.Shadow.Camera`)
+          if (camera) {
+            this.#manage(
+              camera,
+              `${this.#subject.name}.Parameters.Shadow.Camera`,
+              managerOptions,
+              () => {
+                shadow.camera.updateProjectionMatrix()
+              }
+            )
+          }
         }
       }
+    } else if (this.#subject instanceof THREE.WebGLRenderer) {
+      const renderer = this.#subject
+
+      this.#manage(renderer, `Renderer`, managerOptions)
+
+      this.#manage(
+        renderer.shadowMap,
+        `Renderer.shadowMap`,
+        shadowMapManagerOptions,
+        () => {
+          renderer.shadowMap.needsUpdate = true
+
+          traverseMaterials(en3.scene, (material) => {
+            material.needsUpdate = true
+          })
+        }
+      )
     }
   }
 
@@ -373,7 +459,12 @@ export class En3ParametersManager {
     })
   }
 
-  #manage(subject: any, folderKey: string, afterChange?: () => void) {
+  #manage(
+    subject: any,
+    folderKey: string,
+    options: any,
+    afterChange?: () => void
+  ) {
     for (const key in subject) {
       if (key.startsWith('_') || skipKeys.has(key)) {
         continue
@@ -383,8 +474,7 @@ export class En3ParametersManager {
 
       const name = `${folderKey}.${key}`
 
-      const foundedManagerOptions =
-        managerOptions[key as keyof typeof managerOptions]
+      const foundedManagerOptions = options[key as keyof typeof options]
 
       if (typeof value === 'number') {
         if (foundedManagerOptions?.type === 'select') {
@@ -423,9 +513,9 @@ export class En3ParametersManager {
         !key.startsWith('is') &&
         !key.startsWith('matrix')
       ) {
-        this.#createBooleanManager(name, value, subject, key)
+        this.#createBooleanManager(name, value, subject, key, afterChange)
       } else if (value instanceof THREE.Color) {
-        this.#createColorManager(name, value, subject, key)
+        this.#createColorManager(name, value, subject, key, afterChange)
       } else if (foundedManagerOptions) {
         if (foundedManagerOptions?.type === 'select') {
           this.#createSelectManager(

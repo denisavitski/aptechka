@@ -1,12 +1,6 @@
-// TODO: Учитывать FOV
-// TODO: Учитывать смену View
-// TODO: Вынести OrbitControls в отдельный класс
-// TODO: Вынести TransformControls в отдельный класс
-// TODO: Вынести GridHelper в отдельный класс
-
 import { TransformControls } from 'three/examples/jsm/Addons.js'
 import { en3 } from '../core/en3'
-import { Euler, Object3D, Object3DEventMap, Vector3 } from 'three'
+import { Object3D, Object3DEventMap } from 'three'
 import { En3RaycasterEvent } from '../core/En3Raycaster'
 import { En3Object3dManager } from './En3Object3dManager'
 
@@ -15,7 +9,7 @@ type ChildEvent = { child: Object3D<Object3DEventMap> }
 export class En3TransformControls {
   #controls: TransformControls
 
-  #objectControllers: Array<En3Object3dManager> = []
+  #objectManagers: Array<En3Object3dManager> = []
 
   #activeObjectController: En3Object3dManager | null = null
 
@@ -51,59 +45,77 @@ export class En3TransformControls {
 
     this.#controls.dispose()
 
-    this.#objectControllers.forEach((object) => {
-      object.destroy()
-      object.object3d.removeEventListener(
+    this.#objectManagers.forEach((object) => {
+      object.raycasterTarget.removeEventListener(
         'pointerDown',
-        this.#childClickListener as any
+        this.#clickListener as any
       )
+
+      object.object3d.removeEventListener(
+        'childadded',
+        this.#childAddedListener
+      )
+
+      object.destroy()
     })
 
-    this.#objectControllers = []
+    this.#objectManagers = []
   }
 
   #childAddedListener = (e: ChildEvent) => {
     if (
       e.child.name.startsWith('T.') &&
-      !this.#objectControllers.find((v) => v.object3d === e.child)
+      !this.#objectManagers.find((v) => v.object3d === e.child)
     ) {
-      this.#objectControllers.push(new En3Object3dManager(e.child))
+      const manager = new En3Object3dManager(e.child)
 
-      en3.raycaster.add(e.child)
-      e.child.addEventListener('pointerDown', this.#childClickListener as any)
-      e.child.addEventListener('childadded', this.#childAddedListener)
+      this.#objectManagers.push(manager)
+
+      en3.raycaster.add(manager.raycasterTarget, {
+        eventDispatcher: manager.raycasterTarget,
+      })
+
+      manager.raycasterTarget.addEventListener(
+        'pointerDown',
+        this.#clickListener as any
+      )
+      manager.object3d.addEventListener('childadded', this.#childAddedListener)
     }
   }
 
   #childRemovedListener = (e: ChildEvent) => {
-    const objectWrapper = this.#objectControllers.find(
-      (v) => v.object3d === e.child
-    )
+    const manager = this.#getManager(e.child)
 
-    if (objectWrapper) {
-      objectWrapper.destroy()
+    if (manager) {
+      en3.raycaster.remove(manager.raycasterTarget)
 
-      en3.raycaster.remove(e.child)
+      manager.destroy()
 
-      objectWrapper.object3d.removeEventListener(
+      manager.raycasterTarget.removeEventListener(
         'pointerDown',
-        this.#childClickListener as any
+        this.#clickListener as any
       )
 
-      e.child.removeEventListener('childadded', this.#childAddedListener)
-
-      this.#objectControllers = this.#objectControllers.filter(
-        (w) => w !== objectWrapper
+      manager.object3d.removeEventListener(
+        'childadded',
+        this.#childAddedListener
       )
+
+      this.#objectManagers = this.#objectManagers.filter((w) => w !== manager)
     }
   }
 
-  #childClickListener = (e: En3RaycasterEvent) => {
-    this.#activeObjectController =
-      this.#objectControllers.find((w) => w.object3d === e.object) || null
+  #clickListener = (e: En3RaycasterEvent) => {
+    const manager = this.#getManager(e.target)
 
-    if (this.#activeObjectController) {
-      this.#controls.attach(this.#activeObjectController.object3d)
+    if (manager) {
+      this.#activeObjectController =
+        this.#objectManagers.find((w) => w.object3d === manager?.object3d) ||
+        null
+
+      if (this.#activeObjectController) {
+        this.#controls.attach(this.#activeObjectController.object3d)
+      }
     }
   }
 
@@ -120,6 +132,20 @@ export class En3TransformControls {
       this.#controls.setSize(this.#controls.size + 0.1)
     } else if (e.key === '-' || e.key === '_') {
       this.#controls.setSize(this.#controls.size - 0.1)
+    } else if (e.key === 'h') {
+      this.#objectManagers.forEach((manager) => {
+        manager.helpers.forEach((helper) => {
+          helper.visible = !helper.visible
+        })
+      })
     }
+  }
+
+  #getManager(object: Object3D<any>) {
+    const manager = this.#objectManagers.find(
+      (v) => v.object3d === object || v.raycasterTarget === object
+    )
+
+    return manager
   }
 }
