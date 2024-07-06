@@ -25,7 +25,7 @@ const stylesheet = createStylesheet({
   ':host': {
     display: 'grid',
     gridAutoFlow: 'column',
-    gridTemplateColumns: '0.4fr 1fr',
+    gridTemplateColumns: '0.5fr 1fr',
     alignItems: 'center',
     color: aptechkaTheme.colorFont.var,
     gap: 'var(--gap-medium)',

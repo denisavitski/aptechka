@@ -4,9 +4,11 @@ import { En3OrbitControls } from './En3OrbitControls'
 import { En3GridHelper } from './En3GridHelper'
 import { En3TransformControls } from './En3TransformControls'
 import { En3ParametersManager } from './En3ParametersManager'
+import { En3ComposerManager } from './En3ComposerManager'
 
 export class En3Helpers {
   #rendererManager: En3ParametersManager
+  #composerManager: En3ComposerManager | null = null
   #gridHelper: En3GridHelper
   #cameraManager: En3Object3dManager
   #orbitControls: En3OrbitControls
@@ -14,6 +16,11 @@ export class En3Helpers {
 
   constructor() {
     this.#rendererManager = new En3ParametersManager(en3.webglRenderer)
+
+    if (en3.composer) {
+      this.#composerManager = new En3ComposerManager()
+    }
+
     this.#gridHelper = new En3GridHelper()
     this.#cameraManager = new En3Object3dManager(en3.camera)
 
@@ -35,6 +42,7 @@ export class En3Helpers {
 
   public destroy() {
     this.#rendererManager.destroy()
+    this.#composerManager?.destroy()
     this.#gridHelper.destroy()
     this.#cameraManager.destroy()
     this.#orbitControls.destroy()

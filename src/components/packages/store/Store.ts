@@ -17,6 +17,7 @@ export type StoreEqualityCheckCallback<StoreType> = (
 export interface StoreManager {
   type: string
   disabled?: boolean
+  invisible?: boolean
 }
 
 export interface StoreStringManager extends StoreManager {

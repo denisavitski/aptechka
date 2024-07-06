@@ -5,23 +5,26 @@ import {
   BoxGeometry,
   Color,
   DirectionalLight,
-  HemisphereLight,
   Mesh,
   MeshStandardMaterial,
-  PointLight,
-  PointLightHelper,
-  SpotLight,
 } from 'three'
 import { En3Helpers } from '../helpers/En3Helpers'
+import { EffectComposer, RenderPass } from 'three/examples/jsm/Addons.js'
 
 en3.setup({
-  webGLRendererParameters: {},
+  composer: EffectComposer,
 })
 
 en3.webglRenderer.toneMapping = ACESFilmicToneMapping
 en3.webglRenderer.toneMappingExposure = 1.4
 
 new En3Helpers()
+
+const renderPass = new RenderPass(en3.scene, en3.camera)
+
+en3.composer.addPass(renderPass)
+
+console.log(renderPass)
 
 const boxes: Array<Mesh<BoxGeometry, MeshStandardMaterial>> = []
 

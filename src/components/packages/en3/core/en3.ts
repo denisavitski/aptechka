@@ -6,6 +6,7 @@ import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 import { en3Cache } from './en3Cache'
 import { En3Raycaster } from './En3Raycaster'
+import { EffectComposer } from 'three/examples/jsm/Addons.js'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
@@ -14,6 +15,7 @@ export interface En3Options {
   view?: En3ViewOptions
   cacheAssets?: boolean
   zIndex?: number
+  composer?: typeof EffectComposer
 }
 
 class En3 {
@@ -35,6 +37,8 @@ class En3 {
 
   #isCreated = false
   #cacheAssets = false
+
+  #composer: EffectComposer = null!
 
   public get CDNVersion() {
     return this.#CDNVersion
@@ -84,6 +88,10 @@ class En3 {
     return this.#cacheAssets
   }
 
+  public get composer() {
+    return this.#composer
+  }
+
   public setup(options?: En3Options) {
     if (this.#isCreated) {
       console.warn('[en3.setup]: You are trying to setup en3 again.')
@@ -121,6 +129,14 @@ class En3 {
 
     this.#raycaster = new En3Raycaster()
 
+    if (options?.composer) {
+      this.#composer = new options.composer(this.#webglRenderer)
+
+      this.render = () => {
+        this.#composer.render()
+      }
+    }
+
     this.#cacheAssets = options?.cacheAssets || false
 
     this.#isCreated = true
@@ -149,6 +165,8 @@ class En3 {
     this.#webglRenderer.dispose()
     this.#webglRenderer.domElement.remove()
     this.#webglRenderer = null!
+    this.#composer.dispose()
+    this.#composer = null!
 
     this.#isCreated = false
 
@@ -225,6 +243,11 @@ class En3 {
     this.#pixelRatio = Math.min(this.#maxPixelRatio, devicePixelRatio || 1)
     this.#webglRenderer.setPixelRatio(this.#pixelRatio)
     this.#webglRenderer.setSize(this.#width, this.#height)
+
+    if (this.#composer) {
+      this.#composer.setPixelRatio(this.#pixelRatio)
+      this.#composer.setSize(this.#width, this.#height)
+    }
   }
 
   #tickListener: TickerCallback = () => {

@@ -12,8 +12,9 @@ const stylesheet = createStylesheet({
     height: 'max-content',
   },
   'e-checkbox': {
-    width: 'var(--height-input)',
-    height: 'var(--height-input)',
+    '--size': 'calc(var(--height-input) * 0.8)',
+    width: 'var(--size)',
+    height: 'var(--size)',
     borderRadius: aptechkaTheme.borderRadiusSmall.var,
   },
 })

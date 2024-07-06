@@ -14,8 +14,7 @@ export class En3OrbitControls {
         name: 'Controls.OrbitControls.Target',
         manager: {
           type: 'number',
-          step: 0.0001,
-          ease: 10,
+          invisible: true,
         },
       },
     })

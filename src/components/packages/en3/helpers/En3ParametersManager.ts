@@ -1,9 +1,4 @@
-import {
-  Store,
-  StoreManagers,
-  StoreNumberManager,
-  StoreSelectManager,
-} from '@packages/store'
+import { Store, StoreManagers, StoreSelectManager } from '@packages/store'
 import * as THREE from 'three'
 import { en3 } from '../core/en3'
 import { traverseMaterials } from '../utils'
@@ -102,7 +97,9 @@ const shadowMapTypes = [
   'VSMShadowMap',
 ]
 
-const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
+const defautOptionsCatalog: {
+  [key: string]: StoreManagers[keyof StoreManagers]
+} = {
   intensity: {
     type: 'number',
     min: 0,
@@ -350,7 +347,7 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
   },
 }
 
-const shadowMapManagerOptions: {
+const shadowMapOptionsCatalog: {
   [key: string]: StoreManagers[keyof StoreManagers]
 } = {
   type: {
@@ -373,83 +370,113 @@ const skipKeys = new Set([
   'up',
 ])
 
+interface ManageParameters {
+  subject: any
+  folderKey: string
+  optionsCatalog?: any
+  afterChange?: () => void
+}
+
+interface ManagerParameters<
+  M extends StoreManagers[keyof StoreManagers] = StoreManagers[keyof StoreManagers]
+> {
+  name: string
+  value: any
+  subject: any
+  key: string
+  managerOptions?: M
+  afterChange?: () => void
+}
+
+export type OptionsCatalog = {
+  [key: string]: StoreManagers[keyof StoreManagers]
+}
+
 export class En3ParametersManager {
   #subject: any
 
   #managers: Array<Store<any, any, any>> = []
 
-  constructor(subject: any) {
+  constructor(
+    subject: any,
+    optionsCatalog: OptionsCatalog = defautOptionsCatalog
+  ) {
     this.#subject = subject
 
     if (this.#subject instanceof THREE.Object3D) {
-      this.#manage(
-        this.#subject,
-        `${this.#subject.name}.Parameters`,
-        managerOptions,
-        this.#subject instanceof THREE.Camera
-          ? () => {
-              en3.view.resize()
-            }
-          : undefined
-      )
+      this.#manage({
+        subject: this.#subject,
+        optionsCatalog,
+        folderKey: `${this.#subject.name}.Parameters`,
+        afterChange:
+          this.#subject instanceof THREE.Camera
+            ? () => {
+                en3.view.resize()
+              }
+            : undefined,
+      })
 
       if (this.#subject instanceof THREE.Mesh) {
         const material = this.#subject.material
 
         if (material instanceof THREE.Material) {
-          this.#manage(
-            material,
-            `${this.#subject.name}.Parameters.Material`,
-            managerOptions,
-            () => {
+          this.#manage({
+            subject: material,
+            folderKey: `${this.#subject.name}.Parameters.Material`,
+            optionsCatalog,
+            afterChange: () => {
               material.needsUpdate = true
-            }
-          )
+            },
+          })
         }
       } else if (this.#subject instanceof THREE.Light) {
         const shadow = this.#subject.shadow
 
         if (shadow) {
-          this.#manage(
-            shadow,
-            `${this.#subject.name}.Parameters.Shadow`,
-            managerOptions,
-            () => {
+          this.#manage({
+            subject: shadow,
+            folderKey: `${this.#subject.name}.Parameters.Shadow`,
+            optionsCatalog,
+            afterChange: () => {
               shadow.needsUpdate = true
-            }
-          )
+            },
+          })
 
           const camera = shadow.camera
 
           if (camera) {
-            this.#manage(
-              camera,
-              `${this.#subject.name}.Parameters.Shadow.Camera`,
-              managerOptions,
-              () => {
+            this.#manage({
+              subject: camera,
+              folderKey: `${this.#subject.name}.Parameters.Shadow.Camera`,
+              optionsCatalog,
+              afterChange: () => {
                 shadow.camera.updateProjectionMatrix()
-              }
-            )
+              },
+            })
           }
         }
       }
     } else if (this.#subject instanceof THREE.WebGLRenderer) {
       const renderer = this.#subject
 
-      this.#manage(renderer, `Renderer`, managerOptions)
+      this.#manage({
+        subject: renderer,
+        folderKey: `Renderer`,
+        optionsCatalog,
+      })
 
-      this.#manage(
-        renderer.shadowMap,
-        `Renderer.shadowMap`,
-        shadowMapManagerOptions,
-        () => {
+      this.#manage({
+        subject: renderer.shadowMap,
+        folderKey: `Renderer.shadowMap`,
+        optionsCatalog: shadowMapOptionsCatalog,
+        afterChange: () => {
           renderer.shadowMap.needsUpdate = true
 
           traverseMaterials(en3.scene, (material) => {
             material.needsUpdate = true
           })
-        }
-      )
+        },
+      })
     }
   }
 
@@ -459,12 +486,9 @@ export class En3ParametersManager {
     })
   }
 
-  #manage(
-    subject: any,
-    folderKey: string,
-    options: any,
-    afterChange?: () => void
-  ) {
+  #manage(parameters: ManageParameters) {
+    const { subject, folderKey, optionsCatalog, afterChange } = parameters
+
     for (const key in subject) {
       if (key.startsWith('_') || skipKeys.has(key)) {
         continue
@@ -474,77 +498,91 @@ export class En3ParametersManager {
 
       const name = `${folderKey}.${key}`
 
-      const foundedManagerOptions = options[key as keyof typeof options]
+      const managerOptions = optionsCatalog[key as keyof typeof optionsCatalog]
 
       if (typeof value === 'number') {
-        if (foundedManagerOptions?.type === 'select') {
-          this.#createSelectManager(
+        if (managerOptions?.type === 'select') {
+          this.#createSelectManager({
             name,
             value,
             subject,
             key,
-            foundedManagerOptions,
-            afterChange
-          )
+            managerOptions,
+            afterChange,
+          })
         } else {
-          this.#createNumberManager(
+          this.#createNumberManager({
             name,
             value,
             subject,
             key,
-            foundedManagerOptions,
-            afterChange
-          )
+            managerOptions,
+            afterChange,
+          })
         }
       } else if (
         value instanceof THREE.Vector2 ||
         value instanceof THREE.Vector3
       ) {
-        this.#createVectorManager(
+        this.#createVectorManager({
           name,
           value,
           subject,
           key,
-          foundedManagerOptions,
-          afterChange
-        )
+          managerOptions,
+          afterChange,
+        })
       } else if (
         typeof value === 'boolean' &&
         !key.startsWith('is') &&
         !key.startsWith('matrix')
       ) {
-        this.#createBooleanManager(name, value, subject, key, afterChange)
+        this.#createBooleanManager({
+          name,
+          value,
+          subject,
+          key,
+          managerOptions,
+          afterChange,
+        })
       } else if (value instanceof THREE.Color) {
-        this.#createColorManager(name, value, subject, key, afterChange)
-      } else if (foundedManagerOptions) {
-        if (foundedManagerOptions?.type === 'select') {
-          this.#createSelectManager(
+        this.#createColorManager({
+          name,
+          value,
+          subject,
+          key,
+          managerOptions,
+          afterChange,
+        })
+      } else if (managerOptions) {
+        if (managerOptions?.type === 'select') {
+          this.#createSelectManager({
             name,
             value,
             subject,
             key,
-            foundedManagerOptions,
-            afterChange
-          )
+            managerOptions,
+            afterChange,
+          })
         }
       }
     }
   }
 
-  #createNumberManager(
-    name: string,
-    initialValue: any,
-    subject: any,
-    key: string,
-    foundedManagerOptions?: (typeof managerOptions)[keyof typeof managerOptions],
-    afterChange?: () => void
-  ) {
-    const manager = new Store(initialValue, {
+  #createNumberManager({
+    name,
+    value,
+    subject,
+    key,
+    managerOptions,
+    afterChange,
+  }: ManagerParameters) {
+    const manager = new Store(value, {
       passport: {
         name,
         manager: {
           type: 'number',
-          ...foundedManagerOptions,
+          ...managerOptions,
         },
       },
     })
@@ -557,14 +595,14 @@ export class En3ParametersManager {
     this.#managers.push(manager)
   }
 
-  #createVectorManager(
-    name: string,
-    initialValue: THREE.Vector2 | THREE.Vector3,
-    subject: any,
-    key: string,
-    foundedManagerOptions?: (typeof managerOptions)[keyof typeof managerOptions],
-    afterChange?: () => void
-  ) {
+  #createVectorManager({
+    name,
+    value,
+    subject,
+    key,
+    managerOptions,
+    afterChange,
+  }: ManagerParameters) {
     const vectorToArray = (value: THREE.Vector2 | THREE.Vector3) => {
       const arr = [value.x, value.y]
 
@@ -575,12 +613,12 @@ export class En3ParametersManager {
       return arr
     }
 
-    const manager = new Store(vectorToArray(initialValue), {
+    const manager = new Store(vectorToArray(value), {
       passport: {
         name,
         manager: {
           type: 'number',
-          ...foundedManagerOptions,
+          ...managerOptions,
         },
       },
     })
@@ -593,18 +631,20 @@ export class En3ParametersManager {
     this.#managers.push(manager)
   }
 
-  #createBooleanManager(
-    name: string,
-    initialValue: boolean,
-    subject: any,
-    key: string,
-    afterChange?: () => void
-  ) {
-    const manager = new Store(initialValue, {
+  #createBooleanManager({
+    name,
+    value,
+    subject,
+    key,
+    managerOptions,
+    afterChange,
+  }: ManagerParameters) {
+    const manager = new Store(value, {
       passport: {
         name,
         manager: {
           type: 'boolean',
+          ...managerOptions,
         },
       },
     })
@@ -617,18 +657,20 @@ export class En3ParametersManager {
     this.#managers.push(manager)
   }
 
-  #createColorManager(
-    name: string,
-    initialValue: THREE.Color,
-    subject: any,
-    key: string,
-    afterChange?: () => void
-  ) {
-    const manager = new Store(`#${initialValue.getHexString()}`, {
+  #createColorManager({
+    name,
+    value,
+    subject,
+    key,
+    managerOptions,
+    afterChange,
+  }: ManagerParameters) {
+    const manager = new Store(`#${value.getHexString()}`, {
       passport: {
         name,
         manager: {
           type: 'color',
+          ...managerOptions,
         },
       },
     })
@@ -641,44 +683,46 @@ export class En3ParametersManager {
     this.#managers.push(manager)
   }
 
-  #createSelectManager(
-    name: string,
-    initialValue: any,
-    subject: any,
-    key: string,
-    foundedManagerOptions: StoreSelectManager,
-    afterChange?: () => void
-  ) {
-    const variants = foundedManagerOptions.variants
+  #createSelectManager({
+    name,
+    value,
+    subject,
+    key,
+    managerOptions,
+    afterChange,
+  }: ManagerParameters<StoreSelectManager>) {
+    const variants = managerOptions?.variants
 
-    let initialVariant = null
+    if (variants) {
+      let initialVariant = null
 
-    for (const key of variants) {
-      if (initialValue === THREE[key as keyof typeof THREE]) {
-        initialVariant = key
-      }
-    }
-
-    const manager = new Store(initialVariant || initialValue, {
-      passport: {
-        name,
-        manager: {
-          ...foundedManagerOptions,
-        },
-      },
-    })
-
-    manager.subscribe((e) => {
-      if (typeof e.current === 'string') {
-        if (e.current[0] === e.current[0].toUpperCase()) {
-          subject[key] = THREE[e.current as keyof typeof THREE]
-        } else {
-          subject[key] = e.current
+      for (const key of variants) {
+        if (value === THREE[key as keyof typeof THREE]) {
+          initialVariant = key
         }
       }
-      afterChange?.()
-    })
 
-    this.#managers.push(manager)
+      const manager = new Store(initialVariant || value, {
+        passport: {
+          name,
+          manager: {
+            ...managerOptions,
+          },
+        },
+      })
+
+      manager.subscribe((e) => {
+        if (typeof e.current === 'string') {
+          if (e.current[0] === e.current[0].toUpperCase()) {
+            subject[key] = THREE[e.current as keyof typeof THREE]
+          } else {
+            subject[key] = e.current
+          }
+        }
+        afterChange?.()
+      })
+
+      this.#managers.push(manager)
+    }
   }
 }

@@ -17,6 +17,6 @@ export enum TICK_ORDER {
   ANIMATION,
   LAYOUT_BOX,
   LADDER,
-  EN3,
-  LAST = 100000,
+  EN3 = 100000,
+  LAST = 100001,
 }

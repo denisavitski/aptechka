@@ -22,17 +22,17 @@ import { tweakerStorage } from './tweakerStorage'
 
 const stylesheet = createStylesheet({
   ':host': {
-    '--tweaker-width': '500px',
+    '--tweaker-width': '550px',
     '--tweaker-offset': '20px',
-    '--tweaker-folder-height': '40px',
-    '--height-input': '30px',
-    '--gap-large': '16px',
-    '--gap-medium': '12px',
+    '--tweaker-folder-height': '35px',
+    '--height-input': '25px',
+    '--gap-large': '12px',
+    '--gap-medium': '10px',
     '--gap-small': '8px',
     '--gap-extra-small': '4px',
-    '--font-size-large': '20px',
-    '--font-size-medium': '16px',
-    '--font-size-small': '14px',
+    '--font-size-large': '16px',
+    '--font-size-medium': '14px',
+    '--font-size-small': '12px',
     '--duration-short': '0.2s',
 
     fontFamily: 'sans-serif',
@@ -46,7 +46,7 @@ const stylesheet = createStylesheet({
     backgroundColor: aptechkaTheme.colorMain.var,
     borderRadius: aptechkaTheme.borderRadius.var,
 
-    transition: 'opacity 0.2s',
+    transition: 'opacity 0.1s',
 
     zIndex: '100',
 
@@ -260,14 +260,6 @@ export class TweakerElement extends TweakerFolderElement {
         }),
       ],
     })
-
-    this.addEventListener('accordionItemToggle', (e) => {
-      if (e.detail.opened) {
-        this.style.opacity = '1'
-      } else {
-        this.style.opacity = '0.1'
-      }
-    })
   }
 
   protected override connectedCallback() {
@@ -296,7 +288,7 @@ export class TweakerElement extends TweakerFolderElement {
 
   #storesChangeListener = debounce(() => {
     activeStores.current.forEach((store) => {
-      if (store.passport) {
+      if (store.passport && !store.passport.manager?.invisible) {
         const sname = store.passport.name.split('.')
 
         this.handleStore({
