@@ -87,7 +87,7 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
   intensity: {
     type: 'number',
     min: 0,
-    max: 50,
+    max: 20,
     step: 0.0001,
   },
   renderOrder: {
@@ -255,6 +255,58 @@ const managerOptions: { [key: string]: StoreManagers[keyof StoreManagers] } = {
     min: 0,
     step: 0.0001,
   },
+  distance: {
+    type: 'number',
+    min: 0,
+    step: 0.1,
+  },
+  decay: {
+    type: 'number',
+    min: 0,
+    step: 0.00001,
+    ease: 0.001,
+  },
+  focus: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    step: 0.00001,
+  },
+  bias: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    step: 0.000001,
+  },
+  blurSamples: {
+    type: 'number',
+    min: 0,
+    step: 1,
+  },
+  normalBias: {
+    type: 'number',
+    min: 0,
+    step: 0.001,
+    ease: 0.01,
+  },
+  radius: {
+    type: 'number',
+    min: 0,
+    step: 0.001,
+    ease: 0.01,
+  },
+  penumbra: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    step: 0.000001,
+  },
+  power: {
+    type: 'number',
+    min: 0,
+    step: 0.001,
+    ease: 0.01,
+  },
 }
 
 const skipKeys = new Set([
@@ -267,6 +319,7 @@ const skipKeys = new Set([
   'rotation',
   'coordinateSystem',
   'aspect',
+  'autoUpdate',
 ])
 
 export class En3ParametersManager {
@@ -277,26 +330,40 @@ export class En3ParametersManager {
   constructor(subject: any) {
     this.#subject = subject
 
-    this.#manage(
-      this.#subject,
-      `${this.#subject.name}.Parameters`,
-      this.#subject instanceof THREE.Camera
-        ? () => {
-            en3.view.resize()
-          }
-        : undefined
-    )
-
-    const material = this.#subject.material
-
-    if (material instanceof THREE.Material) {
+    if (this.#subject instanceof THREE.Object3D) {
       this.#manage(
-        material,
-        `${this.#subject.name}.Parameters.Material`,
-        () => {
-          material.needsUpdate = true
-        }
+        this.#subject,
+        `${this.#subject.name}.Parameters`,
+        this.#subject instanceof THREE.Camera
+          ? () => {
+              en3.view.resize()
+            }
+          : undefined
       )
+
+      if (this.#subject instanceof THREE.Mesh) {
+        const material = this.#subject.material
+
+        if (material instanceof THREE.Material) {
+          this.#manage(
+            material,
+            `${this.#subject.name}.Parameters.Material`,
+            () => {
+              material.needsUpdate = true
+            }
+          )
+        }
+      } else if (this.#subject instanceof THREE.Light) {
+        const shadow = this.#subject.shadow
+
+        this.#manage(shadow, `${this.#subject.name}.Parameters.Shadow`)
+
+        const camera = shadow.camera
+
+        if (camera) {
+          this.#manage(camera, `${this.#subject.name}.Parameters.Shadow.Camera`)
+        }
+      }
     }
   }
 

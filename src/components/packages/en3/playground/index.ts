@@ -7,6 +7,7 @@ import {
   DirectionalLight,
   Mesh,
   MeshStandardMaterial,
+  PointLight,
 } from 'three'
 import { En3Helpers } from '../helpers/En3Helpers'
 
@@ -25,7 +26,7 @@ for (let index = 0; index < 10; index++) {
   const geo = new BoxGeometry()
   const mat = new MeshStandardMaterial({ color: 'lightblue' })
   const mesh = new Mesh(geo, mat)
-  mesh.name = `T.P.Objects.XXX-${index + 1}`
+  mesh.name = `Objects.XXX-${index + 1}`
   mesh.scale.setScalar(200)
   mesh.position.z = 250 * index * -1
   mesh.position.x = 60 * index
@@ -34,12 +35,10 @@ for (let index = 0; index < 10; index++) {
   en3.view.add(mesh)
 }
 
-const directionalLight = new DirectionalLight()
-directionalLight.name = 'Lights.Directional'
-
-directionalLight.position.z = 1000
-
-en3.view.add(directionalLight)
+const pointLight = new PointLight()
+pointLight.name = 'T.P.Lights.Point'
+pointLight.position.z = 1000
+en3.view.add(pointLight)
 
 boxes.forEach((box) => {
   en3.raycaster.add(box, {
