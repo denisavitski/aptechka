@@ -2,6 +2,7 @@ import { Store, StoreManagers, StoreSelectManager } from '@packages/store'
 import * as THREE from 'three'
 import { en3 } from '../core/en3'
 import { traverseMaterials } from '../utils'
+import { isObject } from '@packages/utils'
 
 const blendingEquations = [
   'AddEquation',
@@ -88,13 +89,6 @@ const toneMappingTypes = [
   'AgXToneMapping',
   'NeutralToneMapping',
   'CustomToneMapping',
-]
-
-const shadowMapTypes = [
-  'BasicShadowMap',
-  'PCFShadowMap',
-  'PCFSoftShadowMap',
-  'VSMShadowMap',
 ]
 
 const defautOptionsCatalog: {
@@ -345,18 +339,26 @@ const defautOptionsCatalog: {
     min: 0,
     step: 1,
   },
-}
-
-const shadowMapOptionsCatalog: {
-  [key: string]: StoreManagers[keyof StoreManagers]
-} = {
-  type: {
-    type: 'select',
-    variants: shadowMapTypes,
+  damp: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    step: 0.000001,
+  },
+  strength: {
+    type: 'number',
+    min: 0,
+    step: 0.01,
+  },
+  threshold: {
+    type: 'number',
+    min: 0,
+    max: 1,
+    step: 0.0001,
   },
 }
 
-const skipKeys = new Set([
+const defaultSkipKeys = new Set([
   'stencilFuncMask',
   'needsUpdate',
   'version',
@@ -374,6 +376,7 @@ interface ManageParameters {
   subject: any
   folderKey: string
   optionsCatalog?: any
+  skipKeys: Set<string>
   afterChange?: () => void
 }
 
@@ -392,92 +395,36 @@ export type OptionsCatalog = {
   [key: string]: StoreManagers[keyof StoreManagers]
 }
 
+export interface En3ParametersManagerOptions {
+  optionsCatalog?: OptionsCatalog
+  folderName?: string
+  skipKeys?: Array<string>
+  afterChange?: () => void
+}
+
 export class En3ParametersManager {
   #subject: any
 
   #managers: Array<Store<any, any, any>> = []
 
-  constructor(
-    subject: any,
-    optionsCatalog: OptionsCatalog = defautOptionsCatalog
-  ) {
+  constructor(subject: any, options?: En3ParametersManagerOptions) {
     this.#subject = subject
 
-    if (this.#subject instanceof THREE.Object3D) {
-      this.#manage({
-        subject: this.#subject,
-        optionsCatalog,
-        folderKey: `${this.#subject.name}.Parameters`,
-        afterChange:
-          this.#subject instanceof THREE.Camera
-            ? () => {
-                en3.view.resize()
-              }
-            : undefined,
-      })
-
-      if (this.#subject instanceof THREE.Mesh) {
-        const material = this.#subject.material
-
-        if (material instanceof THREE.Material) {
-          this.#manage({
-            subject: material,
-            folderKey: `${this.#subject.name}.Parameters.Material`,
-            optionsCatalog,
-            afterChange: () => {
-              material.needsUpdate = true
-            },
-          })
-        }
-      } else if (this.#subject instanceof THREE.Light) {
-        const shadow = this.#subject.shadow
-
-        if (shadow) {
-          this.#manage({
-            subject: shadow,
-            folderKey: `${this.#subject.name}.Parameters.Shadow`,
-            optionsCatalog,
-            afterChange: () => {
-              shadow.needsUpdate = true
-            },
-          })
-
-          const camera = shadow.camera
-
-          if (camera) {
-            this.#manage({
-              subject: camera,
-              folderKey: `${this.#subject.name}.Parameters.Shadow.Camera`,
-              optionsCatalog,
-              afterChange: () => {
-                shadow.camera.updateProjectionMatrix()
-              },
-            })
-          }
-        }
-      }
-    } else if (this.#subject instanceof THREE.WebGLRenderer) {
-      const renderer = this.#subject
-
-      this.#manage({
-        subject: renderer,
-        folderKey: `Renderer`,
-        optionsCatalog,
-      })
-
-      this.#manage({
-        subject: renderer.shadowMap,
-        folderKey: `Renderer.shadowMap`,
-        optionsCatalog: shadowMapOptionsCatalog,
-        afterChange: () => {
-          renderer.shadowMap.needsUpdate = true
-
-          traverseMaterials(en3.scene, (material) => {
-            material.needsUpdate = true
-          })
-        },
-      })
+    const optionsCatalog = {
+      ...defautOptionsCatalog,
+      ...options?.optionsCatalog,
     }
+    const skipKeys = new Set([...defaultSkipKeys, ...(options?.skipKeys || [])])
+    const folderName = options?.folderName || this.#subject.name
+    const afterChange = options?.afterChange
+
+    this.#manage({
+      subject: this.#subject,
+      skipKeys,
+      optionsCatalog,
+      folderKey: folderName,
+      afterChange,
+    })
   }
 
   public destroy() {
@@ -487,14 +434,16 @@ export class En3ParametersManager {
   }
 
   #manage(parameters: ManageParameters) {
-    const { subject, folderKey, optionsCatalog, afterChange } = parameters
+    const { subject, folderKey, optionsCatalog, afterChange, skipKeys } =
+      parameters
 
     for (const key in subject) {
       if (key.startsWith('_') || skipKeys.has(key)) {
         continue
       }
 
-      const value = subject[key]
+      const valueOrObjectWithValue = subject[key]
+      const value = this.#getValue(valueOrObjectWithValue)
 
       const name = `${folderKey}.${key}`
 
@@ -504,7 +453,7 @@ export class En3ParametersManager {
         if (managerOptions?.type === 'select') {
           this.#createSelectManager({
             name,
-            value,
+            value: valueOrObjectWithValue,
             subject,
             key,
             managerOptions,
@@ -513,7 +462,7 @@ export class En3ParametersManager {
         } else {
           this.#createNumberManager({
             name,
-            value,
+            value: valueOrObjectWithValue,
             subject,
             key,
             managerOptions,
@@ -526,7 +475,7 @@ export class En3ParametersManager {
       ) {
         this.#createVectorManager({
           name,
-          value,
+          value: valueOrObjectWithValue,
           subject,
           key,
           managerOptions,
@@ -539,7 +488,7 @@ export class En3ParametersManager {
       ) {
         this.#createBooleanManager({
           name,
-          value,
+          value: valueOrObjectWithValue,
           subject,
           key,
           managerOptions,
@@ -548,7 +497,7 @@ export class En3ParametersManager {
       } else if (value instanceof THREE.Color) {
         this.#createColorManager({
           name,
-          value,
+          value: valueOrObjectWithValue,
           subject,
           key,
           managerOptions,
@@ -558,7 +507,7 @@ export class En3ParametersManager {
         if (managerOptions?.type === 'select') {
           this.#createSelectManager({
             name,
-            value,
+            value: valueOrObjectWithValue,
             subject,
             key,
             managerOptions,
@@ -577,7 +526,7 @@ export class En3ParametersManager {
     managerOptions,
     afterChange,
   }: ManagerParameters) {
-    const manager = new Store(value, {
+    const manager = new Store(this.#getValue(value), {
       passport: {
         name,
         manager: {
@@ -588,7 +537,11 @@ export class En3ParametersManager {
     })
 
     manager.subscribe((e) => {
-      subject[key] = e.current
+      this.#setObjectValue(
+        subject,
+        key,
+        (object, key) => (object[key] = e.current)
+      )
       afterChange?.()
     })
 
@@ -613,7 +566,7 @@ export class En3ParametersManager {
       return arr
     }
 
-    const manager = new Store(vectorToArray(value), {
+    const manager = new Store(vectorToArray(this.#getValue(value)), {
       passport: {
         name,
         manager: {
@@ -624,7 +577,9 @@ export class En3ParametersManager {
     })
 
     manager.subscribe((e) => {
-      ;(subject[key] as any).set(...e.current)
+      this.#setObjectValue(subject, key, (object, key) =>
+        object[key].set(...e.current)
+      )
       afterChange?.()
     })
 
@@ -639,7 +594,7 @@ export class En3ParametersManager {
     managerOptions,
     afterChange,
   }: ManagerParameters) {
-    const manager = new Store(value, {
+    const manager = new Store(this.#getValue(value), {
       passport: {
         name,
         manager: {
@@ -650,7 +605,11 @@ export class En3ParametersManager {
     })
 
     manager.subscribe((e) => {
-      subject[key] = e.current
+      this.#setObjectValue(
+        subject,
+        key,
+        (object, key) => (object[key] = e.current)
+      )
       afterChange?.()
     })
 
@@ -665,7 +624,7 @@ export class En3ParametersManager {
     managerOptions,
     afterChange,
   }: ManagerParameters) {
-    const manager = new Store(`#${value.getHexString()}`, {
+    const manager = new Store(`#${this.#getValue(value).getHexString()}`, {
       passport: {
         name,
         manager: {
@@ -676,7 +635,11 @@ export class En3ParametersManager {
     })
 
     manager.subscribe((e) => {
-      subject[key] = new THREE.Color(e.current)
+      this.#setObjectValue(
+        subject,
+        key,
+        (object, key) => (object[key] = new THREE.Color(e.current))
+      )
       afterChange?.()
     })
 
@@ -702,7 +665,7 @@ export class En3ParametersManager {
         }
       }
 
-      const manager = new Store(initialVariant || value, {
+      const manager = new Store(initialVariant || this.#getValue(value), {
         passport: {
           name,
           manager: {
@@ -714,15 +677,46 @@ export class En3ParametersManager {
       manager.subscribe((e) => {
         if (typeof e.current === 'string') {
           if (e.current[0] === e.current[0].toUpperCase()) {
-            subject[key] = THREE[e.current as keyof typeof THREE]
+            this.#setObjectValue(
+              subject,
+              key,
+              (object, key) =>
+                (object[key] = THREE[e.current as keyof typeof THREE])
+            )
           } else {
-            subject[key] = e.current
+            this.#setObjectValue(
+              subject,
+              key,
+              (object, key) => (object[key] = e.current)
+            )
           }
         }
         afterChange?.()
       })
 
       this.#managers.push(manager)
+    }
+  }
+
+  #isObjectWithValue(valueOrObjectwithValue: any) {
+    return isObject(valueOrObjectwithValue) && 'value' in valueOrObjectwithValue
+  }
+
+  #getValue(valueOrObjectwithValue: any) {
+    return this.#isObjectWithValue(valueOrObjectwithValue)
+      ? valueOrObjectwithValue.value
+      : valueOrObjectwithValue
+  }
+
+  #setObjectValue(
+    object: any,
+    key: string,
+    callback: (object: any, key: string) => any
+  ) {
+    if (this.#isObjectWithValue(object[key])) {
+      callback(object[key], 'value')
+    } else {
+      callback(object, key)
     }
   }
 }

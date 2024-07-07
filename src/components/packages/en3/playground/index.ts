@@ -7,9 +7,18 @@ import {
   DirectionalLight,
   Mesh,
   MeshStandardMaterial,
+  Vector2,
 } from 'three'
 import { En3Helpers } from '../helpers/En3Helpers'
-import { EffectComposer, RenderPass } from 'three/examples/jsm/Addons.js'
+import {
+  AfterimagePass,
+  BokehPass,
+  EffectComposer,
+  FilmPass,
+  RenderPass,
+  UnrealBloomPass,
+} from 'three/examples/jsm/Addons.js'
+import { ticker } from '@packages/ticker'
 
 en3.setup({
   composer: EffectComposer,
@@ -21,10 +30,14 @@ en3.webglRenderer.toneMappingExposure = 1.4
 new En3Helpers()
 
 const renderPass = new RenderPass(en3.scene, en3.camera)
-
 en3.composer.addPass(renderPass)
-
-console.log(renderPass)
+const film = new UnrealBloomPass(
+  new Vector2(window.innerWidth, window.innerHeight),
+  1.5,
+  0.4,
+  0.85
+)
+en3.composer.addPass(film)
 
 const boxes: Array<Mesh<BoxGeometry, MeshStandardMaterial>> = []
 
@@ -52,5 +65,11 @@ boxes.forEach((box) => {
 
   box.addEventListener('pointerLeave', (e) => {
     box.material.color = new Color('lightblue')
+  })
+})
+
+ticker.subscribe((t) => {
+  boxes.forEach((box) => {
+    box.rotation.z = t.timestamp * 0.001
   })
 })

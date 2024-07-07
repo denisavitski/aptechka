@@ -15,6 +15,8 @@ import {
   Light,
   Camera,
   CameraHelper,
+  Mesh,
+  Material,
 } from 'three'
 import { En3ParametersManager } from './En3ParametersManager'
 import { en3 } from '../core/en3'
@@ -29,7 +31,7 @@ export interface En3Object3dManagerOptions {
 export class En3Object3dManager {
   #object3d: Object3D
 
-  #parametersManager: En3ParametersManager | null = null
+  #parametersManagers: Array<En3ParametersManager> = []
 
   #position: Store<XYZ>
   #rotation: Store<XYZ>
@@ -137,7 +139,58 @@ export class En3Object3dManager {
     })
 
     if (parameters) {
-      this.#parametersManager = new En3ParametersManager(this.#object3d)
+      this.#parametersManagers.push(
+        new En3ParametersManager(this.#object3d, {
+          folderName: `${this.#object3d.name}.Parameters`,
+          afterChange:
+            this.#object3d instanceof Camera
+              ? () => {
+                  en3.view.resize()
+                }
+              : undefined,
+        })
+      )
+
+      if (this.#object3d instanceof Mesh) {
+        const material = this.#object3d.material
+
+        if (material instanceof Material) {
+          this.#parametersManagers.push(
+            new En3ParametersManager(material, {
+              folderName: `${this.#object3d.name}.Parameters.Material`,
+              afterChange: () => {
+                material.needsUpdate = true
+              },
+            })
+          )
+        }
+      } else if (this.#object3d instanceof Light) {
+        const shadow = this.#object3d.shadow
+
+        if (shadow) {
+          this.#parametersManagers.push(
+            new En3ParametersManager(shadow, {
+              folderName: `${this.#object3d.name}.Parameters.Shadow`,
+              afterChange: () => {
+                shadow.needsUpdate = true
+              },
+            })
+          )
+        }
+
+        const camera = shadow.camera
+
+        if (camera) {
+          this.#parametersManagers.push(
+            new En3ParametersManager(shadow, {
+              folderName: `${this.#object3d.name}.Parameters.Shadow.Camera`,
+              afterChange: () => {
+                shadow.camera.updateProjectionMatrix()
+              },
+            })
+          )
+        }
+      }
     }
 
     if (this.#helpers.length) {
@@ -158,7 +211,7 @@ export class En3Object3dManager {
   }
 
   public destroy() {
-    this.#parametersManager?.destroy()
+    this.#parametersManagers.forEach((m) => m.destroy())
 
     this.#position.close()
     this.#rotation.close()

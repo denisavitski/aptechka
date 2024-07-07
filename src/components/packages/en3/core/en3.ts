@@ -6,7 +6,7 @@ import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
 import { en3Cache } from './en3Cache'
 import { En3Raycaster } from './En3Raycaster'
-import { EffectComposer } from 'three/examples/jsm/Addons.js'
+import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
