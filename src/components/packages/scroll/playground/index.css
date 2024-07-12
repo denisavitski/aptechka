@@ -1,6 +1,12 @@
+.f {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden auto;
+}
+
 .wrap {
   width: 100%;
-  height: 100%;
+  height: 100vh;
 }
 
 .reviews {
@@ -12,13 +18,15 @@
   --current-index-start-offset: 1;
   --current-index-end-offset: -1;
   --damping: 10;
-  --focus-delay: 1000;
   --loop: true;
-
-  width: 100%;
-  height: 100%;
+  --autoplay: 0.1;
+  --controls: false;
 
   border: 0.1rem solid red;
 
   overflow: hidden;
+  pointer-events: none;
+}
+.s {
+  height: 500vh;
 }

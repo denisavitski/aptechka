@@ -223,7 +223,9 @@ export class ScrollElement extends CustomElement {
       this.#dragControls = new DragControls({ element: this.#contentElement })
       this.#dragControls.changeEvent.subscribe(this.#notAutoplayControlListener)
 
-      this.#autoplayControls = new AutoplayControls()
+      this.#autoplayControls = new AutoplayControls({
+        culling: this,
+      })
       this.#autoplayControls.changeEvent.subscribe(this.#controlsListener)
 
       this.#axisCSSProperty.subscribe(({ current }) => {
