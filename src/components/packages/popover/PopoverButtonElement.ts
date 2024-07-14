@@ -49,11 +49,19 @@ export class PopoverButtonElement extends CustomElement {
     const targetId = this.getAttribute('target')
 
     if (targetId) {
-      const popoverElement =
-        document.querySelector(`#${targetId}`) ||
-        (this.getRootNode() as ParentNode).querySelector(`#${targetId}`)
+      let popoverElement: Element | null | undefined = null
 
-      if (popoverElement) {
+      if (targetId === 'parent') {
+        popoverElement = this.closest('popover')
+      } else if (targetId === 'sibling') {
+        popoverElement = this.parentElement?.closest('popover')
+      } else {
+        popoverElement =
+          document.querySelector(`#${targetId}`) ||
+          (this.getRootNode() as ParentNode).querySelector(`#${targetId}`)
+      }
+
+      if (popoverElement instanceof HTMLElement) {
         this.#popoverElement = popoverElement as PopoverElement
 
         this.#popoverElement.addEventListener(

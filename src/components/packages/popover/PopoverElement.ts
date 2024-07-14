@@ -14,6 +14,12 @@ export class PopoverElement extends CustomElement {
   #single = new Attribute(this, 'single', false)
   #historyAllowed = false
 
+  constructor() {
+    super()
+
+    this.setAttribute('popover', '')
+  }
+
   public get history() {
     return this.#history
   }
