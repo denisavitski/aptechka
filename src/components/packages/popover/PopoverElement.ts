@@ -17,6 +17,16 @@ export class PopoverElement extends CustomElement {
   constructor() {
     super()
     this.setAttribute('popover-target', '')
+
+    this.addEventListener('transitionstart', () => {
+      this.classList.remove('transition-end')
+      this.classList.add('transition-start')
+    })
+
+    this.addEventListener('transitionend', () => {
+      this.classList.remove('transition-start')
+      this.classList.add('transition-end')
+    })
   }
 
   public get history() {
@@ -98,7 +108,7 @@ export class PopoverElement extends CustomElement {
       this.classList.remove('triggered')
       this.style.display = 'none'
       this.dispatchEvent(new CustomEvent('popoverClosed'))
-    }, getElementTransitionDurationMS(this))
+    }, getElementTransitionDurationMS(this) + 10)
   }
 
   protected connectedCallback() {
@@ -124,6 +134,9 @@ export class PopoverElement extends CustomElement {
     clearTimeout(this.#closeTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
+
+    this.classList.remove('transition-end')
+    this.classList.remove('transition-start')
   }
 
   get #path() {
@@ -140,13 +153,16 @@ export class PopoverElement extends CustomElement {
     this.#withOrder(() => {
       const path = event.composedPath()
 
-      if (
-        (!path.find((p) => p === this) &&
-          !path.find(
-            (p) => p instanceof HTMLElement && p.closest('e-popover-button')
-          )) ||
-        (path[0] instanceof HTMLElement && path[0].closest('[outside]'))
-      ) {
+      const target = path[0]
+
+      const containsTarget =
+        target instanceof HTMLElement &&
+        (this.contains(target) || this.shadowRoot?.contains(target))
+
+      const outsideTarget =
+        target instanceof HTMLElement && target.hasAttribute('outside')
+
+      if (!containsTarget || outsideTarget) {
         this.close()
       }
     })
