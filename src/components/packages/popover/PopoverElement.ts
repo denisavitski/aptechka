@@ -16,8 +16,7 @@ export class PopoverElement extends CustomElement {
 
   constructor() {
     super()
-
-    this.setAttribute('popover', '')
+    this.setAttribute('popover-target', '')
   }
 
   public get history() {
@@ -142,12 +141,11 @@ export class PopoverElement extends CustomElement {
       const path = event.composedPath()
 
       if (
-        !path.find((p) => p === this) &&
-        !path.find(
-          (p) => p instanceof HTMLElement && p.closest('e-popover-button')
-        ) &&
-        path[0] instanceof HTMLElement &&
-        !path[0].closest('[data-outside]')
+        (!path.find((p) => p === this) &&
+          !path.find(
+            (p) => p instanceof HTMLElement && p.closest('e-popover-button')
+          )) ||
+        (path[0] instanceof HTMLElement && path[0].closest('[outside]'))
       ) {
         this.close()
       }

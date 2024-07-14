@@ -52,9 +52,9 @@ export class PopoverButtonElement extends CustomElement {
       let popoverElement: Element | null | undefined = null
 
       if (targetId === 'parent') {
-        popoverElement = this.closest('[popover]')
+        popoverElement = this.closest('[popover-target]')
       } else if (targetId === 'sibling') {
-        popoverElement = this.parentElement?.querySelector('[popover]')
+        popoverElement = this.parentElement?.querySelector('[popover-target]')
       } else {
         popoverElement =
           document.querySelector(`#${targetId}`) ||

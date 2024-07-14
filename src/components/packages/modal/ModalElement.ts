@@ -24,7 +24,7 @@ const stylesheet = createStylesheet({
     height: '100%',
 
     transitionProperty: 'opacity',
-    transitionDuration: 'var(--duration-short)',
+    transitionDuration: 'var(--transition-duration)',
   },
 
   ':host::before': {
@@ -79,7 +79,7 @@ const stylesheet = createStylesheet({
     justifyContent: 'center',
 
     transitionProperty: 'transform',
-    transitionDuration: 'var(--duration-short)',
+    transitionDuration: 'var(--transition-duration)',
     willChange: 'transform',
   },
 
