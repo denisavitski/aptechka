@@ -17,16 +17,6 @@ export class PopoverElement extends CustomElement {
   constructor() {
     super()
     this.setAttribute('popover-target', '')
-
-    this.addEventListener('transitionstart', () => {
-      this.classList.remove('transition-end')
-      this.classList.add('transition-start')
-    })
-
-    this.addEventListener('transitionend', () => {
-      this.classList.remove('transition-start')
-      this.classList.add('transition-end')
-    })
   }
 
   public get history() {
@@ -134,9 +124,6 @@ export class PopoverElement extends CustomElement {
     clearTimeout(this.#closeTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
-
-    this.classList.remove('transition-end')
-    this.classList.remove('transition-start')
   }
 
   get #path() {
