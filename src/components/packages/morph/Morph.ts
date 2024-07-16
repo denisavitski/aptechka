@@ -61,11 +61,18 @@ export class Morph {
 
       this.#morphElements = this.#getMorphElements(document.body)
 
-      this.#currentPathname = this.normalizePath(location.pathname).pathname
+      const normalizedPath = this.normalizePath(location.pathname)
+
+      this.#currentPathname = normalizedPath.pathname
 
       document.documentElement.setAttribute(
         'data-current-pathname',
         this.#currentPathname
+      )
+
+      document.documentElement.setAttribute(
+        'data-current-leaf',
+        normalizedPath.leaf
       )
 
       this.#findLinks()
@@ -104,7 +111,7 @@ export class Morph {
     historyAction: ChangeHistoryAction = 'push'
   ) {
     const parts = this.normalizePath(path)
-    let { pathname, hash, parameters } = parts
+    let { pathname, hash, parameters, leaf } = parts
 
     if (
       this.#candidatePathname === pathname ||
@@ -263,6 +270,8 @@ export class Morph {
       this.#findLinks()
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
+
+      document.documentElement.setAttribute('data-current-leaf', leaf)
 
       this.postprocessor?.({ pathname, isCached })
       this.#afterNavigationEvent.notify({ pathname, isCached })
