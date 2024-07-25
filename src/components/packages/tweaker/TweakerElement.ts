@@ -273,9 +273,7 @@ export class TweakerElement extends TweakerFolderElement {
     }
   }
 
-  protected override disconnectedCallback() {
-    super.disconnectedCallback()
-
+  protected disconnectedCallback() {
     window.removeEventListener('beforeunload', this.#unloadListener)
     tweakerStorage.save()
 
@@ -301,15 +299,13 @@ export class TweakerElement extends TweakerFolderElement {
     if (!this.#scrollRestored) {
       this.#scrollRestored = true
 
-      setTimeout(() => {
-        this.contentElement.scroll({
-          top: tweakerStorage.scrollValue,
-        })
+      this.contentElement.scroll({
+        top: tweakerStorage.scrollValue,
+      })
 
-        this.contentElement.addEventListener('scroll', () => {
-          tweakerStorage.scrollValue = this.contentElement.scrollTop
-        })
-      }, 150)
+      this.contentElement.addEventListener('scroll', () => {
+        tweakerStorage.scrollValue = this.contentElement.scrollTop
+      })
     }
   }, 10)
 }

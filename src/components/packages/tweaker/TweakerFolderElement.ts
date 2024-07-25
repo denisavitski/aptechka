@@ -1,4 +1,4 @@
-import { define } from '@packages/custom-element'
+import { CustomElement, define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
 import { AccordionElement } from '@packages/accordion'
 import { Store } from '@packages/store'
@@ -41,10 +41,22 @@ const stylesheet = createStylesheet({
   },
 
   '.body': {
-    transitionProperty: 'height',
-    transitionDuration: 'var(--duration-short)',
     overflow: 'hidden',
-    height: '0px',
+    height: '0',
+  },
+
+  ':host(.transition-allowed) .body': {
+    transition:
+      'height var(--duration-short), display var(--duration-short) allow-discrete',
+  },
+
+  ':host(.opened) .body': {
+    height: 'calc-size(auto)',
+    display: 'block',
+
+    '@starting-style': {
+      height: '0',
+    },
   },
 
   '.body-content': {
@@ -73,7 +85,7 @@ export interface TweakerFolderParameters {
 }
 
 @define('e-tweaker-folder')
-export class TweakerFolderElement extends AccordionElement {
+export class TweakerFolderElement extends CustomElement {
   #key: string
   #head = new Store<any>(null)
   #content = new Store<Array<TweakerFolderElement | TweakerFieldElement>>([])
@@ -91,21 +103,21 @@ export class TweakerFolderElement extends AccordionElement {
     this.#mutationObserver = new MutationObserver(this.#mutationListener)
 
     element(this, {
-      onAccordionItemToggle: (e) => {
-        e.stopPropagation()
-
-        if (e.detail.opened) {
-          tweakerStorage.openPanel(this.#key)
-        } else {
-          tweakerStorage.closePanel(this.#key)
-        }
-      },
       children: [
         div({
           class: 'wrapper',
           children: [
             div({
               class: 'head',
+              onClick: (e) => {
+                this.classList.toggle('opened')
+
+                if (this.classList.contains('opened')) {
+                  tweakerStorage.openPanel(this.#key)
+                } else {
+                  tweakerStorage.closePanel(this.#key)
+                }
+              },
               children: [
                 this.#key
                   ? div({
@@ -163,14 +175,14 @@ export class TweakerFolderElement extends AccordionElement {
     return this.#contentElement
   }
 
-  protected override connectedCallback() {
-    super.connectedCallback()
+  protected connectedCallback() {
+    if (tweakerStorage.isPanelOpened(this.#key)) {
+      this.classList.add('opened')
+    }
 
     setTimeout(() => {
-      if (tweakerStorage.isPanelOpened(this.#key)) {
-        this.openAll({ skipTransition: true })
-      }
-    }, 50)
+      this.classList.add('transition-allowed')
+    })
 
     this.#mutationObserver.observe(this.#contentRootElement, {
       childList: true,
