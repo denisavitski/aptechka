@@ -2,7 +2,7 @@ import { CustomElement } from '@packages/custom-element'
 import { Store } from '@packages/store'
 
 export class TweakerStoreManagerElement<
-  S extends Store<any, any, any>
+  S extends Store<any, any>
 > extends CustomElement {
   #stores: Array<S>
 

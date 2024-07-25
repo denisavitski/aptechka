@@ -405,7 +405,7 @@ export interface En3ParametersManagerOptions {
 export class En3ParametersManager {
   #subject: any
 
-  #managers: Array<Store<any, any, any>> = []
+  #managers: Array<Store<any, any>> = []
 
   constructor(subject: any, options?: En3ParametersManagerOptions) {
     this.#subject = subject

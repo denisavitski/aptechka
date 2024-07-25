@@ -8,7 +8,7 @@ export class Derived<DerivedType, StoreType> extends Store<DerivedType> {
   #unsubscriber: Function
 
   constructor(
-    store: Store<StoreType, any, any>,
+    store: Store<StoreType, any>,
     callback: DerivedCallback<StoreType, DerivedType>,
     parameters?: StoreOptions<DerivedType>
   ) {

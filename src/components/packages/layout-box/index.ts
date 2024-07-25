@@ -2,7 +2,7 @@ import { cssUnitParser } from '@packages/css-unit-parser'
 import { Ladder } from '@packages/ladder'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
-import { StoreCallback, StoreEntry } from '@packages/store'
+import { StoreCallback } from '@packages/store'
 import { ticker } from '@packages/ticker'
 import {
   ElementOrSelector,
@@ -73,7 +73,7 @@ export type LayoutBoxXYZ = { x: number; y: number; z: number }
 
 export type LayoutBoxScrollStepCallback =
   () => LayoutBoxScrollStepCallbackReturn
-export type LayoutBoxStepCallback = StoreCallback<StoreEntry<LayoutBoxXYZ>>
+export type LayoutBoxStepCallback = StoreCallback<LayoutBoxXYZ>
 
 export type LayoutBoxFrontSide = 'left' | 'top'
 

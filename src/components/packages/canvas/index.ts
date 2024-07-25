@@ -147,6 +147,7 @@ export class CanvasElement extends CustomElement {
 
     this.context.scale(this.pixelRatio, this.pixelRatio)
 
+    this.#dispatchResizeEvent()
     this.#dispatchRenderEvent()
   }
 
@@ -165,6 +166,15 @@ export class CanvasElement extends CustomElement {
       })
     )
   }
+
+  #dispatchResizeEvent() {
+    this.dispatchEvent(
+      new CustomEvent('canvasResize', {
+        composed: true,
+        detail: this.detail,
+      })
+    )
+  }
 }
 
 declare global {
@@ -174,5 +184,6 @@ declare global {
 
   interface HTMLElementEventMap {
     canvasRender: CustomEvent<Canvas2DRenderDetail>
+    canvasResize: CustomEvent<Canvas2DRenderDetail>
   }
 }

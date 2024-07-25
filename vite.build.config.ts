@@ -56,24 +56,6 @@ export function buildConfig() {
           'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
 
-          // > JSX
-          'jsx/index': './src/components/packages/jsx/index.ts',
-          'jsx/hooks/store/index':
-            './src/components/packages/jsx/hooks/store/index.ts',
-          'jsx/hooks/onAnimationFrame':
-            './src/components/packages/jsx/hooks/onAnimationFrame.ts',
-          'jsx/hooks/onElementResize':
-            './src/components/packages/jsx/hooks/onElementResize.ts',
-          'jsx/hooks/onIntersection':
-            './src/components/packages/jsx/hooks/onIntersection.ts',
-          'jsx/hooks/onWindowResize':
-            './src/components/packages/jsx/hooks/onWindowResize.ts',
-          'jsx/hooks/watchAttribute':
-            './src/components/packages/jsx/hooks/watchAttribute.ts',
-          'jsx/hooks/watchCSSProperty':
-            './src/components/packages/jsx/hooks/watchCSSProperty.ts',
-          // < JSX
-
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',

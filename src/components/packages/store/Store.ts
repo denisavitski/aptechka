@@ -1,13 +1,12 @@
 import { storeRegistry } from './StoreRegistry'
 
-export interface StoreEntry<StoreType> {
+export interface StoreState<StoreType> {
   current: StoreType
-  previous: StoreType | undefined
+  previous: StoreType
+  initial: StoreType
 }
 
-export type StoreCallback<Entry extends StoreEntry<any>> = (
-  entry: Entry
-) => void
+export type StoreCallback<StoreType> = (state: StoreState<StoreType>) => void
 
 export type StoreEqualityCheckCallback<StoreType> = (
   currentValue: StoreType,
@@ -83,15 +82,13 @@ export interface StoreOptions<
 
 export class Store<
   StoreType = unknown,
-  StoreManager extends StoreManagerType = StoreManagerType,
-  Entry extends StoreEntry<StoreType> = StoreEntry<StoreType>
+  StoreManager extends StoreManagerType = StoreManagerType
 > {
   #passport: StorePassport<StoreManager> | undefined
-  #initial: StoreType
-  #previous: StoreType | undefined
-  #current: StoreType
+
+  #state: StoreState<StoreType>
   #equalityCheck: StoreEqualityCheckCallback<StoreType>
-  #callbacks = new Set<StoreCallback<Entry>>()
+  #callbacks = new Set<StoreCallback<StoreType>>()
   #skipSubscribeNotification: boolean
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
   #notifyAndClose: boolean
@@ -102,10 +99,12 @@ export class Store<
     options?: StoreOptions<StoreType, StoreManager>
   ) {
     this.#passport = options?.passport
-    this.#initial = value
-    this.#previous = undefined
 
-    this.#current = value
+    this.#state = {
+      initial: value,
+      previous: value,
+      current: value,
+    }
 
     this.#equalityCheck =
       options?.equalityCheck ||
@@ -131,20 +130,20 @@ export class Store<
   }
 
   public get initial() {
-    return this.#initial
+    return this.#state.initial
   }
 
   public get previous() {
-    return this.#previous
+    return this.#state.previous
   }
 
   public get current() {
-    return this.#current
+    return this.#state.current
   }
 
   public set current(value: StoreType) {
-    if (!this.#equalityCheck(this.#current, value)) {
-      this.#previous = this.#current
+    if (!this.#equalityCheck(this.#state.current, value)) {
+      this.#state.previous = this.#state.current
 
       if (this.#middlewares) {
         for (const middleware of this.#middlewares) {
@@ -152,7 +151,8 @@ export class Store<
         }
       }
 
-      this.#current = value
+      this.#state.current = value
+
       this.#notify()
 
       if (this.#notifyAndClose) {
@@ -163,13 +163,6 @@ export class Store<
 
   public get subscribers() {
     return this.#callbacks
-  }
-
-  public get entry() {
-    return {
-      current: this.#current,
-      previous: this.#previous,
-    } as Entry
   }
 
   public addMiddleware(middleware: StoreMiddleware<StoreType>) {
@@ -188,7 +181,7 @@ export class Store<
     }
   }
 
-  public subscribe(callback: StoreCallback<Entry>) {
+  public subscribe(callback: StoreCallback<StoreType>) {
     if (!this.#invisible && !this.#callbacks.size) {
       shareStore(this)
     }
@@ -196,7 +189,7 @@ export class Store<
     this.#callbacks.add(callback)
 
     if (!this.#skipSubscribeNotification) {
-      callback(this.entry)
+      callback(this.#state)
     }
 
     return () => {
@@ -204,7 +197,7 @@ export class Store<
     }
   }
 
-  public unsubscribe(callback: StoreCallback<Entry>) {
+  public unsubscribe(callback: StoreCallback<StoreType>) {
     this.#callbacks.delete(callback)
 
     if (!this.#callbacks.size) {
@@ -226,22 +219,22 @@ export class Store<
 
   #notify() {
     for (const callback of this.#callbacks) {
-      callback(this.entry)
+      callback(this.#state)
     }
   }
 }
 
-export const activeStores = new Store<Array<Store<any, any, any>>>([], {
+export const activeStores = new Store<Array<Store<any, any>>>([], {
   invisible: true,
 })
 
-function shareStore(store: Store<any, any, any>) {
+function shareStore(store: Store<any, any>) {
   if (!activeStores.current.includes(store)) {
     activeStores.current = [...activeStores.current, store]
   }
 }
 
-function unshareStore(store: Store<any, any, any>) {
+function unshareStore(store: Store<any, any>) {
   if (activeStores.current.includes(store)) {
     activeStores.current = activeStores.current.filter((s) => s !== store)
   }

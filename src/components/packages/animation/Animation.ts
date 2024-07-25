@@ -1,4 +1,4 @@
-import { Store, StoreEntry, StoreOptions } from '@packages/store'
+import { Store, StoreOptions } from '@packages/store'
 import {
   TickerAddOptions,
   TickerCallback,
@@ -13,14 +13,6 @@ import {
 } from '@packages/utils'
 import { TICK_ORDER } from '@packages/order'
 
-export interface AnimationEntry extends StoreEntry<number> {
-  delta: number
-  distance: number
-  deltaProgress: number
-  distanceProgress: number
-  direction: number
-}
-
 export interface AnimationOptions extends TickerAddOptions {
   min?: number
   max?: number
@@ -32,9 +24,8 @@ export type AnimationConstructorOptions<Options extends AnimationOptions> =
   StoreOptions<number, 'number'> & Options
 
 export abstract class Animation<
-  Entry extends AnimationEntry = AnimationEntry,
   Options extends AnimationOptions = AnimationOptions
-> extends Store<number, 'number', Entry> {
+> extends Store<number, 'number'> {
   #maxFPS: number | undefined
   #order = TICK_ORDER.ANIMATION
   #culling: ElementOrSelector | undefined | null | false
@@ -116,18 +107,6 @@ export abstract class Animation<
     return this.distance
       ? preciseNumber(Math.abs(this.current - this.#min) / this.distance, 6)
       : 0
-  }
-
-  public override get entry() {
-    return {
-      ...super.entry,
-      from: this.#from,
-      delta: this.delta,
-      distance: this.distance,
-      direction: this.direction,
-      deltaProgress: this.deltaProgress,
-      distanceProgress: this.distanceProgress,
-    }
   }
 
   public set(value: number, options?: Options) {

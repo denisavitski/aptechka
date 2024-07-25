@@ -3,7 +3,6 @@ import { RESIZE_ORDER } from '@packages/order'
 import {
   Store,
   StoreCallback,
-  StoreEntry,
   StoreManagerType,
   StoreOptions,
 } from '@packages/store'
@@ -59,7 +58,7 @@ export class CSSProperty<
     }
   }
 
-  public override subscribe(callback: StoreCallback<StoreEntry<StoreType>>) {
+  public override subscribe(callback: StoreCallback<StoreType>) {
     if (!this.subscribers.size) {
       this.observe()
     }
@@ -67,7 +66,7 @@ export class CSSProperty<
     return super.subscribe(callback)
   }
 
-  public override unsubscribe(callback: StoreCallback<StoreEntry<StoreType>>) {
+  public override unsubscribe(callback: StoreCallback<StoreType>) {
     super.unsubscribe(callback)
 
     if (!this.subscribers.size) {

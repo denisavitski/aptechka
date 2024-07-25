@@ -8,9 +8,7 @@ import { TweakerSelectManagerElement } from './TweakerSelectManagerElement'
 import { TweakerStringManagerElement } from './TweakerStringManagerElement'
 
 export const tweakerManagerConstructors: {
-  [key in StoreManagerType]: typeof TweakerStoreManagerElement<
-    Store<any, any, any>
-  >
+  [key in StoreManagerType]: typeof TweakerStoreManagerElement<Store<any, any>>
 } = {
   boolean: TweakerBooleanManagerElement,
   color: TweakerColorManagerElement,

@@ -31,9 +31,6 @@ export class Resource<StoreType> extends Store<StoreType> {
     return this.#isPending
   }
 
-  /**
-   * Calls fetcher again and sets isPending to true.
-   */
   public refetch() {
     this.#isPending.current = true
 

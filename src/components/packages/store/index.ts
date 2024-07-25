@@ -1,9 +1,6 @@
-export { ArrayStore } from './ArrayStore'
-
 export {
   Store,
   activeStores,
-  type StoreEntry,
   type StoreCallback,
   type StorePassport,
   type StoreMiddleware,
@@ -21,8 +18,6 @@ export {
 } from './Store'
 
 export { Derived, type DerivedCallback } from './Derived'
-
-export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
 
 export { Resource, type ResourceFetcher } from './Resource'
 

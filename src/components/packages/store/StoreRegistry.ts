@@ -73,7 +73,7 @@ class StoreRegistry {
     this.saveState()
   }
 
-  public updateStore(store: Store<any, any, any>) {
+  public updateStore(store: Store<any, any>) {
     if (!Array.isArray(this.#loadedState?.stores)) {
       return store
     }

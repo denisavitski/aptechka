@@ -3,7 +3,6 @@ import { damp, nullishCoalescing, preciseNumber } from '@packages/utils'
 import {
   Animation,
   AnimationConstructorOptions,
-  AnimationEntry,
   AnimationOptions,
 } from './Animation'
 
@@ -13,12 +12,7 @@ export interface DampedOptions extends AnimationOptions {
   mass?: number
 }
 
-export interface DampedEntry extends AnimationEntry {
-  velocity: number
-  speed: number
-}
-
-export class Damped extends Animation<DampedEntry, DampedOptions> {
+export class Damped extends Animation<DampedOptions> {
   public damping = 20
   public stiffness = 0
   public mass = 0
@@ -41,14 +35,6 @@ export class Damped extends Animation<DampedEntry, DampedOptions> {
 
   public get speed() {
     return this.#speed
-  }
-
-  public override get entry() {
-    return {
-      ...super.entry,
-      velocity: this.#velocity,
-      speed: this.#speed,
-    }
   }
 
   public override updateOptions(options?: DampedOptions) {

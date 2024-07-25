@@ -44,7 +44,7 @@ export type ElementConstructorStyleToken = Exclude<
   'length' | 'parentRule'
 >
 
-export type ElementConstructorStyleValue = string | Store<any>
+export type ElementConstructorStyleValue = string | number | Store<any>
 
 export type ElementConstructorStyle = Partial<{
   [K in ElementConstructorStyleToken]: ElementConstructorStyleValue
@@ -450,17 +450,17 @@ export class ElementConstructor<
 
   #setStyleProperty(
     token: ElementConstructorStyleToken,
-    value?: string | null | undefined
+    value?: string | number | null | undefined
   ) {
     if (token.includes('--')) {
       if (value) {
-        ;(this.#node as HTMLElement).style.setProperty(token, value)
+        ;(this.#node as HTMLElement).style.setProperty(token, value.toString())
       } else {
         ;(this.#node as HTMLElement).style.removeProperty(token)
       }
     } else {
       if (value) {
-        ;(this.#node as HTMLElement).style[token as any] = value
+        ;(this.#node as HTMLElement).style[token as any] = value.toString()
       } else {
         ;(this.#node as HTMLElement).style[token as any] = ''
       }

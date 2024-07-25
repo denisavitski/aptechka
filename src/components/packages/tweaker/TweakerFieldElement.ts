@@ -77,12 +77,12 @@ const stylesheet = createStylesheet({
 })
 
 export interface TweakerFieldParameters {
-  store: Store<any, StoreManagerType, any>
+  store: Store<any, StoreManagerType>
 }
 
 @define('e-tweaker-field')
 export class TweakerFieldElement extends CustomElement {
-  #stores: Array<Store<any, StoreManagerType, any>> = []
+  #stores: Array<Store<any, StoreManagerType>> = []
   #key: string
   #name: string
   #pointerEnter = false
@@ -156,7 +156,7 @@ export class TweakerFieldElement extends CustomElement {
     return this.#stores
   }
 
-  public addStore(store: Store<any, any, any>) {
+  public addStore(store: Store<any, any>) {
     this.#storeManager.addStore(store)
   }
 
