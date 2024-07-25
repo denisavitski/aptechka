@@ -46,7 +46,7 @@ export class Damped extends Animation<DampedOptions> {
   }
 
   protected override handleAnimationFrame(e: TickerCallbackEntry) {
-    if (preciseNumber(this.current, 4) === preciseNumber(this.target, 4)) {
+    if (preciseNumber(this.current, 6) === preciseNumber(this.target, 6)) {
       this.unlistenAnimationFrame()
       this.current = this.target
     }

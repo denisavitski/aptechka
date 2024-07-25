@@ -167,7 +167,9 @@ export abstract class Animation<
     this.#min = nullishCoalescing(options?.min, this.#min)
     this.#max = nullishCoalescing(options?.max, this.#max)
 
-    this.#setTarget(this.#tmpSetValue || this.#target)
+    this.#setTarget(
+      typeof this.#tmpSetValue === 'number' ? this.#tmpSetValue : this.#target
+    )
 
     if (options?.equalize) {
       this.unlistenAnimationFrame()

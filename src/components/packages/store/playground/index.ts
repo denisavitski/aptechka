@@ -1,1 +1,3 @@
-import { generateId } from '@packages/utils'
+import { Store } from '../Store'
+
+const store = new Store(1)
