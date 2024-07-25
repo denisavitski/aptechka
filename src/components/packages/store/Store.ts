@@ -2,7 +2,7 @@ import { storeRegistry } from './StoreRegistry'
 
 export interface StoreState<StoreType> {
   current: StoreType
-  previous: StoreType
+  previous: StoreType | undefined
   initial: StoreType
 }
 
@@ -102,7 +102,7 @@ export class Store<
 
     this.#state = {
       initial: value,
-      previous: value,
+      previous: undefined,
       current: value,
     }
 

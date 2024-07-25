@@ -1,6 +1,5 @@
 import { CustomElement, define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
-import { AccordionElement } from '@packages/accordion'
 import { Store } from '@packages/store'
 
 import arrowIcon from '@assets/icons/arrow.svg?raw'
@@ -41,8 +40,11 @@ const stylesheet = createStylesheet({
   },
 
   '.body': {
+    display: 'none',
     overflow: 'hidden',
-    height: '0',
+    '@supports (height: calc-size(auto))': {
+      height: '0',
+    },
   },
 
   ':host(.transition-allowed) .body': {

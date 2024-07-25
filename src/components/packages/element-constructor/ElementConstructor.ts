@@ -595,6 +595,7 @@ export class ElementConstructor<
             const currentNodes = Array.from(rootElement.childNodes)
 
             const currentItems = [current].flat()
+
             const previousItems = [previous].flat()
 
             const nodesToDelete: Array<Node> = []

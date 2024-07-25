@@ -1,4 +1,3 @@
-import '@packages/checkbox'
 import { Store, StoreMiddleware } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { define } from '@packages/custom-element'

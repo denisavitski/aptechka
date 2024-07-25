@@ -1,5 +1,3 @@
-import '@packages/accordion'
-
 import { Store, activeStores } from '@packages/store'
 
 import { CustomElement, define } from '@packages/custom-element'

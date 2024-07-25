@@ -6,6 +6,7 @@ import { a, createStylesheet, element } from '@packages/element-constructor'
 const stylesheet = createStylesheet({
   a: {
     color: 'inherit',
+    fontSize: 'var(--font-size-small)',
   },
 })
 
@@ -17,6 +18,8 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
     super(...stores)
 
     this.openShadow(stylesheet)
+
+    console.log(this.firstStore)
 
     element(this, {
       children: [

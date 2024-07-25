@@ -10,20 +10,26 @@ import { aptechkaTheme } from '@packages/theme'
 
 const stylesheet = createStylesheet({
   'e-select': {
+    display: 'block',
     width: '100%',
+
     '--arrow-color': aptechkaTheme.colorFont.var,
   },
 
   'e-select-head': {
     width: '100%',
+    height: 'var(--height-input)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    fontSize: 'var(--font-size-small)',
   },
 
   'e-select-option': {
+    height: 'var(--height-input)',
     transitionDuration: 'var(--duration-short)',
     transitionProperty: 'color',
+    fontSize: 'var(--font-size-small)',
   },
 
   'e-select-option:hover': {
