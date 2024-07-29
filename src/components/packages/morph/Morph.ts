@@ -194,9 +194,10 @@ export class Morph {
 
       const elementsWithLoad = addHeadChildren.filter(
         (child) =>
-          child.tagName === 'STYLE' ||
-          child.tagName === 'SCRIPT' ||
-          child.tagName === 'LINK'
+          (child.tagName === 'STYLE' ||
+            child.tagName === 'SCRIPT' ||
+            child.tagName === 'LINK') &&
+          child.getAttribute('rel') !== 'canonical'
       ) as Array<HTMLLinkElement>
 
       if (this.#waitForHeadToLoad && elementsWithLoad.length) {
