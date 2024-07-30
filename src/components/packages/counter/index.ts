@@ -1,6 +1,5 @@
 // TODO
 
-import { CustomElement, define } from '@packages/custom-element'
 import { createStylesheet, element, span } from '@packages/element-constructor'
 
 const stylesheet = createStylesheet({
@@ -16,8 +15,7 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-counter')
-export class CounterElement extends CustomElement {
+export class CounterElement extends HTMLElement {
   #from: number = null!
   #to: number = null!
   #step: number = null!
@@ -39,7 +37,8 @@ export class CounterElement extends CustomElement {
   constructor() {
     super()
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       children: [

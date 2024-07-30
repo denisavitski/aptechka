@@ -1,8 +1,7 @@
-import { CustomElement } from '@packages/custom-element'
 import { findParentElement } from '@packages/utils'
 import { ScrollElement } from './ScrollElement'
 
-export class ScrollUserElement extends CustomElement {
+export class ScrollUserElement extends HTMLElement {
   #scrollElement: ScrollElement = null!
 
   public get scrollElement() {

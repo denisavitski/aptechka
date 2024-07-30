@@ -1,7 +1,5 @@
 import { Store, activeStores } from '@packages/store'
 
-import { CustomElement, define } from '@packages/custom-element'
-
 import {
   div,
   element,
@@ -78,8 +76,7 @@ export interface TweakerFieldParameters {
   store: Store<any, StoreManagerType>
 }
 
-@define('e-tweaker-field')
-export class TweakerFieldElement extends CustomElement {
+export class TweakerFieldElement extends HTMLElement {
   #stores: Array<Store<any, StoreManagerType>> = []
   #key: string
   #name: string
@@ -97,7 +94,8 @@ export class TweakerFieldElement extends CustomElement {
 
     this.#storeManager = new tweakerManagerConstructors[type](this.#stores[0])
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       class: {
@@ -187,6 +185,10 @@ export class TweakerFieldElement extends CustomElement {
       }
     }
   }
+}
+
+if (!customElements.get('e-tweaker-field')) {
+  customElements.define('e-tweaker-field', TweakerFieldElement)
 }
 
 declare global {

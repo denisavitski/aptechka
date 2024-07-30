@@ -1,6 +1,5 @@
 import { aptechkaTheme } from '@packages/theme'
 import { Store } from '@packages/store/Store'
-import { define } from '@packages/custom-element'
 import { createStylesheet, element, input } from '@packages/element-constructor'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 
@@ -32,14 +31,14 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-string-manager')
 export class TweakerStringManagerElement<
   S extends Store<any, any> = Store<string, 'string'>
 > extends TweakerStoreManagerElement<S> {
   constructor(...stores: Array<S>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       children: [
@@ -56,6 +55,10 @@ export class TweakerStringManagerElement<
       ],
     })
   }
+}
+
+if (!customElements.get('e-tweaker-string-manager')) {
+  customElements.define('e-tweaker-string-manager', TweakerStringManagerElement)
 }
 
 declare global {

@@ -35,8 +35,6 @@ export function buildConfig() {
             './src/components/packages/css-unit-parser/index.ts',
           'css-value-parser/index':
             './src/components/packages/css-value-parser/index.ts',
-          'custom-element/index':
-            './src/components/packages/custom-element/index.ts',
           'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
           'element-constructor/index':
@@ -52,6 +50,24 @@ export function buildConfig() {
           'en3/misc/index': './src/components/packages/en3/misc/index.ts',
           'en3/utils/index': './src/components/packages/en3/utils/index.ts',
           // < EN3
+
+          // > JSX
+          'jsx/index': './src/components/packages/jsx/index.ts',
+          'jsx/hooks/store/index':
+            './src/components/packages/jsx/hooks/store/index.ts',
+          'jsx/hooks/onAnimationFrame':
+            './src/components/packages/jsx/hooks/onAnimationFrame.ts',
+          'jsx/hooks/onElementResize':
+            './src/components/packages/jsx/hooks/onElementResize.ts',
+          'jsx/hooks/onIntersection':
+            './src/components/packages/jsx/hooks/onIntersection.ts',
+          'jsx/hooks/onWindowResize':
+            './src/components/packages/jsx/hooks/onWindowResize.ts',
+          'jsx/hooks/watchAttribute':
+            './src/components/packages/jsx/hooks/watchAttribute.ts',
+          'jsx/hooks/watchCSSProperty':
+            './src/components/packages/jsx/hooks/watchCSSProperty.ts',
+          // < JSX
 
           'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',

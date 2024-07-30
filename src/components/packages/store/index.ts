@@ -19,6 +19,10 @@ export {
 
 export { Derived, type DerivedCallback } from './Derived'
 
+export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
+
+export { Keyed, type KeyedCallback, type KeyedSource } from './Keyed'
+
 export { Resource, type ResourceFetcher } from './Resource'
 
 export { Composed, type ComposedCallback } from './Composed'

@@ -1,9 +1,7 @@
-import { CustomElement, define } from '@packages/custom-element'
 import { Pointer } from './Pointer'
 import { CSSProperty } from '@packages/css-property'
 
-@define('e-pointer')
-export class PointerElement extends CustomElement {
+export class PointerElement extends HTMLElement {
   #pointer: Pointer
 
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
@@ -81,6 +79,10 @@ export class PointerElement extends CustomElement {
     this.style.removeProperty('--y')
     this.style.removeProperty('--z')
   }
+}
+
+if (!customElements.get('e-pointer')) {
+  customElements.define('e-pointer', PointerElement)
 }
 
 declare global {

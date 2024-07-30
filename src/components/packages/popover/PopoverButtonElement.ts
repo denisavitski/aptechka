@@ -1,12 +1,10 @@
-import { CustomElement, define } from '@packages/custom-element'
 import { PopoverElement } from './PopoverElement'
 import { element } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
 
-@define('e-popover-button')
-export class PopoverButtonElement extends CustomElement {
+export class PopoverButtonElement extends HTMLElement {
   #popoverElement: PopoverElement | undefined
 
   constructor() {
@@ -122,6 +120,10 @@ export class PopoverButtonElement extends CustomElement {
   #popoverClosedListener = () => {
     this.classList.remove('triggered')
   }
+}
+
+if (!customElements.get('e-popover-button')) {
+  customElements.define('e-popover-button', PopoverButtonElement)
 }
 
 declare global {

@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
 import { SelectOptionElement } from './SelectOptionElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
@@ -29,7 +28,6 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-select-head')
 export class SelectHeadElement extends SelectUserElement {
   #valueElement: HTMLElement = null!
 
@@ -37,7 +35,8 @@ export class SelectHeadElement extends SelectUserElement {
     super()
 
     if (isBrowser) {
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       element(this, {
         children: [
@@ -89,6 +88,10 @@ export class SelectHeadElement extends SelectUserElement {
   #toggleListener = () => {
     this.classList.toggle('opened', this.selectElement.opened)
   }
+}
+
+if (!customElements.get('e-select-head')) {
+  customElements.define('e-select-head', SelectHeadElement)
 }
 
 declare global {

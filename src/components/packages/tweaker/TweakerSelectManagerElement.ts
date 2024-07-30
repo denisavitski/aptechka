@@ -2,7 +2,6 @@ import '@packages/select'
 
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { define } from '@packages/custom-element'
 import { createStylesheet, element, span } from '@packages/element-constructor'
 
 import { SelectElement } from '@packages/select'
@@ -49,14 +48,14 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-select-manager')
 export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
   Store<string, 'select'>
 > {
   constructor(...stores: Array<Store<string, 'select'>>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     const variants = this.firstStore.passport?.manager?.variants || []
 
@@ -84,6 +83,10 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
       }),
     })
   }
+}
+
+if (!customElements.get('e-tweaker-select-manager')) {
+  customElements.define('e-tweaker-select-manager', TweakerSelectManagerElement)
 }
 
 declare global {

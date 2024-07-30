@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import { SourceElement } from '@packages/source'
 import { ticker } from '@packages/ticker'
 
@@ -9,7 +8,6 @@ export interface ReadyStateChangeEventDetail {
 
 export type ReadyStateChangeEvent = CustomEvent<ReadyStateChangeEventDetail>
 
-@define('e-video')
 export class VideoElement extends SourceElement<HTMLVideoElement> {
   #progress = 0
 
@@ -83,6 +81,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       ticker.unsubscribe(this.#checkReady)
     }
   }
+}
+
+if (!customElements.get('e-video')) {
+  customElements.define('e-video', VideoElement)
 }
 
 declare global {

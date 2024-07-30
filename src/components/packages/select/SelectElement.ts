@@ -1,4 +1,3 @@
-import { CustomElement, define } from '@packages/custom-element'
 import {
   button,
   createStylesheet,
@@ -60,8 +59,7 @@ export interface SelectToggleDetail {
   opened: boolean
 }
 
-@define('e-select')
-export class SelectElement extends CustomElement {
+export class SelectElement extends HTMLElement {
   static formAssociated = true
 
   #internals: ElementInternals = null!
@@ -75,7 +73,8 @@ export class SelectElement extends CustomElement {
     super()
 
     if (isBrowser) {
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       this.#internals = this.attachInternals()
 
@@ -193,6 +192,10 @@ export class SelectElement extends CustomElement {
       })
     )
   }
+}
+
+if (!customElements.get('e-select')) {
+  customElements.define('e-select', SelectElement)
 }
 
 declare global {

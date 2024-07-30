@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import {
   button,
   createStylesheet,
@@ -141,7 +140,6 @@ export interface StoreBox {
   remainingFolders: Array<string>
 }
 
-@define('e-tweaker')
 export class TweakerElement extends TweakerFolderElement {
   #scrollRestored = false
 
@@ -152,7 +150,7 @@ export class TweakerElement extends TweakerFolderElement {
 
     tweakerStorage.load()
 
-    this.addStylesheet(stylesheet)
+    this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
 
     this.head.current = [
       div({
@@ -308,6 +306,10 @@ export class TweakerElement extends TweakerFolderElement {
       })
     }
   }, 10)
+}
+
+if (!customElements.get('e-tweaker')) {
+  customElements.define('e-tweaker', TweakerElement)
 }
 
 declare global {

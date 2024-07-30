@@ -1,5 +1,4 @@
 import { Store } from '@packages/store'
-import { define } from '@packages/custom-element'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { a, createStylesheet, element } from '@packages/element-constructor'
 
@@ -10,14 +9,14 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-link-manager')
 export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
   Store<string, 'link'>
 > {
   constructor(...stores: Array<Store<string, 'link'>>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     console.log(this.firstStore)
 
@@ -33,6 +32,10 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
       ],
     })
   }
+}
+
+if (!customElements.get('e-tweaker-link-manager')) {
+  customElements.define('e-tweaker-link-manager', TweakerLinkManagerElement)
 }
 
 declare global {

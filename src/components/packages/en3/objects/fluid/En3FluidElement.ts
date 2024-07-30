@@ -1,13 +1,10 @@
-import { CustomElement } from '@packages/custom-element'
 import { type TickerCallback, ticker } from '@packages/ticker'
 import { windowResizer } from '@packages/window-resizer'
-import { define } from '@packages/custom-element'
 import { en3 } from '@packages/en3/core/en3'
 
 import { En3Fluid } from './En3Fluid'
 
-@define('en3-fluid')
-export class En3FluidElement extends CustomElement {
+export class En3FluidElement extends HTMLElement {
   #fluid: En3Fluid = null!
 
   public get fluid() {
@@ -39,6 +36,10 @@ export class En3FluidElement extends CustomElement {
       this.#fluid.update()
     }
   }
+}
+
+if (!customElements.get('e-fluid')) {
+  customElements.define('e-fluid', En3FluidElement)
 }
 
 declare global {

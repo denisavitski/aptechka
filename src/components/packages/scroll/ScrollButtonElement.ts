@@ -17,7 +17,9 @@ export abstract class ScrollButtonElement extends ScrollUserElement {
   constructor() {
     super()
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     if (isBrowser) {
       element(this, {

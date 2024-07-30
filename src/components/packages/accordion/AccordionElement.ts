@@ -1,4 +1,3 @@
-import { CustomElement, define } from '@packages/custom-element'
 import { Attribute } from '@packages/attribute'
 import {
   Axes2D,
@@ -268,8 +267,7 @@ class AccordionItem {
   }
 }
 
-@define('e-accordion')
-export class AccordionElement extends CustomElement {
+export class AccordionElement extends HTMLElement {
   #axisAttribute = new Attribute<Axes2D>(this, 'axis', 'y')
   #multipleAttribute = new Attribute(this, 'multiple', false)
   #items: Array<AccordionItem> = []
@@ -359,6 +357,10 @@ export class AccordionElement extends CustomElement {
   get #root(): HTMLElement | ShadowRoot {
     return this.shadowRoot ? this.shadowRoot : this
   }
+}
+
+if (!customElements.get('e-accordion')) {
+  customElements.define('e-accordion', AccordionElement)
 }
 
 declare global {

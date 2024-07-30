@@ -1,4 +1,3 @@
-import { CustomElement } from '@packages/custom-element'
 import { loading } from '@packages/loading'
 import type { Source } from './SourceClass'
 import { SourceManager } from './SourceManager'
@@ -7,9 +6,7 @@ import { isBrowser, kebabToCamel } from '@packages/utils'
 
 let id = 0
 
-export abstract class SourceElement<
-  T extends HTMLElement
-> extends CustomElement {
+export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
   #isFirstLoadHappened = false

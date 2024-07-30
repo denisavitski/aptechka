@@ -1,4 +1,3 @@
-import { CustomElement, define } from '@packages/custom-element'
 import { div, element, createStylesheet } from '@packages/element-constructor'
 import { Store } from '@packages/store'
 
@@ -86,8 +85,7 @@ export interface TweakerFolderParameters {
   storeBox?: StoreBox
 }
 
-@define('e-tweaker-folder')
-export class TweakerFolderElement extends CustomElement {
+export class TweakerFolderElement extends HTMLElement {
   #key: string
   #head = new Store<any>(null)
   #content = new Store<Array<TweakerFolderElement | TweakerFieldElement>>([])
@@ -99,7 +97,8 @@ export class TweakerFolderElement extends CustomElement {
   constructor(parameters: TweakerFolderParameters) {
     super()
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     this.#key = parameters.key
     this.#mutationObserver = new MutationObserver(this.#mutationListener)
@@ -253,6 +252,10 @@ export class TweakerFolderElement extends CustomElement {
       this.remove()
     }
   }
+}
+
+if (!customElements.get('e-tweaker-folder')) {
+  customElements.define('e-tweaker-folder', TweakerFolderElement)
 }
 
 declare global {

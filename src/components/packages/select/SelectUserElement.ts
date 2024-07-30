@@ -1,7 +1,6 @@
-import { CustomElement } from '@packages/custom-element'
 import { SelectElement } from './SelectElement'
 
-export class SelectUserElement extends CustomElement {
+export class SelectUserElement extends HTMLElement {
   #selectElement: SelectElement = null!
 
   public get selectElement() {

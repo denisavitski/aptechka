@@ -1,6 +1,5 @@
 import { Store, StoreMiddleware } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { define } from '@packages/custom-element'
 import {
   createStylesheet,
   div,
@@ -99,7 +98,6 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-number-manager')
 export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   Store<Array<number> | number, 'number'>
 > {
@@ -118,7 +116,8 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   constructor(...stores: Array<Store<Array<number> | number, 'number'>>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     this.#min = nullishCoalescing(
       this.firstStore.passport?.manager?.min,
@@ -312,6 +311,10 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   #resizeListener = () => {
     this.#updateKnobPositions()
   }
+}
+
+if (!customElements.get('e-tweaker-number-manager')) {
+  customElements.define('e-tweaker-number-manager', TweakerNumberManagerElement)
 }
 
 declare global {

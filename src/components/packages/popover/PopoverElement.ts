@@ -1,10 +1,8 @@
 import { Attribute } from '@packages/attribute'
-import { define, CustomElement } from '@packages/custom-element'
 import { Store } from '@packages/store'
 import { getElementTransitionDurationMS } from '@packages/utils'
 
-@define('e-popover')
-export class PopoverElement extends CustomElement {
+export class PopoverElement extends HTMLElement {
   private static __opened: Array<PopoverElement> = []
 
   #openedIndex = -1
@@ -191,6 +189,10 @@ export class PopoverElement extends CustomElement {
 
     this.#historyAllowed = true
   }
+}
+
+if (!customElements.get('e-popover')) {
+  customElements.define('e-popover', PopoverElement)
 }
 
 declare global {

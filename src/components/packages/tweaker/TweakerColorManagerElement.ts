@@ -1,5 +1,4 @@
 import { Store } from '@packages/store/Store'
-import { define } from '@packages/custom-element'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
@@ -30,14 +29,14 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-color-manager')
 export class TweakerColorManagerElement extends TweakerStoreManagerElement<
   Store<string, 'color'>
 > {
   constructor(...stores: Array<Store<string, 'color'>>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       children: [
@@ -51,6 +50,10 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
       ],
     })
   }
+}
+
+if (!customElements.get('e-tweaker-color-manager')) {
+  customElements.define('e-tweaker-color-manager', TweakerColorManagerElement)
 }
 
 declare global {

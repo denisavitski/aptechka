@@ -1,7 +1,5 @@
-import { define } from '@packages/custom-element'
 import { SourceElement } from '@packages/source'
 
-@define('e-image')
 export class ImageElement extends SourceElement<HTMLImageElement> {
   protected override createConsumer() {
     return document.createElement('img')
@@ -10,6 +8,10 @@ export class ImageElement extends SourceElement<HTMLImageElement> {
   protected override consumeSource(url: string | null) {
     this.consumerElement.src = url || ''
   }
+}
+
+if (!customElements.get('e-image')) {
+  customElements.define('e-image', ImageElement)
 }
 
 declare global {

@@ -1,9 +1,8 @@
-import { CustomElement } from '@packages/custom-element'
 import { Store } from '@packages/store'
 
 export class TweakerStoreManagerElement<
   S extends Store<any, any>
-> extends CustomElement {
+> extends HTMLElement {
   #stores: Array<S>
 
   constructor(...stores: Array<S>) {

@@ -1,16 +1,14 @@
 import { Store, StoreOptions } from './Store'
 
-export type DerivedCallback<StoreType, DerivedType> = (
-  value: StoreType
-) => DerivedType
+export type DerivedCallback<SourceType, Type> = (value: SourceType) => Type
 
-export class Derived<DerivedType, StoreType> extends Store<DerivedType> {
+export class Derived<Type, SourceType> extends Store<Type> {
   #unsubscriber: Function
 
   constructor(
-    store: Store<StoreType, any>,
-    callback: DerivedCallback<StoreType, DerivedType>,
-    parameters?: StoreOptions<DerivedType>
+    store: Store<SourceType, any>,
+    callback: DerivedCallback<SourceType, Type>,
+    parameters?: StoreOptions<Type>
   ) {
     super(null!, parameters)
 

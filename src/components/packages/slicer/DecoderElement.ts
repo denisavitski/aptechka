@@ -1,7 +1,6 @@
 import { generateId } from '@packages/utils'
 import { Letter, LetterParameters } from './Letter'
 import { SlicerElement } from './SlicerElement'
-import { define } from '@packages/custom-element'
 
 class DecoderLetter extends Letter {
   #chars: string
@@ -24,7 +23,6 @@ class DecoderLetter extends Letter {
   }
 }
 
-@define('e-decoder')
 export class DecoderElement extends SlicerElement {
   constructor() {
     super({
@@ -37,6 +35,10 @@ export class DecoderElement extends SlicerElement {
       ;(letter as DecoderLetter).play(progress)
     })
   }
+}
+
+if (!customElements.get('e-decoder')) {
+  customElements.define('e-decoder', DecoderElement)
 }
 
 declare global {

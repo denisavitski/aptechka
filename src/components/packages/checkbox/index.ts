@@ -1,4 +1,3 @@
-import { define, CustomElement } from '@packages/custom-element'
 import {
   createStylesheet,
   element,
@@ -59,8 +58,7 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-checkbox')
-export class CheckboxElement extends CustomElement {
+export class CheckboxElement extends HTMLElement {
   static formAssociated = true
 
   #inputElement: HTMLInputElement = null!
@@ -69,7 +67,8 @@ export class CheckboxElement extends CustomElement {
   constructor() {
     super()
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
     this.#internals = this.attachInternals()
 
     element(this, {
@@ -140,6 +139,10 @@ export class CheckboxElement extends CustomElement {
 
     this.classList.toggle('checked', this.checked)
   }
+}
+
+if (!customElements.get('e-checkbox')) {
+  customElements.define('e-checkbox', CheckboxElement)
 }
 
 declare global {

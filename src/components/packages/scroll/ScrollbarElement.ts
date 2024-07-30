@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { isBrowser, setupDrag } from '@packages/utils'
@@ -46,7 +45,6 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-scrollbar')
 export class ScrollbarElement extends ScrollUserElement {
   #slotElement: HTMLSlotElement = null!
   #thumbElement: HTMLElement = null!
@@ -62,7 +60,8 @@ export class ScrollbarElement extends ScrollUserElement {
     super()
 
     if (isBrowser) {
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       element(this, {
         slot: 'static',
@@ -175,6 +174,10 @@ export class ScrollbarElement extends ScrollUserElement {
     const startValue = this.scrollElement.targetScrollValue
     const grabCursor = this.#isHorisontal ? grabEvent.x : grabEvent.y
   }
+}
+
+if (!customElements.get('e-scrollbar')) {
+  customElements.define('e-scrollbar', ScrollbarElement)
 }
 
 declare global {

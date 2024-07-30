@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import { SelectUserElement } from './SelectUserElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
@@ -12,13 +11,13 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-select-option')
 export class SelectOptionElement extends SelectUserElement {
   constructor() {
     super()
 
     if (isBrowser) {
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       element(this, {
         tabindex: 0,
@@ -75,6 +74,10 @@ export class SelectOptionElement extends SelectUserElement {
     this.selectElement.value = this.value
     this.selectElement.close()
   }
+}
+
+if (!customElements.get('e-select-option')) {
+  customElements.define('e-select-option', SelectOptionElement)
 }
 
 declare global {

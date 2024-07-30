@@ -1,6 +1,5 @@
 import { Canvas2DRenderDetail, CanvasElement } from '@packages/canvas'
 import { CSSProperty } from '@packages/css-property'
-import { define } from '@packages/custom-element'
 import { elementResizer } from '@packages/element-resizer'
 import { SourceElement, SourceManagerSourceSet } from '@packages/source'
 import { contain, cover, isBrowser } from '@packages/utils'
@@ -26,7 +25,6 @@ function extractNumbersBetweenCurlyBraces(str: string) {
   return null
 }
 
-@define('e-sequence')
 export class SequenceElement extends SourceElement<CanvasElement> {
   #currentImages: Array<HTMLImageElement> = []
 
@@ -218,6 +216,10 @@ export class SequenceElement extends SourceElement<CanvasElement> {
       this.#currentIndex = (this.#currentIndex + 1) % this.#currentImages.length
     }
   }
+}
+
+if (!customElements.get('e-sequence')) {
+  customElements.define('e-sequence', SequenceElement)
 }
 
 declare global {

@@ -1,14 +1,12 @@
 import { Word } from './Word.js'
 import { Letter } from './Letter'
-import { CustomElement, define } from '@packages/custom-element'
 
 export interface SlicerParameters {
   wordConstructor?: typeof Word
   letterConstructor?: typeof Letter
 }
 
-@define('e-slicer')
-export class SlicerElement extends CustomElement {
+export class SlicerElement extends HTMLElement {
   #originalText = ''
   #words: Array<Word> = []
   #letters: Array<Letter> = []
@@ -94,6 +92,10 @@ export class SlicerElement extends CustomElement {
     this.style.removeProperty('--words-length')
     this.style.removeProperty('--letters-length')
   }
+}
+
+if (!customElements.get('e-slicer')) {
+  customElements.define('e-slicer', SlicerElement)
 }
 
 declare global {

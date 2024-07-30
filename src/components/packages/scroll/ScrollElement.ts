@@ -5,7 +5,6 @@ import {
   DragControls,
   AutoplayControls,
 } from '@packages/controls'
-import { define, CustomElement } from '@packages/custom-element'
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
@@ -83,8 +82,7 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-scroll')
-export class ScrollElement extends CustomElement {
+export class ScrollElement extends HTMLElement {
   #damped: Damped = null!
 
   #controlsCSSProperty = new CSSProperty<boolean>(this, '--controls', true)
@@ -185,7 +183,8 @@ export class ScrollElement extends CustomElement {
         order: TICK_ORDER.SCROLL,
       })
 
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       element(this, {
         tabIndex: 0,
@@ -1152,6 +1151,10 @@ export class ScrollElement extends CustomElement {
 
     return nearestIndex !== null ? this.#sections[nearestIndex] : null
   }
+}
+
+if (!customElements.get('e-scroll')) {
+  customElements.define('e-scroll', ScrollElement)
 }
 
 declare global {

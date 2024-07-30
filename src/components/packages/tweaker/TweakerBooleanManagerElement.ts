@@ -1,7 +1,6 @@
 import '@packages/checkbox'
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { define } from '@packages/custom-element'
 import { createStylesheet, element } from '@packages/element-constructor'
 import { aptechkaTheme } from '@packages/theme'
 
@@ -19,14 +18,14 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-tweaker-boolean-manager')
 export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
   Store<boolean, 'boolean'>
 > {
   constructor(...stores: Array<Store<boolean, 'boolean'>>) {
     super(...stores)
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       children: [
@@ -43,6 +42,13 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
       ],
     })
   }
+}
+
+if (!customElements.get('e-tweaker-boolean-manager')) {
+  customElements.define(
+    'e-tweaker-boolean-manager',
+    TweakerBooleanManagerElement
+  )
 }
 
 declare global {

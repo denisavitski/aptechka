@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import { debounce } from '@packages/utils'
 import { ScrollBehaviour, ScrollElement } from './ScrollElement'
 import { ScrollUserElement } from './ScrollUserElement'
@@ -48,7 +47,6 @@ class BulletButton {
   }
 }
 
-@define('e-scroll-bullet-buttons')
 export class ScrollBulletButtonsElement extends ScrollUserElement {
   #buttons: Array<BulletButton> = []
 
@@ -90,6 +88,10 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
       this.#buttons.push(button)
     }
   }, 0)
+}
+
+if (!customElements.get('e-scroll-bullet-buttons')) {
+  customElements.define('e-scroll-bullet-buttons', ScrollBulletButtonsElement)
 }
 
 declare global {

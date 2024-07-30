@@ -1,5 +1,4 @@
 import { CSSProperty } from '@packages/css-property'
-import { define, CustomElement } from '@packages/custom-element'
 import {
   canvas,
   createStylesheet,
@@ -33,8 +32,7 @@ export interface Canvas2DRenderDetail {
 
 export type Canvas2DRenderCallback = (entry: Canvas2DRenderDetail) => void
 
-@define('e-canvas')
-export class CanvasElement extends CustomElement {
+export class CanvasElement extends HTMLElement {
   #fpsCSSProperty = new CSSProperty<number>(this, '--fps', 0)
 
   #canvasElement: HTMLCanvasElement = null!
@@ -50,7 +48,8 @@ export class CanvasElement extends CustomElement {
   constructor() {
     super()
 
-    this.openShadow(stylesheet)
+    const shadow = this.attachShadow({ mode: 'open' })
+    shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       children: canvas({
@@ -175,6 +174,10 @@ export class CanvasElement extends CustomElement {
       })
     )
   }
+}
+
+if (!customElements.get('e-canvas')) {
+  customElements.define('e-canvas', CanvasElement)
 }
 
 declare global {

@@ -1,8 +1,6 @@
-import { define } from '@packages/custom-element'
 import { ScrollButtonElement } from './ScrollButtonElement'
 import { ScrollBehaviour } from './ScrollElement'
 
-@define('e-scroll-set-button')
 export class ScrollSetButtonElement extends ScrollButtonElement {
   protected override handleClick() {
     const index = this.getAttribute('index')
@@ -10,6 +8,10 @@ export class ScrollSetButtonElement extends ScrollButtonElement {
 
     this.scrollElement.scrollToSection(parseInt(index || '0'), { behaviour })
   }
+}
+
+if (!customElements.get('e-scroll-set-button')) {
+  customElements.define('e-scroll-set-button', ScrollSetButtonElement)
 }
 
 declare global {

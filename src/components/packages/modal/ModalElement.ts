@@ -1,4 +1,3 @@
-import { define } from '@packages/custom-element'
 import {
   createStylesheet,
   element,
@@ -111,7 +110,6 @@ const stylesheet = createStylesheet({
   },
 })
 
-@define('e-modal')
 export class ModalElement extends PopoverElement {
   #resizeObserver: ResizeObserver = null!
   #innerElement: HTMLElement = null!
@@ -120,7 +118,8 @@ export class ModalElement extends PopoverElement {
     super()
 
     if (isBrowser) {
-      this.openShadow(stylesheet)
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(stylesheet)
 
       element(this, {
         children: div({
@@ -168,6 +167,10 @@ export class ModalElement extends PopoverElement {
 
     this.#resizeObserver.disconnect()
   }
+}
+
+if (!customElements.get('e-modal')) {
+  customElements.define('e-modal', ModalElement)
 }
 
 declare global {

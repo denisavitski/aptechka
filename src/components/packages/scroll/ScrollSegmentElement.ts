@@ -5,8 +5,7 @@ import {
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
 } from '@packages/utils/layout'
-import { clamp, step } from '@packages/utils/math'
-import { define } from '@packages/custom-element'
+import { step } from '@packages/utils/math'
 import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { ScrollUserElement } from './ScrollUserElement'
@@ -19,7 +18,6 @@ export interface ScrollSegmentResizeDetail {
   finish: number
 }
 
-@define('e-scroll-segment')
 export class ScrollSegmentElement extends ScrollUserElement {
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
   #massCSSProperty = new CSSProperty<number>(this, '--mass', 0)
@@ -753,6 +751,10 @@ export class ScrollSegmentElement extends ScrollUserElement {
 
     this.#scrollEntries = allScrollEntriesAbove.slice(scrollIndex + 1)
   }, 0)
+}
+
+if (!customElements.get('e-scroll-segment')) {
+  customElements.define('e-scroll-segment', ScrollSegmentElement)
 }
 
 declare global {
