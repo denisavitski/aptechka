@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -137,6 +137,11 @@
       "require": "./lib/jsx/index.cjs",
       "default": "./lib/jsx/index.js",
       "types": "./lib/jsx/index.d.ts"
+    },
+    "./jsx/hooks/animation": {
+      "require": "./lib/jsx/hooks/animation/index.cjs",
+      "default": "./lib/jsx/hooks/animation/index.js",
+      "types": "./lib/jsx/hooks/animation/index.d.ts"
     },
     "./jsx/hooks/store": {
       "require": "./lib/jsx/hooks/store/index.cjs",
@@ -375,6 +380,9 @@
       ],
       "jsx": [
         "lib/jsx/index.d.ts"
+      ],
+      "jsx/hooks/animation": [
+        "lib/jsx/hooks/animation/index.d.ts"
       ],
       "jsx/hooks/store": [
         "lib/jsx/hooks/store/index.d.ts"

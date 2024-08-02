@@ -21,12 +21,12 @@ export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
 export type ElementConstructorTagNames = keyof ElementConstructorTagNameMap
 
 export type ElementConstructorStringStoreClass =
-  | Store<string | null | undefined>
-  | Store<string>
+  | Store<any, any>
+  | Store<any, any>
 
 export type ElementConstructorStringArrayStoreClass =
-  | Store<Array<string | null | undefined>>
-  | Store<Array<string>>
+  | Store<Array<any>, any>
+  | Store<Array<any>, any>
 
 export type ElementConstructorClass =
   | string
@@ -34,13 +34,15 @@ export type ElementConstructorClass =
       | string
       | ElementConstructorStringStoreClass
       | ElementConstructorStringArrayStoreClass
+      | null
+      | undefined
     >
   | ElementConstructorStringStoreClass
   | ElementConstructorStringArrayStoreClass
-  | { [key: string]: boolean | Store<boolean> }
+  | { [key: string]: boolean | Store<boolean, any> }
 
 export type ElementConstructorStyleToken = Exclude<
-  Extract<keyof CSSStyleDeclaration, string> | `--${string}`,
+  Extract<keyof CSSStyleDeclaration, string> | `--${string}` | `-${string}`,
   'length' | 'parentRule'
 >
 
@@ -135,6 +137,7 @@ export type ElementConstructorTagObject<
   lightChildren?: any
   onDisconnect?: ConnectorDisconnectCallback
   onConnect?: ConnectorConnectCallback
+  connectedClass?: boolean | string
 } & ElementConstructorAttributes<T> &
   ElementConstructorEvents
 
@@ -145,8 +148,8 @@ export class ElementConstructor<
     : Node
 > {
   #node: N = null!
-  #connectCallbacks: Set<Function> = new Set()
-  #disconnectCallbacks: Set<Function> = new Set()
+  #connectCallbacks: Set<ConnectorConnectCallback> = new Set()
+  #disconnectCallbacks: Set<ConnectorDisconnectCallback> = new Set()
   #connectorUnsubscribeCallback: (() => void) | undefined
   #storeRootElements: Array<HTMLElement> | undefined
   #events:
@@ -261,6 +264,14 @@ export class ElementConstructor<
             : (this.#node as any),
           value
         )
+      } else if (propertyName === 'connectedClass') {
+        this.#connectCallbacks.add(() => {
+          requestAnimationFrame(() => {
+            ;(this.#node as HTMLElement).classList.add(
+              typeof value === 'boolean' ? 'connected' : value
+            )
+          })
+        })
       } else if (propertyName.startsWith('on')) {
         if (!events) {
           events = {}
@@ -319,7 +330,9 @@ export class ElementConstructor<
       ;(this.#node as HTMLElement).classList.add(classObject)
     } else if (Array.isArray(classObject)) {
       classObject.forEach((v) => {
-        this.#createClassList(v)
+        if (v) {
+          this.#createClassList(v)
+        }
       })
     } else if (typeof classObject === 'object') {
       if (classObject instanceof Store) {
@@ -594,32 +607,37 @@ export class ElementConstructor<
 
             const currentNodes = Array.from(rootElement.childNodes)
 
-            const currentItems = [current].flat()
+            const currentItems = Array.isArray(current) ? current : [current]
 
-            const previousItems = [previous].flat()
+            const previousItems = Array.isArray(previous)
+              ? previous
+              : [previous]
 
             const nodesToDelete: Array<Node> = []
 
-            const previousItemsWithDeletedItems: Array<any> = []
+            const similarPreviousItems: Array<any> = []
 
-            previousItems.forEach((previousItem, index) => {
-              if (!currentItems.includes(previousItem) && currentNodes[index]) {
-                nodesToDelete.push(currentNodes[index])
-              } else {
-                previousItemsWithDeletedItems.push(previousItem)
-              }
-            })
+            if (currentNodes.length) {
+              previousItems.forEach((previousItem, index) => {
+                if (!currentItems.includes(previousItem)) {
+                  nodesToDelete.push(currentNodes[index])
+                } else {
+                  similarPreviousItems.push(previousItem)
+                }
+              })
+            }
 
             currentItems.forEach((currentItem, index) => {
-              if (previousItemsWithDeletedItems[index]) {
-                if (currentItem !== previousItemsWithDeletedItems[index]) {
+              if (similarPreviousItems[index] != undefined) {
+                if (currentItem !== similarPreviousItems[index]) {
                   const newNode = this.#getNode(currentItem)
                   const currentNode = currentNodes[index]
 
-                  if (newNode instanceof Node) {
-                    if (!currentNode.isEqualNode(newNode)) {
-                      rootElement.replaceChild(newNode, currentNode)
-                    }
+                  if (
+                    newNode instanceof Node &&
+                    !currentNode.isEqualNode(newNode)
+                  ) {
+                    rootElement.replaceChild(newNode, currentNode)
                   } else {
                     rootElement.removeChild(currentNode)
                   }
@@ -709,17 +727,17 @@ export class ElementConstructor<
     }
   }
 
-  #connect: ConnectorConnectCallback = () => {
+  #connect: ConnectorConnectCallback = (node) => {
     this.#connectCallbacks.forEach((callback) => {
-      callback()
+      callback(node)
     })
 
     this.#connectCallbacks.clear()
   }
 
-  #disconnect: ConnectorDisconnectCallback = (expired) => {
+  #disconnect: ConnectorDisconnectCallback = (node, expired) => {
     this.#disconnectCallbacks.forEach((callback) => {
-      callback(expired)
+      callback(node, expired)
     })
 
     this.#disconnectCallbacks.clear()

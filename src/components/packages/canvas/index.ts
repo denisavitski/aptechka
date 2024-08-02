@@ -30,7 +30,7 @@ export interface Canvas2DRenderDetail {
   timeBetweenFrames: number
 }
 
-export type Canvas2DRenderCallback = (entry: Canvas2DRenderDetail) => void
+export type CanvasRenderEvent = CustomEvent<Canvas2DRenderDetail>
 
 export class CanvasElement extends HTMLElement {
   #fpsCSSProperty = new CSSProperty<number>(this, '--fps', 0)
@@ -186,7 +186,7 @@ declare global {
   }
 
   interface HTMLElementEventMap {
-    canvasRender: CustomEvent<Canvas2DRenderDetail>
-    canvasResize: CustomEvent<Canvas2DRenderDetail>
+    canvasRender: CanvasRenderEvent
+    canvasResize: CanvasRenderEvent
   }
 }

@@ -237,7 +237,5 @@ function shareStore(store: Store<any, any>) {
 function unshareStore(store: Store<any, any>) {
   if (activeStores.current.includes(store)) {
     activeStores.current = activeStores.current.filter((s) => s !== store)
-
-    console.log(activeStores.current)
   }
 }

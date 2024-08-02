@@ -1,8 +1,8 @@
 import { Derived } from '@packages/store'
 import { _createStore } from '../basic/_createStore'
 
-export function createDerived<DerivedType, StoreType>(
-  ...parameters: ConstructorParameters<typeof Derived<DerivedType, StoreType>>
+export function createDerived<Type, SourceType>(
+  ...parameters: ConstructorParameters<typeof Derived<Type, SourceType>>
 ) {
-  return _createStore(new Derived<DerivedType, StoreType>(...parameters))
+  return _createStore(new Derived<Type, SourceType>(...parameters))
 }

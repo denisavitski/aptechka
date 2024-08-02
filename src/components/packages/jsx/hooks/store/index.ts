@@ -1,5 +1,6 @@
 export { createComposed } from './createComposed'
 export { createDerived } from './createDerived'
 export { createDerivedArray } from './createDerivedArray'
+export { createCached } from './createCached'
 export { createResource } from './createResource'
 export { createStore } from './createStore'

@@ -1,18 +1,18 @@
 import { Store, StoreOptions } from './Store'
 
-export type KeyedCallback<Type, SourceType extends Array<KeyedSource>> = (
+export type CachedCallback<Type, SourceType extends Array<CachedSource>> = (
   value: SourceType[number]['value'],
   index: number,
   arr: SourceType
 ) => Type
 
-export interface KeyedSource<T = any> {
+export interface CachedSource<T = any> {
   key: any
   value: T
   revalidate?: boolean
 }
 
-export class Keyed<Type, SourceType extends Array<KeyedSource>> extends Store<
+export class Cached<Type, SourceType extends Array<CachedSource>> extends Store<
   Array<Type>
 > {
   #unsubscriber: Function
@@ -21,7 +21,7 @@ export class Keyed<Type, SourceType extends Array<KeyedSource>> extends Store<
 
   constructor(
     store: Store<SourceType, any>,
-    callback: KeyedCallback<Type, SourceType>,
+    callback: CachedCallback<Type, SourceType>,
     parameters?: StoreOptions<Array<Type>>
   ) {
     super(null!, parameters)
@@ -30,7 +30,7 @@ export class Keyed<Type, SourceType extends Array<KeyedSource>> extends Store<
       this.current = e.current.map((item, i, arr) => {
         let result = this.#cache.get(item.key)
 
-        if (!result || item.revalidate) {
+        if (result === undefined || item.revalidate) {
           result = callback(item.value, i, arr as SourceType)
           this.#cache.set(item.key, result)
         }

@@ -1,3 +1,7 @@
+import {
+  ConnectorConnectCallback,
+  ConnectorDisconnectCallback,
+} from '@packages/connector'
 import type {
   ElementConstructor,
   ElementConstructorClass,
@@ -9,7 +13,7 @@ import type {
 import type { Store } from '@packages/store'
 import type { Split } from '@packages/utils'
 
-type StoreOr<T> = T | Store<T | null | undefined>
+type StoreOr<T> = T | Store<T, any>
 
 declare global {
   namespace JSX {
@@ -33,7 +37,7 @@ declare global {
     type Component<TProps extends object = object> = {
       formAssociated?: boolean
       noCustomElement?: boolean
-      (props: BaseProps & TProps): ComponentChild
+      (props: BaseProps & TProps): ComponentChild | undefined
     }
 
     type HTMLOrSVGEvents = Partial<{
@@ -44,6 +48,11 @@ declare global {
         >]
       ) => void
     }>
+
+    type SpecialEvents = {
+      onConnect?: ConnectorConnectCallback
+      onDisconnect?: ConnectorDisconnectCallback
+    }
 
     interface DOMAttributes {
       ref?: { current: any }
@@ -73,6 +82,7 @@ declare global {
       challenge?: StoreOr<string>
       checked?: StoreOr<boolean>
       class?: ElementConstructorClass
+      connectedClass?: boolean | string
       cols?: StoreOr<number>
       colSpan?: StoreOr<number>
       content?: StoreOr<string>
@@ -87,7 +97,7 @@ declare global {
       default?: StoreOr<boolean>
       defer?: StoreOr<boolean>
       dir?: StoreOr<'auto' | 'rtl' | 'ltr'>
-      disabled?: StoreOr<boolean>
+      disabled?: StoreOr<true | null>
       disableRemotePlayback?: StoreOr<boolean>
       download?: StoreOr<string>
       draggable?: StoreOr<boolean>
@@ -208,7 +218,10 @@ declare global {
       [key: string]: any
     }
 
-    type AllAttributes = UnknownAttributes & HTMLAttributes & HTMLOrSVGEvents
+    type AllAttributes = UnknownAttributes &
+      HTMLAttributes &
+      HTMLOrSVGEvents &
+      SpecialEvents
 
     type SpecialTags = {
       component: AllAttributes

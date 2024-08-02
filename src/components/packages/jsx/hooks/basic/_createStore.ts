@@ -9,7 +9,7 @@ export function _createStore<T extends Store<any, any>>(
   const store =
     typeof arg === 'function' ? arg(currentComponentElement.value) : arg
 
-  if (currentComponentElement) {
+  if (currentComponentElement.value) {
     onDisconnect(() => store.close())
   }
 

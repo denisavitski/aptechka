@@ -1,12 +1,19 @@
-export type ConnectorConnectCallback = () => void
-export type ConnectorDisconnectCallback = (expired?: boolean) => void
+import { TICK_ORDER } from '@packages/order'
+import { ticker, TickerCallback } from '@packages/ticker'
 
-interface ConnectorSubscriber {
-  node: Node
-  connectCallback?: ConnectorConnectCallback
-  disconnectCallback?: ConnectorDisconnectCallback
+export type ConnectorConnectCallback<T extends Node = Node> = (node: T) => void
+export type ConnectorDisconnectCallback<T extends Node = Node> = (
+  node: T,
+  expired?: boolean
+) => void
+
+interface ConnectorSubscriber<T extends Node = Node> {
+  node: T
+  connectCallback?: ConnectorConnectCallback<T>
+  disconnectCallback?: ConnectorDisconnectCallback<T>
   isConnected: boolean
   timer: number
+  startTime: number
   maxWaitSec: number
   unsubscribeAfterDisconnect: boolean
 }
@@ -21,7 +28,6 @@ export interface ConnectorOptions {
 export class Connector {
   #subscribers: Array<ConnectorSubscriber> = []
   #intervalId: ReturnType<typeof setInterval> | undefined
-  #interval = 100
 
   public subscribe(node: Node, options: ConnectorOptions) {
     const l = this.#subscribers.length
@@ -32,19 +38,15 @@ export class Connector {
       disconnectCallback: options.disconnectCallback,
       isConnected: false,
       maxWaitSec:
-        typeof options.maxWaitSec === 'number'
-          ? options.maxWaitSec === 0
-            ? this.#interval / 1000
-            : options.maxWaitSec
-          : Infinity,
+        typeof options.maxWaitSec === 'number' ? options.maxWaitSec : Infinity,
       timer: 0,
+      startTime: performance.now(),
       unsubscribeAfterDisconnect: options.unsubscribeAfterDisconnect || false,
     })
 
     if (!l) {
-      this.#intervalId = setInterval(this.#intervalListener, this.#interval)
-      setTimeout(() => {
-        this.#intervalListener()
+      ticker.subscribe(this.#animationFrameListener, {
+        order: TICK_ORDER.CONNECTOR,
       })
     }
 
@@ -69,7 +71,7 @@ export class Connector {
     )
 
     if (!this.#subscribers.length) {
-      clearInterval(this.#intervalId)
+      ticker.unsubscribe(this.#animationFrameListener)
       this.#intervalId = undefined
     }
   }
@@ -79,15 +81,15 @@ export class Connector {
     this.#subscribers = []
   }
 
-  #intervalListener = () => {
+  #animationFrameListener: TickerCallback = (e) => {
     for (let index = this.#subscribers.length - 1; index >= 0; index--) {
       const subscriber = this.#subscribers[index]
 
       if (subscriber.node.isConnected && !subscriber.isConnected) {
-        subscriber.connectCallback?.()
+        subscriber.connectCallback?.(subscriber.node)
         subscriber.isConnected = true
       } else if (!subscriber.node.isConnected && subscriber.isConnected) {
-        subscriber.disconnectCallback?.()
+        subscriber.disconnectCallback?.(subscriber.node)
         subscriber.isConnected = false
 
         if (subscriber.unsubscribeAfterDisconnect) {
@@ -95,14 +97,16 @@ export class Connector {
         }
       }
 
-      subscriber.timer += this.#interval
+      if (!subscriber.isConnected) {
+        subscriber.timer = Math.max(
+          0,
+          e.timeElapsedSinceSubscription - subscriber.startTime
+        )
 
-      if (
-        !subscriber.isConnected &&
-        subscriber.timer > subscriber.maxWaitSec * 1000
-      ) {
-        subscriber.disconnectCallback?.(true)
-        this.unsubscribe(subscriber)
+        if (subscriber.timer > subscriber.maxWaitSec * 1000) {
+          subscriber.disconnectCallback?.(subscriber.node, true)
+          this.unsubscribe(subscriber)
+        }
       }
     }
   }

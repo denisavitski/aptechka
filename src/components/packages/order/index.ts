@@ -13,6 +13,7 @@ export enum RESIZE_ORDER {
 
 export enum TICK_ORDER {
   FIRST = -100000,
+  CONNECTOR,
   SCROLL,
   ANIMATION,
   LAYOUT_BOX,

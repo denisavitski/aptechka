@@ -43,11 +43,11 @@ export function h(
 
       return () => new ElementConstructor(instance, attributes).node
     } else {
-      if (tag === Fragment) {
-        return Fragment(children)
-      }
-
       attributes.children = stack.reverse()
+
+      if (tag === Fragment) {
+        return Fragment(attributes.children)
+      }
 
       const flags = {
         noCustomElement: tag.noCustomElement,

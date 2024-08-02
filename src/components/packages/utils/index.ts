@@ -1,6 +1,7 @@
 export * from './array'
 export * from './attributes'
 export * from './browser'
+export * from './bytes'
 export * from './canvas'
 export * from './collisions'
 export * from './coordinates'

@@ -21,7 +21,7 @@ export { Derived, type DerivedCallback } from './Derived'
 
 export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
 
-export { Keyed, type KeyedCallback, type KeyedSource } from './Keyed'
+export { Cached, type CachedCallback, type CachedSource } from './Cached'
 
 export { Resource, type ResourceFetcher } from './Resource'
 

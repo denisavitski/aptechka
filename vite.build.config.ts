@@ -53,6 +53,8 @@ export function buildConfig() {
 
           // > JSX
           'jsx/index': './src/components/packages/jsx/index.ts',
+          'jsx/hooks/animation/index':
+            './src/components/packages/jsx/hooks/animation/index.ts',
           'jsx/hooks/store/index':
             './src/components/packages/jsx/hooks/store/index.ts',
           'jsx/hooks/onAnimationFrame':
