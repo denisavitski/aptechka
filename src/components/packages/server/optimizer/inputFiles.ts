@@ -74,6 +74,28 @@ function specialPath(path: string, specialString: string) {
   }
 }
 
+async function getFolderSourceFiles(folderPath: string) {
+  const leafs = await readdir(folderPath)
+
+  const files: Array<{
+    name: string
+    buffer: Buffer
+  }> = []
+
+  for await (const leaf of leafs) {
+    const name = removeExtension(leaf)
+
+    const buffer = await readFile(join(folderPath, leaf))
+
+    files.push({
+      name: name,
+      buffer: buffer,
+    })
+  }
+
+  return files
+}
+
 export async function inputFiles({
   sourceFolder,
   destinationFolder,
@@ -94,22 +116,18 @@ export async function inputFiles({
 
       if (statSync(sourcePath).isDirectory()) {
         if (sourcePath.includes('@sprite')) {
-          const leafs = await readdir(sourcePath)
+          const files = await getFolderSourceFiles(sourcePath)
 
           const content: SpriteSource['content'] = []
 
-          for await (const leaf of leafs) {
-            if (getExtension(leaf) === 'svg') {
-              const fileName = removeExtension(leaf)
-
-              const buffer = await readFile(join(sourcePath, leaf))
-
+          files.forEach((file) => {
+            if (getExtension(file.name) === 'svg') {
               content.push({
-                name: fileName,
-                buffer: buffer,
+                name: file.name,
+                buffer: file.buffer,
               })
             }
-          }
+          })
 
           const destinationSvgPath = specialPath(
             `${destinationPath}.svg`,
