@@ -17,11 +17,20 @@ export {
   type StoreManagerType,
 } from './Store'
 
-export { Derived, type DerivedCallback } from './Derived'
+export { Derived, AsyncDerived, type DerivedCallback } from './Derived'
 
-export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
+export {
+  DerivedArray,
+  AsyncDerivedArray,
+  type DerivedArrayCallback,
+} from './DerivedArray'
 
-export { Cached, type CachedCallback, type CachedSource } from './Cached'
+export {
+  Cached,
+  AsyncCached,
+  type CachedCallback,
+  type CachedSource,
+} from './Cached'
 
 export { Resource, type ResourceFetcher } from './Resource'
 

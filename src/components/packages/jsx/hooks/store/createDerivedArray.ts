@@ -1,4 +1,4 @@
-import { DerivedArray } from '@packages/store'
+import { AsyncDerivedArray, DerivedArray } from '@packages/store'
 import { _createStore } from '../basic/_createStore'
 
 export function createDerivedArray<
@@ -10,4 +10,17 @@ export function createDerivedArray<
   >
 ) {
   return _createStore(new DerivedArray<DerivedType, StoreType>(...parameters))
+}
+
+export function createAsyncDerivedArray<
+  DerivedType,
+  StoreType extends Array<any> = Array<any>
+>(
+  ...parameters: ConstructorParameters<
+    typeof AsyncDerivedArray<DerivedType, StoreType>
+  >
+) {
+  return _createStore(
+    new AsyncDerivedArray<DerivedType, StoreType>(...parameters)
+  )
 }

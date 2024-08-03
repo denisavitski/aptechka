@@ -33,6 +33,7 @@ export class ComponentElement extends HTMLElement {
 
     const res = parameters?.tag({
       ...parameters.attributes,
+      this: this,
     })
 
     const childrenType = nextComponentAttributes.value?.lightChildren

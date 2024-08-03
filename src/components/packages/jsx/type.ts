@@ -6,6 +6,8 @@ import type {
   ElementConstructor,
   ElementConstructorClass,
   ElementConstructorEventMap,
+  ElementConstructorRef,
+  ElementConstructorRefCallback,
   ElementConstructorStyle,
   ElementConstructorTagNames,
 } from '@packages/element-constructor'
@@ -32,6 +34,7 @@ declare global {
 
     interface BaseProps {
       children?: Array<ComponentChild>
+      this?: HTMLElement
     }
 
     type Component<TProps extends object = object> = {
@@ -54,11 +57,7 @@ declare global {
       onDisconnect?: ConnectorDisconnectCallback
     }
 
-    interface DOMAttributes {
-      ref?: { current: any }
-    }
-
-    interface HTMLAttributes extends DOMAttributes {
+    interface HTMLAttributes<TKey extends ElementConstructorTagNames = any> {
       accept?: StoreOr<string>
       acceptCharset?: StoreOr<string>
       accessKey?: StoreOr<string>
@@ -187,7 +186,7 @@ declare global {
       title?: StoreOr<string>
       type?: StoreOr<string>
       useMap?: StoreOr<string>
-      value?: StoreOr<string | string[] | number>
+      value?: StoreOr<string | string[] | number | boolean>
       volume?: StoreOr<string | number>
       width?: StoreOr<number | string>
       wmode?: StoreOr<string>
@@ -212,16 +211,16 @@ declare global {
       forceSvg?: boolean
 
       lightChildren?: boolean
+
+      ref?: ElementConstructorRef<TKey>
     }
 
     type UnknownAttributes = {
       [key: string]: any
     }
 
-    type AllAttributes = UnknownAttributes &
-      HTMLAttributes &
-      HTMLOrSVGEvents &
-      SpecialEvents
+    type AllAttributes<TKey extends ElementConstructorTagNames = any> =
+      UnknownAttributes & HTMLAttributes<TKey> & HTMLOrSVGEvents & SpecialEvents
 
     type SpecialTags = {
       component: AllAttributes
@@ -233,7 +232,7 @@ declare global {
     }
 
     type IntrinsicElementsHTML = {
-      [TKey in ElementConstructorTagNames]?: AllAttributes
+      [TKey in ElementConstructorTagNames]?: AllAttributes<TKey>
     } & SpecialTags
 
     type IntrinsicElements = IntrinsicElementsHTML

@@ -98,13 +98,17 @@ export type ElementConstructorRefCallback<
     : Node
 ) => void
 
-export type ElementConstructorRef<
+export type ElementConstructorObjectRef<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
 > = {
   current: T extends ElementConstructorTagNames
     ? ElementConstructorTagNameMap[T]
     : Node
 }
+
+export type ElementConstructorRef<
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+> = ElementConstructorRefCallback<T> | ElementConstructorObjectRef<T>
 
 export type ElementConstructorEventValue<E extends Event> =
   | {
@@ -132,7 +136,7 @@ export type ElementConstructorTagObject<
   class?: ElementConstructorClass
   style?: T extends 'style' ? ElementConstructorJSS : ElementConstructorStyle
   children?: any
-  ref?: ElementConstructorRefCallback<T> | ElementConstructorRef<T>
+  ref?: ElementConstructorRef<T>
   forceSvg?: boolean
   lightChildren?: any
   onDisconnect?: ConnectorDisconnectCallback
