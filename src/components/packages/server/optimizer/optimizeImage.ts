@@ -1,16 +1,14 @@
 import sharp from 'sharp'
 import { ImageFileBox, OptimizedEntry } from './types'
-import { extname } from 'path'
+import { replaceExtension } from './path'
 
 export async function optimizeImage(box: ImageFileBox) {
   const settings = box.settings
 
-  const arrayBuffer = box.file
-  const image = sharp(arrayBuffer)
+  const image = sharp(box.buffer)
   const meta = await image.metadata()
   const width = meta.width
   const height = meta.height
-  const format = extname(box.path).slice(1)
 
   const entries: Array<OptimizedEntry> = []
 
@@ -23,12 +21,12 @@ export async function optimizeImage(box: ImageFileBox) {
     }
   }
 
-  if (format === 'jpg' || format === 'jpeg') {
+  if (box.ext === 'jpg' || box.ext === 'jpeg') {
     image.jpeg({
       mozjpeg: true,
       quality: settings.quality,
     })
-  } else if (format === 'png') {
+  } else if (box.ext === 'png') {
     image.png({
       compressionLevel: 9,
       adaptiveFiltering: true,
@@ -40,8 +38,8 @@ export async function optimizeImage(box: ImageFileBox) {
   const buffer = await image.toBuffer()
 
   entries.push({
-    buffer,
-    path: box.path,
+    data: buffer,
+    destinationPath: settings.destinationPath,
   })
 
   if (settings.webp) {
@@ -53,8 +51,8 @@ export async function optimizeImage(box: ImageFileBox) {
       .toBuffer()
 
     entries.push({
-      buffer,
-      path: box.path.split('.').slice(0, -1).join('.') + '.webp',
+      data: buffer,
+      destinationPath: replaceExtension(settings.destinationPath, 'webp'),
     })
   }
 
@@ -62,9 +60,11 @@ export async function optimizeImage(box: ImageFileBox) {
     const buffer = await image.resize(20, 20).blur(10).toBuffer()
 
     entries.push({
-      buffer,
-      path:
-        box.path.split('.').slice(0, -1).join('.') + `.placeholder.${format}`,
+      data: buffer,
+      destinationPath: replaceExtension(
+        settings.destinationPath,
+        `placeholder.${box.ext}`
+      ),
     })
   }
 

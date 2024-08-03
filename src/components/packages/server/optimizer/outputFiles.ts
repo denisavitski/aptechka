@@ -5,8 +5,8 @@ import { outputFile } from './outputFile'
 
 export async function outputFiles(entries: Array<OptimizedEntry>) {
   for await (const entry of entries) {
-    await mkdir(dirname(entry.path), { recursive: true })
-    await writeFile(entry.path, entry.buffer)
-    outputFile(entry.path, entry.buffer)
+    await mkdir(dirname(entry.destinationPath), { recursive: true })
+    await writeFile(entry.destinationPath, entry.data)
+    outputFile(entry.destinationPath, entry.data)
   }
 }

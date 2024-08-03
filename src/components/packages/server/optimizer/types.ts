@@ -1,46 +1,67 @@
+import type { FaviconOptions } from 'favicons'
+
 export type FileBoxSettings = {
-  [key: string]: number | string | boolean
+  [key: string]: any
 }
 
-export interface FileBox {
-  file: Buffer
-  path: string
-  type: string
+export interface FileBox<
+  T extends string = string,
+  S extends FileBoxSettings = {}
+> {
+  buffer: Buffer
+  type: T
   ext: string
+  settings: S
 }
 
-export interface SkipFileBox extends FileBox {
-  type: 'skip'
-}
+export type SkipFileBox = FileBox<
+  'skip',
+  {
+    destinationPath: string
+  }
+>
 
-export interface FileBoxWithSettings extends FileBox {
-  settings: FileBoxSettings
-}
-
-export interface ImageFileBox extends FileBoxWithSettings {
-  type: 'image'
-  settings: {
+export type ImageFileBox = FileBox<
+  'image',
+  {
+    destinationPath: string
     quality: number
     scale: number
     placeholder: boolean
     webp: boolean
   }
-}
+>
 
-export interface VideoFileBox extends FileBoxWithSettings {
-  type: 'video'
-  settings: {
+export type VideoFileBox = FileBox<
+  'video',
+  {
+    destinationPath: string
     quality: number
     scale: number
     fps: number | 'auto'
   }
-}
+>
 
-export type KnownFileBox = VideoFileBox | ImageFileBox | SkipFileBox
+type V = FaviconOptions
+
+export type FaviconFileBox = FileBox<
+  'favicon',
+  {
+    destinationFolderPath: string
+    destinationHtmlPath: string
+    options?: FaviconOptions
+  }
+>
+
+export type KnownFileBox =
+  | VideoFileBox
+  | ImageFileBox
+  | SkipFileBox
+  | FaviconFileBox
 
 export interface OptimizedEntry {
-  buffer: Buffer
-  path: string
+  data: Buffer | string
+  destinationPath: string
 }
 
 export const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'webp', 'jpeg'] as const

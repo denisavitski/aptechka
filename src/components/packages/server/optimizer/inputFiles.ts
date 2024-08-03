@@ -1,27 +1,47 @@
-import { readdirSync, readFileSync, statSync } from 'fs'
+import { statSync } from 'fs'
 import { extname, join, sep } from 'path'
 import {
   ALLOWED_IMAGE_EXTENSIONS,
   ALLOWED_VIDEO_EXTENSIONS,
-  FileBoxWithSettings,
+  FaviconFileBox,
+  FileBox,
   ImageFileBox,
   KnownFileBox,
   VideoFileBox,
 } from './types'
 import { readdir, readFile } from 'fs/promises'
+import { removeExtension } from './path'
 
 export interface InputFilesCallbackEntry {
   type: KnownFileBox['type']
   path: string
 }
 
-export type InputFilesCallback<T extends FileBoxWithSettings> = (
+export type InputFilesCallback<T extends FileBox> = (
   entry: InputFilesCallbackEntry
 ) => T
 
+export interface InputsFilesCallbackDefaultParameters {
+  destinationPath: string
+}
+
+export interface InputsFilesCallbackFaviconParameters {
+  destinationFolderPath: string
+  destinationHtmlPath: string
+}
+
 export interface InputFilesSettings {
-  image?(path: string): Partial<ImageFileBox['settings']>
-  video?(path: string): Partial<VideoFileBox['settings']>
+  image?(
+    parameters: InputsFilesCallbackDefaultParameters
+  ): Partial<ImageFileBox['settings']>
+
+  video?(
+    parameters: InputsFilesCallbackDefaultParameters
+  ): Partial<VideoFileBox['settings']>
+
+  favicon?(
+    parameters: InputsFilesCallbackFaviconParameters
+  ): Partial<FaviconFileBox['settings']>
 }
 
 export interface InputFilesParameters {
@@ -58,24 +78,41 @@ export async function inputFiles({
       } else {
         const ext = extname(destinationPath).toLowerCase().slice(1)
 
-        const file = await readFile(sourcePath)
+        const buffer = await readFile(sourcePath)
 
-        if (
+        if (destinationPath.includes('favicon')) {
+          const destinationFolderPath = removeExtension(destinationPath)
+          const destinationHtmlPath = `${destinationFolderPath}/head.html`
+
+          boxes.push({
+            ext,
+            buffer,
+            type: 'favicon',
+            settings: {
+              destinationFolderPath,
+              destinationHtmlPath
+              ...settings?.favicon?.({
+                destinationFolderPath,
+                destinationHtmlPath
+              }),
+            },
+          })
+        } else if (
           ALLOWED_IMAGE_EXTENSIONS.includes(
             ext as (typeof ALLOWED_IMAGE_EXTENSIONS)[number]
           )
         ) {
           boxes.push({
             ext,
-            file,
-            path: destinationPath,
+            buffer,
             type: 'image',
             settings: {
               placeholder: false,
               quality: 80,
               scale: 1,
               webp: false,
-              ...settings?.image?.(destinationPath),
+              destinationPath,
+              ...settings?.image?.({destinationPath}),
             },
           })
         } else if (
@@ -85,18 +122,23 @@ export async function inputFiles({
         ) {
           boxes.push({
             ext,
-            file,
-            path: destinationPath,
+            buffer,
             type: 'video',
             settings: {
               quality: 80,
               scale: 1,
               fps: 'auto',
-              ...settings?.video?.(destinationPath),
+              destinationPath,
+              ...settings?.video?.({destinationPath}),
             },
           })
         } else {
-          boxes.push({ ext, file, path: destinationPath, type: 'skip' })
+          boxes.push({
+            ext,
+            buffer,
+            type: 'skip',
+            settings: { destinationPath },
+          })
         }
       }
     }

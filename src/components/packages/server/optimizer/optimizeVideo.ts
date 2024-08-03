@@ -5,25 +5,22 @@ import { mkdir, readFile } from 'fs/promises'
 import { clear } from './clear'
 import { outputFile } from './outputFile'
 import Ffmpeg from 'fluent-ffmpeg'
+import { getExtension, removeExtension } from './path'
 
 const tmpPath = (path: string) => {
   const random = randomUUID()
 
-  const splitted = path.split('.')
-  const left = splitted.slice(0, -1).join('.')
-  const right = splitted.slice(-1).join('.')
-
-  return `${left}.${random}.${right}`
+  return `${removeExtension(path)}.${random}.${getExtension(path)}`
 }
 
 export async function optimizeVideo(box: VideoFileBox) {
   const settings = box.settings
 
   const entry = await new Promise<OptimizedEntry>(async (resolve, reject) => {
-    const inputPath = tmpPath(box.path)
-    const outputPath = tmpPath(box.path)
+    const inputPath = tmpPath(settings.destinationPath)
+    const outputPath = tmpPath(settings.destinationPath)
 
-    await outputFile(inputPath, box.file)
+    await outputFile(inputPath, box.buffer)
     await mkdir(dirname(outputPath), { recursive: true })
 
     let command = Ffmpeg(inputPath).outputOptions([
@@ -39,7 +36,7 @@ export async function optimizeVideo(box: VideoFileBox) {
       .on('end', async () => {
         const buffer = await readFile(outputPath)
         await clear(inputPath, outputPath)
-        resolve({ buffer, path: box.path })
+        resolve({ data: buffer, destinationPath: settings.destinationPath })
       })
       .on('error', async (e) => {
         await clear(inputPath, outputPath)

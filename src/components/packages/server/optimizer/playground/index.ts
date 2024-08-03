@@ -1,18 +1,17 @@
-import { clear } from '../clear'
-import { inputFiles } from '../inputFiles'
-import { optimize } from '../optimize'
-import { outputFiles } from '../outputFiles'
+import { optimizer } from '../optimizer'
 
-await clear('src/components/packages/server/optimizer/playground/dest')
-
-const input = await inputFiles({
+optimizer({
   sourceFolder: 'src/components/packages/server/optimizer/playground/source',
   destinationFolder: 'src/components/packages/server/optimizer/playground/dest',
   settings: {
-    image: () => {
+    image: (p) => {
       return {
         placeholder: true,
         webp: true,
+        path:
+          p.destinationPath.split('.').slice(0, -1).join('.') +
+          '.kek.' +
+          p.destinationPath.split('.').slice(-1).join('.'),
       }
     },
     video: () => {
@@ -21,9 +20,12 @@ const input = await inputFiles({
         scale: 0.5,
       }
     },
+    favicon: (parameters) => {
+      return {
+        options: {
+          appDescription: 'HEH',
+        },
+      }
+    },
   },
 })
-
-const optimized = await optimize(input)
-
-await outputFiles(optimized)
