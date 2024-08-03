@@ -1,10 +1,11 @@
 import sharp from 'sharp'
 import { ImageSource, Output } from './types'
-import { getExtension, replaceExtension } from './path'
+import { replaceExtension } from './path'
+import { extname } from 'path'
 
 export async function optimizeImage(source: ImageSource) {
   const { settings } = source
-  const ext = getExtension(settings.destinationPath)
+  const ext = extname(settings.destinationPath).toLowerCase()
   const image = sharp(source.content)
   const meta = await image.metadata()
   const width = meta.width
@@ -21,12 +22,12 @@ export async function optimizeImage(source: ImageSource) {
     }
   }
 
-  if (ext === 'jpg' || ext === 'jpeg') {
+  if (ext === '.jpg' || ext === '.jpeg') {
     image.jpeg({
       mozjpeg: true,
       quality: settings?.quality,
     })
-  } else if (ext === 'png') {
+  } else if (ext === '.png') {
     image.png({
       compressionLevel: 9,
       adaptiveFiltering: true,
@@ -63,7 +64,7 @@ export async function optimizeImage(source: ImageSource) {
       data: buffer,
       destinationPath: replaceExtension(
         settings.destinationPath,
-        `placeholder.${ext}`
+        `placeholder${ext}`
       ),
     })
   }

@@ -12,7 +12,7 @@ import {
   VideoSource,
 } from './types'
 import { readdir, readFile } from 'fs/promises'
-import { getExtension, removeExtension } from './path'
+import { removeExtension } from './path'
 import { getFolderFiles } from './getFolderFiles'
 
 export interface InputFilesCallbackEntry {
@@ -105,7 +105,7 @@ export async function inputFiles({
           const content: SpriteSource['content'] = []
 
           files.forEach((file) => {
-            if (getExtension(file.name) === 'svg') {
+            if (file.ext === '.svg') {
               content.push({
                 name: file.name,
                 buffer: file.buffer,
@@ -164,16 +164,14 @@ export async function inputFiles({
           })
         }
         if (destinationPath.includes('@sequence')) {
-          const destinationFolder = removeExtension(
-            specialPath(destinationPath, '@sequence')
-          )
+          const path = specialPath(destinationPath, '@sequence')
 
           sources.push({
             content,
             type: 'sequence',
             settings: {
-              destinationPath: destinationFolder,
-              ...settings?.sequence?.({ destinationPath: destinationFolder }),
+              destinationPath: path,
+              ...settings?.sequence?.({ destinationPath: path }),
             },
           })
         } else if (

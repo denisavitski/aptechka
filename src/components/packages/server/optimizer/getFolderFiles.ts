@@ -1,6 +1,6 @@
 import { readdir, readFile } from 'fs/promises'
-import { join } from 'path'
-import { getExtension, removeExtension } from './path'
+import { extname, join } from 'path'
+import { removeExtension } from './path'
 
 export async function getFolderFiles(folderPath: string) {
   const leafs = await readdir(folderPath)
@@ -18,7 +18,7 @@ export async function getFolderFiles(folderPath: string) {
     files.push({
       name: removeExtension(leaf),
       path: join(folderPath, leaf),
-      ext: getExtension(leaf),
+      ext: extname(leaf),
       buffer: buffer,
     })
   }

@@ -1,11 +1,8 @@
 import { randomUUID } from 'crypto'
+import { extname } from 'path'
 
 export function removeExtension(path: string) {
-  return path.split('.').slice(0, -1).join('.')
-}
-
-export function getExtension(path: string) {
-  return path.split('.').slice(-1).join('.')
+  return path.replace(/\.[^/.]+$/, '')
 }
 
 export function replaceExtension(path: string, newExtension: string) {
@@ -15,5 +12,5 @@ export function replaceExtension(path: string, newExtension: string) {
 export function getTmpPath(path: string) {
   const random = randomUUID()
 
-  return `${removeExtension(path)}.${random}.${getExtension(path)}`
+  return `${removeExtension(path)}.${random}${extname(path)}`
 }

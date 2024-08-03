@@ -1,6 +1,6 @@
 import { mkdir, readFile } from 'fs/promises'
 import { outputFile } from './outputFile'
-import { getTmpPath } from './path'
+import { getTmpPath, removeExtension } from './path'
 import { dirname, join } from 'path'
 import Ffmpeg from 'fluent-ffmpeg'
 import { clear } from './clear'
@@ -41,13 +41,13 @@ export async function FFmpeg({
             return {
               data: file.buffer,
               destinationPath: join(
-                inputPath,
-                `${file.name.split('.').slice(0, -1)}.${file.ext}`
+                removeExtension(inputPath),
+                `${file.name.split('.').slice(0, -1)}${file.ext}`
               ),
             }
           })
 
-          await clear(folderPath)
+          await clear(tmpInputPath, folderPath)
 
           resolve(output)
         } else {

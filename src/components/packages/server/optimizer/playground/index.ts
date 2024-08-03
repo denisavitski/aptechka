@@ -37,7 +37,4 @@ optimizer({
       }
     },
   },
-  onProgress: (progress) => {
-    console.log(progress)
-  },
 })
