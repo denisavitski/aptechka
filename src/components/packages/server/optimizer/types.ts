@@ -33,7 +33,6 @@ export interface VideoFileBox extends FileBoxWithSettings {
     quality: number
     scale: number
     fps: number | 'auto'
-    hevc: boolean
   }
 }
 

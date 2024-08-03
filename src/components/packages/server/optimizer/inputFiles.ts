@@ -92,7 +92,6 @@ export async function inputFiles({
               quality: 80,
               scale: 1,
               fps: 'auto',
-              hevc: false,
               ...settings?.video?.(destinationPath),
             },
           })

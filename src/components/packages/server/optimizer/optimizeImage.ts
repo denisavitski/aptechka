@@ -64,7 +64,7 @@ export async function optimizeImage(box: ImageFileBox) {
     entries.push({
       buffer,
       path:
-        box.path.split('.').slice(0, -1).join('.') + `placeholder.${format}`,
+        box.path.split('.').slice(0, -1).join('.') + `.placeholder.${format}`,
     })
   }
 
