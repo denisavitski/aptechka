@@ -1,6 +1,7 @@
 node_modules
 dist
-lib
+client-lib
+server-lib
 src/components/demos
 src/static
 .DS_Store
