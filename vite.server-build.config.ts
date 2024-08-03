@@ -1,11 +1,13 @@
 import { UserConfig } from 'vite'
 import dtsPlugin from 'vite-plugin-dts'
+import { sharedConfig } from './vite.shared.config'
 
 export function serverBuildConfig() {
   const config: UserConfig = {
+    ...sharedConfig(),
     plugins: [
       dtsPlugin({
-        include: 'src/components/packages/server',
+        include: './src/components/packages/server',
       }),
     ],
     build: {

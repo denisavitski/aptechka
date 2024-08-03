@@ -1,5 +1,7 @@
+import { clamp } from '@packages/client/utils/math'
+
 export function xxx() {
-  console.log('A')
+  console.log(clamp(5, 0, 1))
 }
 
 xxx()

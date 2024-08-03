@@ -1,13 +1,13 @@
 import { UserConfig } from 'vite'
 import dtsPlugin from 'vite-plugin-dts'
 import packageJson from './package.json'
-import { browserSharedConfig } from './vite.shared.config'
+import { clientSharedConfig } from './vite.client-shared.config'
 
 export function clientBuildConfig() {
   const config: UserConfig = {
     plugins: [
       dtsPlugin({
-        include: ['./src/components/packages'],
+        include: ['./src/components/packages/client'],
         copyDtsFiles: true,
         exclude: '**/playground/**',
       }),
@@ -128,7 +128,7 @@ export function clientBuildConfig() {
         }),
       },
     },
-    ...browserSharedConfig(),
+    ...clientSharedConfig(),
   }
 
   return config
