@@ -1,3 +1,3 @@
-import { devMode } from '@packages/dev'
+import { devMode } from '@packages/client/dev'
 
 devMode()

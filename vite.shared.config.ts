@@ -12,7 +12,7 @@ export function browserSharedConfig() {
     esbuild: {
       jsxFactory: 'h',
       jsxFragment: 'Fragment',
-      jsxInject: `import { h, Fragment } from '@packages/jsx'`,
+      jsxInject: `import { h, Fragment } from '@packages/client/jsx'`,
     },
     css: {
       modules: {

@@ -1,0 +1,1 @@
+"use strict";const n=require("./globals-bYKki-b9.cjs");function o(e){n.currentComponentElement.value.addDisconnectCallback(e)}function c(e){const t=typeof e=="function"?e(n.currentComponentElement.value):e;return n.currentComponentElement.value&&o(()=>t.close()),t}exports._createStore=c;exports.onDisconnect=o;

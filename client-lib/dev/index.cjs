@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const o=require("../css-property/index.cjs"),t=require("../Store-Cr3VaD9G.cjs"),c=require("../ticker/index.cjs");function i(){c.ticker.subscribe(()=>{for(let e=0;e<t.activeStores.current.length;e++){const r=t.activeStores.current[e];r instanceof o.CSSProperty&&r.check()}})}exports.devMode=i;

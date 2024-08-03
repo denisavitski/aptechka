@@ -1,0 +1,1 @@
+"use strict";const r=(e,o=100)=>{let t;return(...u)=>{clearTimeout(t),t=setTimeout(()=>e(...u),o)}},s=(e,o=0)=>{let t=!1;return(...u)=>{t||(t=!0,setTimeout(()=>{e(...u),t=!1},o))}};exports.debounce=r;exports.throttle=s;

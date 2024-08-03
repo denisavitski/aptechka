@@ -1,0 +1,1 @@
+"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const c=require("../../element-resizer/index.cjs"),i=require("../../onConnect-DGP866cj.cjs");function l(...e){i.onConnect(n=>{const t=e.length>1?e[0]:n,o=e.length>1?e[1]:e[0];return c.elementResizer.subscribe(t,o)})}exports.onElementResize=l;
