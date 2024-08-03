@@ -6,12 +6,14 @@ import {
   FaviconSource,
   ImageSource,
   KnownSource,
+  SequenceSource,
   Source,
   SpriteSource,
   VideoSource,
 } from './types'
 import { readdir, readFile } from 'fs/promises'
 import { getExtension, removeExtension } from './path'
+import { getFolderFiles } from './getFolderFiles'
 
 export interface InputFilesCallbackEntry {
   type: KnownSource['type']
@@ -47,6 +49,10 @@ export interface InputFilesSettings {
   sprite?(
     parameters: InputsFilesCallbackDefaultParameters
   ): Partial<SpriteSource['settings']>
+
+  sequence?(
+    parameters: InputsFilesCallbackDefaultParameters
+  ): Partial<SequenceSource['settings']>
 }
 
 export interface InputFilesParameters {
@@ -74,28 +80,6 @@ function specialPath(path: string, specialString: string) {
   }
 }
 
-async function getFolderSourceFiles(folderPath: string) {
-  const leafs = await readdir(folderPath)
-
-  const files: Array<{
-    name: string
-    buffer: Buffer
-  }> = []
-
-  for await (const leaf of leafs) {
-    const name = removeExtension(leaf)
-
-    const buffer = await readFile(join(folderPath, leaf))
-
-    files.push({
-      name: name,
-      buffer: buffer,
-    })
-  }
-
-  return files
-}
-
 export async function inputFiles({
   sourceFolder,
   destinationFolder,
@@ -116,7 +100,7 @@ export async function inputFiles({
 
       if (statSync(sourcePath).isDirectory()) {
         if (sourcePath.includes('@sprite')) {
-          const files = await getFolderSourceFiles(sourcePath)
+          const files = await getFolderFiles(sourcePath)
 
           const content: SpriteSource['content'] = []
 
@@ -178,6 +162,20 @@ export async function inputFiles({
               }),
             },
           })
+        }
+        if (destinationPath.includes('@sequence')) {
+          const destinationFolder = removeExtension(
+            specialPath(destinationPath, '@sequence')
+          )
+
+          sources.push({
+            content,
+            type: 'sequence',
+            settings: {
+              destinationPath: destinationFolder,
+              ...settings?.sequence?.({ destinationPath: destinationFolder }),
+            },
+          })
         } else if (
           ALLOWED_IMAGE_EXTENSIONS.includes(
             ext as (typeof ALLOWED_IMAGE_EXTENSIONS)[number]
@@ -206,7 +204,6 @@ export async function inputFiles({
             settings: {
               quality: 80,
               scale: 1,
-              fps: 'auto',
               destinationPath,
               ...settings?.video?.({ destinationPath }),
             },

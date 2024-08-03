@@ -1,4 +1,5 @@
 import { generateFavicon } from './generateFavicon'
+import { generateSequence } from './generateSequence'
 import { generateSprite } from './generateSprite'
 import { optimizeImage } from './optimizeImage'
 import { optimizeVideo } from './optimizeVideo'
@@ -16,6 +17,8 @@ export async function optimize(sources: Array<KnownSource>) {
       output.push(...(await generateFavicon(source)))
     } else if (source.type === 'sprite') {
       output.push(...(await generateSprite(source)))
+    } else if (source.type === 'sequence') {
+      output.push(...(await generateSequence(source)))
     } else {
       output.push({
         data: source.content,

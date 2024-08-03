@@ -41,7 +41,7 @@ export type VideoSource = Source<
     destinationPath: string
     quality?: number
     scale?: number
-    fps?: number | 'auto'
+    fps?: number
   }
 >
 
@@ -65,12 +65,23 @@ export type SpriteSource = Source<
   }
 >
 
+export type SequenceSource = Source<
+  Buffer,
+  'sequence',
+  {
+    destinationPath: string
+    fps?: number
+    frameExtension?: 'png' | 'jpg'
+  }
+>
+
 export type KnownSource =
   | VideoSource
   | ImageSource
   | SkipSource
   | FaviconSource
   | SpriteSource
+  | SequenceSource
 
 export interface OutputItem {
   data: Buffer | string

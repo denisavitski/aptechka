@@ -31,5 +31,10 @@ optimizer({
         name: 'qwerty',
       }
     },
+    sequence: () => {
+      return {
+        fps: 2,
+      }
+    },
   },
 })
