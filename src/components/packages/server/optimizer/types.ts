@@ -41,7 +41,7 @@ export type KnownFileBox = VideoFileBox | ImageFileBox | SkipFileBox
 
 export interface OptimizedEntry {
   buffer: Buffer
-  format: string
+  path: string
 }
 
 export const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'webp', 'jpeg'] as const

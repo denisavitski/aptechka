@@ -8,46 +8,57 @@ import {
   KnownFileBox,
   VideoFileBox,
 } from './types'
+import { readdir, readFile } from 'fs/promises'
 
-export interface GetFilesCallbackEntry {
+export interface InputFilesCallbackEntry {
   type: KnownFileBox['type']
   path: string
 }
 
-export type GetFilesCallback<T extends FileBoxWithSettings> = (
-  entry: GetFilesCallbackEntry
+export type InputFilesCallback<T extends FileBoxWithSettings> = (
+  entry: InputFilesCallbackEntry
 ) => T
 
-export interface GetFilesSettings {
+export interface InputFilesSettings {
   image?(path: string): Partial<ImageFileBox['settings']>
   video?(path: string): Partial<VideoFileBox['settings']>
 }
 
-export function prepareFiles(
-  sourceFolderPath: string,
-  destFolderPath: string,
-  settings?: GetFilesSettings
-) {
+export interface InputFilesParameters {
+  sourceFolder: string
+  destinationFolder: string
+  settings?: InputFilesSettings
+}
+
+export async function inputFiles({
+  sourceFolder,
+  destinationFolder,
+  settings,
+}: InputFilesParameters) {
   let boxes: Array<KnownFileBox> = []
 
-  const currentPaths = readdirSync(sourceFolderPath)
+  const currentPaths = await readdir(sourceFolder)
 
-  for (const currentPath of currentPaths) {
+  for await (const currentPath of currentPaths) {
     if (!currentPath.includes('.DS_Store')) {
-      const sourcePath = join(sourceFolderPath, currentPath.toString())
+      const sourcePath = join(sourceFolder, currentPath.toString())
 
-      const destPath = join(
-        destFolderPath,
-        sourcePath.replaceAll(sep, '/').replace(sourceFolderPath, '')
+      const destinationPath = join(
+        destinationFolder,
+        sourcePath.replaceAll(sep, '/').replace(sourceFolder, '')
       )
 
       if (statSync(sourcePath).isDirectory()) {
-        const result = prepareFiles(sourcePath, destPath)
+        const result = await inputFiles({
+          sourceFolder: sourcePath,
+          destinationFolder: destinationPath,
+          settings,
+        })
         boxes = [...boxes, ...result]
       } else {
-        const ext = extname(destPath).toLowerCase().slice(1)
+        const ext = extname(destinationPath).toLowerCase().slice(1)
 
-        const file = readFileSync(sourcePath)
+        const file = await readFile(sourcePath)
 
         if (
           ALLOWED_IMAGE_EXTENSIONS.includes(
@@ -57,14 +68,14 @@ export function prepareFiles(
           boxes.push({
             ext,
             file,
-            path: destPath,
+            path: destinationPath,
             type: 'image',
             settings: {
               placeholder: false,
               quality: 80,
               scale: 1,
               webp: false,
-              ...settings?.image?.(destPath),
+              ...settings?.image?.(destinationPath),
             },
           })
         } else if (
@@ -75,18 +86,18 @@ export function prepareFiles(
           boxes.push({
             ext,
             file,
-            path: destPath,
+            path: destinationPath,
             type: 'video',
             settings: {
               quality: 80,
               scale: 1,
               fps: 'auto',
               hevc: false,
-              ...settings?.video?.(destPath),
+              ...settings?.video?.(destinationPath),
             },
           })
         } else {
-          boxes.push({ ext, file, path: destPath, type: 'skip' })
+          boxes.push({ ext, file, path: destinationPath, type: 'skip' })
         }
       }
     }
