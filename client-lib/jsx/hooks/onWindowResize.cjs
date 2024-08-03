@@ -1,1 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const n=require("../../window-resizer/index.cjs"),o=require("../../onConnect-DGP866cj.cjs");function i(...e){o.onConnect(()=>n.windowResizer.subscribe(...e))}exports.onWindowResize=i;

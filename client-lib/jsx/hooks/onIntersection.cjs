@@ -1,1 +1,0 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const c=require("../../intersector/index.cjs"),r=require("../../onConnect-DGP866cj.cjs");function i(...e){r.onConnect(n=>{const t=e.length>1?e[0]:n,o=e.length>1?e[1]:e[0];return c.intersector.subscribe(t,o)})}exports.onIntersection=i;

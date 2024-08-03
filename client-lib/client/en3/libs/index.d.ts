@@ -1,1 +1,0 @@
-export { MeshoptDecoder } from './MeshoptDecoder';
