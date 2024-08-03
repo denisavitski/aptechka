@@ -489,23 +489,25 @@
     "build:server": "tsc && vite build --mode server-lib",
     "build:site": "tsc && vite build --mode site",
     "dev:client": "vite --host --mode site",
-    "dev:optimizer": "tsx ./src/components/packages/server/optimizer/index.ts"
+    "dev:optimizer": "tsx ./src/components/packages/server/optimizer/playground/index.ts"
   },
   "devDependencies": {
-    "@types/node": "^20.12.5",
+    "@types/node": "^22.1.0",
     "@types/three": "^0.165.0",
+    "tsx": "^4.16.5",
     "vite": "5.2.8",
     "vite-plugin-dts": "^3.8.1",
-    "vite-plugin-htmc": "^0.1.9",
-    "tsx": "^4.16.5"
+    "vite-plugin-htmc": "^0.1.9"
   },
   "dependencies": {
     "detect-gpu": "^5.0.38",
+    "sharp": "^0.33.4",
     "three": "^0.166.1",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.38",
+    "sharp": "^0.33.4",
     "three": "^0.166.1",
     "urlpattern-polyfill": "^10.0.0"
   }

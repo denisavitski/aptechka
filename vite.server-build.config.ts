@@ -8,6 +8,7 @@ export function serverBuildConfig() {
     plugins: [
       dtsPlugin({
         include: './src/components/packages/server',
+        exclude: '**/playground/**',
       }),
     ],
     build: {
