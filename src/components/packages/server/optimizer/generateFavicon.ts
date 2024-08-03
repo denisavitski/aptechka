@@ -1,31 +1,27 @@
 import favicons from 'favicons'
-import { FaviconFileBox, OptimizedEntry } from './types'
-import { writeFile } from 'fs/promises'
+import { FaviconSource, Output } from './types'
 import { join } from 'path'
 
-export async function generateFavicon(box: FaviconFileBox) {
-  const entries: Array<OptimizedEntry> = []
+export async function generateFavicon(source: FaviconSource) {
+  const output: Output = []
 
-  const settings = box.settings
+  const { settings } = source
 
-  const response = await favicons(
-    settings.destinationFolderPath,
-    settings.options
-  )
+  const response = await favicons(source.content, settings)
 
-  entries.push(
+  output.push(
     ...[...response.images, ...response.files].map((item) => {
       return {
-        destinationPath: join(settings.destinationFolderPath, item.name),
+        destinationPath: join(settings.destinationPath, item.name),
         data: item.contents,
       }
     })
   )
 
-  entries.push({
+  output.push({
     destinationPath: settings.destinationHtmlPath,
     data: response.html.join('\n'),
   })
 
-  return entries
+  return output
 }

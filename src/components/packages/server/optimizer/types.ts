@@ -1,68 +1,83 @@
 import type { FaviconOptions } from 'favicons'
 
-export type FileBoxSettings = {
+export type SourceSettings = {
   [key: string]: any
 }
 
-export interface FileBox<
+export interface Source<
+  B = Buffer,
   T extends string = string,
-  S extends FileBoxSettings = {}
+  S extends SourceSettings = {}
 > {
-  buffer: Buffer
+  content: B
   type: T
-  ext: string
   settings: S
 }
 
-export type SkipFileBox = FileBox<
+export type SkipSource = Source<
+  Buffer,
   'skip',
   {
     destinationPath: string
   }
 >
 
-export type ImageFileBox = FileBox<
+export type ImageSource = Source<
+  Buffer,
   'image',
   {
     destinationPath: string
-    quality: number
-    scale: number
-    placeholder: boolean
-    webp: boolean
+    quality?: number
+    scale?: number
+    placeholder?: boolean
+    webp?: boolean
   }
 >
 
-export type VideoFileBox = FileBox<
+export type VideoSource = Source<
+  Buffer,
   'video',
   {
     destinationPath: string
-    quality: number
-    scale: number
-    fps: number | 'auto'
+    quality?: number
+    scale?: number
+    fps?: number | 'auto'
   }
 >
 
-type V = FaviconOptions
-
-export type FaviconFileBox = FileBox<
+export type FaviconSource = Source<
+  Buffer,
   'favicon',
   {
-    destinationFolderPath: string
+    destinationPath: string
     destinationHtmlPath: string
-    options?: FaviconOptions
+  } & FaviconOptions
+>
+
+export type SpriteSource = Source<
+  Array<{ name: string; buffer: Buffer }>,
+  'sprite',
+  {
+    destinationPath: string
+    name?: string
+    removeStroke?: boolean
+    removeFill?: boolean
   }
 >
 
-export type KnownFileBox =
-  | VideoFileBox
-  | ImageFileBox
-  | SkipFileBox
-  | FaviconFileBox
+export type KnownSource =
+  | VideoSource
+  | ImageSource
+  | SkipSource
+  | FaviconSource
+  | SpriteSource
 
-export interface OptimizedEntry {
+export interface OutputItem {
   data: Buffer | string
   destinationPath: string
 }
+
+export type Output = Array<OutputItem>
 
 export const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'webp', 'jpeg'] as const
 export const ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'mov'] as const

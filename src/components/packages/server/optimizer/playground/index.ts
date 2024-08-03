@@ -1,3 +1,4 @@
+import { extname } from 'path'
 import { optimizer } from '../optimizer'
 
 optimizer({
@@ -10,7 +11,7 @@ optimizer({
         webp: true,
         path:
           p.destinationPath.split('.').slice(0, -1).join('.') +
-          '.kek.' +
+          '.qwerty.' +
           p.destinationPath.split('.').slice(-1).join('.'),
       }
     },
@@ -22,9 +23,12 @@ optimizer({
     },
     favicon: (parameters) => {
       return {
-        options: {
-          appDescription: 'HEH',
-        },
+        appDescription: 'qwerty',
+      }
+    },
+    sprite: () => {
+      return {
+        name: 'qwerty',
       }
     },
   },

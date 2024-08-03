@@ -3,21 +3,22 @@ import { extname, join, sep } from 'path'
 import {
   ALLOWED_IMAGE_EXTENSIONS,
   ALLOWED_VIDEO_EXTENSIONS,
-  FaviconFileBox,
-  FileBox,
-  ImageFileBox,
-  KnownFileBox,
-  VideoFileBox,
+  FaviconSource,
+  ImageSource,
+  KnownSource,
+  Source,
+  SpriteSource,
+  VideoSource,
 } from './types'
 import { readdir, readFile } from 'fs/promises'
-import { removeExtension } from './path'
+import { getExtension, removeExtension } from './path'
 
 export interface InputFilesCallbackEntry {
-  type: KnownFileBox['type']
+  type: KnownSource['type']
   path: string
 }
 
-export type InputFilesCallback<T extends FileBox> = (
+export type InputFilesCallback<T extends Source> = (
   entry: InputFilesCallbackEntry
 ) => T
 
@@ -25,23 +26,27 @@ export interface InputsFilesCallbackDefaultParameters {
   destinationPath: string
 }
 
-export interface InputsFilesCallbackFaviconParameters {
-  destinationFolderPath: string
+export interface InputsFilesCallbackFaviconParameters
+  extends InputsFilesCallbackDefaultParameters {
   destinationHtmlPath: string
 }
 
 export interface InputFilesSettings {
   image?(
     parameters: InputsFilesCallbackDefaultParameters
-  ): Partial<ImageFileBox['settings']>
+  ): Partial<ImageSource['settings']>
 
   video?(
     parameters: InputsFilesCallbackDefaultParameters
-  ): Partial<VideoFileBox['settings']>
+  ): Partial<VideoSource['settings']>
 
   favicon?(
     parameters: InputsFilesCallbackFaviconParameters
-  ): Partial<FaviconFileBox['settings']>
+  ): Partial<FaviconSource['settings']>
+
+  sprite?(
+    parameters: InputsFilesCallbackDefaultParameters
+  ): Partial<SpriteSource['settings']>
 }
 
 export interface InputFilesParameters {
@@ -50,12 +55,31 @@ export interface InputFilesParameters {
   settings?: InputFilesSettings
 }
 
+function specialPath(path: string, specialString: string) {
+  const splitted = path.split('/')
+  const left = splitted.slice(0, -1).join('/')
+  const leaf = splitted.slice(-1).join('')
+  const ext = extname(leaf)
+  const sourceName = leaf.replace(ext, '')
+  const name = sourceName.replace(specialString, '')
+
+  if (name) {
+    if (name.startsWith('-')) {
+      return `${left}/${name.slice(1)}${ext}`
+    } else {
+      return `${left}/${name}${ext}`
+    }
+  } else {
+    return `${left}/${sourceName.replace('@', '')}${ext}`
+  }
+}
+
 export async function inputFiles({
   sourceFolder,
   destinationFolder,
   settings,
 }: InputFilesParameters) {
-  let boxes: Array<KnownFileBox> = []
+  let sources: Array<KnownSource> = []
 
   const currentPaths = await readdir(sourceFolder)
 
@@ -69,31 +93,70 @@ export async function inputFiles({
       )
 
       if (statSync(sourcePath).isDirectory()) {
-        const result = await inputFiles({
-          sourceFolder: sourcePath,
-          destinationFolder: destinationPath,
-          settings,
-        })
-        boxes = [...boxes, ...result]
+        if (sourcePath.includes('@sprite')) {
+          const leafs = await readdir(sourcePath)
+
+          const content: SpriteSource['content'] = []
+
+          for await (const leaf of leafs) {
+            if (getExtension(leaf) === 'svg') {
+              const fileName = removeExtension(leaf)
+
+              const buffer = await readFile(join(sourcePath, leaf))
+
+              content.push({
+                name: fileName,
+                buffer: buffer,
+              })
+            }
+          }
+
+          const destinationSvgPath = specialPath(
+            `${destinationPath}.svg`,
+            '@sprite'
+          )
+
+          sources.push({
+            type: 'sprite',
+            content: content,
+            settings: {
+              destinationPath: destinationSvgPath,
+              ...settings?.sprite?.({
+                destinationPath: destinationSvgPath,
+              }),
+            },
+          })
+        } else {
+          const result = await inputFiles({
+            sourceFolder: sourcePath,
+            destinationFolder: destinationPath,
+            settings,
+          })
+
+          sources = [...sources, ...result]
+        }
       } else {
         const ext = extname(destinationPath).toLowerCase().slice(1)
 
-        const buffer = await readFile(sourcePath)
+        const content = await readFile(sourcePath)
 
-        if (destinationPath.includes('favicon')) {
-          const destinationFolderPath = removeExtension(destinationPath)
+        if (destinationPath.includes('@favicon')) {
+          const destinationFolderPath = specialPath(
+            removeExtension(destinationPath),
+            '@favicon'
+          )
+
           const destinationHtmlPath = `${destinationFolderPath}/head.html`
 
-          boxes.push({
-            ext,
-            buffer,
+          sources.push({
+            content,
             type: 'favicon',
             settings: {
-              destinationFolderPath,
-              destinationHtmlPath
+              destinationPath: destinationFolderPath,
+              destinationHtmlPath,
               ...settings?.favicon?.({
-                destinationFolderPath,
-                destinationHtmlPath
+                destinationPath: destinationFolderPath,
+                destinationHtmlPath,
               }),
             },
           })
@@ -102,9 +165,8 @@ export async function inputFiles({
             ext as (typeof ALLOWED_IMAGE_EXTENSIONS)[number]
           )
         ) {
-          boxes.push({
-            ext,
-            buffer,
+          sources.push({
+            content,
             type: 'image',
             settings: {
               placeholder: false,
@@ -112,7 +174,7 @@ export async function inputFiles({
               scale: 1,
               webp: false,
               destinationPath,
-              ...settings?.image?.({destinationPath}),
+              ...settings?.image?.({ destinationPath }),
             },
           })
         } else if (
@@ -120,22 +182,20 @@ export async function inputFiles({
             ext as (typeof ALLOWED_VIDEO_EXTENSIONS)[number]
           )
         ) {
-          boxes.push({
-            ext,
-            buffer,
+          sources.push({
+            content,
             type: 'video',
             settings: {
               quality: 80,
               scale: 1,
               fps: 'auto',
               destinationPath,
-              ...settings?.video?.({destinationPath}),
+              ...settings?.video?.({ destinationPath }),
             },
           })
         } else {
-          boxes.push({
-            ext,
-            buffer,
+          sources.push({
+            content,
             type: 'skip',
             settings: { destinationPath },
           })
@@ -144,5 +204,5 @@ export async function inputFiles({
     }
   }
 
-  return boxes
+  return sources
 }

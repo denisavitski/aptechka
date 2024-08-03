@@ -1,19 +1,19 @@
 import sharp from 'sharp'
-import { ImageFileBox, OptimizedEntry } from './types'
-import { replaceExtension } from './path'
+import { ImageSource, Output } from './types'
+import { getExtension, replaceExtension } from './path'
 
-export async function optimizeImage(box: ImageFileBox) {
-  const settings = box.settings
-
-  const image = sharp(box.buffer)
+export async function optimizeImage(source: ImageSource) {
+  const { settings } = source
+  const ext = getExtension(settings.destinationPath)
+  const image = sharp(source.content)
   const meta = await image.metadata()
   const width = meta.width
   const height = meta.height
 
-  const entries: Array<OptimizedEntry> = []
+  const output: Output = []
 
   if (width && height) {
-    if (settings.scale) {
+    if (settings?.scale) {
       image.resize(
         Math.floor(width * settings.scale),
         Math.floor(height * settings.scale)
@@ -21,28 +21,28 @@ export async function optimizeImage(box: ImageFileBox) {
     }
   }
 
-  if (box.ext === 'jpg' || box.ext === 'jpeg') {
+  if (ext === 'jpg' || ext === 'jpeg') {
     image.jpeg({
       mozjpeg: true,
-      quality: settings.quality,
+      quality: settings?.quality,
     })
-  } else if (box.ext === 'png') {
+  } else if (ext === 'png') {
     image.png({
       compressionLevel: 9,
       adaptiveFiltering: true,
-      quality: settings.quality,
+      quality: settings?.quality,
       effort: 8,
     })
   }
 
   const buffer = await image.toBuffer()
 
-  entries.push({
+  output.push({
     data: buffer,
     destinationPath: settings.destinationPath,
   })
 
-  if (settings.webp) {
+  if (settings?.webp) {
     const buffer = await image
       .webp({
         quality: settings.quality,
@@ -50,23 +50,23 @@ export async function optimizeImage(box: ImageFileBox) {
       })
       .toBuffer()
 
-    entries.push({
+    output.push({
       data: buffer,
       destinationPath: replaceExtension(settings.destinationPath, 'webp'),
     })
   }
 
-  if (settings.placeholder) {
+  if (settings?.placeholder) {
     const buffer = await image.resize(20, 20).blur(10).toBuffer()
 
-    entries.push({
+    output.push({
       data: buffer,
       destinationPath: replaceExtension(
         settings.destinationPath,
-        `placeholder.${box.ext}`
+        `placeholder.${ext}`
       ),
     })
   }
 
-  return entries
+  return output
 }

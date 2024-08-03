@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto'
-import { OptimizedEntry, VideoFileBox } from './types'
+import { OutputItem, VideoSource } from './types'
 import { dirname } from 'path'
 import { mkdir, readFile } from 'fs/promises'
 import { clear } from './clear'
@@ -13,26 +13,26 @@ const tmpPath = (path: string) => {
   return `${removeExtension(path)}.${random}.${getExtension(path)}`
 }
 
-export async function optimizeVideo(box: VideoFileBox) {
-  const settings = box.settings
+export async function optimizeVideo(source: VideoSource) {
+  const { settings } = source
 
-  const entry = await new Promise<OptimizedEntry>(async (resolve, reject) => {
+  const outputItem = await new Promise<OutputItem>(async (resolve, reject) => {
     const inputPath = tmpPath(settings.destinationPath)
     const outputPath = tmpPath(settings.destinationPath)
 
-    await outputFile(inputPath, box.buffer)
+    await outputFile(inputPath, source.content)
     await mkdir(dirname(outputPath), { recursive: true })
 
-    let command = Ffmpeg(inputPath).outputOptions([
-      `-crf ${Math.round(((100 - settings.quality) * 51) / 100)}`,
+    const command = Ffmpeg(inputPath).outputOptions([
+      `-crf ${Math.round(((100 - (settings?.quality || 80)) * 51) / 100)}`,
     ])
 
-    if (settings.fps && settings.fps !== 'auto') {
+    if (settings?.fps && settings.fps !== 'auto') {
       command.fps(settings.fps)
     }
 
     command
-      .size(`${settings.scale * 100}%`)
+      .size(`${(settings?.scale || 1) * 100}%`)
       .on('end', async () => {
         const buffer = await readFile(outputPath)
         await clear(inputPath, outputPath)
@@ -45,5 +45,5 @@ export async function optimizeVideo(box: VideoFileBox) {
       .saveToFile(outputPath)
   })
 
-  return [entry]
+  return [outputItem]
 }

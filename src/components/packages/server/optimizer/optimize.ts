@@ -1,25 +1,28 @@
 import { generateFavicon } from './generateFavicon'
+import { generateSprite } from './generateSprite'
 import { optimizeImage } from './optimizeImage'
 import { optimizeVideo } from './optimizeVideo'
-import { KnownFileBox, OptimizedEntry } from './types'
+import { KnownSource, Output } from './types'
 
-export async function optimize(boxes: Array<KnownFileBox>) {
-  const entries: Array<OptimizedEntry> = []
+export async function optimize(sources: Array<KnownSource>) {
+  const output: Output = []
 
-  for await (const box of boxes) {
-    if (box.type === 'image') {
-      entries.push(...(await optimizeImage(box)))
-    } else if (box.type === 'video') {
-      entries.push(...(await optimizeVideo(box)))
-    } else if (box.type === 'favicon') {
-      entries.push(...(await generateFavicon(box)))
+  for await (const source of sources) {
+    if (source.type === 'image') {
+      output.push(...(await optimizeImage(source)))
+    } else if (source.type === 'video') {
+      output.push(...(await optimizeVideo(source)))
+    } else if (source.type === 'favicon') {
+      output.push(...(await generateFavicon(source)))
+    } else if (source.type === 'sprite') {
+      output.push(...(await generateSprite(source)))
     } else {
-      entries.push({
-        data: box.buffer,
-        destinationPath: box.settings.destinationPath,
+      output.push({
+        data: source.content,
+        destinationPath: source.settings.destinationPath,
       })
     }
   }
 
-  return entries
+  return output
 }

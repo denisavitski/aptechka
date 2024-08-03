@@ -1,12 +1,12 @@
 import { mkdir, writeFile } from 'fs/promises'
-import { OptimizedEntry } from './types'
+import { Output } from './types'
 import { dirname } from 'path'
 import { outputFile } from './outputFile'
 
-export async function outputFiles(entries: Array<OptimizedEntry>) {
-  for await (const entry of entries) {
-    await mkdir(dirname(entry.destinationPath), { recursive: true })
-    await writeFile(entry.destinationPath, entry.data)
-    outputFile(entry.destinationPath, entry.data)
+export async function outputFiles(output: Output) {
+  for await (const item of output) {
+    await mkdir(dirname(item.destinationPath), { recursive: true })
+    await writeFile(item.destinationPath, item.data)
+    outputFile(item.destinationPath, item.data)
   }
 }
