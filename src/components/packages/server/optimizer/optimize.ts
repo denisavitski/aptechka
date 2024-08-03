@@ -5,8 +5,25 @@ import { optimizeImage } from './optimizeImage'
 import { optimizeVideo } from './optimizeVideo'
 import { KnownSource, Output } from './types'
 
-export async function optimize(sources: Array<KnownSource>) {
+export interface OptimizeProgress {
+  ready: number
+  total: number
+  path: string
+}
+
+export type OptimizeProgressCallback = (progress: OptimizeProgress) => void
+
+export interface OptimizeOptions {
+  onProgress?: OptimizeProgressCallback
+}
+
+export async function optimize(
+  sources: Array<KnownSource>,
+  options?: OptimizeOptions
+) {
   const output: Output = []
+
+  let ready = 0
 
   for await (const source of sources) {
     if (source.type === 'image') {
@@ -25,6 +42,12 @@ export async function optimize(sources: Array<KnownSource>) {
         destinationPath: source.settings.destinationPath,
       })
     }
+
+    options?.onProgress?.({
+      ready: ++ready,
+      total: sources.length,
+      path: source.settings.destinationPath,
+    })
   }
 
   return output
