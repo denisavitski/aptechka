@@ -1,8 +1,6 @@
-import { clear } from './clear'
+import { clear, outputFiles } from '../utils'
 import { inputFiles, InputFilesParameters } from './inputFiles'
 import { optimize, OptimizeOptions } from './optimize'
-import { outputFiles } from './outputFiles'
-
 export type OptimizerParameters = InputFilesParameters & OptimizeOptions
 
 export async function optimizer(parameters: OptimizerParameters) {

@@ -12,8 +12,7 @@ import {
   VideoSource,
 } from './types'
 import { readdir, readFile } from 'fs/promises'
-import { removeExtension } from './path'
-import { getFolderFiles } from './getFolderFiles'
+import { removeExtension, getFolderFiles } from '../utils'
 
 export interface InputFilesCallbackEntry {
   type: KnownSource['type']

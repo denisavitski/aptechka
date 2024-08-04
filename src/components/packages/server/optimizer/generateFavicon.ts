@@ -1,6 +1,7 @@
 import favicons from 'favicons'
-import { FaviconSource, Output } from './types'
+import { FaviconSource } from './types'
 import { join } from 'path'
+import { Output } from '../utils'
 
 export async function generateFavicon(source: FaviconSource) {
   const output: Output = []

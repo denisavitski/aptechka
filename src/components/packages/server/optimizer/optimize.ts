@@ -1,9 +1,10 @@
+import { Output } from '../utils'
 import { generateFavicon } from './generateFavicon'
 import { generateSequence } from './generateSequence'
 import { generateSprite } from './generateSprite'
 import { optimizeImage } from './optimizeImage'
 import { optimizeVideo } from './optimizeVideo'
-import { KnownSource, Output } from './types'
+import { KnownSource } from './types'
 
 export interface OptimizeProgress {
   ready: number

@@ -1,13 +1,16 @@
 import { mkdir, readFile } from 'fs/promises'
-import { outputFile } from './outputFile'
-import { getTmpPath, removeExtension } from './path'
 import { dirname, join } from 'path'
 import Ffmpeg from 'fluent-ffmpeg'
-import { clear } from './clear'
-import { Output } from './types'
-import { getFolderFiles } from './getFolderFiles'
+import {
+  clear,
+  getTmpPath,
+  Output,
+  outputFile,
+  removeExtension,
+} from '../utils'
+import { getFolderFiles } from '../utils'
 
-export interface GetFFmpegOutputParameters {
+export interface FFmpegParameters {
   inputPath: string
   outputPath?: string
   fileContent: Buffer
@@ -19,7 +22,7 @@ export async function FFmpeg({
   outputPath,
   fileContent,
   instructions,
-}: GetFFmpegOutputParameters) {
+}: FFmpegParameters) {
   return new Promise<Output>(async (resolve, reject) => {
     const tmpInputPath = getTmpPath(inputPath)
     const tmpOutputPath = getTmpPath(outputPath || inputPath)

@@ -1,6 +1,6 @@
 import { SequenceSource } from './types'
 import { FFmpeg } from './FFmpeg'
-import { removeExtension } from './path'
+import { removeExtension } from '../utils'
 
 export async function generateSequence(source: SequenceSource) {
   const { settings } = source

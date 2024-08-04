@@ -18,6 +18,7 @@ export function serverBuildConfig() {
         input: {
           'optimizer/index':
             './src/components/packages/server/optimizer/index.ts',
+          'utils/index': './src/components/packages/server/utils/index.ts',
         },
       },
     },

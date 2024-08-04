@@ -83,12 +83,5 @@ export type KnownSource =
   | SpriteSource
   | SequenceSource
 
-export interface OutputItem {
-  data: Buffer | string
-  destinationPath: string
-}
-
-export type Output = Array<OutputItem>
-
 export const ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'png', 'webp', 'jpeg'] as const
 export const ALLOWED_VIDEO_EXTENSIONS = ['mp4', 'mov'] as const

@@ -1,7 +1,7 @@
 import sharp from 'sharp'
-import { ImageSource, Output } from './types'
-import { replaceExtension } from './path'
+import { ImageSource } from './types'
 import { extname } from 'path'
+import { Output, replaceExtension } from '../utils'
 
 export async function optimizeImage(source: ImageSource) {
   const { settings } = source
