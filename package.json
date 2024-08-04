@@ -501,6 +501,7 @@
     "preview": "vite preview",
     "build:client": "tsc && vite build --mode client-lib",
     "build:server": "tsc && vite build --mode server-lib",
+    "build:libs": "npm run build:client && npm run build:server",
     "build:site": "tsc && vite build --mode site",
     "dev:client": "vite --host --mode site",
     "dev:optimizer": "tsx ./src/components/packages/server/optimizer/playground/index.ts"

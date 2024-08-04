@@ -17,13 +17,18 @@ jobs:
           node-version: latest
       - name: Install dependencies
         run: npm install
-      - name: Build lib
-        run: npm run build:lib
-      - name: Upload artifact
+      - name: Build libs
+        run: npm run build:libs
+      - name: Upload client-lib
         uses: actions/upload-artifact@v3
         with:
           name: production-files
-          path: ./lib
+          path: ./client-lib
+      - name: Upload server-lib
+        uses: actions/upload-artifact@v3
+        with:
+          name: production-files
+          path: ./server-lib
       - name: Publish package
         run: npm publish --access public
         working-directory: ./
