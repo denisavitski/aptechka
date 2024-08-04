@@ -161,8 +161,7 @@ export async function inputFiles({
               }),
             },
           })
-        }
-        if (destinationPath.includes('@sequence')) {
+        } else if (destinationPath.includes('@sequence')) {
           const path = specialPath(destinationPath, '@sequence')
 
           sources.push({
