@@ -107,7 +107,7 @@ export async function inputFiles({
             if (file.ext === '.svg') {
               content.push({
                 name: file.name,
-                buffer: file.buffer,
+                data: file.buffer,
               })
             }
           })

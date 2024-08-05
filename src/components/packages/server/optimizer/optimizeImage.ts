@@ -1,12 +1,14 @@
 import sharp from 'sharp'
 import { ImageSource } from './types'
 import { extname } from 'path'
-import { Output, replaceExtension } from '../utils'
+import { getBuffer, Output, replaceExtension } from '../utils'
 
 export async function optimizeImage(source: ImageSource) {
   const { settings } = source
+
+  const content = await getBuffer(source.content)
   const ext = extname(settings.destinationPath).toLowerCase()
-  const image = sharp(source.content)
+  const image = sharp(content)
   const meta = await image.metadata()
   const width = meta.width
   const height = meta.height

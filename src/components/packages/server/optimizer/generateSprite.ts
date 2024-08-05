@@ -1,6 +1,6 @@
 import { parse } from 'node-html-parser'
 import { SpriteSource } from './types'
-import { Output } from '../utils'
+import { getBuffer, Output } from '../utils'
 
 export async function generateSprite(source: SpriteSource) {
   const output: Output = []
@@ -15,7 +15,9 @@ export async function generateSprite(source: SpriteSource) {
   let spriteString = svgOpenTag
 
   for await (const item of source.content) {
-    const svgString = item.buffer.toString()
+    const buffer = await getBuffer(item.data)
+
+    const svgString = buffer.toString()
 
     const root = parse(svgString)
     const icon = root.querySelector('svg')!

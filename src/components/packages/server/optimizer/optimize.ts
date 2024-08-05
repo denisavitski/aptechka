@@ -1,4 +1,4 @@
-import { Output } from '../utils'
+import { getBuffer, Output } from '../utils'
 import { generateFavicon } from './generateFavicon'
 import { generateSequence } from './generateSequence'
 import { generateSprite } from './generateSprite'
@@ -39,7 +39,7 @@ export async function optimize(
       output.push(...(await generateSequence(source)))
     } else {
       output.push({
-        data: source.content,
+        data: await getBuffer(source.content),
         destinationPath: source.settings.destinationPath,
       })
     }

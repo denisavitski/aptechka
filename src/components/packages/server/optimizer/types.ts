@@ -5,7 +5,7 @@ export type SourceSettings = {
 }
 
 export interface Source<
-  B = Buffer,
+  B = Buffer | File,
   T extends string = string,
   S extends SourceSettings = {}
 > {
@@ -15,7 +15,7 @@ export interface Source<
 }
 
 export type SkipSource = Source<
-  Buffer,
+  Buffer | File,
   'skip',
   {
     destinationPath: string
@@ -23,7 +23,7 @@ export type SkipSource = Source<
 >
 
 export type ImageSource = Source<
-  Buffer,
+  Buffer | File,
   'image',
   {
     destinationPath: string
@@ -35,7 +35,7 @@ export type ImageSource = Source<
 >
 
 export type VideoSource = Source<
-  Buffer,
+  Buffer | File,
   'video',
   {
     destinationPath: string
@@ -46,7 +46,7 @@ export type VideoSource = Source<
 >
 
 export type FaviconSource = Source<
-  Buffer,
+  Buffer | File,
   'favicon',
   {
     destinationPath: string
@@ -55,7 +55,7 @@ export type FaviconSource = Source<
 >
 
 export type SpriteSource = Source<
-  Array<{ name: string; buffer: Buffer }>,
+  Array<{ name: string; data: Buffer | File }>,
   'sprite',
   {
     destinationPath: string
@@ -66,7 +66,7 @@ export type SpriteSource = Source<
 >
 
 export type SequenceSource = Source<
-  Buffer,
+  Buffer | File,
   'sequence',
   {
     destinationPath: string

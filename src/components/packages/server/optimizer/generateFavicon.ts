@@ -1,14 +1,16 @@
 import favicons from 'favicons'
 import { FaviconSource } from './types'
 import { join } from 'path'
-import { Output } from '../utils'
+import { Output, getBuffer } from '../utils'
 
 export async function generateFavicon(source: FaviconSource) {
   const output: Output = []
 
   const { settings } = source
 
-  const response = await favicons(source.content, settings)
+  const buffer = await getBuffer(source.content)
+
+  const response = await favicons(buffer, settings)
 
   output.push(
     ...[...response.images, ...response.files].map((item) => {
