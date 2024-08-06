@@ -569,7 +569,13 @@ export class ElementConstructor<
       }
     } else {
       if (value != undefined) {
-        element.setAttribute(name, value.toString())
+        const str = value.toString()
+
+        if (name.includes('xlink')) {
+          element.setAttributeNS('http://www.w3.org/1999/xlink', name, str)
+        } else {
+          element.setAttribute(name, str)
+        }
       }
     }
   }

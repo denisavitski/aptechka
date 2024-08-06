@@ -61,4 +61,5 @@ export const knownSvgTags = new Set([
   'title',
   'tspan',
   'view',
+  'use',
 ])
