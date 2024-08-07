@@ -30,7 +30,7 @@ export { optimizer } from './optimizer'
 export { optimizeVideo } from './optimizeVideo'
 
 export {
-  type SourceSettings,
+  type SourceDefaultSettings,
   type Source,
   type SkipSource,
   type ImageSource,

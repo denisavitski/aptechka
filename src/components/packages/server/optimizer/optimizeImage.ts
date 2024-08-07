@@ -2,6 +2,7 @@ import sharp from 'sharp'
 import { ImageSource } from './types'
 import { extname } from 'path'
 import { getBuffer, Output, replaceExtension } from '../utils'
+import { getNumberSetting } from './utils'
 
 export async function optimizeImage(source: ImageSource) {
   const { settings } = source
@@ -15,25 +16,25 @@ export async function optimizeImage(source: ImageSource) {
 
   const output: Output = []
 
+  const scale = getNumberSetting(settings.scale, 1)
+  const quality = getNumberSetting(settings.quality, 80)
+
   if (width && height) {
     if (settings?.scale) {
-      image.resize(
-        Math.floor(width * settings.scale),
-        Math.floor(height * settings.scale)
-      )
+      image.resize(Math.floor(width * scale), Math.floor(height * scale))
     }
   }
 
   if (ext === '.jpg' || ext === '.jpeg') {
     image.jpeg({
       mozjpeg: true,
-      quality: settings?.quality,
+      quality: quality,
     })
   } else if (ext === '.png') {
     image.png({
       compressionLevel: 9,
       adaptiveFiltering: true,
-      quality: settings?.quality,
+      quality: quality,
       effort: 8,
     })
   }
@@ -48,7 +49,7 @@ export async function optimizeImage(source: ImageSource) {
   if (settings?.webp) {
     const buffer = await image
       .webp({
-        quality: settings.quality,
+        quality: quality,
         effort: 5,
       })
       .toBuffer()

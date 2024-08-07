@@ -1,13 +1,34 @@
 import type { FaviconOptions } from 'favicons'
 
-export type SourceSettings = {
+export type SourceDefaultSettings = {
   [key: string]: any
+}
+
+export type SourceSetting = { value: any }
+
+export interface NumberSetting<Min extends number = 0, Max extends number = 1> {
+  value: number
+  min: Min
+  max: Max
+}
+
+export interface ImageSettings {
+  quality?: NumberSetting<0, 100>
+  scale?: NumberSetting<0, 1>
+  placeholder?: boolean
+  webp?: boolean
+}
+
+export interface VideoSettings {
+  fps: NumberSetting<0, 300>
+  quality: NumberSetting<0, 100>
+  scale: NumberSetting<0, 1>
 }
 
 export interface Source<
   B = Buffer | File,
   T extends string = string,
-  S extends SourceSettings = {}
+  S extends SourceDefaultSettings = {}
 > {
   content: B
   type: T
@@ -27,10 +48,10 @@ export type ImageSource = Source<
   'image',
   {
     destinationPath: string
-    quality?: number
-    scale?: number
-    placeholder?: boolean
-    webp?: boolean
+    quality?: ImageSettings['quality']
+    scale?: ImageSettings['scale']
+    placeholder?: ImageSettings['placeholder']
+    webp?: ImageSettings['webp']
   }
 >
 
@@ -39,9 +60,9 @@ export type VideoSource = Source<
   'video',
   {
     destinationPath: string
-    quality?: number
-    scale?: number
-    fps?: number
+    quality?: VideoSettings['quality']
+    scale?: VideoSettings['scale']
+    fps?: VideoSettings['fps']
   }
 >
 

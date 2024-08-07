@@ -182,8 +182,8 @@ export async function inputFiles({
             type: 'image',
             settings: {
               placeholder: false,
-              quality: 80,
-              scale: 1,
+              quality: { value: 80, min: 0, max: 100 },
+              scale: { value: 1, min: 0, max: 1 },
               webp: false,
               destinationPath,
               ...settings?.image?.({ destinationPath }),
@@ -198,8 +198,8 @@ export async function inputFiles({
             content,
             type: 'video',
             settings: {
-              quality: 80,
-              scale: 1,
+              quality: { value: 80, min: 0, max: 100 },
+              scale: { value: 1, min: 0, max: 1 },
               destinationPath,
               ...settings?.video?.({ destinationPath }),
             },
