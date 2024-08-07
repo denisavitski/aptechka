@@ -2,7 +2,7 @@ import { SequenceSource } from './types'
 import { FFmpeg } from './FFmpeg'
 import { getBuffer, removeExtension } from '../utils'
 
-export async function generateSequence(source: SequenceSource) {
+export async function generateSequence(source: Omit<SequenceSource, 'type'>) {
   const { settings } = source
 
   const buffer = await getBuffer(source.content)

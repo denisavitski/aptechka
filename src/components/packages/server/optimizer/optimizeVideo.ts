@@ -3,14 +3,17 @@ import { FFmpeg } from './FFmpeg'
 import { getBuffer } from '../utils'
 import { getNumberSetting } from './utils'
 
-export async function optimizeVideo(source: VideoSource) {
-  const { settings } = source
+export async function optimizeVideo(source: Omit<VideoSource, 'type'>) {
+  const { settings, restrictions } = source
 
   const buffer = await getBuffer(source.content)
 
-  const quality = getNumberSetting(settings?.quality, 80)
-  const fps = getNumberSetting(settings?.quality, 0)
-  const scale = getNumberSetting(settings?.scale, 1)
+  const quality = getNumberSetting(
+    settings?.quality || 80,
+    restrictions?.quality
+  )
+  const fps = getNumberSetting(settings?.fps || 0, restrictions?.fps)
+  const scale = getNumberSetting(settings?.scale || 1, restrictions?.scale)
 
   return FFmpeg({
     inputPath: settings.destinationPath,

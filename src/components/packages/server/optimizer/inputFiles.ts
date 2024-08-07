@@ -182,11 +182,15 @@ export async function inputFiles({
             type: 'image',
             settings: {
               placeholder: false,
-              quality: { value: 80, min: 0, max: 100 },
-              scale: { value: 1, min: 0, max: 1 },
+              quality: 80,
+              scale: 1,
               webp: false,
               destinationPath,
               ...settings?.image?.({ destinationPath }),
+            },
+            restrictions: {
+              quality: { min: 0, max: 100 },
+              scale: { min: 0, max: 1 },
             },
           })
         } else if (
@@ -198,10 +202,16 @@ export async function inputFiles({
             content,
             type: 'video',
             settings: {
-              quality: { value: 80, min: 0, max: 100 },
-              scale: { value: 1, min: 0, max: 1 },
+              quality: 80,
+              scale: 1,
+              fps: 0,
               destinationPath,
               ...settings?.video?.({ destinationPath }),
+            },
+            restrictions: {
+              quality: { min: 0, max: 100 },
+              scale: { min: 0, max: 1 },
+              fps: { min: 0, max: 300 },
             },
           })
         } else {

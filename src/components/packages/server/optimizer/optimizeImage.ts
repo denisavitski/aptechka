@@ -4,8 +4,8 @@ import { extname } from 'path'
 import { getBuffer, Output, replaceExtension } from '../utils'
 import { getNumberSetting } from './utils'
 
-export async function optimizeImage(source: ImageSource) {
-  const { settings } = source
+export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
+  const { settings, restrictions } = source
 
   const content = await getBuffer(source.content)
   const ext = extname(settings.destinationPath).toLowerCase()
@@ -16,11 +16,11 @@ export async function optimizeImage(source: ImageSource) {
 
   const output: Output = []
 
-  const scale = getNumberSetting(settings.scale, 1)
-  const quality = getNumberSetting(settings.quality, 80)
+  const scale = getNumberSetting(settings.scale, restrictions?.scale)
+  const quality = getNumberSetting(settings.quality, restrictions?.quality)
 
   if (width && height) {
-    if (settings?.scale) {
+    if (scale) {
       image.resize(Math.floor(width * scale), Math.floor(height * scale))
     }
   }

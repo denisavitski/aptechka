@@ -17,7 +17,6 @@ optimizer({
     },
     video: () => {
       return {
-        quality: 50,
         scale: 0.5,
       }
     },

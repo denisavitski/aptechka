@@ -3,7 +3,7 @@ import { FaviconSource } from './types'
 import { join } from 'path'
 import { Output, getBuffer } from '../utils'
 
-export async function generateFavicon(source: FaviconSource) {
+export async function generateFavicon(source: Omit<FaviconSource, 'type'>) {
   const output: Output = []
 
   const { settings } = source

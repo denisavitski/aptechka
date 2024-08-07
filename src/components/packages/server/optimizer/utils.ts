@@ -1,13 +1,12 @@
 import { clamp } from '@packages/client/utils'
-import { NumberSetting } from './types'
 
-export function getNumberSetting(
-  setting?: NumberSetting<any, any>,
-  defaultValue = 0
+export function getNumberSetting<T extends number | undefined>(
+  value: T,
+  restricstions?: { min: number; max: number }
 ) {
-  if (setting) {
-    return clamp(setting.value, setting.min, setting.max)
+  if (typeof value === 'number' && restricstions) {
+    return clamp(value, restricstions.min, restricstions.max)
   }
 
-  return defaultValue
+  return value
 }

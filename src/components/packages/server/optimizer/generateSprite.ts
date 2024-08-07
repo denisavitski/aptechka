@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser'
 import { SpriteSource } from './types'
 import { getBuffer, Output } from '../utils'
 
-export async function generateSprite(source: SpriteSource) {
+export async function generateSprite(source: Omit<SpriteSource, 'type'>) {
   const output: Output = []
 
   const { settings } = source

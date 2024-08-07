@@ -6,34 +6,16 @@ export type SourceDefaultSettings = {
 
 export type SourceSetting = { value: any }
 
-export interface NumberSetting<Min extends number = 0, Max extends number = 1> {
-  value: number
-  min: Min
-  max: Max
-}
-
-export interface ImageSettings {
-  quality?: NumberSetting<0, 100>
-  scale?: NumberSetting<0, 1>
-  placeholder?: boolean
-  webp?: boolean
-}
-
-export interface VideoSettings {
-  fps: NumberSetting<0, 300>
-  quality: NumberSetting<0, 100>
-  scale: NumberSetting<0, 1>
-}
-
-export interface Source<
+export type Source<
   B = Buffer | File,
   T extends string = string,
-  S extends SourceDefaultSettings = {}
-> {
+  S extends SourceDefaultSettings = {},
+  R extends Partial<{ [K in keyof S]: any }> | undefined = undefined
+> = {
   content: B
   type: T
   settings: S
-}
+} & (R extends undefined ? {} : { restrictions?: Partial<R> })
 
 export type SkipSource = Source<
   Buffer | File,
@@ -48,10 +30,14 @@ export type ImageSource = Source<
   'image',
   {
     destinationPath: string
-    quality?: ImageSettings['quality']
-    scale?: ImageSettings['scale']
-    placeholder?: ImageSettings['placeholder']
-    webp?: ImageSettings['webp']
+    quality?: number
+    scale?: number
+    placeholder?: boolean
+    webp?: boolean
+  },
+  {
+    quality: { min: 0; max: 100 }
+    scale: { min: 0; max: 1 }
   }
 >
 
@@ -60,9 +46,14 @@ export type VideoSource = Source<
   'video',
   {
     destinationPath: string
-    quality?: VideoSettings['quality']
-    scale?: VideoSettings['scale']
-    fps?: VideoSettings['fps']
+    quality?: number
+    scale?: number
+    fps?: number
+  },
+  {
+    quality: { min: 0; max: 100 }
+    scale: { min: 0; max: 1 }
+    fps: { min: 0; max: 300 }
   }
 >
 
