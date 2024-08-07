@@ -9,13 +9,12 @@ export type SourceSetting = { value: any }
 export type Source<
   B = Buffer | File,
   T extends string = string,
-  S extends SourceDefaultSettings = {},
-  R extends Partial<{ [K in keyof S]: any }> | undefined = undefined
+  S extends SourceDefaultSettings = {}
 > = {
   content: B
   type: T
   settings: S
-} & (R extends undefined ? {} : { restrictions?: Partial<R> })
+}
 
 export type SkipSource = Source<
   Buffer | File,
@@ -34,10 +33,6 @@ export type ImageSource = Source<
     scale?: number
     placeholder?: boolean
     webp?: boolean
-  },
-  {
-    quality: { min: 0; max: 100 }
-    scale: { min: 0; max: 1 }
   }
 >
 
@@ -49,11 +44,6 @@ export type VideoSource = Source<
     quality?: number
     scale?: number
     fps?: number
-  },
-  {
-    quality: { min: 0; max: 100 }
-    scale: { min: 0; max: 1 }
-    fps: { min: 0; max: 300 }
   }
 >
 

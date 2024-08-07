@@ -188,10 +188,6 @@ export async function inputFiles({
               destinationPath,
               ...settings?.image?.({ destinationPath }),
             },
-            restrictions: {
-              quality: { min: 0, max: 100 },
-              scale: { min: 0, max: 1 },
-            },
           })
         } else if (
           ALLOWED_VIDEO_EXTENSIONS.includes(
@@ -207,11 +203,6 @@ export async function inputFiles({
               fps: 0,
               destinationPath,
               ...settings?.video?.({ destinationPath }),
-            },
-            restrictions: {
-              quality: { min: 0, max: 100 },
-              scale: { min: 0, max: 1 },
-              fps: { min: 0, max: 300 },
             },
           })
         } else {
