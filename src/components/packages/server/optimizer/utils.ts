@@ -1,4 +1,4 @@
-import { clamp } from '@packages/client/utils'
+import { clamp } from '../utils'
 
 export function getNumberSetting<T extends number | undefined>(
   value: T,
