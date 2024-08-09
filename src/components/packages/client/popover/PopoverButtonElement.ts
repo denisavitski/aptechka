@@ -50,7 +50,19 @@ export class PopoverButtonElement extends HTMLElement {
       let popoverElement: Element | null | undefined = null
 
       if (targetId === 'parent') {
-        popoverElement = this.closest('[popover-target]')
+        const closestTarget = this.closest('[popover-target]')
+
+        if (closestTarget) {
+          popoverElement = closestTarget
+        } else {
+          const rootNode = this.getRootNode()
+
+          if (rootNode instanceof ShadowRoot) {
+            popoverElement = rootNode.host.closest('[popover-target]')
+          } else if (rootNode instanceof HTMLElement) {
+            popoverElement = rootNode.closest('[popover-target]')
+          }
+        }
       } else if (targetId === 'sibling') {
         popoverElement = this.parentElement?.querySelector('[popover-target]')
       } else {

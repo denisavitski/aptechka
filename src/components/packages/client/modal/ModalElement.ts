@@ -130,7 +130,7 @@ export class ModalElement extends PopoverElement {
             children: [
               element('e-popover-button', {
                 type: 'close',
-                target: this.id,
+                target: 'parent',
                 class: 'close-button',
                 lightChildren: [
                   slot({
