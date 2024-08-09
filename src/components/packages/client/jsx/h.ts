@@ -30,6 +30,8 @@ export function h(
   }
 
   if (typeof tag === 'function') {
+    attributes.children = stack.reverse()
+
     if (isInstanceTag) {
       let instance: any = null
 
@@ -39,12 +41,13 @@ export function h(
         instance = (tag as any)()
       }
 
-      delete attributes.children
+      if (attributes.lightChildren) {
+        attributes.lightChildren = attributes.children
+        delete attributes.children
+      }
 
       return () => new ElementConstructor(instance, attributes).node
     } else {
-      attributes.children = stack.reverse()
-
       if (tag === Fragment) {
         return Fragment(attributes.children)
       }
