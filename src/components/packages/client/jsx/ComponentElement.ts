@@ -10,13 +10,13 @@ export interface ComponentElementParameters {
   attributes: null | { [key: string]: any }
 }
 
-export type ComponentCreateCallback<T = void> = (e: ComponentElement) => T
-
 export type ComponentConnectCallback = (
   e: ComponentElement
-) => void | (() => void)
+) => void | (() => void) | ComponentDisconnectCallback
 
-export type ComponentDisconnectCallback = (e: ComponentElement) => void
+export type ComponentDisconnectCallback = (
+  e: ComponentElement
+) => void | Promise<void>
 
 export class ComponentElement extends HTMLElement {
   #connectCallbacks: Set<ComponentConnectCallback> = new Set()
@@ -55,7 +55,7 @@ export class ComponentElement extends HTMLElement {
     this.#connectCallbacks.add(callback)
   }
 
-  public addDisconnectCallback(callback: ComponentConnectCallback) {
+  public addDisconnectCallback(callback: ComponentDisconnectCallback) {
     this.#disconnectCallbacks.add(callback)
   }
 

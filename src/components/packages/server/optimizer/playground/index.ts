@@ -18,7 +18,8 @@ optimizer({
     },
     video: () => {
       return {
-        scale: 0.5,
+        scale: 0.7,
+        quality: 50,
       }
     },
     favicon: (parameters) => {
