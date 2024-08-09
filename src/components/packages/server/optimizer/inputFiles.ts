@@ -185,6 +185,7 @@ export async function inputFiles({
               quality: 80,
               scale: 1,
               webp: false,
+              forceJPG: false,
               destinationPath,
               ...settings?.image?.({ destinationPath }),
             },

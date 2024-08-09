@@ -7,6 +7,7 @@ optimizer({
   settings: {
     image: (p) => {
       return {
+        forceJPG: true,
         placeholder: true,
         webp: true,
         path:

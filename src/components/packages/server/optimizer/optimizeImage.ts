@@ -8,7 +8,7 @@ export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
   const { settings } = source
 
   const content = await getBuffer(source.content)
-  const ext = extname(settings.destinationPath).toLowerCase()
+
   const image = sharp(content)
   const meta = await image.metadata()
   const width = meta.width
@@ -18,6 +18,9 @@ export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
 
   const scale = getNumberSetting(settings.scale, 0, 1)
   const quality = getNumberSetting(settings.quality, 0, 100)
+
+  let destinationPath = settings.destinationPath
+  let ext = extname(destinationPath).toLowerCase()
 
   if (width && height) {
     if (scale) {
@@ -31,19 +34,33 @@ export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
       quality: quality,
     })
   } else if (ext === '.png') {
-    image.png({
-      compressionLevel: 9,
-      adaptiveFiltering: true,
-      quality: quality,
-      effort: 8,
-    })
+    if (settings.forceJPG) {
+      const bg =
+        typeof settings.forceJPG === 'string' ? settings.forceJPG : '#ffffff'
+
+      image
+        .jpeg({
+          mozjpeg: true,
+        })
+        .flatten({ background: bg })
+
+      destinationPath = replaceExtension(settings.destinationPath, 'jpg')
+      ext = '.jpg'
+    } else {
+      image.png({
+        compressionLevel: 9,
+        adaptiveFiltering: true,
+        quality: quality,
+        effort: 8,
+      })
+    }
   }
 
   const buffer = await image.toBuffer()
 
   output.push({
     data: buffer,
-    destinationPath: settings.destinationPath,
+    destinationPath,
   })
 
   if (settings?.webp) {
@@ -56,7 +73,7 @@ export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
 
     output.push({
       data: buffer,
-      destinationPath: replaceExtension(settings.destinationPath, 'webp'),
+      destinationPath: replaceExtension(destinationPath, 'webp'),
     })
   }
 
@@ -65,10 +82,7 @@ export async function optimizeImage(source: Omit<ImageSource, 'type'>) {
 
     output.push({
       data: buffer,
-      destinationPath: replaceExtension(
-        settings.destinationPath,
-        `placeholder${ext}`
-      ),
+      destinationPath: replaceExtension(destinationPath, `placeholder${ext}`),
     })
   }
 
