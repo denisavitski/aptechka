@@ -12,7 +12,12 @@ export interface ComponentElementParameters {
 
 export type ComponentConnectCallback = (
   e: ComponentElement
-) => void | (() => void) | ComponentDisconnectCallback
+) =>
+  | void
+  | (() => void)
+  | Promise<void>
+  | Promise<() => void>
+  | ComponentDisconnectCallback
 
 export type ComponentDisconnectCallback = (
   e: ComponentElement
@@ -66,10 +71,10 @@ export class ComponentElement extends HTMLElement {
   protected connectedCallback() {
     currentComponentElement.value = this
 
-    this.#connectCallbacks.forEach((callback) => {
-      const disconnectCallback = callback(this)
+    this.#connectCallbacks.forEach(async (callback) => {
+      const disconnectCallback = await callback(this)
 
-      if (disconnectCallback) {
+      if (this.isConnected && disconnectCallback) {
         this.#disconnectCallbacks.add(disconnectCallback)
       }
     })
