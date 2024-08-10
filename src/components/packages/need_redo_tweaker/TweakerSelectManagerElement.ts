@@ -1,11 +1,11 @@
-import '@packages/select'
+import './select'
 
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, span } from '@packages/element-constructor'
 
-import { SelectElement } from '@packages/select'
-import { aptechkaTheme } from '@packages/theme'
+import { SelectElement } from './select'
+import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({
   'e-select': {

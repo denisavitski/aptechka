@@ -18,8 +18,6 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
     const shadow = this.attachShadow({ mode: 'open' })
     shadow.adoptedStyleSheets.push(stylesheet)
 
-    console.log(this.firstStore)
-
     element(this, {
       children: [
         a({

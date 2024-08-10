@@ -1,1 +1,0 @@
-export { AccordionElement } from './AccordionElement'

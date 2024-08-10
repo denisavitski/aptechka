@@ -7,7 +7,7 @@ import { tweakerStorage } from './tweakerStorage'
 
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { StoreBox } from './TweakerElement'
-import { aptechkaTheme } from '@packages/theme'
+import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({
   '.wrapper': {

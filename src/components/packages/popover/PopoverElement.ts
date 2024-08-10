@@ -81,7 +81,7 @@ export class PopoverElement extends HTMLElement {
 
     if (this.#history.current) {
       const url = new URL(location.href)
-      url.searchParams.delete(this.#searchName)
+      url.searchParams.delete(this.id)
       history.replaceState(null, '', url.href)
     }
 
@@ -127,11 +127,7 @@ export class PopoverElement extends HTMLElement {
   get #path() {
     return `${location.pathname}${
       location.search ? location.search + '&' : '?'
-    }${this.#searchName}`
-  }
-
-  get #searchName() {
-    return `modal-${this.id}`
+    }${this.id}`
   }
 
   #clickOutsideListener = (event: MouseEvent) => {
@@ -176,13 +172,13 @@ export class PopoverElement extends HTMLElement {
     if (
       this.#opened.current &&
       this.#history.current &&
-      !location.search.includes(this.#searchName)
+      !location.search.includes(this.id)
     ) {
       this.close()
     } else if (
       !this.#opened.current &&
       this.#history.current &&
-      location.search.includes(this.#searchName)
+      location.search.includes(this.id)
     ) {
       this.open()
     }

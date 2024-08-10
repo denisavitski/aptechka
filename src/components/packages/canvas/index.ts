@@ -1,23 +1,10 @@
 import { CSSProperty } from '@packages/css-property'
 import {
-  canvas,
-  createStylesheet,
-  element,
-} from '@packages/element-constructor'
-import {
   ElementResizerCallback,
   elementResizer,
 } from '@packages/element-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
-import { clamp } from '@packages/utils'
-
-const stylesheet = createStylesheet({
-  ':host, canvas': {
-    display: 'block',
-    width: '100%',
-    height: '100%',
-  },
-})
+import { clamp, isBrowser } from '@packages/utils'
 
 export interface Canvas2DRenderDetail {
   pixelRatio: number
@@ -48,23 +35,31 @@ export class CanvasElement extends HTMLElement {
   constructor() {
     super()
 
-    const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    if (isBrowser) {
+      const styleSheet = new CSSStyleSheet()
 
-    element(this, {
-      children: canvas({
-        ref: (e) => {
-          this.#canvasElement = e
-          this.#context = e.getContext('2d')!
-        },
-      }),
-    })
+      styleSheet.replaceSync(`
+        :host, canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+        }
+      `)
 
-    this.#fpsCSSProperty.subscribe((e) => {
-      if (typeof e.previous !== 'undefined' && e.current !== e.previous) {
-        this.#run()
-      }
-    })
+      const shadow = this.attachShadow({ mode: 'open' })
+      shadow.adoptedStyleSheets.push(styleSheet)
+
+      this.#canvasElement = document.createElement('canvas')
+      this.#context = this.#canvasElement.getContext('2d')!
+
+      shadow.appendChild(this.#canvasElement)
+
+      this.#fpsCSSProperty.subscribe((e) => {
+        if (typeof e.previous !== 'undefined' && e.current !== e.previous) {
+          this.#run()
+        }
+      })
+    }
   }
 
   public get fpsCSSProperty() {

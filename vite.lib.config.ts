@@ -20,11 +20,9 @@ export function libConfig() {
       lib: {
         name: 'Aptechka',
         entry: {
-          'accordion/index': './src/components/packages/accordion/index.ts',
           'animation/index': './src/components/packages/animation/index.ts',
           'attribute/index': './src/components/packages/attribute/index.ts',
           'canvas/index': './src/components/packages/canvas/index.ts',
-          'checkbox/index': './src/components/packages/checkbox/index.ts',
           'class-linked-status/index':
             './src/components/packages/class-linked-status/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',
@@ -58,7 +56,6 @@ export function libConfig() {
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
           'media/index': './src/components/packages/media/index.ts',
-          'modal/index': './src/components/packages/modal/index.ts',
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
@@ -68,14 +65,13 @@ export function libConfig() {
           'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
-          'select/index': './src/components/packages/select/index.ts',
           'sequence/index': './src/components/packages/sequence/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
-          'theme/index': './src/components/packages/theme/index.ts',
           'ticker/index': './src/components/packages/ticker/index.ts',
-          'tweaker/index': './src/components/packages/tweaker/index.ts',
+          'need_redo_tweaker/index':
+            './src/components/packages/need_redo_tweaker/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
           'video/index': './src/components/packages/video/index.ts',
           'window-resizer/index':

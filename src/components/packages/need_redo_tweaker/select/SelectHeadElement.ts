@@ -2,8 +2,8 @@ import { SelectUserElement } from './SelectUserElement'
 import { SelectOptionElement } from './SelectOptionElement'
 import { createStylesheet, element, slot } from '@packages/element-constructor'
 import arrowIcon from '@assets/icons/arrow.svg?raw'
-import { aptechkaTheme } from '@packages/theme'
 import { isBrowser } from '@packages/utils'
+import { aptechkaTheme } from '../theme'
 
 const stylesheet = createStylesheet({
   ':host': {

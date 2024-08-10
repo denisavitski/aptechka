@@ -9,7 +9,7 @@ import {
 import { Store, activeStores, storeRegistry } from '@packages/store'
 import { createJSONAndSave, debounce, setupDrag } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
-import { aptechkaTheme } from '@packages/theme'
+import { aptechkaTheme } from './theme'
 
 import resetIcon from '@assets/icons/reset.svg?raw'
 import copyIcon from '@assets/icons/copy.svg?raw'

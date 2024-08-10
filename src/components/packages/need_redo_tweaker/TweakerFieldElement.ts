@@ -13,7 +13,7 @@ import copyIcon from '@assets/icons/copy.svg?raw'
 import resetIcon from '@assets/icons/reset.svg?raw'
 
 import { tweakerManagerConstructors } from './tweakerManagerConstructors'
-import { aptechkaTheme } from '@packages/theme'
+import { aptechkaTheme } from './theme'
 import { dispatchSizeChangeEvent } from '@packages/utils'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 

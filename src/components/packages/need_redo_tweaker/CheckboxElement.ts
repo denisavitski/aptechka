@@ -6,7 +6,7 @@ import {
   slot,
   span,
 } from '@packages/element-constructor'
-import { aptechkaTheme } from '@packages/theme'
+import { aptechkaTheme } from './theme'
 import checkIcon from '@assets/icons/check.svg?raw'
 
 const stylesheet = createStylesheet({

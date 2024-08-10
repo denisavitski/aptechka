@@ -1,7 +1,7 @@
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from '@packages/element-constructor'
-import { aptechkaTheme } from '@packages/theme'
+import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({
   ':host': {

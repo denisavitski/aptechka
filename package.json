@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.13.1",
+  "version": "0.14.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -18,11 +18,6 @@
   ],
   "type": "module",
   "exports": {
-    "./accordion": {
-      "require": "./lib/accordion/index.cjs",
-      "default": "./lib/accordion/index.js",
-      "types": "./lib/accordion/index.d.ts"
-    },
     "./animation": {
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js",
@@ -37,11 +32,6 @@
       "require": "./lib/canvas/index.cjs",
       "default": "./lib/canvas/index.js",
       "types": "./lib/canvas/index.d.ts"
-    },
-    "./checkbox": {
-      "require": "./lib/checkbox/index.cjs",
-      "default": "./lib/checkbox/index.js",
-      "types": "./lib/checkbox/index.d.ts"
     },
     "./class-linked-status": {
       "require": "./lib/class-linked-status/index.cjs",
@@ -153,11 +143,6 @@
       "default": "./lib/media/index.js",
       "types": "./lib/media/index.d.ts"
     },
-    "./modal": {
-      "require": "./lib/modal/index.cjs",
-      "default": "./lib/modal/index.js",
-      "types": "./lib/modal/index.d.ts"
-    },
     "./morph": {
       "require": "./lib/morph/index.cjs",
       "default": "./lib/morph/index.js",
@@ -198,11 +183,6 @@
       "default": "./lib/scroll-entries/index.js",
       "types": "./lib/scroll-entries/index.d.ts"
     },
-    "./select": {
-      "require": "./lib/select/index.cjs",
-      "default": "./lib/select/index.js",
-      "types": "./lib/select/index.d.ts"
-    },
     "./sequence": {
       "require": "./lib/sequence/index.cjs",
       "default": "./lib/sequence/index.js",
@@ -223,20 +203,15 @@
       "default": "./lib/store/index.js",
       "types": "./lib/store/index.d.ts"
     },
-    "./theme": {
-      "require": "./lib/theme/index.cjs",
-      "default": "./lib/theme/index.js",
-      "types": "./lib/theme/index.d.ts"
-    },
     "./ticker": {
       "require": "./lib/ticker/index.cjs",
       "default": "./lib/ticker/index.js",
       "types": "./lib/ticker/index.d.ts"
     },
-    "./tweaker": {
-      "require": "./lib/tweaker/index.cjs",
-      "default": "./lib/tweaker/index.js",
-      "types": "./lib/tweaker/index.d.ts"
+    "./need_redo_tweaker": {
+      "require": "./lib/need_redo_tweaker/index.cjs",
+      "default": "./lib/need_redo_tweaker/index.js",
+      "types": "./lib/need_redo_tweaker/index.d.ts"
     },
     "./utils": {
       "require": "./lib/utils/index.cjs",
@@ -256,9 +231,6 @@
   },
   "typesVersions": {
     "*": {
-      "accordion": [
-        "lib/accordion/index.d.ts"
-      ],
       "animation": [
         "lib/animation/index.d.ts"
       ],
@@ -267,9 +239,6 @@
       ],
       "canvas": [
         "lib/canvas/index.d.ts"
-      ],
-      "checkbox": [
-        "lib/checkbox/index.d.ts"
       ],
       "class-linked-status": [
         "lib/class-linked-status/index.d.ts"
@@ -340,9 +309,6 @@
       "media": [
         "lib/media/index.d.ts"
       ],
-      "modal": [
-        "lib/modal/index.d.ts"
-      ],
       "morph": [
         "lib/morph/index.d.ts"
       ],
@@ -367,9 +333,6 @@
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"
       ],
-      "select": [
-        "lib/select/index.d.ts"
-      ],
       "sequence": [
         "lib/sequence/index.d.ts"
       ],
@@ -382,14 +345,11 @@
       "store": [
         "lib/store/index.d.ts"
       ],
-      "theme": [
-        "lib/theme/index.d.ts"
-      ],
       "ticker": [
         "lib/ticker/index.d.ts"
       ],
-      "tweaker": [
-        "lib/tweaker/index.d.ts"
+      "need_redo_tweaker": [
+        "lib/need_redo_tweaker/index.d.ts"
       ],
       "utils": [
         "lib/utils/index.d.ts"
