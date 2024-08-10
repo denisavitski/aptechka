@@ -62,26 +62,6 @@ export function clientBuildConfig() {
             './src/components/packages/client/en3/utils/index.ts',
           // < EN3
 
-          // > JSX
-          'jsx/index': './src/components/packages/client/jsx/index.ts',
-          'jsx/hooks/animation/index':
-            './src/components/packages/client/jsx/hooks/animation/index.ts',
-          'jsx/hooks/store/index':
-            './src/components/packages/client/jsx/hooks/store/index.ts',
-          'jsx/hooks/onAnimationFrame':
-            './src/components/packages/client/jsx/hooks/onAnimationFrame.ts',
-          'jsx/hooks/onElementResize':
-            './src/components/packages/client/jsx/hooks/onElementResize.ts',
-          'jsx/hooks/onIntersection':
-            './src/components/packages/client/jsx/hooks/onIntersection.ts',
-          'jsx/hooks/onWindowResize':
-            './src/components/packages/client/jsx/hooks/onWindowResize.ts',
-          'jsx/hooks/watchAttribute':
-            './src/components/packages/client/jsx/hooks/watchAttribute.ts',
-          'jsx/hooks/watchCSSProperty':
-            './src/components/packages/client/jsx/hooks/watchCSSProperty.ts',
-          // < JSX
-
           'image/index': './src/components/packages/client/image/index.ts',
           'intersector/index':
             './src/components/packages/client/intersector/index.ts',

@@ -30,11 +30,7 @@
       "@packages/*": ["src/components/packages/*"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"]
-    },
-
-    "jsx": "preserve",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
+    }
   },
   "include": ["src"]
 }

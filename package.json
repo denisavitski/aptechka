@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.11.11",
+  "version": "0.12.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -133,51 +133,6 @@
       "require": "./client-lib/intersector/index.cjs",
       "default": "./client-lib/intersector/index.js",
       "types": "./client-lib/intersector/index.d.ts"
-    },
-    "./client/jsx": {
-      "require": "./client-lib/jsx/index.cjs",
-      "default": "./client-lib/jsx/index.js",
-      "types": "./client-lib/jsx/index.d.ts"
-    },
-    "./client/jsx/hooks/animation": {
-      "require": "./client-lib/jsx/hooks/animation/index.cjs",
-      "default": "./client-lib/jsx/hooks/animation/index.js",
-      "types": "./client-lib/jsx/hooks/animation/index.d.ts"
-    },
-    "./client/jsx/hooks/store": {
-      "require": "./client-lib/jsx/hooks/store/index.cjs",
-      "default": "./client-lib/jsx/hooks/store/index.js",
-      "types": "./client-lib/jsx/hooks/store/index.d.ts"
-    },
-    "./client/jsx/hooks/onAnimationFrame": {
-      "require": "./client-lib/jsx/hooks/onAnimationFrame.cjs",
-      "default": "./client-lib/jsx/hooks/onAnimationFrame.js",
-      "types": "./client-lib/jsx/hooks/onAnimationFrame.d.ts"
-    },
-    "./client/jsx/hooks/onElementResize": {
-      "require": "./client-lib/jsx/hooks/onElementResize.cjs",
-      "default": "./client-lib/jsx/hooks/onElementResize.js",
-      "types": "./client-lib/jsx/hooks/onElementResize.d.ts"
-    },
-    "./client/jsx/hooks/onIntersection": {
-      "require": "./client-lib/jsx/hooks/onIntersection.cjs",
-      "default": "./client-lib/jsx/hooks/onIntersection.js",
-      "types": "./client-lib/jsx/hooks/onIntersection.d.ts"
-    },
-    "./client/jsx/hooks/onWindowResize": {
-      "require": "./client-lib/jsx/hooks/onWindowResize.cjs",
-      "default": "./client-lib/jsx/hooks/onWindowResize.js",
-      "types": "./client-lib/jsx/hooks/onWindowResize.d.ts"
-    },
-    "./client/jsx/hooks/watchAttribute": {
-      "require": "./client-lib/jsx/hooks/watchAttribute.cjs",
-      "default": "./client-lib/jsx/hooks/watchAttribute.js",
-      "types": "./client-lib/jsx/hooks/watchAttribute.d.ts"
-    },
-    "./client/jsx/hooks/watchCSSProperty": {
-      "require": "./client-lib/jsx/hooks/watchCSSProperty.cjs",
-      "default": "./client-lib/jsx/hooks/watchCSSProperty.js",
-      "types": "./client-lib/jsx/hooks/watchCSSProperty.d.ts"
     },
     "./client/ladder": {
       "require": "./client-lib/ladder/index.cjs",
@@ -386,33 +341,6 @@
       ],
       "client/intersector": [
         "client-lib/intersector/index.d.ts"
-      ],
-      "client/jsx": [
-        "client-lib/jsx/index.d.ts"
-      ],
-      "client/jsx/hooks/animation": [
-        "client-lib/jsx/hooks/animation/index.d.ts"
-      ],
-      "client/jsx/hooks/store": [
-        "client-lib/jsx/hooks/store/index.d.ts"
-      ],
-      "client/jsx/hooks/onAnimationFrame": [
-        "client-lib/jsx/hooks/onAnimationFrame.d.ts"
-      ],
-      "client/jsx/hooks/onElementResize": [
-        "client-lib/jsx/hooks/onElementResize.d.ts"
-      ],
-      "client/jsx/hooks/onIntersection": [
-        "client-lib/jsx/hooks/onIntersection.d.ts"
-      ],
-      "client/jsx/hooks/onWindowResize": [
-        "client-lib/jsx/hooks/onWindowResize.d.ts"
-      ],
-      "client/jsx/hooks/watchAttribute": [
-        "client-lib/jsx/hooks/watchAttribute.d.ts"
-      ],
-      "client/jsx/hooks/watchCSSProperty": [
-        "client-lib/jsx/hooks/watchCSSProperty.d.ts"
       ],
       "client/ladder": [
         "client-lib/ladder/index.d.ts"
