@@ -23,7 +23,7 @@
     "experimentalDecorators": true,
     "allowJs": true,
 
-    "types": ["vite/client", "node"],
+    "types": ["vite/client"],
 
     "baseUrl": "./",
     "paths": {

@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -14,451 +14,424 @@
   },
   "license": "ISC",
   "files": [
-    "client-lib",
-    "server-lib"
+    "lib"
   ],
   "type": "module",
   "exports": {
-    "./client/accordion": {
-      "require": "./client-lib/accordion/index.cjs",
-      "default": "./client-lib/accordion/index.js",
-      "types": "./client-lib/accordion/index.d.ts"
+    "./accordion": {
+      "require": "./lib/accordion/index.cjs",
+      "default": "./lib/accordion/index.js",
+      "types": "./lib/accordion/index.d.ts"
     },
-    "./client/animation": {
-      "require": "./client-lib/animation/index.cjs",
-      "default": "./client-lib/animation/index.js",
-      "types": "./client-lib/animation/index.d.ts"
+    "./animation": {
+      "require": "./lib/animation/index.cjs",
+      "default": "./lib/animation/index.js",
+      "types": "./lib/animation/index.d.ts"
     },
-    "./client/attribute": {
-      "require": "./client-lib/attribute/index.cjs",
-      "default": "./client-lib/attribute/index.js",
-      "types": "./client-lib/attribute/index.d.ts"
+    "./attribute": {
+      "require": "./lib/attribute/index.cjs",
+      "default": "./lib/attribute/index.js",
+      "types": "./lib/attribute/index.d.ts"
     },
-    "./client/canvas": {
-      "require": "./client-lib/canvas/index.cjs",
-      "default": "./client-lib/canvas/index.js",
-      "types": "./client-lib/canvas/index.d.ts"
+    "./canvas": {
+      "require": "./lib/canvas/index.cjs",
+      "default": "./lib/canvas/index.js",
+      "types": "./lib/canvas/index.d.ts"
     },
-    "./client/checkbox": {
-      "require": "./client-lib/checkbox/index.cjs",
-      "default": "./client-lib/checkbox/index.js",
-      "types": "./client-lib/checkbox/index.d.ts"
+    "./checkbox": {
+      "require": "./lib/checkbox/index.cjs",
+      "default": "./lib/checkbox/index.js",
+      "types": "./lib/checkbox/index.d.ts"
     },
-    "./client/class-linked-status": {
-      "require": "./client-lib/class-linked-status/index.cjs",
-      "default": "./client-lib/class-linked-status/index.js",
-      "types": "./client-lib/class-linked-status/index.d.ts"
+    "./class-linked-status": {
+      "require": "./lib/class-linked-status/index.cjs",
+      "default": "./lib/class-linked-status/index.js",
+      "types": "./lib/class-linked-status/index.d.ts"
     },
-    "./client/connector": {
-      "require": "./client-lib/connector/index.cjs",
-      "default": "./client-lib/connector/index.js",
-      "types": "./client-lib/connector/index.d.ts"
+    "./connector": {
+      "require": "./lib/connector/index.cjs",
+      "default": "./lib/connector/index.js",
+      "types": "./lib/connector/index.d.ts"
     },
-    "./client/controls": {
-      "require": "./client-lib/controls/index.cjs",
-      "default": "./client-lib/controls/index.js",
-      "types": "./client-lib/controls/index.d.ts"
+    "./controls": {
+      "require": "./lib/controls/index.cjs",
+      "default": "./lib/controls/index.js",
+      "types": "./lib/controls/index.d.ts"
     },
-    "./client/css-property": {
-      "require": "./client-lib/css-property/index.cjs",
-      "default": "./client-lib/css-property/index.js",
-      "types": "./client-lib/css-property/index.d.ts"
+    "./css-property": {
+      "require": "./lib/css-property/index.cjs",
+      "default": "./lib/css-property/index.js",
+      "types": "./lib/css-property/index.d.ts"
     },
-    "./client/css-unit-parser": {
-      "require": "./client-lib/css-unit-parser/index.cjs",
-      "default": "./client-lib/css-unit-parser/index.js",
-      "types": "./client-lib/css-unit-parser/index.d.ts"
+    "./css-unit-parser": {
+      "require": "./lib/css-unit-parser/index.cjs",
+      "default": "./lib/css-unit-parser/index.js",
+      "types": "./lib/css-unit-parser/index.d.ts"
     },
-    "./client/css-value-parser": {
-      "require": "./client-lib/css-value-parser/index.cjs",
-      "default": "./client-lib/css-value-parser/index.js",
-      "types": "./client-lib/css-value-parser/index.d.ts"
+    "./css-value-parser": {
+      "require": "./lib/css-value-parser/index.cjs",
+      "default": "./lib/css-value-parser/index.js",
+      "types": "./lib/css-value-parser/index.d.ts"
     },
-    "./client/dev": {
-      "require": "./client-lib/dev/index.cjs",
-      "default": "./client-lib/dev/index.js",
-      "types": "./client-lib/dev/index.d.ts"
+    "./dev": {
+      "require": "./lib/dev/index.cjs",
+      "default": "./lib/dev/index.js",
+      "types": "./lib/dev/index.d.ts"
     },
-    "./client/device": {
-      "require": "./client-lib/device/index.cjs",
-      "default": "./client-lib/device/index.js",
-      "types": "./client-lib/device/index.d.ts"
+    "./device": {
+      "require": "./lib/device/index.cjs",
+      "default": "./lib/device/index.js",
+      "types": "./lib/device/index.d.ts"
     },
-    "./client/element-constructor": {
-      "require": "./client-lib/element-constructor/index.cjs",
-      "default": "./client-lib/element-constructor/index.js",
-      "types": "./client-lib/element-constructor/index.d.ts"
+    "./element-constructor": {
+      "require": "./lib/element-constructor/index.cjs",
+      "default": "./lib/element-constructor/index.js",
+      "types": "./lib/element-constructor/index.d.ts"
     },
-    "./client/element-resizer": {
-      "require": "./client-lib/element-resizer/index.cjs",
-      "default": "./client-lib/element-resizer/index.js",
-      "types": "./client-lib/element-resizer/index.d.ts"
+    "./element-resizer": {
+      "require": "./lib/element-resizer/index.cjs",
+      "default": "./lib/element-resizer/index.js",
+      "types": "./lib/element-resizer/index.d.ts"
     },
-    "./client/en3": {
-      "require": "./client-lib/en3/index.cjs",
-      "default": "./client-lib/en3/index.js",
-      "types": "./client-lib/en3/index.d.ts"
+    "./en3": {
+      "require": "./lib/en3/index.cjs",
+      "default": "./lib/en3/index.js",
+      "types": "./lib/en3/index.d.ts"
     },
-    "./client/en3/helpers": {
-      "require": "./client-lib/en3/helpers/index.cjs",
-      "default": "./client-lib/en3/helpers/index.js",
-      "types": "./client-lib/en3/helpers/index.d.ts"
+    "./en3/helpers": {
+      "require": "./lib/en3/helpers/index.cjs",
+      "default": "./lib/en3/helpers/index.js",
+      "types": "./lib/en3/helpers/index.d.ts"
     },
-    "./client/en3/libs": {
-      "require": "./client-lib/en3/libs/index.cjs",
-      "default": "./client-lib/en3/libs/index.js",
-      "types": "./client-lib/en3/libs/index.d.ts"
+    "./en3/libs": {
+      "require": "./lib/en3/libs/index.cjs",
+      "default": "./lib/en3/libs/index.js",
+      "types": "./lib/en3/libs/index.d.ts"
     },
-    "./client/en3/loaders": {
-      "require": "./client-lib/en3/loaders/index.cjs",
-      "default": "./client-lib/en3/loaders/index.js",
-      "types": "./client-lib/en3/loaders/index.d.ts"
+    "./en3/loaders": {
+      "require": "./lib/en3/loaders/index.cjs",
+      "default": "./lib/en3/loaders/index.js",
+      "types": "./lib/en3/loaders/index.d.ts"
     },
-    "./client/en3/misc": {
-      "require": "./client-lib/en3/misc/index.cjs",
-      "default": "./client-lib/en3/misc/index.js",
-      "types": "./client-lib/en3/misc/index.d.ts"
+    "./en3/misc": {
+      "require": "./lib/en3/misc/index.cjs",
+      "default": "./lib/en3/misc/index.js",
+      "types": "./lib/en3/misc/index.d.ts"
     },
-    "./client/en3/utils": {
-      "require": "./client-lib/en3/utils/index.cjs",
-      "default": "./client-lib/en3/utils/index.js",
-      "types": "./client-lib/en3/utils/index.d.ts"
+    "./en3/utils": {
+      "require": "./lib/en3/utils/index.cjs",
+      "default": "./lib/en3/utils/index.js",
+      "types": "./lib/en3/utils/index.d.ts"
     },
-    "./client/image": {
-      "require": "./client-lib/image/index.cjs",
-      "default": "./client-lib/image/index.js",
-      "types": "./client-lib/image/index.d.ts"
+    "./image": {
+      "require": "./lib/image/index.cjs",
+      "default": "./lib/image/index.js",
+      "types": "./lib/image/index.d.ts"
     },
-    "./client/intersector": {
-      "require": "./client-lib/intersector/index.cjs",
-      "default": "./client-lib/intersector/index.js",
-      "types": "./client-lib/intersector/index.d.ts"
+    "./intersector": {
+      "require": "./lib/intersector/index.cjs",
+      "default": "./lib/intersector/index.js",
+      "types": "./lib/intersector/index.d.ts"
     },
-    "./client/ladder": {
-      "require": "./client-lib/ladder/index.cjs",
-      "default": "./client-lib/ladder/index.js",
-      "types": "./client-lib/ladder/index.d.ts"
+    "./ladder": {
+      "require": "./lib/ladder/index.cjs",
+      "default": "./lib/ladder/index.js",
+      "types": "./lib/ladder/index.d.ts"
     },
-    "./client/layout-box": {
-      "require": "./client-lib/layout-box/index.cjs",
-      "default": "./client-lib/layout-box/index.js",
-      "types": "./client-lib/layout-box/index.d.ts"
+    "./layout-box": {
+      "require": "./lib/layout-box/index.cjs",
+      "default": "./lib/layout-box/index.js",
+      "types": "./lib/layout-box/index.d.ts"
     },
-    "./client/loading": {
-      "require": "./client-lib/loading/index.cjs",
-      "default": "./client-lib/loading/index.js",
-      "types": "./client-lib/loading/index.d.ts"
+    "./loading": {
+      "require": "./lib/loading/index.cjs",
+      "default": "./lib/loading/index.js",
+      "types": "./lib/loading/index.d.ts"
     },
-    "./client/media": {
-      "require": "./client-lib/media/index.cjs",
-      "default": "./client-lib/media/index.js",
-      "types": "./client-lib/media/index.d.ts"
+    "./media": {
+      "require": "./lib/media/index.cjs",
+      "default": "./lib/media/index.js",
+      "types": "./lib/media/index.d.ts"
     },
-    "./client/modal": {
-      "require": "./client-lib/modal/index.cjs",
-      "default": "./client-lib/modal/index.js",
-      "types": "./client-lib/modal/index.d.ts"
+    "./modal": {
+      "require": "./lib/modal/index.cjs",
+      "default": "./lib/modal/index.js",
+      "types": "./lib/modal/index.d.ts"
     },
-    "./client/morph": {
-      "require": "./client-lib/morph/index.cjs",
-      "default": "./client-lib/morph/index.js",
-      "types": "./client-lib/morph/index.d.ts"
+    "./morph": {
+      "require": "./lib/morph/index.cjs",
+      "default": "./lib/morph/index.js",
+      "types": "./lib/morph/index.d.ts"
     },
-    "./client/notifier": {
-      "require": "./client-lib/notifier/index.cjs",
-      "default": "./client-lib/notifier/index.js",
-      "types": "./client-lib/notifier/index.d.ts"
+    "./notifier": {
+      "require": "./lib/notifier/index.cjs",
+      "default": "./lib/notifier/index.js",
+      "types": "./lib/notifier/index.d.ts"
     },
-    "./client/order": {
-      "require": "./client-lib/order/index.cjs",
-      "default": "./client-lib/order/index.js",
-      "types": "./client-lib/order/index.d.ts"
+    "./order": {
+      "require": "./lib/order/index.cjs",
+      "default": "./lib/order/index.js",
+      "types": "./lib/order/index.d.ts"
     },
-    "./client/pointer": {
-      "require": "./client-lib/pointer/index.cjs",
-      "default": "./client-lib/pointer/index.js",
-      "types": "./client-lib/pointer/index.d.ts"
+    "./pointer": {
+      "require": "./lib/pointer/index.cjs",
+      "default": "./lib/pointer/index.js",
+      "types": "./lib/pointer/index.d.ts"
     },
-    "./client/popover": {
-      "require": "./client-lib/popover/index.cjs",
-      "default": "./client-lib/popover/index.js",
-      "types": "./client-lib/popover/index.d.ts"
+    "./popover": {
+      "require": "./lib/popover/index.cjs",
+      "default": "./lib/popover/index.js",
+      "types": "./lib/popover/index.d.ts"
     },
-    "./client/router": {
-      "require": "./client-lib/router/index.cjs",
-      "default": "./client-lib/router/index.js",
-      "types": "./client-lib/router/index.d.ts"
+    "./router": {
+      "require": "./lib/router/index.cjs",
+      "default": "./lib/router/index.js",
+      "types": "./lib/router/index.d.ts"
     },
-    "./client/scroll": {
-      "require": "./client-lib/scroll/index.cjs",
-      "default": "./client-lib/scroll/index.js",
-      "types": "./client-lib/scroll/index.d.ts"
+    "./scroll": {
+      "require": "./lib/scroll/index.cjs",
+      "default": "./lib/scroll/index.js",
+      "types": "./lib/scroll/index.d.ts"
     },
-    "./client/scroll-entries": {
-      "require": "./client-lib/scroll-entries/index.cjs",
-      "default": "./client-lib/scroll-entries/index.js",
-      "types": "./client-lib/scroll-entries/index.d.ts"
+    "./scroll-entries": {
+      "require": "./lib/scroll-entries/index.cjs",
+      "default": "./lib/scroll-entries/index.js",
+      "types": "./lib/scroll-entries/index.d.ts"
     },
-    "./client/select": {
-      "require": "./client-lib/select/index.cjs",
-      "default": "./client-lib/select/index.js",
-      "types": "./client-lib/select/index.d.ts"
+    "./select": {
+      "require": "./lib/select/index.cjs",
+      "default": "./lib/select/index.js",
+      "types": "./lib/select/index.d.ts"
     },
-    "./client/sequence": {
-      "require": "./client-lib/sequence/index.cjs",
-      "default": "./client-lib/sequence/index.js",
-      "types": "./client-lib/sequence/index.d.ts"
+    "./sequence": {
+      "require": "./lib/sequence/index.cjs",
+      "default": "./lib/sequence/index.js",
+      "types": "./lib/sequence/index.d.ts"
     },
-    "./client/slicer": {
-      "require": "./client-lib/slicer/index.cjs",
-      "default": "./client-lib/slicer/index.js",
-      "types": "./client-lib/slicer/index.d.ts"
+    "./slicer": {
+      "require": "./lib/slicer/index.cjs",
+      "default": "./lib/slicer/index.js",
+      "types": "./lib/slicer/index.d.ts"
     },
-    "./client/source": {
-      "require": "./client-lib/source/index.cjs",
-      "default": "./client-lib/source/index.js",
-      "types": "./client-lib/source/index.d.ts"
+    "./source": {
+      "require": "./lib/source/index.cjs",
+      "default": "./lib/source/index.js",
+      "types": "./lib/source/index.d.ts"
     },
-    "./client/store": {
-      "require": "./client-lib/store/index.cjs",
-      "default": "./client-lib/store/index.js",
-      "types": "./client-lib/store/index.d.ts"
+    "./store": {
+      "require": "./lib/store/index.cjs",
+      "default": "./lib/store/index.js",
+      "types": "./lib/store/index.d.ts"
     },
-    "./client/svg-path-data": {
-      "require": "./client-lib/svg-path-data/index.cjs",
-      "default": "./client-lib/svg-path-data/index.js",
-      "types": "./client-lib/svg-path-data/index.d.ts"
+    "./svg-path-data": {
+      "require": "./lib/svg-path-data/index.cjs",
+      "default": "./lib/svg-path-data/index.js",
+      "types": "./lib/svg-path-data/index.d.ts"
     },
-    "./client/theme": {
-      "require": "./client-lib/theme/index.cjs",
-      "default": "./client-lib/theme/index.js",
-      "types": "./client-lib/theme/index.d.ts"
+    "./theme": {
+      "require": "./lib/theme/index.cjs",
+      "default": "./lib/theme/index.js",
+      "types": "./lib/theme/index.d.ts"
     },
-    "./client/ticker": {
-      "require": "./client-lib/ticker/index.cjs",
-      "default": "./client-lib/ticker/index.js",
-      "types": "./client-lib/ticker/index.d.ts"
+    "./ticker": {
+      "require": "./lib/ticker/index.cjs",
+      "default": "./lib/ticker/index.js",
+      "types": "./lib/ticker/index.d.ts"
     },
-    "./client/tweaker": {
-      "require": "./client-lib/tweaker/index.cjs",
-      "default": "./client-lib/tweaker/index.js",
-      "types": "./client-lib/tweaker/index.d.ts"
+    "./tweaker": {
+      "require": "./lib/tweaker/index.cjs",
+      "default": "./lib/tweaker/index.js",
+      "types": "./lib/tweaker/index.d.ts"
     },
-    "./client/utils": {
-      "require": "./client-lib/utils/index.cjs",
-      "default": "./client-lib/utils/index.js",
-      "types": "./client-lib/utils/index.d.ts"
+    "./utils": {
+      "require": "./lib/utils/index.cjs",
+      "default": "./lib/utils/index.js",
+      "types": "./lib/utils/index.d.ts"
     },
-    "./client/video": {
-      "require": "./client-lib/video/index.cjs",
-      "default": "./client-lib/video/index.js",
-      "types": "./client-lib/video/index.d.ts"
+    "./video": {
+      "require": "./lib/video/index.cjs",
+      "default": "./lib/video/index.js",
+      "types": "./lib/video/index.d.ts"
     },
-    "./client/window-resizer": {
-      "require": "./client-lib/window-resizer/index.cjs",
-      "default": "./client-lib/window-resizer/index.js",
-      "types": "./client-lib/window-resizer/index.d.ts"
-    },
-    "./server/optimizer": {
-      "default": "./server-lib/optimizer/index.js",
-      "types": "./server-lib/optimizer/index.d.ts"
-    },
-    "./server/utils": {
-      "default": "./server-lib/utils/index.js",
-      "types": "./server-lib/utils/index.d.ts"
+    "./window-resizer": {
+      "require": "./lib/window-resizer/index.cjs",
+      "default": "./lib/window-resizer/index.js",
+      "types": "./lib/window-resizer/index.d.ts"
     }
   },
   "typesVersions": {
     "*": {
-      "client/accordion": [
-        "client-lib/accordion/index.d.ts"
+      "accordion": [
+        "lib/accordion/index.d.ts"
       ],
-      "client/animation": [
-        "client-lib/animation/index.d.ts"
+      "animation": [
+        "lib/animation/index.d.ts"
       ],
-      "client/attribute": [
-        "client-lib/attribute/index.d.ts"
+      "attribute": [
+        "lib/attribute/index.d.ts"
       ],
-      "client/canvas": [
-        "client-lib/canvas/index.d.ts"
+      "canvas": [
+        "lib/canvas/index.d.ts"
       ],
-      "client/checkbox": [
-        "client-lib/checkbox/index.d.ts"
+      "checkbox": [
+        "lib/checkbox/index.d.ts"
       ],
-      "client/class-linked-status": [
-        "client-lib/class-linked-status/index.d.ts"
+      "class-linked-status": [
+        "lib/class-linked-status/index.d.ts"
       ],
-      "client/component": [
-        "client-lib/component/index.d.ts"
+      "component": [
+        "lib/component/index.d.ts"
       ],
-      "client/connector": [
-        "client-lib/connector/index.d.ts"
+      "connector": [
+        "lib/connector/index.d.ts"
       ],
-      "client/controls": [
-        "client-lib/controls/index.d.ts"
+      "controls": [
+        "lib/controls/index.d.ts"
       ],
-      "client/css-property-parser": [
-        "client-lib/css-property-parser/index.d.ts"
+      "css-property-parser": [
+        "lib/css-property-parser/index.d.ts"
       ],
-      "client/css-unit-parser": [
-        "client-lib/css-unit-parser/index.d.ts"
+      "css-unit-parser": [
+        "lib/css-unit-parser/index.d.ts"
       ],
-      "client/css-value-parser": [
-        "client-lib/css-value-parser/index.d.ts"
+      "css-value-parser": [
+        "lib/css-value-parser/index.d.ts"
       ],
-      "client/dev": [
-        "client-lib/dev/index.d.ts"
+      "dev": [
+        "lib/dev/index.d.ts"
       ],
-      "client/device": [
-        "client-lib/device/index.d.ts"
+      "device": [
+        "lib/device/index.d.ts"
       ],
-      "client/element-constructor": [
-        "client-lib/element-constructor/index.d.ts"
+      "element-constructor": [
+        "lib/element-constructor/index.d.ts"
       ],
-      "client/element-resizer": [
-        "client-lib/element-resizer/index.d.ts"
+      "element-resizer": [
+        "lib/element-resizer/index.d.ts"
       ],
-      "client/en3": [
-        "client-lib/en3/index.d.ts"
+      "en3": [
+        "lib/en3/index.d.ts"
       ],
-      "client/en3/helpers": [
-        "client-lib/en3/helpers/index.d.ts"
+      "en3/helpers": [
+        "lib/en3/helpers/index.d.ts"
       ],
-      "client/en3/libs": [
-        "client-lib/en3/libs/index.d.ts"
+      "en3/libs": [
+        "lib/en3/libs/index.d.ts"
       ],
-      "client/en3/loaders": [
-        "client-lib/en3/loaders/index.d.ts"
+      "en3/loaders": [
+        "lib/en3/loaders/index.d.ts"
       ],
-      "client/en3/misc": [
-        "client-lib/en3/misc/index.d.ts"
+      "en3/misc": [
+        "lib/en3/misc/index.d.ts"
       ],
-      "client/en3/utils": [
-        "client-lib/en3/utils/index.d.ts"
+      "en3/utils": [
+        "lib/en3/utils/index.d.ts"
       ],
-      "client/image": [
-        "client-lib/image/index.d.ts"
+      "image": [
+        "lib/image/index.d.ts"
       ],
-      "client/intersector": [
-        "client-lib/intersector/index.d.ts"
+      "intersector": [
+        "lib/intersector/index.d.ts"
       ],
-      "client/ladder": [
-        "client-lib/ladder/index.d.ts"
+      "ladder": [
+        "lib/ladder/index.d.ts"
       ],
-      "client/layout-box": [
-        "client-lib/layout-box/index.d.ts"
+      "layout-box": [
+        "lib/layout-box/index.d.ts"
       ],
-      "client/loading": [
-        "client-lib/loading/index.d.ts"
+      "loading": [
+        "lib/loading/index.d.ts"
       ],
-      "client/media": [
-        "client-lib/media/index.d.ts"
+      "media": [
+        "lib/media/index.d.ts"
       ],
-      "client/modal": [
-        "client-lib/modal/index.d.ts"
+      "modal": [
+        "lib/modal/index.d.ts"
       ],
-      "client/morph": [
-        "client-lib/morph/index.d.ts"
+      "morph": [
+        "lib/morph/index.d.ts"
       ],
-      "client/notifier": [
-        "client-lib/notifier/index.d.ts"
+      "notifier": [
+        "lib/notifier/index.d.ts"
       ],
-      "client/order": [
-        "client-lib/order/index.d.ts"
+      "order": [
+        "lib/order/index.d.ts"
       ],
-      "client/pointer": [
-        "client-lib/pointer/index.d.ts"
+      "pointer": [
+        "lib/pointer/index.d.ts"
       ],
-      "client/popover": [
-        "client-lib/popover/index.d.ts"
+      "popover": [
+        "lib/popover/index.d.ts"
       ],
-      "client/router": [
-        "client-lib/router/index.d.ts"
+      "router": [
+        "lib/router/index.d.ts"
       ],
-      "client/scroll": [
-        "client-lib/scroll/index.d.ts"
+      "scroll": [
+        "lib/scroll/index.d.ts"
       ],
-      "client/scroll-entries": [
-        "client-lib/scroll-entries/index.d.ts"
+      "scroll-entries": [
+        "lib/scroll-entries/index.d.ts"
       ],
-      "client/select": [
-        "client-lib/select/index.d.ts"
+      "select": [
+        "lib/select/index.d.ts"
       ],
-      "client/sequence": [
-        "client-lib/sequence/index.d.ts"
+      "sequence": [
+        "lib/sequence/index.d.ts"
       ],
-      "client/slicer": [
-        "client-lib/slicer/index.d.ts"
+      "slicer": [
+        "lib/slicer/index.d.ts"
       ],
-      "client/source": [
-        "client-lib/source/index.d.ts"
+      "source": [
+        "lib/source/index.d.ts"
       ],
-      "client/store": [
-        "client-lib/store/index.d.ts"
+      "store": [
+        "lib/store/index.d.ts"
       ],
-      "client/svg-path-data": [
-        "client-lib/svg-path-data/index.d.ts"
+      "svg-path-data": [
+        "lib/svg-path-data/index.d.ts"
       ],
-      "client/theme": [
-        "client-lib/theme/index.d.ts"
+      "theme": [
+        "lib/theme/index.d.ts"
       ],
-      "client/ticker": [
-        "client-lib/ticker/index.d.ts"
+      "ticker": [
+        "lib/ticker/index.d.ts"
       ],
-      "client/tweaker": [
-        "client-lib/tweaker/index.d.ts"
+      "tweaker": [
+        "lib/tweaker/index.d.ts"
       ],
-      "client/utils": [
-        "client-lib/utils/index.d.ts"
+      "utils": [
+        "lib/utils/index.d.ts"
       ],
-      "client/video": [
-        "client-lib/video/index.d.ts"
+      "video": [
+        "lib/video/index.d.ts"
       ],
-      "client/window-resizer": [
-        "client-lib/window-resizer/index.d.ts"
-      ],
-      "server/optimizer": [
-        "server-lib/optimizer/index.d.ts"
-      ],
-      "server/utils": [
-        "server-lib/utils/index.d.ts"
+      "window-resizer": [
+        "lib/window-resizer/index.d.ts"
       ]
     }
   },
   "scripts": {
     "preview": "vite preview",
-    "build:client": "tsc && vite build --mode client-lib",
-    "build:server": "tsc && vite build --mode server-lib",
-    "build:libs": "npm run build:client && npm run build:server",
+    "build": "tsc && vite build --mode lib",
     "build:site": "tsc && vite build --mode site",
-    "dev:client": "vite --host --mode site",
-    "dev:optimizer": "tsx ./src/components/packages/server/optimizer/playground/index.ts"
+    "dev": "vite --host --mode site"
   },
   "devDependencies": {
-    "@types/fluent-ffmpeg": "^2.1.25",
-    "@types/node": "^22.1.0",
-    "@types/three": "^0.165.0",
-    "tsx": "^4.16.5",
-    "vite": "5.2.8",
-    "vite-plugin-dts": "^3.8.1",
-    "vite-plugin-htmc": "^0.1.9"
+    "@types/node": "^22.2.0",
+    "@types/three": "^0.167.1",
+    "tsx": "^4.17.0",
+    "vite": "5.4.0",
+    "vite-plugin-dts": "^4.0.2",
+    "vite-plugin-htmc": "^0.1.14"
   },
   "dependencies": {
-    "detect-gpu": "^5.0.38",
-    "favicons": "^7.2.0",
-    "fluent-ffmpeg": "^2.1.3",
-    "node-html-parser": "^6.1.13",
-    "sharp": "^0.33.4",
-    "three": "^0.166.1",
+    "detect-gpu": "^5.0.42",
+    "three": "^0.167.1",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
-    "detect-gpu": "^5.0.38",
-    "favicons": "^7.2.0",
-    "fluent-ffmpeg": "^2.1.3",
-    "node-html-parser": "^6.1.13",
-    "sharp": "^0.33.4",
-    "three": "^0.166.1",
+    "detect-gpu": "^5.0.42",
+    "three": "^0.167.1",
     "urlpattern-polyfill": "^10.0.0"
   }
 }

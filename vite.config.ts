@@ -1,14 +1,11 @@
 // vite.config.js
 import { defineConfig } from 'vite'
 import { siteConfig } from './vite.site.config'
-import { clientBuildConfig } from './vite.client-build.config'
-import { serverBuildConfig } from './vite.server-build.config'
+import { libConfig } from './vite.lib.config'
 
 export default defineConfig((e) => {
-  if (e.mode === 'client-lib') {
-    return clientBuildConfig()
-  } else if (e.mode === 'server-lib') {
-    return serverBuildConfig()
+  if (e.mode === 'lib') {
+    return libConfig()
   }
 
   return siteConfig()
