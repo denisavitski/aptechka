@@ -19,9 +19,9 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
-  Store<boolean, 'boolean'>
+  Store<boolean>
 > {
-  constructor(...stores: Array<Store<boolean, 'boolean'>>) {
+  constructor(...stores: Array<Store<boolean>>) {
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })

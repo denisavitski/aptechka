@@ -43,7 +43,7 @@ class StoreRegistry {
       }
 
       activeStores.current.forEach((store) => {
-        if (store.passport) {
+        if (store.name) {
           this.updateStore(store)
         }
       })
@@ -52,7 +52,7 @@ class StoreRegistry {
 
   public resetState() {
     activeStores.current.forEach((store) => {
-      if (store.passport) {
+      if (store.name) {
         store.reset()
       }
     })
@@ -60,17 +60,13 @@ class StoreRegistry {
     this.saveState()
   }
 
-  public updateStore(store: Store<any, any>) {
+  public updateStore(store: Store<any>) {
     if (!Array.isArray(this.#loadedState?.stores)) {
       return store
     }
 
-    const passport = store.passport
-
-    if (passport) {
-      const match = this.#loadedState?.stores.find(
-        (s) => s.name === passport.name
-      )
+    if (store.name) {
+      const match = this.#loadedState?.stores.find((s) => s.name === store.name)
 
       if (match) {
         store.current = match.value
@@ -86,11 +82,11 @@ class StoreRegistry {
     }
 
     activeStores.current.forEach((store) => {
-      if (store.passport) {
-        if (!state.stores.find((s) => s.name === store.passport!.name)) {
+      if (store.name) {
+        if (!state.stores.find((s) => s.name === store.name)) {
           state.stores.push({
             value: store.current as any,
-            name: store.passport.name,
+            name: store.name,
           })
         }
       }

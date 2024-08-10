@@ -8,7 +8,7 @@ export class Derived<Type, SourceType> extends Store<Type> {
   #unsubscriber: Function
 
   constructor(
-    store: Store<SourceType, any>,
+    store: Store<SourceType>,
     callback: DerivedCallback<SourceType, Type>,
     parameters?: StoreOptions<Type>
   ) {

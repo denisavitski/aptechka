@@ -99,7 +99,7 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
-  Store<Array<number> | number, 'number'>
+  Store<Array<number> | number>
 > {
   #inputElements: Array<HTMLInputElement> = []
   #knobElements: Array<HTMLElement> = []
@@ -113,24 +113,18 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   #isFinite: boolean
   #isDragging = false
 
-  constructor(...stores: Array<Store<Array<number> | number, 'number'>>) {
+  constructor(...stores: Array<Store<Array<number> | number>>) {
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })
     shadow.adoptedStyleSheets.push(stylesheet)
 
-    this.#min = nullishCoalescing(
-      this.firstStore.passport?.manager?.min,
-      -Infinity
-    )
-    this.#max = nullishCoalescing(
-      this.firstStore.passport?.manager?.max,
-      Infinity
-    )
+    this.#min = nullishCoalescing(this.firstStore.__manager?.min, -Infinity)
+    this.#max = nullishCoalescing(this.firstStore.__manager?.max, Infinity)
 
-    this.#step = this.firstStore.passport?.manager?.step || 0.01
+    this.#step = this.firstStore.__manager?.step || 0.01
 
-    this.#ease = this.firstStore.passport?.manager?.ease || 1
+    this.#ease = this.firstStore.__manager?.ease || 1
 
     this.#type = Array.isArray(this.firstStore.current) ? 'array' : 'number'
     this.#isFinite = isFinite(this.#max) && isFinite(this.#min)

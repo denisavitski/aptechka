@@ -281,8 +281,8 @@ export class TweakerElement extends TweakerFolderElement {
 
   #storesChangeListener = debounce(() => {
     activeStores.current.forEach((store) => {
-      if (store.passport && !store.passport.manager?.invisible) {
-        const sname = store.passport.name.split('.')
+      if (store.name) {
+        const sname = store.name.split('.')
 
         this.handleStore({
           store: store,

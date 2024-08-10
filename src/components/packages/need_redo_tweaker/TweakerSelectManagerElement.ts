@@ -49,15 +49,15 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
-  Store<string, 'select'>
+  Store<string>
 > {
-  constructor(...stores: Array<Store<string, 'select'>>) {
+  constructor(...stores: Array<Store<string>>) {
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })
     shadow.adoptedStyleSheets.push(stylesheet)
 
-    const variants = this.firstStore.passport?.manager?.variants || []
+    const variants = this.firstStore.__manager?.variants || []
 
     element(this, {
       children: element('e-select', {
@@ -73,6 +73,7 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
               }),
             ],
           }),
+          // @ts-ignore
           ...variants.map((v, i) =>
             element('e-select-option', {
               lightChildren: v,

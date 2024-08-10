@@ -7,8 +7,6 @@ import {
   button,
 } from '@packages/element-constructor'
 
-import { StoreManagerType } from '@packages/store/Store'
-
 import copyIcon from '@assets/icons/copy.svg?raw'
 import resetIcon from '@assets/icons/reset.svg?raw'
 
@@ -73,11 +71,11 @@ const stylesheet = createStylesheet({
 })
 
 export interface TweakerFieldParameters {
-  store: Store<any, StoreManagerType>
+  store: Store<any>
 }
 
 export class TweakerFieldElement extends HTMLElement {
-  #stores: Array<Store<any, StoreManagerType>> = []
+  #stores: Array<Store<any>> = []
   #key: string
   #name: string
   #pointerEnter = false
@@ -87,19 +85,21 @@ export class TweakerFieldElement extends HTMLElement {
     super()
 
     this.#stores = [parameters.store]
-    this.#key = parameters.store.passport!.name
+    this.#key = parameters.store.name!
     this.#name = this.#key.split('.').slice(-1).toString()
 
-    const type = parameters.store.passport?.manager?.type || 'string'
+    const type = parameters.store.__manager?.type || 'string'
 
-    this.#storeManager = new tweakerManagerConstructors[type](this.#stores[0])
+    this.#storeManager = new (tweakerManagerConstructors as any)[type](
+      this.#stores[0]
+    )
 
     const shadow = this.attachShadow({ mode: 'open' })
     shadow.adoptedStyleSheets.push(stylesheet)
 
     element(this, {
       class: {
-        disabled: parameters.store.passport?.manager?.disabled || false,
+        disabled: parameters.store.__manager?.disabled || false,
       },
       onPointerleave: () => {
         this.#pointerEnter = false
@@ -152,7 +152,7 @@ export class TweakerFieldElement extends HTMLElement {
     return this.#stores
   }
 
-  public addStore(store: Store<any, any>) {
+  public addStore(store: Store<any>) {
     this.#storeManager.addStore(store)
   }
 

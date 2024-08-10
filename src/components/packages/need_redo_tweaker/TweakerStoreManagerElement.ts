@@ -1,7 +1,7 @@
 import { Store } from '@packages/store'
 
 export class TweakerStoreManagerElement<
-  S extends Store<any, any>
+  S extends Store<any>
 > extends HTMLElement {
   #stores: Array<S>
 

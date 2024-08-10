@@ -13,79 +13,22 @@ export type StoreEqualityCheckCallback<StoreType> = (
   newValue: StoreType
 ) => boolean
 
-export interface StoreManager {
-  type: string
-  disabled?: boolean
-  invisible?: boolean
-}
-
-export interface StoreStringManager extends StoreManager {
-  type: 'string'
-}
-
-export interface StoreNumberManager extends StoreManager {
-  type: 'number'
-  min?: number
-  max?: number
-  step?: number
-  ease?: number
-}
-
-export interface StoreColorManager extends StoreManager {
-  type: 'color'
-}
-
-export interface StoreBooleanManager extends StoreManager {
-  type: 'boolean'
-}
-
-export interface StoreLinkManager extends StoreManager {
-  type: 'link'
-  sameWindow?: boolean
-}
-
-export interface StoreSelectManager extends StoreManager {
-  type: 'select'
-  variants: Array<string>
-}
-
-export interface StoreManagers {
-  select: StoreSelectManager
-  link: StoreLinkManager
-  boolean: StoreBooleanManager
-  color: StoreColorManager
-  number: StoreNumberManager
-  string: StoreStringManager
-}
-
-export type StoreManagerType = keyof StoreManagers
-
-export interface StorePassport<T extends StoreManagerType = StoreManagerType> {
-  name: string
-  description?: string
-  manager?: StoreManagers[T]
-}
-
 export type StoreMiddleware<T> = (value: T) => T
 
-export interface StoreOptions<
-  StoreType,
-  StoreManager extends StoreManagerType = StoreManagerType
-> {
+export interface StoreOptions<StoreType> {
+  name?: string
+  __manager?: any
   equalityCheck?: StoreEqualityCheckCallback<StoreType>
-  passport?: StorePassport<StoreManager> | undefined
   validate?: StoreMiddleware<StoreType>
   skipSubscribeNotification?: boolean
   notifyAndClose?: boolean
   invisible?: boolean
 }
 
-export class Store<
-  StoreType = unknown,
-  StoreManager extends StoreManagerType = StoreManagerType
-> {
-  #passport: StorePassport<StoreManager> | undefined
-
+export class Store<StoreType = unknown> {
+  #name: string | undefined
+  // REMOVE
+  __manager?: any
   #state: StoreState<StoreType>
   #equalityCheck: StoreEqualityCheckCallback<StoreType>
   #callbacks = new Set<StoreCallback<StoreType>>()
@@ -94,11 +37,10 @@ export class Store<
   #notifyAndClose: boolean
   #invisible: boolean
 
-  constructor(
-    value: StoreType,
-    options?: StoreOptions<StoreType, StoreManager>
-  ) {
-    this.#passport = options?.passport
+  constructor(value: StoreType, options?: StoreOptions<StoreType>) {
+    this.#name = options?.name
+
+    this.__manager = options?.__manager
 
     this.#state = {
       initial: value,
@@ -120,13 +62,13 @@ export class Store<
     this.#skipSubscribeNotification =
       options?.skipSubscribeNotification || false
 
-    if (this.#passport) {
+    if (this.#name) {
       storeRegistry.updateStore(this)
     }
   }
 
-  public get passport() {
-    return this.#passport
+  public get name() {
+    return this.#name
   }
 
   public get initial() {
@@ -224,17 +166,17 @@ export class Store<
   }
 }
 
-export const activeStores = new Store<Array<Store<any, any>>>([], {
+export const activeStores = new Store<Array<Store<any>>>([], {
   invisible: true,
 })
 
-function shareStore(store: Store<any, any>) {
+function shareStore(store: Store<any>) {
   if (!activeStores.current.includes(store)) {
     activeStores.current = [...activeStores.current, store]
   }
 }
 
-function unshareStore(store: Store<any, any>) {
+function unshareStore(store: Store<any>) {
   if (activeStores.current.includes(store)) {
     activeStores.current = activeStores.current.filter((s) => s !== store)
   }

@@ -1,69 +1,54 @@
-import { Animation, Tweened } from '@packages/animation'
 import { Store } from '@packages/store'
 
 new Store(false, {
-  passport: {
-    name: 'xxx.boolean',
-    manager: {
-      type: 'boolean',
-    },
+  name: 'xxx.boolean',
+  __manager: {
+    type: 'boolean',
   },
 }).subscribe(() => {})
 
 new Store('#ffffff', {
-  passport: {
-    name: 'xxx.color',
-    manager: {
-      type: 'color',
-    },
+  name: 'xxx.color',
+  __manager: {
+    type: 'color',
   },
 }).subscribe(() => {})
 
 new Store('123', {
-  passport: {
-    name: 'xxx.link',
-    manager: {
-      type: 'link',
-    },
+  name: 'xxx.link',
+  __manager: {
+    type: 'link',
   },
 }).subscribe(() => {})
 
 new Store(0, {
-  passport: {
-    name: 'xxx.number',
-    manager: {
-      type: 'number',
-      min: 0,
-      max: 100,
-    },
+  name: 'xxx.number',
+  __manager: {
+    type: 'number',
+    min: 0,
+    max: 100,
   },
 }).subscribe(() => {})
 
 new Store([1, 2, 3], {
-  passport: {
-    name: 'xxx.numbers',
-    manager: {
-      type: 'number',
-    },
+  name: 'xxx.numbers',
+  __manager: {
+    type: 'number',
   },
 }).subscribe(() => {})
 
 new Store('1', {
-  passport: {
-    name: 'xxx.select',
-    manager: {
-      type: 'select',
-      variants: ['1', '2'],
-    },
+  name: 'xxx.select',
+  __manager: {
+    type: 'select',
+    variants: ['1', '2'],
   },
 }).subscribe(() => {})
 
 new Store('xx', {
-  passport: {
-    name: 'xxx.string',
-    manager: {
-      type: 'string',
-    },
+  name: 'xxx.string',
+  __manager: {
+    type: 'string',
   },
 }).subscribe(() => {})
 

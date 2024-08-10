@@ -10,9 +10,9 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
-  Store<string, 'link'>
+  Store<string>
 > {
-  constructor(...stores: Array<Store<string, 'link'>>) {
+  constructor(...stores: Array<Store<string>>) {
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })
@@ -22,9 +22,7 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
       children: [
         a({
           href: this.firstStore,
-          target: this.firstStore.passport?.manager?.sameWindow
-            ? '_self'
-            : '_blank',
+          target: this.firstStore.__manager?.sameWindow ? '_self' : '_blank',
           children: this.firstStore,
         }),
       ],

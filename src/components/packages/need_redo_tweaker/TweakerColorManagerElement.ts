@@ -30,9 +30,9 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerColorManagerElement extends TweakerStoreManagerElement<
-  Store<string, 'color'>
+  Store<string>
 > {
-  constructor(...stores: Array<Store<string, 'color'>>) {
+  constructor(...stores: Array<Store<string>>) {
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })

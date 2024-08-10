@@ -32,7 +32,7 @@ const stylesheet = createStylesheet({
 })
 
 export class TweakerStringManagerElement<
-  S extends Store<any, any> = Store<string, 'string'>
+  S extends Store<any> = Store<string>
 > extends TweakerStoreManagerElement<S> {
   constructor(...stores: Array<S>) {
     super(...stores)

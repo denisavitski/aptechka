@@ -21,11 +21,11 @@ export interface AnimationOptions extends TickerAddOptions {
 }
 
 export type AnimationConstructorOptions<Options extends AnimationOptions> =
-  StoreOptions<number, 'number'> & Options
+  StoreOptions<number> & Options
 
 export abstract class Animation<
   Options extends AnimationOptions = AnimationOptions
-> extends Store<number, 'number'> {
+> extends Store<number> {
   #maxFPS: number | undefined
   #order = TICK_ORDER.ANIMATION
   #culling: ElementOrSelector | undefined | null | false
@@ -42,7 +42,7 @@ export abstract class Animation<
 
   #tmpSetValue: number | null = null
 
-  constructor(initial?: number, options?: StoreOptions<number, 'number'>) {
+  constructor(initial?: number, options?: StoreOptions<number>) {
     super(initial || 0, options)
     this.#target = this.current
   }

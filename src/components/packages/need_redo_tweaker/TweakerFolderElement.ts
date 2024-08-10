@@ -192,7 +192,7 @@ export class TweakerFolderElement extends HTMLElement {
 
   protected handleStore(storeBox: StoreBox) {
     if (storeBox.remainingFolders.length) {
-      const sname = storeBox.store.passport!.name
+      const sname = storeBox.store.name!
       const splittedName = sname.split('.')
       const key = splittedName
         .slice(0, splittedName.length - storeBox.remainingFolders.length)
@@ -219,7 +219,7 @@ export class TweakerFolderElement extends HTMLElement {
       }
     } else {
       const found = this.#content.current.find(
-        (v) => v.key === storeBox.store.passport!.name
+        (v) => v.key === storeBox.store.name
       )
 
       if (found instanceof TweakerFieldElement) {

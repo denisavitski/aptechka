@@ -12,7 +12,7 @@ export class DerivedArray<Type, SourceType extends Array<any>> extends Store<
   #unsubscriber: Function
 
   constructor(
-    store: Store<SourceType, any>,
+    store: Store<SourceType>,
     callback: DerivedArrayCallback<Type, SourceType>,
     parameters?: StoreOptions<Array<Type>>
   ) {
