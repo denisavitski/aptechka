@@ -7,7 +7,6 @@ import {
   element,
   slot,
 } from '@packages/element-constructor'
-import { aptechkaTheme } from '@packages/theme'
 import { elementResizer } from '@packages/element-resizer'
 import { ScrollUserElement } from './ScrollUserElement'
 
@@ -15,7 +14,7 @@ const stylesheet = createStylesheet({
   ':host': {
     display: 'inline-block',
     zIndex: '1',
-    backgroundColor: aptechkaTheme.colorFont.var,
+    backgroundColor: '#ebebeb',
   },
 
   ':host([axis="y"])': {
@@ -35,7 +34,7 @@ const stylesheet = createStylesheet({
   },
 
   '.default-thumb': {
-    backgroundColor: aptechkaTheme.colorMain.var,
+    backgroundColor: 'black',
     borderRadius: '1vmin',
     touchAction: 'none',
   },
