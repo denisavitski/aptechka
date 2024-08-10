@@ -73,8 +73,6 @@ export function libConfig() {
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
-          'svg-path-data/index':
-            './src/components/packages/svg-path-data/index.ts',
           'theme/index': './src/components/packages/theme/index.ts',
           'ticker/index': './src/components/packages/ticker/index.ts',
           'tweaker/index': './src/components/packages/tweaker/index.ts',

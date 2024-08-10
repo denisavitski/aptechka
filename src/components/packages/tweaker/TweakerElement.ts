@@ -180,10 +180,7 @@ export class TweakerElement extends TweakerFolderElement {
             class: 'tweaker-button',
             children: downloadIcon,
             onClick: () => {
-              createJSONAndSave(
-                storeRegistry.projectName,
-                storeRegistry.getState()
-              )
+              createJSONAndSave(storeRegistry.name, storeRegistry.getState())
             },
           }),
           label({

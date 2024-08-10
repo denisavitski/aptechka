@@ -11,26 +11,15 @@ export type StoreRegistryState = {
 }
 
 class StoreRegistry {
+  public storage: Storage = null!
+  public name = 'store-registry'
+
   #loadedState: StoreRegistryState | null = null
-  #projectName: string = ''
-  #localStoreRegistryName = ''
 
   constructor() {
     if (isBrowser) {
-      this.#projectName =
-        document.documentElement.getAttribute('data-project') || 'unnamed'
-      this.#localStoreRegistryName = this.#projectName
-        ? this.#projectName + '-store-registry'
-        : 'store-registry'
+      this.storage = localStorage
     }
-  }
-
-  public get projectName() {
-    return this.#projectName
-  }
-
-  public get localStoreRegistryName() {
-    return this.#localStoreRegistryName
   }
 
   public get loadedState() {
@@ -40,13 +29,11 @@ class StoreRegistry {
   public saveState() {
     const fullState = this.getState()
     const stringState = JSON.stringify(fullState)
-    localStorage.setItem(this.#localStoreRegistryName, stringState)
+    localStorage.setItem(this.name, stringState)
   }
 
   public loadState(
-    state: string | StoreRegistryState | null = localStorage.getItem(
-      this.#localStoreRegistryName
-    )
+    state: string | StoreRegistryState | null = localStorage.getItem(this.name)
   ) {
     if (state) {
       if (typeof state === 'string') {

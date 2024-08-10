@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -223,11 +223,6 @@
       "default": "./lib/store/index.js",
       "types": "./lib/store/index.d.ts"
     },
-    "./svg-path-data": {
-      "require": "./lib/svg-path-data/index.cjs",
-      "default": "./lib/svg-path-data/index.js",
-      "types": "./lib/svg-path-data/index.d.ts"
-    },
     "./theme": {
       "require": "./lib/theme/index.cjs",
       "default": "./lib/theme/index.js",
@@ -386,9 +381,6 @@
       ],
       "store": [
         "lib/store/index.d.ts"
-      ],
-      "svg-path-data": [
-        "lib/svg-path-data/index.d.ts"
       ],
       "theme": [
         "lib/theme/index.d.ts"

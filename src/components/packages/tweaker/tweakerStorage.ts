@@ -17,7 +17,7 @@ class TweakerStorage {
   #changedSizes: TweakerChangedSizes = {}
 
   constructor() {
-    this.#localStorageStudioName = storeRegistry.projectName + '-studio'
+    this.#localStorageStudioName = storeRegistry.name + '-tweaker'
   }
 
   public openPanel(key: string) {
