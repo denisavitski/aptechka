@@ -1,7 +1,6 @@
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { isBrowser } from '@packages/utils'
-import { TierResult, getGPUTier } from 'detect-gpu'
 
 export type DeviceOS =
   | 'macOS'
@@ -15,7 +14,6 @@ class Device {
   #OS = 'unknown'
   #gpu = 'unknown'
   #gpuTier = 0
-  #gpuDetection: Promise<TierResult> = null!
   #isMobile = false
   #isTouch = false
   #isWebgl = false
@@ -24,13 +22,6 @@ class Device {
 
   constructor() {
     if (isBrowser) {
-      this.#gpuDetection = getGPUTier()
-
-      this.#gpuDetection.then((v) => {
-        this.#gpu = v.gpu || 'unknown'
-        this.#gpuTier = v.tier
-      })
-
       this.resize()
       windowResizer.subscribe(this.resize, RESIZE_ORDER.DEVICE)
 
@@ -91,10 +82,6 @@ class Device {
 
   public get gpuTier() {
     return this.#gpuTier
-  }
-
-  public get gpuDetection() {
-    return this.#gpuDetection
   }
 
   public get isMobile() {

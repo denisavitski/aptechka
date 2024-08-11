@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.24.0",
+  "version": "0.25.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -238,11 +238,5 @@
     "vite": "5.4.0",
     "vite-plugin-dts": "^4.0.2",
     "vite-plugin-htmc": "^0.1.14"
-  },
-  "dependencies": {
-    "detect-gpu": "^5.0.42"
-  },
-  "peerDependencies": {
-    "detect-gpu": "^5.0.42"
   }
 }
