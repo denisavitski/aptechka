@@ -47,7 +47,6 @@ export function libConfig() {
           'order/index': './src/components/packages/order/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
-          'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
           'sequence/index': './src/components/packages/sequence/index.ts',
