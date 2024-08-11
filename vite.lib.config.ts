@@ -7,7 +7,7 @@ export function libConfig() {
   const config: UserConfig = {
     plugins: [
       dtsPlugin({
-        include: ['./src/components/packages/client'],
+        include: ['./src/components/packages'],
         copyDtsFiles: true,
         exclude: '**/playground/**',
       }),
@@ -44,12 +44,10 @@ export function libConfig() {
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
           'media/index': './src/components/packages/media/index.ts',
-          'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
-          'router/index': './src/components/packages/router/index.ts',
           'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',

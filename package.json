@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -113,11 +113,6 @@
       "default": "./lib/media/index.js",
       "types": "./lib/media/index.d.ts"
     },
-    "./morph": {
-      "require": "./lib/morph/index.cjs",
-      "default": "./lib/morph/index.js",
-      "types": "./lib/morph/index.d.ts"
-    },
     "./notifier": {
       "require": "./lib/notifier/index.cjs",
       "default": "./lib/notifier/index.js",
@@ -137,11 +132,6 @@
       "require": "./lib/popover/index.cjs",
       "default": "./lib/popover/index.js",
       "types": "./lib/popover/index.d.ts"
-    },
-    "./router": {
-      "require": "./lib/router/index.cjs",
-      "default": "./lib/router/index.js",
-      "types": "./lib/router/index.d.ts"
     },
     "./scroll": {
       "require": "./lib/scroll/index.cjs",
@@ -276,9 +266,6 @@
       "media": [
         "lib/media/index.d.ts"
       ],
-      "morph": [
-        "lib/morph/index.d.ts"
-      ],
       "notifier": [
         "lib/notifier/index.d.ts"
       ],
@@ -290,9 +277,6 @@
       ],
       "popover": [
         "lib/popover/index.d.ts"
-      ],
-      "router": [
-        "lib/router/index.d.ts"
       ],
       "scroll": [
         "lib/scroll/index.d.ts"
@@ -345,12 +329,10 @@
   },
   "dependencies": {
     "detect-gpu": "^5.0.42",
-    "three": "^0.167.1",
-    "urlpattern-polyfill": "^10.0.0"
+    "three": "^0.167.1"
   },
   "peerDependencies": {
     "detect-gpu": "^5.0.42",
-    "three": "^0.167.1",
-    "urlpattern-polyfill": "^10.0.0"
+    "three": "^0.167.1"
   }
 }

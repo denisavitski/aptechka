@@ -23,8 +23,12 @@ export function splitPath(value: string, base = '') {
   }
 }
 
-export function normalizeBase(base: string) {
+export function normalizeBase(base: string = '/') {
   if (!base.endsWith('/')) {
+    base += '/'
+  }
+
+  if (!base.startsWith('/')) {
     base += '/'
   }
 
@@ -47,8 +51,8 @@ export function changeHistory(
   const pathPlus = `${pathname}${h}${p}`
 
   if (action === 'push') {
-    history.pushState(pathPlus, '', pathPlus)
+    history.pushState(null, '', pathPlus)
   } else if (action === 'replace') {
-    history.replaceState(pathPlus, '', pathPlus)
+    history.replaceState(null, '', pathPlus)
   }
 }

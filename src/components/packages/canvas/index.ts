@@ -1,9 +1,12 @@
 import { CSSProperty } from '@packages/css-property'
+
 import {
   ElementResizerCallback,
   elementResizer,
 } from '@packages/element-resizer'
+
 import { ticker, TickerCallback } from '@packages/ticker'
+
 import { clamp, createStylesheet, isBrowser } from '@packages/utils'
 
 export interface Canvas2DRenderDetail {
