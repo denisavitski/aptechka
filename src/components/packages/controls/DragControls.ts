@@ -5,9 +5,9 @@ import {
   setupDrag,
   preciseNumber,
 } from '@packages/utils'
-import { Controls } from './Controls'
 import { ticker } from '@packages/ticker'
 import { TICK_ORDER } from '@packages/order'
+import { Controls } from './Controls'
 
 export interface DragControlsOptions {
   element?: HTMLElement
@@ -112,7 +112,9 @@ export class DragControls extends Controls {
 
         if (!this.swipe) {
           this.#delta = this.#delta * 3
-          ticker.subscribe(this.#tickListener, { order: TICK_ORDER.SCROLL - 1 })
+          ticker.subscribe(this.#tickListener, {
+            order: TICK_ORDER.CONTROLS - 1,
+          })
         }
 
         document.documentElement.classList.remove('grabbing')
