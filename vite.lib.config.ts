@@ -22,7 +22,6 @@ export function libConfig() {
         entry: {
           'animation/index': './src/components/packages/animation/index.ts',
           'attribute/index': './src/components/packages/attribute/index.ts',
-          'canvas/index': './src/components/packages/canvas/index.ts',
           'class-linked-status/index':
             './src/components/packages/class-linked-status/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',

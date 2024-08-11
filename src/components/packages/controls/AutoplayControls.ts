@@ -1,7 +1,7 @@
 import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
-import { Controls } from './Controls'
 import { Tweened } from '@packages/animation'
 import { easeInQuad } from '@packages/utils'
+import { Controls } from './Controls'
 
 export interface AutoplayControlsOptions extends TickerAddOptions {
   speed?: number
