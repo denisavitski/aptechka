@@ -1,5 +1,5 @@
 import { SelectUserElement } from './SelectUserElement'
-import { createStylesheet, element, slot } from '@packages/element-constructor'
+import { createStylesheet, element, slot } from '../element-constructor'
 import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({

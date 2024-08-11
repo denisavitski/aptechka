@@ -1,7 +1,7 @@
 import './CheckboxElement'
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { createStylesheet, element } from '@packages/element-constructor'
+import { createStylesheet, element } from './element-constructor'
 import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({

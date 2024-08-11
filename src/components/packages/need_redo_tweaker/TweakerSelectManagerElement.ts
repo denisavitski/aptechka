@@ -2,7 +2,7 @@ import './select'
 
 import { Store } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { createStylesheet, element, span } from '@packages/element-constructor'
+import { createStylesheet, element, span } from './element-constructor'
 
 import { SelectElement } from './select'
 import { aptechkaTheme } from './theme'

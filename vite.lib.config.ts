@@ -35,8 +35,6 @@ export function libConfig() {
             './src/components/packages/css-value-parser/index.ts',
           'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
-          'element-constructor/index':
-            './src/components/packages/element-constructor/index.ts',
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
           'en3/index': './src/components/packages/en3/index.ts',

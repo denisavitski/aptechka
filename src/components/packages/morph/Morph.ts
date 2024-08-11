@@ -1,4 +1,5 @@
 import { Notifier } from '@packages/notifier'
+
 import {
   ChangeHistoryAction,
   changeHistory,
@@ -6,6 +7,7 @@ import {
   normalizeBase,
   splitPath,
 } from '@packages/utils'
+
 import { Link } from './Link'
 
 export interface MorphParameters {

@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -72,11 +72,6 @@
       "require": "./lib/device/index.cjs",
       "default": "./lib/device/index.js",
       "types": "./lib/device/index.d.ts"
-    },
-    "./element-constructor": {
-      "require": "./lib/element-constructor/index.cjs",
-      "default": "./lib/element-constructor/index.js",
-      "types": "./lib/element-constructor/index.d.ts"
     },
     "./element-resizer": {
       "require": "./lib/element-resizer/index.cjs",
@@ -241,9 +236,6 @@
       ],
       "device": [
         "lib/device/index.d.ts"
-      ],
-      "element-constructor": [
-        "lib/element-constructor/index.d.ts"
       ],
       "element-resizer": [
         "lib/element-resizer/index.d.ts"

@@ -1,4 +1,4 @@
-import { createTheme, style } from '@packages/element-constructor'
+import { createTheme, style } from '../element-constructor'
 import { isBrowser } from '@packages/utils'
 
 export const aptechkaTheme = createTheme(

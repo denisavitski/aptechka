@@ -1,11 +1,6 @@
 import { Store, StoreMiddleware } from '@packages/store/Store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import {
-  createStylesheet,
-  div,
-  element,
-  input,
-} from '@packages/element-constructor'
+import { createStylesheet, div, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'
 import { clamp, nullishCoalescing, setupDrag, toStep } from '@packages/utils'
 import { elementResizer } from '@packages/element-resizer'

@@ -4,7 +4,7 @@ import {
   div,
   element,
   slot,
-} from '@packages/element-constructor'
+} from '../element-constructor'
 import {
   dispatchBeforeSizeChangeEvent,
   dispatchSizeChangeEvent,

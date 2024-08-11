@@ -1,6 +1,6 @@
 import { SelectUserElement } from './SelectUserElement'
 import { SelectOptionElement } from './SelectOptionElement'
-import { createStylesheet, element, slot } from '@packages/element-constructor'
+import { createStylesheet, element, slot } from '../element-constructor'
 import arrowIcon from '@assets/icons/arrow.svg?raw'
 import { isBrowser } from '@packages/utils'
 import { aptechkaTheme } from '../theme'

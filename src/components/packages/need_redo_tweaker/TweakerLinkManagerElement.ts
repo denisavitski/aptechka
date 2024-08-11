@@ -1,6 +1,6 @@
 import { Store } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { a, createStylesheet, element } from '@packages/element-constructor'
+import { a, createStylesheet, element } from './element-constructor'
 
 const stylesheet = createStylesheet({
   a: {

@@ -1,11 +1,6 @@
 import { Store, activeStores } from '@packages/store'
 
-import {
-  div,
-  element,
-  createStylesheet,
-  button,
-} from '@packages/element-constructor'
+import { div, element, createStylesheet, button } from './element-constructor'
 
 import copyIcon from '@assets/icons/copy.svg?raw'
 import resetIcon from '@assets/icons/reset.svg?raw'

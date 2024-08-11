@@ -5,7 +5,7 @@ import {
   element,
   input,
   label,
-} from '@packages/element-constructor'
+} from './element-constructor'
 import { Store, activeStores, storeRegistry } from '@packages/store'
 import { createJSONAndSave, debounce, setupDrag } from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
