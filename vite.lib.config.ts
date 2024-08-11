@@ -37,7 +37,6 @@ export function libConfig() {
           'device/index': './src/components/packages/device/index.ts',
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
-          'en3/index': './src/components/packages/en3/index.ts',
           'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
