@@ -36,7 +36,6 @@ export function libConfig() {
           'device/index': './src/components/packages/device/index.ts',
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
-          'image/index': './src/components/packages/image/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
@@ -48,7 +47,6 @@ export function libConfig() {
           'popover/index': './src/components/packages/popover/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
-          'sequence/index': './src/components/packages/sequence/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
@@ -56,7 +54,6 @@ export function libConfig() {
           'need_redo_tweaker/index':
             './src/components/packages/need_redo_tweaker/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
-          'video/index': './src/components/packages/video/index.ts',
           'window-resizer/index':
             './src/components/packages/window-resizer/index.ts',
         },

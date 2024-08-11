@@ -9,4 +9,3 @@ export {
   type SourceManagerSourceSet,
   type SourceManagerParameters,
 } from './SourceManager'
-export { SourceElement } from './SourceElement'

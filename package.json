@@ -73,11 +73,6 @@
       "default": "./lib/element-resizer/index.js",
       "types": "./lib/element-resizer/index.d.ts"
     },
-    "./image": {
-      "require": "./lib/image/index.cjs",
-      "default": "./lib/image/index.js",
-      "types": "./lib/image/index.d.ts"
-    },
     "./intersector": {
       "require": "./lib/intersector/index.cjs",
       "default": "./lib/intersector/index.js",
@@ -128,11 +123,6 @@
       "default": "./lib/scroll-entries/index.js",
       "types": "./lib/scroll-entries/index.d.ts"
     },
-    "./sequence": {
-      "require": "./lib/sequence/index.cjs",
-      "default": "./lib/sequence/index.js",
-      "types": "./lib/sequence/index.d.ts"
-    },
     "./slicer": {
       "require": "./lib/slicer/index.cjs",
       "default": "./lib/slicer/index.js",
@@ -162,11 +152,6 @@
       "require": "./lib/utils/index.cjs",
       "default": "./lib/utils/index.js",
       "types": "./lib/utils/index.d.ts"
-    },
-    "./video": {
-      "require": "./lib/video/index.cjs",
-      "default": "./lib/video/index.js",
-      "types": "./lib/video/index.d.ts"
     },
     "./window-resizer": {
       "require": "./lib/window-resizer/index.cjs",
@@ -212,9 +197,6 @@
       "element-resizer": [
         "lib/element-resizer/index.d.ts"
       ],
-      "image": [
-        "lib/image/index.d.ts"
-      ],
       "intersector": [
         "lib/intersector/index.d.ts"
       ],
@@ -245,9 +227,6 @@
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"
       ],
-      "sequence": [
-        "lib/sequence/index.d.ts"
-      ],
       "slicer": [
         "lib/slicer/index.d.ts"
       ],
@@ -265,9 +244,6 @@
       ],
       "utils": [
         "lib/utils/index.d.ts"
-      ],
-      "video": [
-        "lib/video/index.d.ts"
       ],
       "window-resizer": [
         "lib/window-resizer/index.d.ts"
