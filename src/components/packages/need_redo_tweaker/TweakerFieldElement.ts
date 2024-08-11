@@ -7,8 +7,8 @@ import resetIcon from '@assets/icons/reset.svg?raw'
 
 import { tweakerManagerConstructors } from './tweakerManagerConstructors'
 import { aptechkaTheme } from './theme'
-import { dispatchSizeChangeEvent } from '@packages/utils'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
+import { dispatchSizeChangeEvent } from './events'
 
 const stylesheet = createStylesheet({
   ':host': {

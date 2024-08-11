@@ -3,6 +3,7 @@ import { UserConfig } from 'vite'
 
 export function sharedConfig() {
   const config: UserConfig = {
+    plugins: [],
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',

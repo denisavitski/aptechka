@@ -5,12 +5,11 @@ import {
   element,
   slot,
 } from '../element-constructor'
+import { getElementTransitionDurationMS, isBrowser } from '@packages/utils'
 import {
   dispatchBeforeSizeChangeEvent,
   dispatchSizeChangeEvent,
-  getElementTransitionDurationMS,
-  isBrowser,
-} from '@packages/utils'
+} from '../events'
 
 const stylesheet = createStylesheet({
   ':host': {

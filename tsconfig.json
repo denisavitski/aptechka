@@ -30,7 +30,9 @@
       "@packages/*": ["src/components/packages/*"],
       "@components/*": ["src/components/*"],
       "@assets/*": ["src/assets/*"]
-    }
+    },
+
+    "jsx": "react-jsx"
   },
   "include": ["src"]
 }

@@ -1,24 +1,11 @@
-export function dispatchSizeChangeEvent(node: Node) {
-  node.dispatchEvent(
-    new CustomEvent('sizeChange', {
-      bubbles: true,
-      composed: true,
-    })
-  )
-}
-
-export function dispatchBeforeSizeChangeEvent(node: Node) {
-  node.dispatchEvent(
-    new CustomEvent('beforeSizeChange', {
-      bubbles: true,
-      composed: true,
-    })
-  )
-}
-
-declare global {
-  interface HTMLElementEventMap {
-    sizeChange: CustomEvent
-    beforeSizeChange: CustomEvent
+export function dispatchEvent<From extends HTMLElement | Window>(
+  from: From,
+  name: From extends HTMLElement ? keyof HTMLElementEventMap : WindowEventMap,
+  init?: CustomEventInit & { custom?: boolean }
+) {
+  if (init?.custom) {
+    from.dispatchEvent(new CustomEvent(name as string, init))
+  } else {
+    from.dispatchEvent(new Event(name as string, init))
   }
 }
