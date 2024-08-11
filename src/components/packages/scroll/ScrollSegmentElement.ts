@@ -8,9 +8,9 @@ import {
 import { step } from '@packages/utils/math'
 import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
-import { ScrollUserElement } from './ScrollUserElement'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'
+import { ScrollUserElement } from './ScrollUserElement'
 
 export interface ScrollSegmentResizeDetail {
   start: number

@@ -1,5 +1,4 @@
 import { PopoverElement } from './PopoverElement'
-import { element } from '@packages/element-constructor'
 import { isBrowser } from '@packages/utils'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
@@ -11,30 +10,30 @@ export class PopoverButtonElement extends HTMLElement {
     super()
 
     if (isBrowser) {
-      element(this, {
-        tabindex: this.getAttribute('tabindex') || '0',
-        onClick: () => {
-          if (this.#popoverElement) {
-            const type = this.getAttribute('type') || 'open'
+      this.tabIndex = parseInt(this.getAttribute('tabindex') || '0')
 
-            if (
-              type === 'open' ||
-              (type === 'toggle' && !this.#popoverElement.opened.current)
-            ) {
-              this.#popoverElement.open()
-            } else if (
-              type === 'close' ||
-              (type === 'toggle' && this.#popoverElement.opened.current)
-            ) {
-              this.#popoverElement.close()
-            }
+      this.addEventListener('click', () => {
+        if (this.#popoverElement) {
+          const type = this.getAttribute('type') || 'open'
+
+          if (
+            type === 'open' ||
+            (type === 'toggle' && !this.#popoverElement.opened.current)
+          ) {
+            this.#popoverElement.open()
+          } else if (
+            type === 'close' ||
+            (type === 'toggle' && this.#popoverElement.opened.current)
+          ) {
+            this.#popoverElement.close()
           }
-        },
-        onKeydown: (e) => {
-          if (e.code === 'Space') {
-            ;(e.currentTarget as HTMLElement).click()
-          }
-        },
+        }
+      })
+
+      this.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          ;(e.currentTarget as HTMLElement).click()
+        }
       })
     }
   }

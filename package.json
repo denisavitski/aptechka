@@ -88,31 +88,6 @@
       "default": "./lib/en3/index.js",
       "types": "./lib/en3/index.d.ts"
     },
-    "./en3/helpers": {
-      "require": "./lib/en3/helpers/index.cjs",
-      "default": "./lib/en3/helpers/index.js",
-      "types": "./lib/en3/helpers/index.d.ts"
-    },
-    "./en3/libs": {
-      "require": "./lib/en3/libs/index.cjs",
-      "default": "./lib/en3/libs/index.js",
-      "types": "./lib/en3/libs/index.d.ts"
-    },
-    "./en3/loaders": {
-      "require": "./lib/en3/loaders/index.cjs",
-      "default": "./lib/en3/loaders/index.js",
-      "types": "./lib/en3/loaders/index.d.ts"
-    },
-    "./en3/misc": {
-      "require": "./lib/en3/misc/index.cjs",
-      "default": "./lib/en3/misc/index.js",
-      "types": "./lib/en3/misc/index.d.ts"
-    },
-    "./en3/utils": {
-      "require": "./lib/en3/utils/index.cjs",
-      "default": "./lib/en3/utils/index.js",
-      "types": "./lib/en3/utils/index.d.ts"
-    },
     "./image": {
       "require": "./lib/image/index.cjs",
       "default": "./lib/image/index.js",

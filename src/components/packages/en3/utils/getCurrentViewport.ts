@@ -1,5 +1,5 @@
 import { OrthographicCamera, Vector3 } from 'three'
-import { en3 } from '../core/en3'
+import { en3 } from '../en3'
 
 const tempTarget = new Vector3()
 const position = new Vector3()

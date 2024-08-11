@@ -1,48 +1,8 @@
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
-import { isBrowser, setupDrag } from '@packages/utils'
-import {
-  createStylesheet,
-  div,
-  element,
-  slot,
-} from '@packages/element-constructor'
+import { createStylesheet, isBrowser, setupDrag } from '@packages/utils'
 import { elementResizer } from '@packages/element-resizer'
 import { ScrollUserElement } from './ScrollUserElement'
-
-const stylesheet = createStylesheet({
-  ':host': {
-    display: 'inline-block',
-    zIndex: '1',
-    backgroundColor: '#ebebeb',
-  },
-
-  ':host([axis="y"])': {
-    position: 'absolute',
-    right: '0',
-    top: '0',
-    width: '1vmin',
-    height: '100%',
-  },
-
-  ':host([axis="x"])': {
-    position: 'absolute',
-    left: '0',
-    bottom: '0',
-    width: '100%',
-    height: '1vmin',
-  },
-
-  '.default-thumb': {
-    backgroundColor: 'black',
-    borderRadius: '1vmin',
-    touchAction: 'none',
-  },
-
-  '::slotted(*)': {
-    touchAction: 'none',
-  },
-})
 
 export class ScrollbarElement extends ScrollUserElement {
   #slotElement: HTMLSlotElement = null!
@@ -60,18 +20,49 @@ export class ScrollbarElement extends ScrollUserElement {
 
     if (isBrowser) {
       const shadow = this.attachShadow({ mode: 'open' })
-      shadow.adoptedStyleSheets.push(stylesheet)
 
-      element(this, {
-        slot: 'static',
-        'drag-dead-zone': '',
-        children: [
-          slot({
-            ref: (e) => (this.#slotElement = e),
-            children: div({ class: 'default-thumb' }),
-          }),
-        ],
-      })
+      shadow.adoptedStyleSheets.push(
+        createStylesheet({
+          ':host': {
+            display: 'inline-block',
+            zIndex: '1',
+            backgroundColor: '#ebebeb',
+          },
+
+          ':host([axis="y"])': {
+            position: 'absolute',
+            right: '0',
+            top: '0',
+            width: '1vmin',
+            height: '100%',
+          },
+
+          ':host([axis="x"])': {
+            position: 'absolute',
+            left: '0',
+            bottom: '0',
+            width: '100%',
+            height: '1vmin',
+          },
+
+          '.default-thumb': {
+            backgroundColor: 'black',
+            borderRadius: '0.3vmin',
+            touchAction: 'none',
+          },
+
+          '::slotted(*)': {
+            touchAction: 'none',
+          },
+        })
+      )
+
+      this.setAttribute('drag-dead-zone', '')
+
+      this.#slotElement = document.createElement('slot')
+      this.#slotElement.innerHTML = `<div class="default-thumb"></div>`
+
+      shadow.appendChild(this.#slotElement)
     }
   }
 
@@ -170,7 +161,7 @@ export class ScrollbarElement extends ScrollUserElement {
       }
     )
 
-    const startValue = this.scrollElement.targetScrollValue
+    const startValue = this.scrollElement.damped.target
     const grabCursor = this.#isHorisontal ? grabEvent.x : grabEvent.y
   }
 }

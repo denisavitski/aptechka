@@ -4,7 +4,6 @@ import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'
-import { en3Cache } from './en3Cache'
 import { En3Raycaster } from './En3Raycaster'
 import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 
@@ -13,7 +12,6 @@ export interface En3Options {
   maxPixelRatio?: number
   containerElement?: ElementOrSelector<HTMLElement>
   view?: En3ViewOptions
-  cacheAssets?: boolean
   zIndex?: number
   composer?: typeof EffectComposer
 }
@@ -84,10 +82,6 @@ class En3 {
     return this.#pixelRatio
   }
 
-  public get cacheAssets() {
-    return this.#cacheAssets
-  }
-
   public get composer() {
     return this.#composer
   }
@@ -137,8 +131,6 @@ class En3 {
       }
     }
 
-    this.#cacheAssets = options?.cacheAssets || false
-
     this.#isCreated = true
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.EN3)
@@ -169,12 +161,6 @@ class En3 {
     this.#composer = null!
 
     this.#isCreated = false
-
-    en3Cache.forEach((v) => {
-      v.dispose()
-    })
-
-    en3Cache.clear()
   }
 
   public createView(viewName: string, viewOptions?: En3ViewOptions) {

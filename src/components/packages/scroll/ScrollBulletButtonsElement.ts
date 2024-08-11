@@ -1,26 +1,28 @@
-import { debounce } from '@packages/utils'
+import { debounce, isBrowser } from '@packages/utils'
 import { ScrollBehaviour, ScrollElement } from './ScrollElement'
 import { ScrollUserElement } from './ScrollUserElement'
 
 class BulletButton {
-  #element: HTMLButtonElement
-  #scrollElement: ScrollElement
-  #index: number
-  #behaviour: ScrollBehaviour
+  #element: HTMLButtonElement = null!
+  #scrollElement: ScrollElement = null!
+  #index: number = null!
+  #behaviour: ScrollBehaviour = null!
 
   constructor(
     scrollElement: ScrollElement,
     index: number,
     behaviour: ScrollBehaviour
   ) {
-    this.#element = document.createElement('button')
-    this.#scrollElement = scrollElement
-    this.#behaviour = behaviour
-    this.#index = index
+    if (isBrowser) {
+      this.#element = document.createElement('button')
+      this.#scrollElement = scrollElement
+      this.#behaviour = behaviour
+      this.#index = index
 
-    this.#element.addEventListener('click', this.#clickListener)
-    this.#scrollElement.counter.subscribe(this.#counterChangeListener)
-    this.#counterChangeListener()
+      this.#element.addEventListener('click', this.#clickListener)
+      this.#scrollElement.counter.subscribe(this.#counterChangeListener)
+      this.#counterChangeListener()
+    }
   }
 
   public get element() {

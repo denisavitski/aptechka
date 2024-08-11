@@ -1,25 +1,17 @@
 import { cssValueParser } from '@packages/css-value-parser'
 import { RESIZE_ORDER } from '@packages/order'
-import {
-  Store,
-  StoreCallback,
-  StoreManagerType,
-  StoreOptions,
-} from '@packages/store'
+import { Store, StoreCallback, StoreOptions } from '@packages/store'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
 
-export interface CSSPropertyOptions<
-  StoreType extends number | boolean | string,
-  StoreManager extends StoreManagerType = StoreManagerType
-> extends StoreOptions<StoreType, StoreManager> {
+export interface CSSPropertyOptions<StoreType extends number | boolean | string>
+  extends StoreOptions<StoreType> {
   rawValueCheck?: boolean
 }
 
 export class CSSProperty<
-  StoreType extends number | boolean | string,
-  StoreManager extends StoreManagerType = StoreManagerType
-> extends Store<StoreType, StoreManager> {
+  StoreType extends number | boolean | string
+> extends Store<StoreType> {
   #element: HTMLElement
   #property: string
   #currentRawValue: string
@@ -30,7 +22,7 @@ export class CSSProperty<
     elementOrSelector: ElementOrSelector<HTMLElement>,
     property: string,
     defaultValue: StoreType,
-    options?: CSSPropertyOptions<StoreType, StoreManager>
+    options?: CSSPropertyOptions<StoreType>
   ) {
     super(defaultValue, options)
 

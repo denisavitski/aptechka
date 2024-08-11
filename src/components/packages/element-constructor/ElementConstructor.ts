@@ -20,13 +20,11 @@ export type ElementConstructorTagNameMap = HTMLElementTagNameMap &
 
 export type ElementConstructorTagNames = keyof ElementConstructorTagNameMap
 
-export type ElementConstructorStringStoreClass =
-  | Store<any, any>
-  | Store<any, any>
+export type ElementConstructorStringStoreClass = Store<any> | Store<any>
 
 export type ElementConstructorStringArrayStoreClass =
-  | Store<Array<any>, any>
-  | Store<Array<any>, any>
+  | Store<Array<any>>
+  | Store<Array<any>>
 
 export type ElementConstructorClass =
   | string
@@ -39,7 +37,7 @@ export type ElementConstructorClass =
     >
   | ElementConstructorStringStoreClass
   | ElementConstructorStringArrayStoreClass
-  | { [key: string]: boolean | Store<boolean, any> }
+  | { [key: string]: boolean | Store<boolean> }
 
 export type ElementConstructorStyleToken = Exclude<
   Extract<keyof CSSStyleDeclaration, string> | `--${string}` | `-${string}`,

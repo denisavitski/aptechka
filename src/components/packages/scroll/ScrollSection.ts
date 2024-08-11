@@ -1,10 +1,12 @@
 import { scrollEntries } from '@packages/scroll-entries'
-import { ScrollElement } from './ScrollElement'
+
 import {
   getCumulativeOffsetTop,
   getCumulativeOffsetLeft,
   clamp,
 } from '@packages/utils'
+
+import { ScrollElement } from './ScrollElement'
 
 export type ScrollSectionMark = 'current' | 'previous' | 'next' | null
 

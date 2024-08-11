@@ -8,7 +8,7 @@ import {
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { scrollEntries } from '@packages/scroll-entries'
-import { Derived, Store } from '@packages/store'
+import { Store } from '@packages/store'
 import {
   getCumulativeOffsetTop,
   getCumulativeOffsetLeft,
@@ -17,13 +17,8 @@ import {
   clamp,
   EasingFunction,
   easeInOutExpo,
-} from '@packages/utils'
-import {
   createStylesheet,
-  div,
-  element,
-  slot,
-} from '@packages/element-constructor'
+} from '@packages/utils'
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
@@ -186,25 +181,18 @@ export class ScrollElement extends HTMLElement {
       const shadow = this.attachShadow({ mode: 'open' })
       shadow.adoptedStyleSheets.push(stylesheet)
 
-      element(this, {
-        tabIndex: 0,
-        children: [
-          div({
-            class: 'static',
-            children: [slot({ name: 'static' })],
-          }),
-          div({
-            class: 'content',
-            children: [slot({ ref: (e) => (this.#slotElement = e) })],
-            style: {
-              flexDirection: new Derived(this.#axisCSSProperty, (e) =>
-                e === 'x' ? 'row' : 'column'
-              ),
-            },
-            ref: (e) => (this.#contentElement = e),
-          }),
-        ],
-      })
+      this.tabIndex = 0
+
+      const staticElement = document.createElement('div')
+      staticElement.className = 'static'
+      staticElement.innerHTML = '<slot name="static"></slot>'
+      shadow.appendChild(staticElement)
+
+      this.#contentElement = document.createElement('div')
+      this.#contentElement.className = 'content'
+      this.#slotElement = document.createElement('slot')
+      this.#contentElement.appendChild(this.#slotElement)
+      shadow.appendChild(this.#contentElement)
 
       this.#wheelControls = new WheelControls({ element: this.#contentElement })
       this.#wheelControls.changeEvent.subscribe(

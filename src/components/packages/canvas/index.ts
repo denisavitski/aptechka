@@ -4,7 +4,7 @@ import {
   elementResizer,
 } from '@packages/element-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
-import { clamp, isBrowser } from '@packages/utils'
+import { clamp, createStylesheet, isBrowser } from '@packages/utils'
 
 export interface Canvas2DRenderDetail {
   pixelRatio: number
@@ -36,18 +36,17 @@ export class CanvasElement extends HTMLElement {
     super()
 
     if (isBrowser) {
-      const styleSheet = new CSSStyleSheet()
-
-      styleSheet.replaceSync(`
-        :host, canvas {
-          display: block;
-          width: 100%;
-          height: 100%;
-        }
-      `)
-
       const shadow = this.attachShadow({ mode: 'open' })
-      shadow.adoptedStyleSheets.push(styleSheet)
+
+      shadow.adoptedStyleSheets.push(
+        createStylesheet({
+          ' :host, canvas': {
+            display: 'block',
+            width: '100%',
+            height: '100%',
+          },
+        })
+      )
 
       this.#canvasElement = document.createElement('canvas')
       this.#context = this.#canvasElement.getContext('2d')!
