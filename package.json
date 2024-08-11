@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -108,11 +108,6 @@
       "default": "./lib/order/index.js",
       "types": "./lib/order/index.d.ts"
     },
-    "./popover": {
-      "require": "./lib/popover/index.cjs",
-      "default": "./lib/popover/index.js",
-      "types": "./lib/popover/index.d.ts"
-    },
     "./scroll-entries": {
       "require": "./lib/scroll-entries/index.cjs",
       "default": "./lib/scroll-entries/index.js",
@@ -207,9 +202,6 @@
       ],
       "order": [
         "lib/order/index.d.ts"
-      ],
-      "popover": [
-        "lib/popover/index.d.ts"
       ],
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"

@@ -43,7 +43,6 @@ export function libConfig() {
           'media/index': './src/components/packages/media/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
-          'popover/index': './src/components/packages/popover/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
           'source/index': './src/components/packages/source/index.ts',
