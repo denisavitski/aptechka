@@ -5,7 +5,7 @@ import {
   setupDrag,
   preciseNumber,
 } from '@packages/utils'
-import { ticker } from '@packages/ticker'
+import { ticker } from '@packages/ticker/vanilla'
 import { TICK_ORDER } from '@packages/order'
 import { Controls } from './Controls'
 

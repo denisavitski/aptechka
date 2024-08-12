@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { activeStores } from '@packages/store'
-import { ticker } from '@packages/ticker'
+import { ticker } from '@packages/ticker/vanilla'
 
 export function devMode() {
   ticker.subscribe(() => {

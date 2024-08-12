@@ -3,20 +3,6 @@ import { debounce, isBrowser } from '@packages/utils'
 
 export type WindowResizerCallback = () => void
 
-export const dispatchWindowResizeEvent = debounce((cause?: any) => {
-  if (cause) {
-    window.dispatchEvent(
-      new CustomEvent('resize', {
-        detail: {
-          cause: cause,
-        },
-      })
-    )
-  } else {
-    window.dispatchEvent(new Event('resize'))
-  }
-}, 0)
-
 export class WindowResizer extends Notifier<WindowResizerCallback> {
   #isResizeScheduled = false
 

@@ -3,7 +3,7 @@ import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, div, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'
 import { clamp, nullishCoalescing, setupDrag, toStep } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer'
+import { elementResizer } from '@packages/element-resizer/vanilla'
 
 const stylesheet = createStylesheet({
   ':host': {

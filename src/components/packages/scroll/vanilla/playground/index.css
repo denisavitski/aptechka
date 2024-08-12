@@ -1,0 +1,19 @@
+.reviews {
+  --gap: 5rem;
+  --sections-in-view: 1;
+  --axis: y;
+  --controls: true;
+  --classes: true;
+  --current-index-start-offset: 1;
+  --current-index-end-offset: -1;
+  --damping: 10;
+  --loop: true;
+  --controls: true;
+
+  border: 0.1rem solid red;
+
+  overflow: hidden;
+}
+.s {
+  height: 500vh;
+}

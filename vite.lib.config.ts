@@ -34,25 +34,39 @@ export function libConfig() {
             './src/components/packages/css-value-parser/index.ts',
           'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
-          'element-resizer/index':
-            './src/components/packages/element-resizer/index.ts',
-          'intersector/index': './src/components/packages/intersector/index.ts',
+          'element-resizer/vanilla/index':
+            './src/components/packages/element-resizer/vanilla/index.ts',
+          'element-resizer/react/index':
+            './src/components/packages/element-resizer/react/index.ts',
+          'intersector/vanilla/index':
+            './src/components/packages/intersector/vanilla/index.ts',
+          'intersector/react/index':
+            './src/components/packages/intersector/react/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
           'media/index': './src/components/packages/media/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
+          'scroll/vanilla/index':
+            './src/components/packages/scroll/vanilla/index.ts',
+          'scroll/react/index':
+            './src/components/packages/scroll/react/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
-          'ticker/index': './src/components/packages/ticker/index.ts',
+          'ticker/vanilla/index':
+            './src/components/packages/ticker/vanilla/index.ts',
+          'ticker/react/index':
+            './src/components/packages/ticker/react/index.ts',
           'need_redo_tweaker/index':
             './src/components/packages/need_redo_tweaker/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
-          'window-resizer/index':
-            './src/components/packages/window-resizer/index.ts',
+          'window-resizer/vanilla/index':
+            './src/components/packages/window-resizer/vanilla/index.ts',
+          'window-resizer/react/index':
+            './src/components/packages/window-resizer/react/index.ts',
         },
         formats: ['es', 'cjs'],
         fileName: (format, entryName) =>

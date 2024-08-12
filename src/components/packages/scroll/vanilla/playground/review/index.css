@@ -1,0 +1,10 @@
+.review {
+  position: relative;
+
+  width: 100%;
+  height: 100vh;
+
+  will-change: transform;
+
+  background-color: lightblue;
+}

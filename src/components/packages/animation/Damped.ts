@@ -1,4 +1,4 @@
-import { TickerCallbackEntry } from '@packages/ticker'
+import { TickerCallbackEntry } from '@packages/ticker/vanilla'
 import { damp, nullishCoalescing, preciseNumber } from '@packages/utils'
 import {
   Animation,

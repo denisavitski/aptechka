@@ -4,7 +4,7 @@ import {
   TickerCallback,
   TickerCallbackEntry,
   ticker,
-} from '@packages/ticker'
+} from '@packages/ticker/vanilla'
 import {
   ElementOrSelector,
   clamp,

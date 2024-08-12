@@ -1,5 +1,5 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer'
+import { windowResizer } from '@packages/window-resizer/vanilla'
 import { isBrowser } from '@packages/utils'
 
 export type DeviceOS =

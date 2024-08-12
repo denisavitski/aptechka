@@ -3,7 +3,7 @@ import { Ladder } from '@packages/ladder'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { StoreCallback } from '@packages/store'
-import { ticker } from '@packages/ticker'
+import { ticker } from '@packages/ticker/vanilla'
 import {
   ElementOrSelector,
   Axes3D,
@@ -13,8 +13,8 @@ import {
   getCumulativeOffsetTop,
   getElement,
 } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer'
-import { windowResizer } from '@packages/window-resizer'
+import { elementResizer } from '@packages/element-resizer/vanilla'
+import { windowResizer } from '@packages/window-resizer/vanilla'
 import { Notifier } from '@packages/notifier'
 
 export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {

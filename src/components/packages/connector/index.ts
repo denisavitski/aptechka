@@ -1,5 +1,5 @@
 import { TICK_ORDER } from '@packages/order'
-import { ticker, TickerCallback } from '@packages/ticker'
+import { ticker, TickerCallback } from '@packages/ticker/vanilla'
 
 export type ConnectorConnectCallback<T extends Node = Node> = (node: T) => void
 export type ConnectorDisconnectCallback<T extends Node = Node> = (
