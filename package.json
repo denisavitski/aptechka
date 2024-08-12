@@ -103,6 +103,16 @@
       "default": "./lib/media/index.js",
       "types": "./lib/media/index.d.ts"
     },
+    "./media-elements": {
+      "require": "./lib/media-elements/index.cjs",
+      "default": "./lib/media-elements/index.js",
+      "types": "./lib/media-elements/index.d.ts"
+    },
+    "./morph": {
+      "require": "./lib/morph/index.cjs",
+      "default": "./lib/morph/index.js",
+      "types": "./lib/morph/index.d.ts"
+    },
     "./notifier": {
       "require": "./lib/notifier/index.cjs",
       "default": "./lib/notifier/index.js",
@@ -228,6 +238,12 @@
       "media": [
         "lib/media/index.d.ts"
       ],
+      "media-elements": [
+        "lib/media-elements/index.d.ts"
+      ],
+      "morph": [
+        "lib/morph/index.d.ts"
+      ],
       "notifier": [
         "lib/notifier/index.d.ts"
       ],
@@ -274,13 +290,13 @@
   },
   "devDependencies": {
     "@types/node": "^22.2.0",
+    "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
     "tsx": "^4.17.0",
     "vite": "5.4.0",
     "vite-plugin-dts": "^4.0.2",
-    "vite-plugin-htmc": "0.1.15",
-    "@vitejs/plugin-react": "^4.3.1",
-    "@types/react": "^18.3.3"
+    "vite-plugin-htmc": "0.1.15"
   },
   "dependencies": {
     "react": "^18.3.1",

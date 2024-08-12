@@ -46,6 +46,9 @@ export function libConfig() {
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
           'media/index': './src/components/packages/media/index.ts',
+          'media-elements/index':
+            './src/components/packages/media-elements/index.ts',
+          'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
           'scroll/vanilla/index':
