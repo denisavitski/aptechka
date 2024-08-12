@@ -1,3 +1,5 @@
+'use client'
+
 import { Ref, useEffect } from 'react'
 import { ticker, TickerAddOptions, TickerCallback } from '../vanilla'
 

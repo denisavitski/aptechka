@@ -36,6 +36,7 @@ export function libConfig() {
           'device/index': './src/components/packages/device/index.ts',
           'element-resizer/vanilla/index':
             './src/components/packages/element-resizer/vanilla/index.ts',
+          'en3/index': './src/components/packages/en3/index.ts',
           'element-resizer/react/index':
             './src/components/packages/element-resizer/react/index.ts',
           'intersector/vanilla/index':
@@ -51,12 +52,15 @@ export function libConfig() {
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
+          'pointer/index': './src/components/packages/pointer/index.ts',
+          'router/index': './src/components/packages/router/index.ts',
           'scroll/vanilla/index':
             './src/components/packages/scroll/vanilla/index.ts',
           'scroll/react/index':
             './src/components/packages/scroll/react/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
+          'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/index': './src/components/packages/store/index.ts',
           'ticker/vanilla/index':

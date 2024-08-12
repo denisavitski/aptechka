@@ -1,3 +1,5 @@
+'use client'
+
 import { Ref, useEffect } from 'react'
 import { intersector, IntersectorCallback } from '../vanilla'
 import { ElementOrSelector } from '@packages/utils'
