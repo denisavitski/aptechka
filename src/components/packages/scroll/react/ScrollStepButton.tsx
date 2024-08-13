@@ -6,7 +6,7 @@ import {
 } from '@packages/scroll/vanilla'
 import { ReactCustomElement } from '@packages/utils'
 
-export type ReactScrollStepButtonElement = ReactCustomElement<
+export type ReactScrollStepButton = ReactCustomElement<
   ScrollStepButtonElement,
   {
     step?: number | string
@@ -14,9 +14,7 @@ export type ReactScrollStepButtonElement = ReactCustomElement<
   }
 >
 
-export const ScrollStepButton: React.FC<ReactScrollStepButtonElement> = (
-  props
-) => {
+export const ScrollStepButton: React.FC<ReactScrollStepButton> = (props) => {
   return (
     <e-scroll-step-button
       {...props}
@@ -29,7 +27,7 @@ export const ScrollStepButton: React.FC<ReactScrollStepButtonElement> = (
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'e-scroll-step-button': ReactScrollStepButtonElement
+      'e-scroll-step-button': ReactScrollStepButton
     }
   }
 }

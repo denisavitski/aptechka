@@ -7,7 +7,7 @@ import {
 
 import { ReactCustomElement } from '@packages/utils'
 
-export type ReactScrollSetButtonElement = ReactCustomElement<
+export type ReactScrollSetButton = ReactCustomElement<
   ScrollSetButtonElement,
   {
     index?: number | string
@@ -15,9 +15,7 @@ export type ReactScrollSetButtonElement = ReactCustomElement<
   }
 >
 
-export const ScrollSetButton: React.FC<ReactScrollSetButtonElement> = (
-  props
-) => {
+export const ScrollSetButton: React.FC<ReactScrollSetButton> = (props) => {
   return (
     <e-scroll-set-button
       {...props}
@@ -30,7 +28,7 @@ export const ScrollSetButton: React.FC<ReactScrollSetButtonElement> = (
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      'e-scroll-set-button': ReactScrollSetButtonElement
+      'e-scroll-set-button': ReactScrollSetButton
     }
   }
 }

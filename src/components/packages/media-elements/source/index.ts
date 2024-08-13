@@ -1,8 +1,8 @@
-import { loading } from '@packages/loading'
 import { SourceManager, type Source } from '@packages/source'
 import { ClassLinkedStatus } from '@packages/class-linked-status'
 import { isBrowser, kebabToCamel } from '@packages/utils'
 import { dispatchEvent } from '@packages/utils'
+import { loading } from '@packages/loading'
 
 let id = 0
 
@@ -30,7 +30,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   constructor() {
     super()
 
-    if (isBrowser) {
+    if (isBrowser && window.IntersectionObserver) {
       this.#id = `source-consumer-${++id}`
       this.#intersectionObserver = new IntersectionObserver(
         this.#intersectionListener
@@ -137,7 +137,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.consumeSource(url)
 
       if (!this.#isLazy && !this.#isFirstLoadHappened) {
-        loading.setTotal(this.#id, 1)
+        loading.add(this.#id)
       }
 
       this.#consumerElement.onloadeddata = () => {
@@ -192,7 +192,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
-      loading.setLoaded(this.#id, 1)
+      loading.complete(this.#id)
     }
 
     this.#isFirstLoadHappened = true
@@ -204,7 +204,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
-      loading.setError(this.#id, url)
+      loading.error(this.#id)
     }
 
     this.#isFirstLoadHappened = true

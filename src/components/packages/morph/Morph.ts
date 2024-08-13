@@ -9,6 +9,7 @@ import {
 } from '@packages/utils'
 
 import { Link } from './Link'
+import { loading } from '@packages/loading'
 
 export interface MorphParameters {
   base?: string
@@ -123,6 +124,8 @@ export class Morph {
     const isCached = this.#cache.has(pathname)
 
     try {
+      loading.add('__morph')
+
       let isOkToSwitch = true
 
       this.#beforeNavigationEvent.notify({
@@ -274,6 +277,7 @@ export class Morph {
 
       this.postprocessor?.({ pathname, isCached })
       this.#afterNavigationEvent.notify({ pathname, isCached })
+      loading.complete('__morph')
     } catch (e) {
       console.error(e)
     }

@@ -1,131 +1,90 @@
-import { Notifier } from '@packages/notifier'
-import { debounce } from '@packages/utils'
+import { debounce, dispatchEvent } from '@packages/utils'
 
-export interface LoadingProgressDetail {
-  loaded: number
-  total: number
-  progress: number
-  namespace: string
+export interface LoadingEvents {
+  loadingProgress: CustomEvent<{
+    total: number
+    loaded: number
+    progress: number
+  }>
+  loadingStart: CustomEvent<{}>
+  loadingComplete: CustomEvent<{
+    total: number
+  }>
 }
-
-export interface LoadingErrorDetail {
-  namespace: string
-  url: string
-}
-
-export interface LoadingCompleteDetail {
-  total: number
-}
-
-export type LoadingProgressSubscriber = (detail: LoadingProgressDetail) => void
-export type LoadingErrorSubscriber = (detail: LoadingErrorDetail) => void
-export type LoadingCompleteSubscriber = (detail: LoadingCompleteDetail) => void
 
 class Loading {
-  #counter: Map<string, { total: number; loaded: number }> = new Map()
-  #progressEvent = new Notifier<LoadingProgressSubscriber>()
-  #completeEvent = new Notifier<LoadingCompleteSubscriber>()
-  #errorEvent = new Notifier<LoadingErrorSubscriber>()
-  #isComplete = false
+  #map = new Map<string, boolean>()
+  #isStarted = false
 
-  public get progressEvent() {
-    return this.#progressEvent
+  public add(resourceName: string) {
+    this.#map.set(resourceName, false)
+    this.#start()
   }
 
-  public get completeEvent() {
-    return this.#completeEvent
+  public complete(resourceName: string) {
+    this.#map.set(resourceName, true)
+    this.#check()
   }
 
-  public get errorEvent() {
-    return this.#errorEvent
-  }
-
-  public get _counter() {
-    return this.#counter
-  }
-
-  public get isComplete() {
-    return this.#isComplete
-  }
-
-  public reset() {
-    this.#isComplete = false
-    this.#counter.clear()
-  }
-
-  public setTotal(namespace: string, total: number = 1) {
-    if (this.#isComplete) {
-      return
+  public error(resourceName: string) {
+    if (this.#map.has(resourceName)) {
+      console.error(`Failed to load ${resourceName}`)
+      this.#map.delete(resourceName)
     }
 
-    this.#counter.set(namespace, { loaded: 0, total: total })
+    this.#check()
   }
 
-  public setLoaded(namespace: string, loaded: number = 1) {
-    if (this.#isComplete) {
-      return
-    }
+  #start = debounce(() => {
+    if (!this.#isStarted) {
+      this.#isStarted = true
 
-    if (this.#counter.has(namespace)) {
-      const ns = this.#counter.get(namespace)!
-
-      if (ns.loaded !== loaded) {
-        this.#counter.set(namespace, { ...ns, loaded: loaded })
-        this.#progressListener(namespace)
-      }
-    }
-  }
-
-  public setError(namespace: string, url: string) {
-    if (this.#isComplete) {
-      return
-    }
-
-    if (this.#counter.has(namespace)) {
-      const ns = this.#counter.get(namespace)!
-      this.#counter.set(namespace, { ...ns, total: ns.total - 1 })
-      this.#errorEvent.notify({
-        namespace,
-        url,
+      dispatchEvent(window, 'loadingStart', {
+        detail: {},
       })
+
+      this.#check()
     }
-  }
+  }, 0)
 
-  public getStats() {
-    return Array.from(this.#counter).reduce(
-      (p, c) => {
-        return { loaded: p.loaded + c[1].loaded, total: p.total + c[1].total }
+  #check = () => {
+    if (!this.#isStarted) {
+      return
+    }
+
+    const total = this.#map.size
+    const loaded = Array.from(this.#map).filter((item) => item[1]).length
+
+    const progress = loaded / total
+
+    dispatchEvent(window, 'loadingProgress', {
+      detail: {
+        total,
+        loaded,
+        progress,
       },
-      { loaded: 0, total: 0 }
-    )
-  }
-
-  #progressListener = (namespace: string) => {
-    const { loaded, total } = this.getStats()
-
-    this.#progressEvent.notify({
-      progress: loaded / total,
-      loaded,
-      total,
-      namespace,
     })
 
-    this.#tryComplete()
+    if (progress === 1) {
+      this.#complete()
+    }
   }
 
-  #tryComplete = debounce(() => {
-    const { loaded, total } = this.getStats()
+  #complete = debounce(() => {
+    this.#isStarted = false
 
-    if (loaded === total) {
-      this.#isComplete = true
+    dispatchEvent(window, 'loadingComplete', {
+      detail: {
+        total: this.#map.size,
+      },
+    })
 
-      const { total } = this.getStats()
-
-      this.#completeEvent.notify({
-        total,
-      })
-    }
-  }, 150)
+    this.#map.clear()
+  }, 0)
 }
 
 export const loading = new Loading()
+
+declare global {
+  interface WindowEventMap extends LoadingEvents {}
+}

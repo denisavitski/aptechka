@@ -1,7 +1,19 @@
-export function dispatchEvent(
+export function dispatchEvent<
+  K extends keyof HTMLElementEventMap | keyof WindowEventMap
+>(
   from: HTMLElement | Window,
-  name: keyof HTMLElementEventMap | keyof WindowEventMap,
-  init?: CustomEventInit & { custom?: boolean }
+  name: K,
+  init?: CustomEventInit<
+    K extends keyof HTMLElementEventMap
+      ? HTMLElementEventMap[K] extends CustomEvent<any>
+        ? HTMLElementEventMap[K]['detail']
+        : unknown
+      : K extends keyof WindowEventMap
+      ? WindowEventMap[K] extends CustomEvent<any>
+        ? WindowEventMap[K]['detail']
+        : unknown
+      : unknown
+  > & { custom?: boolean }
 ) {
   if (init?.custom || init?.detail) {
     from.dispatchEvent(new CustomEvent(name as string, init))

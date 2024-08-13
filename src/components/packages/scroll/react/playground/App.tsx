@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Scroll, useScroll } from '../Scroll'
 import { Scrollbar } from '../Scrollbar'
 import { ScrollBulletButtons } from '../ScrollBulletButtons'

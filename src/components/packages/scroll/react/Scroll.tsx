@@ -3,14 +3,7 @@
 import '@packages/scroll/vanilla'
 import { ScrollElement } from '@packages/scroll/vanilla'
 import { ReactCustomElement } from '@packages/utils'
-import {
-  createContext,
-  forwardRef,
-  MutableRefObject,
-  RefObject,
-  useContext,
-  useRef,
-} from 'react'
+import { createContext, forwardRef, RefObject, useContext, useRef } from 'react'
 
 export type ReactScroll = ReactCustomElement<ScrollElement>
 
