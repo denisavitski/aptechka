@@ -9,10 +9,7 @@ const t1 = new Tweened(0, {
   easing: easeInOutExpo,
 })
 
-const t2 = new Damped(0, {
-  min: 0,
-  max: 1,
-})
+const t2 = new Damped(0, {})
 
 t1.subscribe((e) => {
   box1.style.transform = `rotate(${e.current}deg)`
