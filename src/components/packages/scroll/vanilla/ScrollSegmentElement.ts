@@ -66,6 +66,11 @@ export class ScrollSegmentElement extends ScrollUserElement {
   )
   #passedVarCSSProperty = new CSSProperty<string>(this, '--passed-var', '')
   #progressVarCSSProperty = new CSSProperty<string>(this, '--progress-var', '')
+  #animationVarTypeCSSProperty = new CSSProperty<'current' | 'target'>(
+    this,
+    '--animation-var-type',
+    'current'
+  )
   #distanceVarCSSProperty = new CSSProperty<string>(this, '--distance-var', '')
   #startVarCSSProperty = new CSSProperty<string>(this, '--start-var', '')
   #finishVarCSSProperty = new CSSProperty<string>(this, '--finish-var', '')
@@ -84,7 +89,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
   #directionSize = 0
   #moverDirectionSize = 0
 
-  #passed = new Damped(0, { order: TICK_ORDER.SCROLL - 1, min: 0, max: 1 })
+  #passed = new Damped(0, { order: TICK_ORDER.SEGMENT, min: 0, max: 1 })
   #progress = 0
 
   #start = 0
@@ -137,6 +142,10 @@ export class ScrollSegmentElement extends ScrollUserElement {
 
   public get progressVarCSSProperty() {
     return this.#progressVarCSSProperty
+  }
+
+  public get animationVarTypeCSSProperty() {
+    return this.#animationVarTypeCSSProperty
   }
 
   public get distanceVarCSSProperty() {
@@ -427,6 +436,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
     this.#releasedFromFinishCSSProperty.observe()
     this.#passedVarCSSProperty.observe()
     this.#progressVarCSSProperty.observe()
+    this.#animationVarTypeCSSProperty.observe()
     this.#distanceVarCSSProperty.observe()
     this.#startVarCSSProperty.observe()
     this.#finishVarCSSProperty.observe()
@@ -561,11 +571,13 @@ export class ScrollSegmentElement extends ScrollUserElement {
     })
 
     this.#passed.subscribe((e) => {
-      this.#progress = this.#passed.current / this.#distance || 0
-      this.setVar(
-        this.#passedVarCSSProperty.current,
-        this.#passed.current.toFixed(6)
-      )
+      const passedValue =
+        this.#passed[this.#animationVarTypeCSSProperty.current]
+
+      this.#progress = passedValue / this.#distance || 0
+
+      this.setVar(this.#passedVarCSSProperty.current, passedValue.toFixed(6))
+
       this.setVar(
         this.#progressVarCSSProperty.current,
         this.#progress.toFixed(6)
