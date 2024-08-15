@@ -322,7 +322,7 @@ export class ScrollSegmentElement extends ScrollUserElement {
       }
     } else if (this.#isCaptured.current) {
       this.#passed.set(
-        step(this.#distance / 2, this.#passed.current, 0, this.#distance)
+        step(this.#distance / 2, this.#passed.target, 0, this.#distance)
       )
 
       this.#releaseListener()
