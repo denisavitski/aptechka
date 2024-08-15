@@ -62,7 +62,9 @@ export function libConfig() {
             './src/components/packages/scroll-entries/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
-          'store/index': './src/components/packages/store/index.ts',
+          'store/vanilla/index':
+            './src/components/packages/store/vanilla/index.ts',
+          'store/react/index': './src/components/packages/store/react/index.ts',
           'ticker/vanilla/index':
             './src/components/packages/ticker/vanilla/index.ts',
           'ticker/react/index':

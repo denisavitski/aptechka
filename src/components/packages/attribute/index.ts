@@ -1,4 +1,8 @@
-import { Store, StoreCallback, StoreOptions } from '@packages/store'
+import {
+  Store,
+  StoreSubscribeCallback,
+  StoreOptions,
+} from '@packages/store/vanilla'
 import {
   ElementOrSelector,
   isBrowser,
@@ -48,7 +52,7 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     }
   }
 
-  public override subscribe(callback: StoreCallback<T>) {
+  public override subscribe(callback: StoreSubscribeCallback<T>) {
     if (!this.subscribers.size) {
       this.observe()
     }
@@ -56,7 +60,7 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     return super.subscribe(callback)
   }
 
-  public override unsubscribe(callback: StoreCallback<T>) {
+  public override unsubscribe(callback: StoreSubscribeCallback<T>) {
     super.unsubscribe(callback)
 
     if (!this.subscribers.size) {

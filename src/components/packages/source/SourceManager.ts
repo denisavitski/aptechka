@@ -1,6 +1,6 @@
 import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer/vanilla'
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import type { Source } from './SourceClass'
 import { SourceSet, SourceSetMediaSources } from './SourceSet'
 

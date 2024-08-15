@@ -1,4 +1,4 @@
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 
 new Store(false, {
   name: 'xxx.boolean',

@@ -1,6 +1,6 @@
 import './select'
 
-import { Store } from '@packages/store/Store'
+import { Store } from '@packages/store/vanilla'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, span } from './element-constructor'
 

@@ -1,4 +1,4 @@
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { a, createStylesheet, element } from './element-constructor'
 

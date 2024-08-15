@@ -1,5 +1,5 @@
 function getActualValue(rule: CSSStyleRule, name: string) {
-  const obj = rule.styleMap.get(name)
+  const obj = rule.style.getPropertyValue(name)
 
   if (obj) {
     const stringValue = obj.toString()

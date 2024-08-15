@@ -1,7 +1,7 @@
 'use client'
 
 import { ScrollSegmentElement } from '@packages/scroll/vanilla'
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import { ReactCustomElement } from '@packages/utils'
 import { forwardRef, useEffect, useRef } from 'react'
 

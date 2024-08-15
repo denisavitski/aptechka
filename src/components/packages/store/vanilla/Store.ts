@@ -6,7 +6,9 @@ export interface StoreState<StoreType> {
   initial: StoreType
 }
 
-export type StoreCallback<StoreType> = (state: StoreState<StoreType>) => void
+export type StoreSubscribeCallback<StoreType> = (
+  state: StoreState<StoreType>
+) => void
 
 export type StoreEqualityCheckCallback<StoreType> = (
   currentValue: StoreType,
@@ -31,7 +33,7 @@ export class Store<StoreType = unknown> {
   __manager?: any
   #state: StoreState<StoreType>
   #equalityCheck: StoreEqualityCheckCallback<StoreType>
-  #callbacks = new Set<StoreCallback<StoreType>>()
+  #callbacks = new Set<StoreSubscribeCallback<StoreType>>()
   #skipSubscribeNotification: boolean
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
   #notifyAndClose: boolean
@@ -123,7 +125,7 @@ export class Store<StoreType = unknown> {
     }
   }
 
-  public subscribe(callback: StoreCallback<StoreType>) {
+  public subscribe(callback: StoreSubscribeCallback<StoreType>) {
     if (!this.#invisible && !this.#callbacks.size) {
       shareStore(this)
     }
@@ -139,7 +141,7 @@ export class Store<StoreType = unknown> {
     }
   }
 
-  public unsubscribe(callback: StoreCallback<StoreType>) {
+  public unsubscribe(callback: StoreSubscribeCallback<StoreType>) {
     this.#callbacks.delete(callback)
 
     if (!this.#callbacks.size) {

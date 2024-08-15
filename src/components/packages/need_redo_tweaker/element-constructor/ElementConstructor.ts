@@ -1,4 +1,4 @@
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import {
   SplitFirst,
   camelToKebab,

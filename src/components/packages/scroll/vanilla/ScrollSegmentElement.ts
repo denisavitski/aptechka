@@ -7,7 +7,7 @@ import {
   getCumulativeOffsetTop,
   step,
 } from '@packages/utils'
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'

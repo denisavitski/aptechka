@@ -8,7 +8,7 @@ import {
 import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer/vanilla'
 import { scrollEntries } from '@packages/scroll-entries'
-import { Store } from '@packages/store'
+import { Store } from '@packages/store/vanilla'
 import {
   getCumulativeOffsetTop,
   getCumulativeOffsetLeft,

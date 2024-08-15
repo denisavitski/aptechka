@@ -7,12 +7,6 @@ const morph = new Morph({
   base: '/components/packages/morph/playground/',
 })
 
-morph.preprocessor = async (v) => {
-  await wait(1000)
-
-  v.resolve()
-}
-
 addEventListener('loadingStart', (e) => {
   console.log('-----')
   console.log('loadingStart', JSON.stringify(e.detail))

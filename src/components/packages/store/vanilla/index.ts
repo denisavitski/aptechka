@@ -1,7 +1,8 @@
 export {
   Store,
   activeStores,
-  type StoreCallback,
+  type StoreState,
+  type StoreSubscribeCallback,
   type StoreMiddleware,
   type StoreOptions,
   type StoreEqualityCheckCallback,

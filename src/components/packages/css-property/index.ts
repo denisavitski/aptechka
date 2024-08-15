@@ -1,6 +1,10 @@
 import { cssValueParser } from '@packages/css-value-parser'
 import { RESIZE_ORDER } from '@packages/order'
-import { Store, StoreCallback, StoreOptions } from '@packages/store'
+import {
+  Store,
+  StoreSubscribeCallback,
+  StoreOptions,
+} from '@packages/store/vanilla'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer/vanilla'
 
@@ -50,7 +54,7 @@ export class CSSProperty<
     }
   }
 
-  public override subscribe(callback: StoreCallback<StoreType>) {
+  public override subscribe(callback: StoreSubscribeCallback<StoreType>) {
     if (!this.subscribers.size) {
       this.observe()
     }
@@ -58,7 +62,7 @@ export class CSSProperty<
     return super.subscribe(callback)
   }
 
-  public override unsubscribe(callback: StoreCallback<StoreType>) {
+  public override unsubscribe(callback: StoreSubscribeCallback<StoreType>) {
     super.unsubscribe(callback)
 
     if (!this.subscribers.size) {

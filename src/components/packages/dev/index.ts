@@ -1,5 +1,5 @@
 import { CSSProperty } from '@packages/css-property'
-import { activeStores } from '@packages/store'
+import { activeStores } from '@packages/store/vanilla'
 import { ticker } from '@packages/ticker/vanilla'
 
 export function devMode() {

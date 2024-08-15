@@ -1,4 +1,4 @@
-import { Store, StoreOptions } from '@packages/store'
+import { Store, StoreOptions } from '@packages/store/vanilla'
 import {
   TickerAddOptions,
   TickerCallback,

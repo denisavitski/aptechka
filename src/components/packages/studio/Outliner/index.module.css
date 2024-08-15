@@ -1,0 +1,13 @@
+.outliner {
+  --gap: 20px;
+
+  position: absolute;
+  top: var(--panel-offset);
+  left: var(--panel-offset);
+
+  width: max-content;
+  min-width: 300px;
+
+  background-color: var(--panel-background);
+  border-radius: var(--panel-radius);
+}
