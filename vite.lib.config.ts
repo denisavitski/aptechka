@@ -4,12 +4,16 @@ import packageJson from './package.json'
 import { sharedConfig } from './vite.shared.config'
 
 export function libConfig() {
+  const shared = sharedConfig()
+
   const config: UserConfig = {
+    ...shared,
     plugins: [
+      ...shared.plugins!,
       dtsPlugin({
         include: ['./src/components/packages'],
         copyDtsFiles: true,
-        exclude: '**/playground/**',
+        exclude: ['**/playground/**'],
       }),
     ],
     build: {
@@ -17,6 +21,7 @@ export function libConfig() {
       emptyOutDir: true,
       outDir: 'lib',
       target: 'es2016',
+      sourcemap: false,
       lib: {
         name: 'Aptechka',
         entry: {
@@ -36,9 +41,9 @@ export function libConfig() {
           'device/index': './src/components/packages/device/index.ts',
           'element-resizer/vanilla/index':
             './src/components/packages/element-resizer/vanilla/index.ts',
-          'en3/index': './src/components/packages/en3/index.ts',
           'element-resizer/react/index':
             './src/components/packages/element-resizer/react/index.ts',
+          'en3/index': './src/components/packages/en3/index.ts',
           'intersector/vanilla/index':
             './src/components/packages/intersector/vanilla/index.ts',
           'intersector/react/index':
@@ -85,9 +90,15 @@ export function libConfig() {
         external: Object.keys({
           ...packageJson.peerDependencies,
         }),
+        // onwarn(warning, defaultHandler) {
+        //   if (warning.code === 'SOURCEMAP_ERROR') {
+        //     return
+        //   }
+
+        //   defaultHandler(warning)
+        // },
       },
     },
-    ...sharedConfig(),
   }
 
   return config
