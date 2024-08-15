@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.26.2",
+  "version": "0.26.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -168,10 +168,10 @@
       "default": "./lib/source/index.js",
       "types": "./lib/source/index.d.ts"
     },
-    "./store/vanill": {
-      "require": "./lib/store/vanill/index.cjs",
-      "default": "./lib/store/vanill/index.js",
-      "types": "./lib/store/vanill/index.d.ts"
+    "./store/vanilla": {
+      "require": "./lib/store/vanilla/index.cjs",
+      "default": "./lib/store/vanilla/index.js",
+      "types": "./lib/store/vanilla/index.d.ts"
     },
     "./store/react": {
       "require": "./lib/store/react/index.cjs",
