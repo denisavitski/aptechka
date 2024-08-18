@@ -17,3 +17,12 @@
 .s {
   height: 500vh;
 }
+
+.x {
+  --progress-var: progress;
+
+  display: block;
+  width: 200px;
+  height: 200px;
+  background-color: tomato;
+}

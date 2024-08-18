@@ -65,6 +65,8 @@ export function libConfig() {
             './src/components/packages/scroll/react/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
+          'scroll-segment/index':
+            './src/components/packages/scroll-segment/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
           'store/vanilla/index':
