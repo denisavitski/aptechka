@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.27.0",
+  "version": "0.27.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -73,10 +73,15 @@
       "default": "./lib/device/index.js",
       "types": "./lib/device/index.d.ts"
     },
-    "./element-resizer": {
-      "require": "./lib/element-resizer/index.cjs",
-      "default": "./lib/element-resizer/index.js",
-      "types": "./lib/element-resizer/index.d.ts"
+    "./element-resizer/vanilla": {
+      "require": "./lib/element-resizer/vanilla/index.cjs",
+      "default": "./lib/element-resizer/vanilla/index.js",
+      "types": "./lib/element-resizer/vanilla/index.d.ts"
+    },
+    "./element-resizer/react": {
+      "require": "./lib/element-resizer/react/index.cjs",
+      "default": "./lib/element-resizer/react/index.js",
+      "types": "./lib/element-resizer/react/index.d.ts"
     },
     "./en3": {
       "require": "./lib/en3/index.cjs",
