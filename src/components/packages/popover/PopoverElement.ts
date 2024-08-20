@@ -16,7 +16,7 @@ export class PopoverElement extends HTMLElement {
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new Attribute(this, 'history', false)
-  #restore = new Attribute(this, 'history', false)
+  #restore = new Attribute(this, 'restore', false)
   #single = new Attribute(this, 'single', false)
   #historyAllowed = false
 
@@ -92,11 +92,7 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
-    if (this.#history.current) {
-      const url = new URL(location.href)
-      url.searchParams.delete(this.id)
-      history.replaceState(null, '', url.href)
-    }
+    this.#deleteSearchParam()
 
     this.classList.remove('opened')
     this.style.opacity = '0'
@@ -133,6 +129,9 @@ export class PopoverElement extends HTMLElement {
     setTimeout(() => {
       if (this.#restore.current) {
         this.#popStateListener()
+      } else {
+        this.#deleteSearchParam()
+        this.#historyAllowed = true
       }
     }, 0)
   }
@@ -177,6 +176,14 @@ export class PopoverElement extends HTMLElement {
         this.close()
       }
     })
+  }
+
+  #deleteSearchParam() {
+    if (this.#history.current) {
+      const url = new URL(location.href)
+      url.searchParams.delete(this.id)
+      history.replaceState(null, '', url.href)
+    }
   }
 
   #keydownListener = (event: KeyboardEvent) => {
