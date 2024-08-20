@@ -58,6 +58,7 @@ export function libConfig() {
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
+          'popover/index': './src/components/packages/popover/index.ts',
           'router/index': './src/components/packages/router/index.ts',
           'scroll/vanilla/index':
             './src/components/packages/scroll/vanilla/index.ts',

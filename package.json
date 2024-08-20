@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.27.1",
+  "version": "0.28.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -142,6 +142,11 @@
       "require": "./lib/pointer/index.cjs",
       "default": "./lib/pointer/index.js",
       "types": "./lib/pointer/index.d.ts"
+    },
+    "./popover": {
+      "require": "./lib/popover/index.cjs",
+      "default": "./lib/popover/index.js",
+      "types": "./lib/popover/index.d.ts"
     },
     "./router": {
       "require": "./lib/router/index.cjs",
@@ -298,6 +303,9 @@
       ],
       "pointer": [
         "lib/pointer/index.d.ts"
+      ],
+      "popover": [
+        "lib/popover/index.d.ts"
       ],
       "router": [
         "lib/router/index.d.ts"
