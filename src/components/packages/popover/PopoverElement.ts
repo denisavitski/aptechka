@@ -16,11 +16,16 @@ export class PopoverElement extends HTMLElement {
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new Attribute(this, 'history', false)
+  #restore = new Attribute(this, 'history', false)
   #single = new Attribute(this, 'single', false)
   #historyAllowed = false
 
   public get history() {
     return this.#history
+  }
+
+  public get restore() {
+    return this.#restore
   }
 
   public get single() {
@@ -115,6 +120,7 @@ export class PopoverElement extends HTMLElement {
 
   protected connectedCallback() {
     this.#history.observe()
+    this.#restore.observe()
     this.#single.observe()
 
     this.style.opacity = '0'
@@ -125,12 +131,15 @@ export class PopoverElement extends HTMLElement {
     addEventListener('popstate', this.#popStateListener)
 
     setTimeout(() => {
-      this.#popStateListener()
+      if (this.#restore.current) {
+        this.#popStateListener()
+      }
     }, 0)
   }
 
   protected disconnectedCallback() {
     this.#history.unobserve()
+    this.#restore.unobserve()
     this.#single.unobserve()
 
     this.style.opacity = ''
