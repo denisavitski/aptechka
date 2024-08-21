@@ -25,6 +25,7 @@ export function libConfig() {
       lib: {
         name: 'Aptechka',
         entry: {
+          'accordion/index': './src/components/packages/accordion/index.ts',
           'animation/index': './src/components/packages/animation/index.ts',
           'attribute/index': './src/components/packages/attribute/index.ts',
           'class-linked-status/index':

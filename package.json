@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.28.2",
+  "version": "0.29.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -18,6 +18,11 @@
   ],
   "type": "module",
   "exports": {
+    "./accordion": {
+      "require": "./lib/accordion/index.cjs",
+      "default": "./lib/accordion/index.js",
+      "types": "./lib/accordion/index.d.ts"
+    },
     "./animation": {
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js",
@@ -226,6 +231,9 @@
   },
   "typesVersions": {
     "*": {
+      "accordion": [
+        "lib/accordion/index.d.ts"
+      ],
       "animation": [
         "lib/animation/index.d.ts"
       ],
