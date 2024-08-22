@@ -283,6 +283,16 @@ export class ScrollSegmentElement extends HTMLElement {
       ? getCumulativeOffsetTop(this, el)
       : getCumulativeOffsetLeft(this, el)
 
+    const stickyParents = this.#getStickyParents()
+
+    const stickyOffset = stickyParents.reduce(
+      (p, c) =>
+        p + (this.#scrollContainer.vertical ? c.offsetTop : c.offsetLeft),
+      0
+    )
+
+    this.#directionPosition -= stickyOffset
+
     this.#start = this.getStart()
     this.#distance = this.getDistance()
 
@@ -438,6 +448,23 @@ export class ScrollSegmentElement extends HTMLElement {
 
     this.#anotherScrollEntries = allScrollEntriesAbove.slice(scrollIndex + 1)
   }, 0)
+
+  #getStickyParents() {
+    const stickyParents: HTMLElement[] = []
+    let parent = this.parentElement
+
+    while (parent) {
+      const style = window.getComputedStyle(parent)
+
+      if (style.position === 'sticky') {
+        stickyParents.push(parent)
+      }
+
+      parent = parent.parentElement
+    }
+
+    return stickyParents
+  }
 
   #connect() {
     if (!this.#scrollContainer) {
