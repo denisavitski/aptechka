@@ -10,11 +10,18 @@ export interface LoadingEvents {
   loadingComplete: CustomEvent<{
     total: number
   }>
+  loadingError: CustomEvent<{
+    name: string
+  }>
 }
 
 class Loading {
   #map = new Map<string, boolean>()
   #isStarted = false
+
+  public get map() {
+    return this.#map
+  }
 
   public add(resourceName: string) {
     this.#map.set(resourceName, false)
@@ -30,6 +37,12 @@ class Loading {
     if (this.#map.has(resourceName)) {
       console.error(`Failed to load ${resourceName}`)
       this.#map.delete(resourceName)
+
+      dispatchEvent(window, 'loadingError', {
+        detail: {
+          name: resourceName,
+        },
+      })
     }
 
     this.#check()
@@ -39,9 +52,7 @@ class Loading {
     if (!this.#isStarted) {
       this.#isStarted = true
 
-      dispatchEvent(window, 'loadingStart', {
-        detail: {},
-      })
+      dispatchEvent(window, 'loadingStart')
 
       this.#check()
     }

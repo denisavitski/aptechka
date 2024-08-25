@@ -18,6 +18,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #intersectionHappened = false
   #isLazy = false
   #id: string = ''
+  #idWithUrl = ''
 
   #status = new ClassLinkedStatus(this, {
     loading: false,
@@ -126,6 +127,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
 
     if (source) {
+      this.#idWithUrl = `${this.#id}-${source.url}`
       const isKeepSourceParameters = this.hasAttribute('keep-source-parameters')
 
       this.#status.set('loading', true)
@@ -137,7 +139,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.consumeSource(url)
 
       if (!this.#isLazy && !this.#isFirstLoadHappened) {
-        loading.add(this.#id)
+        loading.add(this.#idWithUrl)
       }
 
       this.#consumerElement.onloadeddata = () => {
@@ -192,7 +194,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
-      loading.complete(this.#id)
+      loading.complete(this.#idWithUrl)
     }
 
     this.#isFirstLoadHappened = true
@@ -204,7 +206,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
-      loading.error(this.#id)
+      loading.error(this.#idWithUrl)
     }
 
     this.#isFirstLoadHappened = true
