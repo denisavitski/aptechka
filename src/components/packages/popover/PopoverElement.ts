@@ -170,7 +170,7 @@ export class PopoverElement extends HTMLElement {
         (this.contains(target) || this.shadowRoot?.contains(target))
 
       const outsideTarget =
-        target instanceof HTMLElement && target.hasAttribute('outside')
+        target instanceof HTMLElement && target.hasAttribute('data-outside')
 
       if (!containsTarget || outsideTarget) {
         this.close()
