@@ -78,7 +78,7 @@ export class PopoverElement extends HTMLElement {
     }
 
     if (useTransition) {
-      setTimeout(opened)
+      setTimeout(opened, 10)
     } else {
       opened()
     }
