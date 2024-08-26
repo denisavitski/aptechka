@@ -57,6 +57,7 @@ export class PopoverElement extends HTMLElement {
 
     clearTimeout(this.#closeTimeoutId)
 
+    this.classList.remove('closing')
     this.classList.add('triggered')
     this.style.display = 'block'
 
@@ -95,6 +96,7 @@ export class PopoverElement extends HTMLElement {
     this.#deleteSearchParam()
 
     this.classList.remove('opened')
+    this.classList.add('closing')
     this.style.opacity = '0'
 
     dispatchEvent(this, 'popoverClosing', {
@@ -106,6 +108,7 @@ export class PopoverElement extends HTMLElement {
 
     setTimeout(() => {
       this.classList.remove('triggered')
+      this.classList.remove('closing')
       this.style.display = 'none'
 
       dispatchEvent(this, 'popoverClosed', {
@@ -123,6 +126,10 @@ export class PopoverElement extends HTMLElement {
     this.style.display = 'none'
 
     this.setAttribute('popover-target', '')
+    this.classList.remove('closing')
+    this.classList.remove('closed')
+    this.classList.remove('triggered')
+    this.classList.remove('opened')
 
     addEventListener('popstate', this.#popStateListener)
 
