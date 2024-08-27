@@ -1,3 +1,4 @@
+import { device } from '@packages/device'
 import { SourceElement } from '../source'
 
 export class ImageElement extends SourceElement<HTMLImageElement> {
@@ -6,7 +7,13 @@ export class ImageElement extends SourceElement<HTMLImageElement> {
   }
 
   protected override consumeSource(url: string | null) {
-    this.consumerElement.src = url || ''
+    if (url && this.hasAttribute('webp') && device.isWebp) {
+      const webpUrl = url.split('.').slice(0, -1).join('.') + '.webp'
+
+      this.consumerElement.src = webpUrl
+    } else {
+      this.consumerElement.src = url || ''
+    }
   }
 }
 
