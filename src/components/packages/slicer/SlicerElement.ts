@@ -1,10 +1,13 @@
 import { Word } from './Word.js'
 import { Letter } from './Letter.js'
+import { Media } from '@packages/media'
 
 export class SlicerElement extends HTMLElement {
   #originalText = ''
   #words: Array<Word> = []
   #letters: Array<Letter> = []
+
+  #media: Media | null = null
 
   public get wordsArray() {
     return this.#words
@@ -21,6 +24,28 @@ export class SlicerElement extends HTMLElement {
   protected connectedCallback() {
     this.#originalText = this.textContent?.trim() || ''
 
+    if (this.hasAttribute('media')) {
+      this.#media = new Media(this.getAttribute('media')!)
+
+      this.#media.subscribe((e) => {
+        if (e.current) {
+          this.#split()
+        } else if (!e.current && e.previous) {
+          this.#unsplit()
+        }
+      })
+    } else {
+      this.#split()
+    }
+  }
+
+  protected disconnectedCallback() {
+    this.#unsplit()
+
+    this.#media?.close()
+  }
+
+  #split() {
     this.innerHTML = ''
 
     let lettersAcc = 0
@@ -70,7 +95,7 @@ export class SlicerElement extends HTMLElement {
     this.style.setProperty('--letters-length', this.#letters.length.toString())
   }
 
-  protected disconnectedCallback() {
+  #unsplit() {
     this.#words = []
     this.textContent = this.#originalText
     this.style.removeProperty('--words-length')
