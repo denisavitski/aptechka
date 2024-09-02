@@ -48,10 +48,6 @@ export class Word {
       }
     }
 
-    if (this.#hasNewLine) {
-      this.#element.appendChild(document.createElement('br'))
-    }
-
     this.#element.classList.add('word')
   }
 
