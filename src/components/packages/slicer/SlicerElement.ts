@@ -85,9 +85,7 @@ export class SlicerElement extends HTMLElement {
       this.appendChild(word.element)
 
       if (wi !== this.#words.length - 1) {
-        const span = document.createElement('span')
-        span.innerHTML = '&nbsp;'
-        this.appendChild(span)
+        word.element.insertAdjacentHTML('beforeend', '&nbsp;')
       }
     })
 
