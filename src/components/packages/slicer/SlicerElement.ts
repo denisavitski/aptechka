@@ -84,7 +84,7 @@ export class SlicerElement extends HTMLElement {
     this.#words.forEach((word, wi) => {
       this.appendChild(word.element)
 
-      if (wi !== this.#words.length - 1) {
+      if (!word.hasNewLine && wi !== this.#words.length - 1) {
         word.element.insertAdjacentHTML('beforeend', '&nbsp;')
       }
     })

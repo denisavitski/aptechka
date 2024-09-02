@@ -12,11 +12,18 @@ export class Word {
   #index: number
   #element: HTMLSpanElement
   #letters: Array<Letter>
+  #hasNewLine: boolean
 
   constructor(parameters: WordParameters) {
     this.#index = parameters.index
     this.#element = document.createElement('span')
     this.#letters = []
+
+    this.#hasNewLine = parameters.text.endsWith('\\n')
+
+    if (this.#hasNewLine) {
+      parameters.text = parameters.text.replace('\\n', '')
+    }
 
     if (parameters.letters && parameters.lettersAcc !== undefined) {
       this.#letters = parameters.text.split('').map((letter, i) => {
@@ -41,6 +48,10 @@ export class Word {
       }
     }
 
+    if (this.#hasNewLine) {
+      this.#element.appendChild(document.createElement('br'))
+    }
+
     this.#element.classList.add('word')
   }
 
@@ -54,5 +65,9 @@ export class Word {
 
   public get letters() {
     return this.#letters
+  }
+
+  public get hasNewLine() {
+    return this.#hasNewLine
   }
 }
