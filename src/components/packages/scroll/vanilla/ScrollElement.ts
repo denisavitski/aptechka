@@ -455,7 +455,8 @@ export class ScrollElement extends HTMLElement {
             this.#scrollSize +
             this.#viewportSize -
             previousSection.position +
-            this.#gap
+            this.#gap +
+            1
         } else if (
           this.#counter.current === this.#sections.length - 1 &&
           previousCounter === 0
@@ -734,7 +735,8 @@ export class ScrollElement extends HTMLElement {
   }
 
   protected disconnectedCallback() {
-    this.setAttribute('tabindex', '')
+    this.removeAttribute('tabindex')
+    this.classList.remove('has-overflow')
 
     this.#controlsCSSProperty.unobserve()
     this.#axisCSSProperty.unobserve()
@@ -804,7 +806,6 @@ export class ScrollElement extends HTMLElement {
 
   #disable() {
     if (!this.#disabled) {
-      console.log(this, 'disable')
       this.#disabled = true
 
       this.#damped.unsubscribe(this.#animatedChangeListener)
@@ -996,11 +997,15 @@ export class ScrollElement extends HTMLElement {
         ? this.#contentElement.offsetHeight
         : this.#contentElement.offsetWidth) > this.#viewportSize
 
+    this.classList.toggle('has-overflow', this.#hasOverflow)
+
     if (!this.#hasOverflow) {
       this.#disable()
     } else {
       this.#enable()
     }
+
+    this.#animatedChangeListener()
   }
 
   #animatedChangeListener = () => {
