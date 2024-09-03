@@ -64,6 +64,12 @@ const stylesheet = createStylesheet({
     height: 'var(--static-height, 100%)',
   },
 
+  '.content-wrapper': {
+    width: '100%',
+    height: '100%',
+    overflow: 'var(--overflow, initial)',
+  },
+
   '.content': {
     position: 'relative',
     display: 'flex',
@@ -146,6 +152,7 @@ export class ScrollElement extends HTMLElement {
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
 
+  #contentWrapperElement: HTMLElement = null!
   #contentElement: HTMLElement = null!
   #slotElement: HTMLSlotElement = null!
   #sections: Array<ScrollSection> = []
@@ -185,11 +192,16 @@ export class ScrollElement extends HTMLElement {
       staticElement.innerHTML = '<slot name="static"></slot>'
       shadow.appendChild(staticElement)
 
+      this.#contentWrapperElement = document.createElement('div')
+      this.#contentWrapperElement.className = 'content-wrapper'
+
       this.#contentElement = document.createElement('div')
       this.#contentElement.className = 'content'
       this.#slotElement = document.createElement('slot')
+
       this.#contentElement.appendChild(this.#slotElement)
-      shadow.appendChild(this.#contentElement)
+      this.#contentWrapperElement.appendChild(this.#contentElement)
+      shadow.appendChild(this.#contentWrapperElement)
     }
   }
 
@@ -302,6 +314,10 @@ export class ScrollElement extends HTMLElement {
 
   public get targetScrollValue() {
     return this.#getScrollValue('target')
+  }
+
+  public get contentWrapperElement() {
+    return this.#contentWrapperElement
   }
 
   public get contentElement() {

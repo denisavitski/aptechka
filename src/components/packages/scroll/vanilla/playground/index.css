@@ -9,6 +9,7 @@
   --damping: 10;
   --loop: true;
   --controls: true;
+  --overflow: hidden;
 
   border: 0.1rem solid red;
 
