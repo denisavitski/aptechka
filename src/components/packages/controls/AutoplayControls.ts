@@ -65,7 +65,7 @@ export class AutoplayControls extends Controls {
   }
 
   public pauseAndContinue(duration: number, instant?: boolean) {
-    if (duration) {
+    if (this.#connected && duration) {
       clearTimeout(this.#pauseTimeoutId)
 
       this.#paused.set(1, {

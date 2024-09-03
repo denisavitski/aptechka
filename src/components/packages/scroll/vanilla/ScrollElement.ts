@@ -629,22 +629,6 @@ export class ScrollElement extends HTMLElement {
       this.#damped.stiffness = e.current
     })
 
-    this.#disabledCSSProperty.subscribe((e) => {
-      if (e.current && !e.previous) {
-        this.#disable()
-      } else if (!e.current && e.previous) {
-        this.#enable()
-      }
-    })
-
-    this.#hibernatedCSSProperty.subscribe((e) => {
-      if (e.current && !e.previous) {
-        this.#hibernate()
-      } else if (!e.current && e.previous) {
-        this.#awake()
-      }
-    })
-
     this.#autoplayCSSProperty.subscribe((e) => {
       this.#autoplayControls.speed = e.current
 
@@ -695,6 +679,22 @@ export class ScrollElement extends HTMLElement {
       }
     })
 
+    this.#disabledCSSProperty.subscribe((e) => {
+      if (e.current && !e.previous) {
+        this.#disable()
+      } else if (!e.current && e.previous) {
+        this.#enable()
+      }
+    })
+
+    this.#hibernatedCSSProperty.subscribe((e) => {
+      if (e.current && !e.previous) {
+        this.#hibernate()
+      } else if (!e.current && e.previous) {
+        this.#awake()
+      }
+    })
+
     this.#controlsCSSProperty.observe()
     this.#axisCSSProperty.observe()
     this.#directionCSSProperty.observe()
@@ -722,7 +722,7 @@ export class ScrollElement extends HTMLElement {
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
-    if (!this.#hibernated) {
+    if (!this.#hibernatedCSSProperty.current) {
       this.#awake()
     }
   }
@@ -803,14 +803,14 @@ export class ScrollElement extends HTMLElement {
       this.#damped.unsubscribe(this.#animatedChangeListener)
       this.#damped.unlistenAnimationFrame()
 
+      clearInterval(this.#focusTimeoutId)
+
+      this.#setTween.unlistenAnimationFrame()
+
       this.#wheelControls.disconnect()
       this.#keyboardControls.disconnect()
       this.#dragControls.disconnect()
       this.#autoplayControls.disconnect()
-
-      clearInterval(this.#focusTimeoutId)
-
-      this.#setTween.unlistenAnimationFrame()
     }
   }
 
@@ -867,10 +867,10 @@ export class ScrollElement extends HTMLElement {
 
       scrollEntries.register(this)
 
+      this.#enable()
+
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
       elementResizer.subscribe(this, this.#resizeListener)
-
-      this.#enable()
     }
   }
 
