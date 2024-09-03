@@ -57,6 +57,10 @@ export class ScrollSection {
 
   public destroy() {
     scrollEntries.unregister(this.#element)
+    this.unsetTransform()
+  }
+
+  public unsetTransform() {
     this.#element.style.transform = ''
     this.mark(null)
   }

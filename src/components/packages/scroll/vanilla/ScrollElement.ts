@@ -173,6 +173,8 @@ export class ScrollElement extends HTMLElement {
   #overscroll = 0
   #distance = 0
 
+  #isResized = false
+  #hasOverflow = false
   #disabled = true
   #hibernated = true
 
@@ -364,6 +366,10 @@ export class ScrollElement extends HTMLElement {
     return this.#loopCSSProperty.current
       ? this.#distance + this.#gap
       : this.#distance
+  }
+
+  public get hasOverflow() {
+    return this.#hasOverflow
   }
 
   public get overscroll() {
@@ -632,7 +638,7 @@ export class ScrollElement extends HTMLElement {
     this.#autoplayCSSProperty.subscribe((e) => {
       this.#autoplayControls.speed = e.current
 
-      if (e.current && !e.previous) {
+      if (!this.#disabled && e.current && !e.previous) {
         this.#autoplayControls.connect()
       } else if (!e.current && e.previous) {
         this.#autoplayControls.disconnect()
@@ -798,6 +804,7 @@ export class ScrollElement extends HTMLElement {
 
   #disable() {
     if (!this.#disabled) {
+      console.log(this, 'disable')
       this.#disabled = true
 
       this.#damped.unsubscribe(this.#animatedChangeListener)
@@ -811,6 +818,12 @@ export class ScrollElement extends HTMLElement {
       this.#keyboardControls.disconnect()
       this.#dragControls.disconnect()
       this.#autoplayControls.disconnect()
+
+      if (!this.#hasOverflow) {
+        this.sections.forEach((section) => {
+          section.unsetTransform()
+        })
+      }
     }
   }
 
@@ -977,9 +990,24 @@ export class ScrollElement extends HTMLElement {
         equalize: true,
       })
     }
+
+    this.#hasOverflow =
+      (this.vertical
+        ? this.#contentElement.offsetHeight
+        : this.#contentElement.offsetWidth) > this.#viewportSize
+
+    if (!this.#hasOverflow) {
+      this.#disable()
+    } else {
+      this.#enable()
+    }
   }
 
   #animatedChangeListener = () => {
+    if (!this.#hasOverflow) {
+      return
+    }
+
     const currentScrollValue = this.currentScrollValue
 
     this.#overscroll = Math.max(0, currentScrollValue - this.#scrollSize)
