@@ -10,7 +10,9 @@
   --loop: true;
   --controls: true;
   --overflow: hidden;
-  --autoplay: 1;
+  --autoplay: 1000;
+  --autoplay-pause-duration: 4000;
+  --sectional: true;
 
   border: 0.1rem solid red;
 

@@ -64,14 +64,20 @@ export class AutoplayControls extends Controls {
     }
   }
 
-  public pauseAndContinue(duration: number) {
-    if (duration && !this.#paused.target) {
-      clearInterval(this.#pauseTimeoutId)
+  public pauseAndContinue(duration: number, instant?: boolean) {
+    if (duration) {
+      clearTimeout(this.#pauseTimeoutId)
 
-      this.#paused.set(1, { duration: Math.min(duration, 1000) })
+      this.#paused.set(1, {
+        duration: Math.min(duration, 1000),
+        equalize: instant,
+      })
 
       this.#pauseTimeoutId = setTimeout(() => {
-        this.#paused.set(0, { duration: Math.min(duration, 5000) })
+        this.#paused.set(0, {
+          duration: Math.min(duration, 5000),
+          equalize: instant,
+        })
       }, duration)
     }
   }
@@ -98,7 +104,7 @@ export class AutoplayControls extends Controls {
     clearInterval(this.#intervalId)
     ticker.unsubscribe(this.#animationFrameCallback)
 
-    clearInterval(this.#pauseTimeoutId)
+    clearTimeout(this.#pauseTimeoutId)
     this.#paused.close()
 
     document.removeEventListener(

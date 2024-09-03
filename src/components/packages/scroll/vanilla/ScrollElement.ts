@@ -1025,7 +1025,8 @@ export class ScrollElement extends HTMLElement {
 
       if (this.#autoplayCSSProperty.current) {
         this.#autoplayControls.pauseAndContinue(
-          this.#autoplayPauseDurationCSSProperty.current
+          this.#autoplayPauseDurationCSSProperty.current,
+          this.sectionalCSSProperty.current
         )
       }
 
