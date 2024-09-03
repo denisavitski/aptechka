@@ -11,10 +11,19 @@
   --loop: true;
   --gap: 3.2rem;
   --sections-in-view: 3;
-  --autoplay: 1;
+  --autoplay: 1000;
   --autoplay-user-direction: true;
+  --sectional: true;
   --overflow: hidden;
+  --hibernated: true;
   height: max-content;
+
+  display: none;
+}
+
+.global__slider.triggered {
+  --hibernated: false;
+  display: block;
 }
 
 .global__slider__item {

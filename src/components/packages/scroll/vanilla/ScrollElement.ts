@@ -722,7 +722,9 @@ export class ScrollElement extends HTMLElement {
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
-    this.#awake()
+    if (!this.#hibernated) {
+      this.#awake()
+    }
   }
 
   protected disconnectedCallback() {
@@ -785,7 +787,7 @@ export class ScrollElement extends HTMLElement {
 
     this.#sections = []
 
-    this.#counter.current = 0
+    this.#counter.reset()
     this.#damped.reset()
 
     dispatchEvent(this, 'scrollSectionsChange', {
@@ -797,6 +799,7 @@ export class ScrollElement extends HTMLElement {
   #disable() {
     if (!this.#disabled) {
       this.#disabled = true
+
       this.#damped.unsubscribe(this.#animatedChangeListener)
       this.#damped.unlistenAnimationFrame()
 
@@ -833,14 +836,15 @@ export class ScrollElement extends HTMLElement {
       windowResizer.unsubscribe(this.#resizeListener)
       elementResizer.unsubscribe(this.#resizeListener)
 
-      this.#damped.reset()
-
       this.#disable()
 
       this.#contentElement.style.transform = ''
 
-      if (this.#splitCSSProperty.current) {
+      if (this.#sections.length) {
         this.#unsplit()
+      } else {
+        this.#counter.reset()
+        this.#damped.reset()
       }
 
       scrollEntries.unregister(this)
@@ -851,7 +855,13 @@ export class ScrollElement extends HTMLElement {
     if (this.#hibernated) {
       this.#hibernated = false
 
-      if (this.#splitCSSProperty.current) {
+      if (
+        this.#loopCSSProperty.current ||
+        this.#splitCSSProperty.current ||
+        this.#loopCSSProperty.current ||
+        this.#autoSizeCSSProperty.current ||
+        this.#sectionalCSSProperty.current
+      ) {
         this.#split()
       }
 
