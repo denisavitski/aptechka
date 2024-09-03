@@ -1,32 +1,61 @@
-.reviews {
-  --gap: 5rem;
-  --sections-in-view: 1;
-  --axis: y;
-  --controls: true;
-  --classes: true;
-  --current-index-start-offset: 1;
-  --current-index-end-offset: -1;
+.global__slider {
+  --axis: x;
   --damping: 10;
+  --auto-size: true;
   --loop: true;
-  --controls: true;
+  --gap: 3.2rem;
+  --sections-in-view: 3;
+  --autoplay: 1;
+  --autoplay-pause-duration: 1000;
   --overflow: hidden;
-  --autoplay: 1000;
-  --autoplay-pause-duration: 4000;
-  --sectional: true;
-
-  border: 0.1rem solid red;
-
-  overflow: hidden;
-}
-.s {
-  height: 500vh;
 }
 
-.x {
-  --progress-var: progress;
+.global__slider__item {
+  height: 22rem;
 
-  display: block;
-  width: 200px;
-  height: 200px;
-  background-color: tomato;
+  background-color: rgb(166, 166, 166);
+  border-radius: 4rem;
+}
+
+.global__slider__button {
+  position: absolute;
+  top: 50%;
+
+  z-index: 1;
+
+  width: 7.2rem;
+  height: 7.2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: red;
+  border-radius: 50%;
+}
+
+.global__slider__button_prev {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.global__slider__button_next {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.global__slider__button__icon {
+  width: 30%;
+  height: 30%;
+
+  fill: none;
+  stroke: blue;
+}
+
+.global__slider__button_next .global__slider__button__icon {
+  transform: translateX(8%) rotate(0);
+}
+
+.global__slider__button_prev .global__slider__button__icon {
+  transform: translateX(-8%) rotate(-180deg);
 }

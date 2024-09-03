@@ -477,6 +477,8 @@ export class ScrollElement extends HTMLElement {
   }
 
   public setPosition(value: number, options?: ScrollSetOptions) {
+    this.#processAutoplay()
+
     if (!options?.tween) {
       this.#damped.set(value, {
         equalize: options?.behaviour === 'instant',
@@ -1019,17 +1021,7 @@ export class ScrollElement extends HTMLElement {
 
   #notAutoplayControlListener = (type: string, value: number) => {
     if (this.#controlsCSSProperty.current) {
-      if (this.#autoplayUserDirectionCSSProperty.current) {
-        this.#autoplayControls.direction = Math.sign(value) || 1
-      }
-
-      if (this.#autoplayCSSProperty.current) {
-        this.#autoplayControls.pauseAndContinue(
-          this.#autoplayPauseDurationCSSProperty.current,
-          this.sectionalCSSProperty.current
-        )
-      }
-
+      this.#processAutoplay()
       this.#controlsListener(type, value)
     }
   }
@@ -1083,6 +1075,19 @@ export class ScrollElement extends HTMLElement {
       }
     } else {
       this.#damped.shift(value)
+    }
+  }
+
+  #processAutoplay(direction = 1) {
+    if (this.#autoplayUserDirectionCSSProperty.current) {
+      this.#autoplayControls.direction = direction
+    }
+
+    if (this.#autoplayCSSProperty.current) {
+      this.#autoplayControls.pauseAndContinue(
+        this.#autoplayPauseDurationCSSProperty.current,
+        this.sectionalCSSProperty.current
+      )
     }
   }
 
