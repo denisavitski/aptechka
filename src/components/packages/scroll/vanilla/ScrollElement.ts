@@ -1020,11 +1020,13 @@ export class ScrollElement extends HTMLElement {
   #notAutoplayControlListener = (type: string, value: number) => {
     if (this.#controlsCSSProperty.current) {
       if (this.#autoplayUserDirectionCSSProperty.current) {
+        this.#autoplayControls.direction = Math.sign(value) || 1
+      }
+
+      if (this.#autoplayCSSProperty.current) {
         this.#autoplayControls.pauseAndContinue(
           this.#autoplayPauseDurationCSSProperty.current
         )
-
-        this.#autoplayControls.direction = Math.sign(value) || 1
       }
 
       this.#controlsListener(type, value)
