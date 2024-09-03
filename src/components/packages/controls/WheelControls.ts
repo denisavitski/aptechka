@@ -61,8 +61,6 @@ export class WheelControls extends Controls {
   #wheelListener = (event: WheelEvent) => {
     let delta = 0
 
-    event.preventDefault()
-
     if (
       (this.axis === 'x' &&
         Math.abs(event.deltaY) > Math.abs(event.deltaX) * 0.5) ||
@@ -71,6 +69,8 @@ export class WheelControls extends Controls {
     ) {
       return
     }
+
+    event.preventDefault()
 
     delta =
       (this.axis === 'max'

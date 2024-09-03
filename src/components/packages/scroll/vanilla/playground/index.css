@@ -1,3 +1,9 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden auto;
+}
+
 .global__slider {
   --axis: x;
   --damping: 10;
@@ -6,8 +12,10 @@
   --gap: 3.2rem;
   --sections-in-view: 3;
   --autoplay: 1;
-  --autoplay-pause-duration: 1000;
+  --sectional: 1000;
+  --autoplay-pause-duration: 4000;
   --overflow: hidden;
+  height: max-content;
 }
 
 .global__slider__item {
@@ -58,4 +66,8 @@
 
 .global__slider__button_prev .global__slider__button__icon {
   transform: translateX(-8%) rotate(-180deg);
+}
+
+.sec {
+  height: 200vh;
 }
