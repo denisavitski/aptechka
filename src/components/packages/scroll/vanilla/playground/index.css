@@ -12,8 +12,7 @@
   --gap: 3.2rem;
   --sections-in-view: 3;
   --autoplay: 1;
-  --sectional: 1000;
-  --autoplay-pause-duration: 4000;
+  --autoplay-user-direction: true;
   --overflow: hidden;
   height: max-content;
 }

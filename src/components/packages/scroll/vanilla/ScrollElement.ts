@@ -477,7 +477,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   public setPosition(value: number, options?: ScrollSetOptions) {
-    this.#processAutoplay()
+    this.#processAutoplay(Math.sign(value) || 1)
 
     if (!options?.tween) {
       this.#damped.set(value, {
@@ -1021,7 +1021,7 @@ export class ScrollElement extends HTMLElement {
 
   #notAutoplayControlListener = (type: string, value: number) => {
     if (this.#controlsCSSProperty.current) {
-      this.#processAutoplay()
+      this.#processAutoplay(Math.sign(value) || 1)
       this.#controlsListener(type, value)
     }
   }
