@@ -15,7 +15,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
   #isFirstLoadHappened = false
-  #intersectionHappened = false
+  #lazyLoaded = false
   #isLazy = false
   #id: string = ''
   #idWithUrl = ''
@@ -53,6 +53,17 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   public get isLazy() {
     return this.#isLazy
+  }
+
+  public triggerLazyLoad() {
+    if (
+      this.#sourceManager.current &&
+      this.#sourceManager.current !== this.#sourceManager.previous
+    ) {
+      this.#loadSource(this.#sourceManager.current)
+    }
+
+    this.#lazyLoaded = true
   }
 
   protected abstract createConsumer(): T
@@ -93,7 +104,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#isLazy = this.hasAttribute('lazy')
 
     this.#sourceManager.subscribe((d) => {
-      if (!this.#isLazy || (this.#isLazy && this.#intersectionHappened)) {
+      if (!this.#isLazy || (this.#isLazy && this.#lazyLoaded)) {
         this.#loadSource(d.current)
       }
     })
@@ -163,17 +174,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     if (this.#isLazy) {
       if (
-        (!this.#intersectionHappened || this.hasAttribute('reload-source')) &&
+        (!this.#lazyLoaded || this.hasAttribute('reload-source')) &&
         entry.isIntersecting
       ) {
-        if (
-          this.#sourceManager.current &&
-          this.#sourceManager.current !== this.#sourceManager.previous
-        ) {
-          this.#loadSource(this.#sourceManager.current)
-        }
-
-        this.#intersectionHappened = true
+        this.triggerLazyLoad()
       }
     }
 
