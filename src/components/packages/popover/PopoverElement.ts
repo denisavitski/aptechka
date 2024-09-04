@@ -3,8 +3,8 @@ import { Store } from '@packages/store/vanilla'
 import { dispatchEvent, getElementTransitionDurationMS } from '@packages/utils'
 
 export interface PopoverEvents {
-  popoverTriggered: CustomEvent
-  popoverOpened: CustomEvent
+  popoverTriggered: CustomEvent<{ trigger: any }>
+  popoverOpened: CustomEvent<{ trigger: any }>
   popoverClosing: CustomEvent
   popoverClosed: CustomEvent
 }
@@ -19,6 +19,7 @@ export class PopoverElement extends HTMLElement {
   #restore = new Attribute(this, 'restore', false)
   #single = new Attribute(this, 'single', false)
   #historyAllowed = false
+  #lastTrigger: any
 
   public get history() {
     return this.#history
@@ -36,10 +37,16 @@ export class PopoverElement extends HTMLElement {
     return this.#opened
   }
 
-  public open = (useTransition = true) => {
+  public get lastTrigger() {
+    return this.#lastTrigger
+  }
+
+  public open = (options?: { skipTransition?: boolean; trigger?: any }) => {
     if (this.#opened.current) {
       return
     }
+
+    this.#lastTrigger = options?.trigger
 
     this.#opened.current = true
 
@@ -63,6 +70,9 @@ export class PopoverElement extends HTMLElement {
 
     dispatchEvent(this, 'popoverTriggered', {
       custom: true,
+      detail: {
+        trigger: this.#lastTrigger,
+      },
     })
 
     const opened = () => {
@@ -74,13 +84,16 @@ export class PopoverElement extends HTMLElement {
 
       dispatchEvent(this, 'popoverOpened', {
         custom: true,
+        detail: {
+          trigger: this.#lastTrigger,
+        },
       })
     }
 
-    if (useTransition) {
-      setTimeout(opened, 10)
-    } else {
+    if (options?.skipTransition) {
       opened()
+    } else {
+      setTimeout(opened, 10)
     }
   }
 

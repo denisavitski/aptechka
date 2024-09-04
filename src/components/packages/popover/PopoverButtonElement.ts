@@ -18,7 +18,7 @@ export class PopoverButtonElement extends HTMLElement {
             type === 'open' ||
             (type === 'toggle' && !this.#popoverElement.opened.current)
           ) {
-            this.#popoverElement.open()
+            this.#popoverElement.open({ trigger: this })
           } else if (
             type === 'close' ||
             (type === 'toggle' && this.#popoverElement.opened.current)
