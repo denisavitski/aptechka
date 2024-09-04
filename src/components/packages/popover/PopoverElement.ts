@@ -170,6 +170,15 @@ export class PopoverElement extends HTMLElement {
     this.#withOrder(() => {
       const path = event.composedPath()
 
+      if (
+        path.find(
+          (el) =>
+            el instanceof HTMLElement && el.hasAttribute('data-popover-content')
+        )
+      ) {
+        return
+      }
+
       const target = path[0]
 
       const containsTarget =
