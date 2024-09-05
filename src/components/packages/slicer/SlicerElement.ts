@@ -48,8 +48,6 @@ export class SlicerElement extends HTMLElement {
   #split() {
     console.log(this.childNodes)
 
-    const restNodes: Array<Node> = []
-
     const nodes: Array<Node> = []
 
     this.#words = []
