@@ -3,7 +3,7 @@ import { Letter } from './Letter.js'
 import { Media } from '@packages/media'
 
 export class SlicerElement extends HTMLElement {
-  #originalText = ''
+  #originalHTML = ''
   #words: Array<Word> = []
   #letters: Array<Letter> = []
 
@@ -17,12 +17,12 @@ export class SlicerElement extends HTMLElement {
     return this.#letters
   }
 
-  public get originalText() {
-    return this.#originalText
+  public get originalHTML() {
+    return this.#originalHTML
   }
 
   protected connectedCallback() {
-    this.#originalText = this.textContent?.trim() || ''
+    this.#originalHTML = this.innerHTML.trim()
 
     if (this.hasAttribute('media')) {
       this.#media = new Media(this.getAttribute('media')!)
@@ -46,27 +46,46 @@ export class SlicerElement extends HTMLElement {
   }
 
   #split() {
-    this.innerHTML = ''
+    console.log(this.childNodes)
+
+    const restNodes: Array<Node> = []
+
+    const nodes: Array<Node> = []
+
+    this.#words = []
+
+    let wordsAcc = 0
 
     let lettersAcc = 0
 
-    this.#words = this.#originalText
-      .replace(/  +/g, ' ')
-      .split(' ')
-      .map((text, index) => {
-        const word = new Word({
-          index,
-          text,
-          letters: this.hasAttribute('letters'),
-          lettersAcc,
-          clone: this.hasAttribute('clone'),
-        })
+    this.childNodes.forEach((node) => {
+      if (node.nodeName === '#text' && node.textContent) {
+        const text = node.textContent.trim()
 
-        lettersAcc += word.letters.length
-        this.#letters.push(...word.letters)
+        text
+          .replace(/  +/g, ' ')
+          .split(' ')
+          .map((text) => {
+            const word = new Word({
+              index: wordsAcc,
+              text: text + ' ',
+              letters: this.hasAttribute('letters'),
+              lettersAcc,
+              clone: this.hasAttribute('clone'),
+            })
 
-        return word
-      })
+            lettersAcc += word.letters.length
+            wordsAcc += 1
+
+            this.#letters.push(...word.letters)
+
+            this.#words.push(word)
+            nodes.push(word.element)
+          })
+      } else {
+        nodes.push(node)
+      }
+    })
 
     if (this.hasAttribute('index')) {
       this.#words.forEach((word) => {
@@ -81,16 +100,10 @@ export class SlicerElement extends HTMLElement {
       })
     }
 
-    this.#words.forEach((word, wi) => {
-      this.appendChild(word.element)
+    this.innerHTML = ''
 
-      if (wi !== this.#words.length - 1) {
-        word.element.insertAdjacentHTML('beforeend', '&nbsp;')
-      }
-
-      if (word.hasNewLine) {
-        word.element.after(document.createElement('br'))
-      }
+    nodes.forEach((node) => {
+      this.appendChild(node)
     })
 
     this.style.setProperty('--words-length', this.#words.length.toString())
@@ -99,7 +112,7 @@ export class SlicerElement extends HTMLElement {
 
   #unsplit() {
     this.#words = []
-    this.textContent = this.#originalText
+    this.innerHTML = this.#originalHTML
     this.style.removeProperty('--words-length')
     this.style.removeProperty('--letters-length')
   }

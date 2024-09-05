@@ -58,6 +58,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
   protected override consumeSource(url: string | null) {
     this.consumerElement.src = url || ''
+    this.consumerElement.autoplay = true
   }
 
   #checkReady = () => {
