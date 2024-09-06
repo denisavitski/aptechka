@@ -125,7 +125,7 @@ export class DragControls extends Controls {
   }
 
   #tickListener = () => {
-    if (!Math.floor(this.#delta)) {
+    if (!Math.floor(Math.abs(this.#delta))) {
       ticker.unsubscribe(this.#tickListener)
     }
 

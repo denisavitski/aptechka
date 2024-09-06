@@ -173,7 +173,6 @@ export class ScrollElement extends HTMLElement {
   #overscroll = 0
   #distance = 0
 
-  #isResized = false
   #hasOverflow = false
   #disabled = true
   #hibernated = true
@@ -455,8 +454,7 @@ export class ScrollElement extends HTMLElement {
             this.#scrollSize +
             this.#viewportSize -
             previousSection.position +
-            this.#gap +
-            1
+            this.#gap
         } else if (
           this.#counter.current === this.#sections.length - 1 &&
           previousCounter === 0
@@ -501,6 +499,8 @@ export class ScrollElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    scrollEntries.register(this)
+
     this.#damped = new Damped(0, {
       damping: 0.01,
       min: 0,
@@ -869,6 +869,8 @@ export class ScrollElement extends HTMLElement {
     if (this.#hibernated) {
       this.#hibernated = false
 
+      scrollEntries.register(this)
+
       if (
         this.#loopCSSProperty.current ||
         this.#splitCSSProperty.current ||
@@ -878,8 +880,6 @@ export class ScrollElement extends HTMLElement {
       ) {
         this.#split()
       }
-
-      scrollEntries.register(this)
 
       this.#enable()
 

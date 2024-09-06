@@ -10,20 +10,14 @@
   --auto-size: true;
   --loop: true;
   --gap: 3.2rem;
-  --sections-in-view: 3;
-  --autoplay: 1000;
-  --autoplay-user-direction: true;
+  --sections-in-view: 1;
   --sectional: true;
   --overflow: hidden;
-  --hibernated: true;
   height: max-content;
-
-  display: none;
+  --mouse-drag: true;
 }
 
 .global__slider.triggered {
-  --hibernated: false;
-  display: block;
 }
 
 .global__slider__item {
