@@ -273,17 +273,14 @@ export class PopoverElement extends HTMLElement {
   }
 
   #resizeListener = () => {
-    this.style.width = '0px'
-    this.style.height = '0px'
+    this.style.removeProperty('--content-width')
+    this.style.removeProperty('--content-height')
 
     this.#debouncedResize()
   }
 
   #debouncedResize = debounce(() => {
     this.#resize()
-
-    this.style.width = ''
-    this.style.height = ''
   }, 20)
 
   #resize = () => {
