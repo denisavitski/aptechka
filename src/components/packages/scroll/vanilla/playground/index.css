@@ -9,7 +9,6 @@ e-scroll {
   --overflow: hidden;
   --mouse-drag: true;
   --drag-inertion: 1;
-  --duration: 1000;
 }
 
 section {

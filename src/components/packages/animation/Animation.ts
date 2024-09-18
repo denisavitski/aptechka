@@ -172,7 +172,7 @@ export abstract class Animation<
     )
 
     if (options?.equalize) {
-      // this.unlistenAnimationFrame()
+      this.unlistenAnimationFrame()
       this.current = this.#target
     }
 
