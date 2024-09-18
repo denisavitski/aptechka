@@ -22,11 +22,7 @@ export class PopoverElement extends HTMLElement {
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new Attribute(this, 'history', false)
   #restore = new Attribute(this, 'restore', false)
-  #dominance = new Attribute<'all' | 'previous' | false>(
-    this,
-    'dominance',
-    false
-  )
+  #dominance = new Attribute<number>(this, 'dominance', 0)
   #historyAllowed = false
   #lastTrigger: any
 
@@ -59,17 +55,14 @@ export class PopoverElement extends HTMLElement {
 
     this.#opened.current = true
 
-    if (this.#dominance.current === 'all') {
-      PopoverElement.__opened.forEach((m) => m.close())
-      PopoverElement.__opened = []
-    } else if (this.#dominance.current === 'previous') {
-      PopoverElement.__opened = PopoverElement.__opened.filter((e, i, arr) => {
-        if (i < arr.length - 1) {
-          return true
-        } else {
+    if (this.#dominance.current) {
+      PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
+        if (this.dominance.current >= e.dominance.current) {
           e.close()
           return false
         }
+
+        return true
       })
     }
 
