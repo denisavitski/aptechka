@@ -1,6 +1,21 @@
+.content {
+  display: grid;
+  gap: 2vmin;
+  font-size: 5vmin;
+}
+
 .parent {
   font-size: 100px;
 }
 
 e-popover {
+  overflow: hidden;
+
+  transition: height 0.3s, opacity 0.3s;
+
+  height: 0px;
+}
+
+e-popover.opened {
+  height: var(--content-height);
 }

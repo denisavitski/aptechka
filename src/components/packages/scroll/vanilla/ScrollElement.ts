@@ -192,6 +192,7 @@ export class ScrollElement extends HTMLElement {
   #tweenTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   #setTween = new Tweened()
+  #isGrabbing = false
 
   constructor() {
     super()
@@ -1065,12 +1066,14 @@ export class ScrollElement extends HTMLElement {
 
         section.transform()
 
+        // Change
         if (this.targetScrollValue + section.size / 2 >= section.position) {
           counter = index
         }
       }
 
       this.#counter.current = counter
+      console.log(this.#counter.current)
     } else {
       if (this.vertical) {
         this.#contentElement.style.transform = `translate3d(0px, ${
@@ -1154,7 +1157,7 @@ export class ScrollElement extends HTMLElement {
       const direction = Math.sign(value)
 
       if (this.#sections.length) {
-        this.shiftSections(direction, {
+        const options: ScrollSetOptions = {
           tween:
             this.#easingCSSProperty.current || this.#durationCSSProperty.current
               ? {
@@ -1162,13 +1165,21 @@ export class ScrollElement extends HTMLElement {
                   duration: this.#durationCSSProperty.current || 500,
                 }
               : undefined,
-        })
+        }
+
+        if (this.#isGrabbing) {
+          this.scrollToSection(this.#counter.current, options)
+        } else {
+          this.shiftSections(direction, options)
+        }
       } else {
         this.#damped.shift(direction * this.#viewportSize)
       }
     } else {
       this.#damped.shift(value)
     }
+
+    this.#isGrabbing = type === 'drag'
   }
 
   #processAutoplay(direction = 1) {

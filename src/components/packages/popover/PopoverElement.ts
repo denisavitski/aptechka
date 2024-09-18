@@ -1,6 +1,11 @@
 import { Attribute } from '@packages/attribute'
 import { Store } from '@packages/store/vanilla'
-import { dispatchEvent, getElementTransitionDurationMS } from '@packages/utils'
+import {
+  debounce,
+  dispatchEvent,
+  getElementTransitionDurationMS,
+} from '@packages/utils'
+import { windowResizer } from '@packages/window-resizer/vanilla'
 
 export interface PopoverEvents {
   popoverTriggered: CustomEvent<{ trigger: any }>
@@ -17,7 +22,11 @@ export class PopoverElement extends HTMLElement {
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new Attribute(this, 'history', false)
   #restore = new Attribute(this, 'restore', false)
-  #single = new Attribute(this, 'single', false)
+  #dominance = new Attribute<'all' | 'previous' | false>(
+    this,
+    'dominance',
+    false
+  )
   #historyAllowed = false
   #lastTrigger: any
 
@@ -29,8 +38,8 @@ export class PopoverElement extends HTMLElement {
     return this.#restore
   }
 
-  public get single() {
-    return this.#single
+  public get dominance() {
+    return this.#dominance
   }
 
   public get opened() {
@@ -50,9 +59,18 @@ export class PopoverElement extends HTMLElement {
 
     this.#opened.current = true
 
-    if (this.#single.current) {
+    if (this.#dominance.current === 'all') {
       PopoverElement.__opened.forEach((m) => m.close())
       PopoverElement.__opened = []
+    } else if (this.#dominance.current === 'previous') {
+      PopoverElement.__opened = PopoverElement.__opened.filter((e, i, arr) => {
+        if (i < arr.length - 1) {
+          return true
+        } else {
+          e.close()
+          return false
+        }
+      })
     }
 
     PopoverElement.__opened.push(this)
@@ -78,6 +96,8 @@ export class PopoverElement extends HTMLElement {
     const opened = () => {
       addEventListener('click', this.#clickOutsideListener)
       addEventListener('keydown', this.#keydownListener)
+
+      this.#resize()
 
       this.style.opacity = '1'
       this.classList.add('opened')
@@ -133,7 +153,7 @@ export class PopoverElement extends HTMLElement {
   protected connectedCallback() {
     this.#history.observe()
     this.#restore.observe()
-    this.#single.observe()
+    this.#dominance.observe()
 
     this.style.opacity = '0'
     this.style.display = 'none'
@@ -154,12 +174,16 @@ export class PopoverElement extends HTMLElement {
         this.#historyAllowed = true
       }
     }, 0)
+
+    windowResizer.subscribe(this.#resizeListener)
   }
 
   protected disconnectedCallback() {
+    windowResizer.unsubscribe(this.#resizeListener)
+
     this.#history.unobserve()
     this.#restore.unobserve()
-    this.#single.unobserve()
+    this.#dominance.unobserve()
 
     this.style.opacity = ''
     this.style.display = ''
@@ -171,6 +195,9 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#closeTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
+
+    this.style.removeProperty('--content-width')
+    this.style.removeProperty('--content-height')
   }
 
   get #path() {
@@ -250,6 +277,25 @@ export class PopoverElement extends HTMLElement {
     }
 
     this.#historyAllowed = true
+  }
+
+  #resizeListener = () => {
+    this.style.width = '0px'
+    this.style.height = '0px'
+
+    this.#debouncedResize()
+  }
+
+  #debouncedResize = debounce(() => {
+    this.#resize()
+
+    this.style.width = ''
+    this.style.height = ''
+  }, 20)
+
+  #resize = () => {
+    this.style.setProperty('--content-width', this.scrollWidth + 'px')
+    this.style.setProperty('--content-height', this.scrollHeight + 'px')
   }
 }
 

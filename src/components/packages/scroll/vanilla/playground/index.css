@@ -1,10 +1,10 @@
 e-scroll {
   --axis: y;
-  --damping: 5;
+  --damping: 10;
   --auto-size: true;
   --loop: true;
   --gap: 3.2rem;
-  --sections-in-view: 2;
+  --sections-in-view: 3;
   --sectional: true;
   --overflow: hidden;
   --mouse-drag: true;
