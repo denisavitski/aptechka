@@ -19,3 +19,7 @@ e-popover {
 e-popover.opened {
   height: var(--content-height);
 }
+
+e-popover-button {
+  --type: toggle;
+}
