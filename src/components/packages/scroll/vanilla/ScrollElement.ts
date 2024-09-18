@@ -1150,7 +1150,7 @@ export class ScrollElement extends HTMLElement {
       return
     }
 
-    if (this.#sectionalCSSProperty.current && type === 'drag-end') {
+    if (this.#sectionalCSSProperty.current && type !== 'drag') {
       const direction = Math.sign(value)
 
       if (this.#sections.length) {
