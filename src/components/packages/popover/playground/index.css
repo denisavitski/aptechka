@@ -9,11 +9,13 @@
 }
 
 e-popover {
+  --duration: 0.5s;
+  display: none;
+  opacity: 0;
+  height: 0;
   overflow: hidden;
 
-  transition: height 0.3s, opacity 0.3s;
-
-  height: 0px;
+  transition: opacity var(--duration), height var(--duration);
 }
 
 e-popover.opened {
@@ -22,4 +24,13 @@ e-popover.opened {
 
 e-popover-button {
   --type: toggle;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 20vmin;
+  height: 100vh;
+  background-color: tomato;
 }

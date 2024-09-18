@@ -308,15 +308,15 @@ export class PopoverElement extends HTMLElement {
   }
 
   #resizeListener = () => {
-    this.style.removeProperty('--content-width')
-    this.style.removeProperty('--content-height')
+    this.style.setProperty('--content-width', 'initial')
+    this.style.setProperty('--content-height', 'initial')
 
     this.#debouncedResize()
   }
 
   #debouncedResize = debounce(() => {
     this.#resize()
-  }, 20)
+  }, 10)
 
   #resize = () => {
     this.style.setProperty('--content-width', this.scrollWidth + 'px')
