@@ -1,4 +1,5 @@
 import { Attribute } from '@packages/attribute'
+import { CSSProperty } from '@packages/css-property'
 import { Store } from '@packages/store/vanilla'
 import {
   debounce,
@@ -20,9 +21,11 @@ export class PopoverElement extends HTMLElement {
   #openedIndex = -1
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
-  #history = new Attribute(this, 'history', false)
-  #restore = new Attribute(this, 'restore', false)
-  #dominance = new Attribute<number>(this, 'dominance', 0)
+  #history = new CSSProperty(this, '--history', false)
+  #restore = new CSSProperty(this, '--restore', false)
+  #dominance = new CSSProperty(this, '--dominance', 0)
+  #clickOutside = new CSSProperty(this, '--click-outside', false)
+  #escape = new CSSProperty(this, '--escape', false)
   #historyAllowed = false
   #lastTrigger: any
 
@@ -36,6 +39,14 @@ export class PopoverElement extends HTMLElement {
 
   public get dominance() {
     return this.#dominance
+  }
+
+  public get clickOutside() {
+    return this.#clickOutside
+  }
+
+  public get escape() {
+    return this.#escape
   }
 
   public get opened() {
@@ -117,7 +128,16 @@ export class PopoverElement extends HTMLElement {
 
     this.#opened.current = false
 
-    PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
+    PopoverElement.__opened = PopoverElement.__opened.filter((m) => {
+      if (m === this) {
+        return false
+      } else if (m.#dominance.current < this.dominance.current) {
+        m.close()
+        return false
+      }
+
+      return true
+    })
 
     this.#deleteSearchParam()
 
@@ -147,6 +167,8 @@ export class PopoverElement extends HTMLElement {
     this.#history.observe()
     this.#restore.observe()
     this.#dominance.observe()
+    this.#clickOutside.observe()
+    this.#escape.observe()
 
     this.style.opacity = '0'
     this.style.display = 'none'
@@ -177,6 +199,8 @@ export class PopoverElement extends HTMLElement {
     this.#history.unobserve()
     this.#restore.unobserve()
     this.#dominance.unobserve()
+    this.#clickOutside.unobserve()
+    this.#escape.unobserve()
 
     this.style.opacity = ''
     this.style.display = ''
@@ -200,6 +224,10 @@ export class PopoverElement extends HTMLElement {
   }
 
   #clickOutsideListener = (event: MouseEvent) => {
+    if (!this.#clickOutside.current) {
+      return
+    }
+
     this.#withOrder(() => {
       const path = event.composedPath()
 
@@ -236,6 +264,10 @@ export class PopoverElement extends HTMLElement {
   }
 
   #keydownListener = (event: KeyboardEvent) => {
+    if (!this.#escape.current) {
+      return
+    }
+
     this.#withOrder(() => {
       if (event.code === 'Escape') {
         this.close()
@@ -246,7 +278,10 @@ export class PopoverElement extends HTMLElement {
   #withOrder(okCallback: Function) {
     if (
       PopoverElement.__opened[this.#openedIndex - 1] ||
-      PopoverElement.__opened.length === 1
+      PopoverElement.__opened.length === 1 ||
+      PopoverElement.__opened
+        .filter((e) => e !== this)
+        .every((e) => this.#dominance.current > e.dominance.current)
     ) {
       okCallback()
     }
