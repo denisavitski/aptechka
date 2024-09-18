@@ -20,9 +20,9 @@ export class DragControls extends Controls {
 
   public axis: Axes2D
   public swipe: boolean
+  public inertion = 1
 
   #element: HTMLElement = null!
-  #swiped = false
   #delta = 0
 
   constructor(options?: DragControlsOptions) {
@@ -70,6 +70,8 @@ export class DragControls extends Controls {
     }
 
     let prev = grabEvent
+    let okToNotify = false
+
     this.#delta = 0
 
     document.documentElement.classList.add('grabbing')
@@ -77,15 +79,10 @@ export class DragControls extends Controls {
     setupDrag(
       (moveEvent) => {
         if (
-          this.#swiped ||
-          (DragControls.#currentElement &&
-            DragControls.#currentElement !== this.#element)
+          DragControls.#currentElement &&
+          DragControls.#currentElement !== this.#element
         ) {
           return
-        }
-
-        if (this.swipe) {
-          this.#swiped = true
         }
 
         const dx = prev.x - moveEvent.x
@@ -99,27 +96,32 @@ export class DragControls extends Controls {
 
         prev = moveEvent
 
-        if (
+        okToNotify =
           (this.axis === 'x' && Math.abs(dx) > Math.abs(dy)) ||
           (this.axis === 'y' && Math.abs(dy) > Math.abs(dx))
-        ) {
+
+        if (okToNotify) {
           DragControls.#currentElement = this.#element
+
           this.changeEvent.notify('drag', this.#delta)
         }
       },
       () => {
         DragControls.#currentElement = null
 
-        if (!this.swipe) {
-          this.#delta = this.#delta * 3
-          ticker.subscribe(this.#tickListener, {
-            order: TICK_ORDER.CONTROLS - 1,
-          })
+        if (okToNotify) {
+          if (!this.swipe && this.inertion) {
+            this.#delta = this.#delta * this.inertion
+
+            ticker.subscribe(this.#tickListener, {
+              order: TICK_ORDER.CONTROLS - 1,
+            })
+          } else if (this.swipe) {
+            this.changeEvent.notify('drag-end', this.#delta)
+          }
         }
 
         document.documentElement.classList.remove('grabbing')
-
-        this.#swiped = false
       }
     )
   }

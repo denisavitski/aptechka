@@ -1,4 +1,4 @@
-import { Damped, Tweened } from '@packages/animation'
+import { Damped, Tweened, TweenedOptions } from '@packages/animation'
 import {
   WheelControls,
   KeyboardControls,
@@ -15,7 +15,6 @@ import {
   Axes2D,
   isBrowser,
   clamp,
-  EasingFunction,
   easeInOutExpo,
   createStylesheet,
   dispatchEvent,
@@ -25,6 +24,7 @@ import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
 import { elementResizer } from '@packages/element-resizer/vanilla'
 import { ScrollSection } from './ScrollSection'
+import { TweenEasingName } from '@packages/animation/Tweened'
 
 export interface ScrollEvents {
   scrollSectionsChange: CustomEvent
@@ -35,7 +35,7 @@ export type ScrollBehaviour = 'smooth' | 'instant'
 export interface ScrollSetOptions {
   behaviour?: ScrollBehaviour
   tween?: {
-    easing?: EasingFunction
+    easing?: TweenedOptions['easing']
     duration: number
   }
 }
@@ -99,12 +99,23 @@ export class ScrollElement extends HTMLElement {
   })
   #splitCSSProperty = new CSSProperty<boolean>(this, '--split', false)
   #sectionalCSSProperty = new CSSProperty<boolean>(this, '--sectional', false)
+  #easingCSSProperty = new CSSProperty<TweenEasingName | false>(
+    this,
+    '--easing',
+    false
+  )
+  #durationCSSProperty = new CSSProperty<number | false>(
+    this,
+    '--duration',
+    false
+  )
   #autoSizeCSSProperty = new CSSProperty<boolean>(this, '--auto-size', false)
   #wheelMaxDeltaCSSProperty = new CSSProperty<boolean>(
     this,
     '--wheel-max-delta',
     false
   )
+  #dragInertionCSSProperty = new CSSProperty<number>(this, '--drag-inertion', 1)
   #sectionsInViewCSSProperty = new CSSProperty<number>(
     this,
     '--sections-in-view',
@@ -178,6 +189,7 @@ export class ScrollElement extends HTMLElement {
   #hibernated = true
 
   #focusTimeoutId: ReturnType<typeof setTimeout> | undefined
+  #tweenTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   #setTween = new Tweened()
 
@@ -233,12 +245,24 @@ export class ScrollElement extends HTMLElement {
     return this.#sectionalCSSProperty
   }
 
+  public get easingCSSProperty() {
+    return this.#easingCSSProperty
+  }
+
+  public get durationCSSProperty() {
+    return this.#durationCSSProperty
+  }
+
   public get autoSizeCSSProperty() {
     return this.#autoSizeCSSProperty
   }
 
   public get wheelMaxDeltaCSSProperty() {
     return this.#wheelMaxDeltaCSSProperty
+  }
+
+  public get dragInertionCSSProperty() {
+    return this.#dragInertionCSSProperty
   }
 
   public get sectionsInViewCSSProperty() {
@@ -488,9 +512,13 @@ export class ScrollElement extends HTMLElement {
       this.#damped.set(value, {
         equalize: options?.behaviour === 'instant',
       })
-    } else {
+    } else if (!this.#tweenTimeoutId) {
       this.#setTween.set(this.#damped.current, { equalize: true })
       this.#setTween.set(value, { ...options.tween })
+
+      this.#tweenTimeoutId = setTimeout(() => {
+        this.#tweenTimeoutId = undefined
+      }, options.tween.duration)
     }
   }
 
@@ -555,6 +583,11 @@ export class ScrollElement extends HTMLElement {
       this.#wheelControls.axis = e.current
         ? 'max'
         : this.#axisCSSProperty.current
+    })
+
+    this.#dragInertionCSSProperty.subscribe((e) => {
+      this.#dragControls.inertion =
+        typeof e.current === 'number' ? e.current : 1
     })
 
     this.#pagesCSSProperty.subscribe(() => {
@@ -682,7 +715,7 @@ export class ScrollElement extends HTMLElement {
 
     this.#setTween.subscribe((e) => {
       if (this.#setTween.isRunning.current) {
-        this.#damped.set(e.current)
+        this.#damped.set(e.current, { equalize: true })
       }
     })
 
@@ -708,8 +741,11 @@ export class ScrollElement extends HTMLElement {
     this.#pagesCSSProperty.observe()
     this.#splitCSSProperty.observe()
     this.#sectionalCSSProperty.observe()
+    this.#easingCSSProperty.observe()
+    this.#durationCSSProperty.observe()
     this.#autoSizeCSSProperty.observe()
     this.#wheelMaxDeltaCSSProperty.observe()
+    this.#dragInertionCSSProperty.observe()
     this.#sectionsInViewCSSProperty.observe()
     this.#loopCSSProperty.observe()
     this.#dampingCSSProperty.observe()
@@ -744,8 +780,11 @@ export class ScrollElement extends HTMLElement {
     this.#pagesCSSProperty.unobserve()
     this.#splitCSSProperty.unobserve()
     this.#sectionalCSSProperty.unobserve()
+    this.#easingCSSProperty.unobserve()
+    this.#durationCSSProperty.unobserve()
     this.#autoSizeCSSProperty.unobserve()
     this.#wheelMaxDeltaCSSProperty.unobserve()
+    this.#dragInertionCSSProperty.unobserve()
     this.#sectionsInViewCSSProperty.unobserve()
     this.#loopCSSProperty.unobserve()
     this.#dampingCSSProperty.unobserve()
@@ -812,6 +851,7 @@ export class ScrollElement extends HTMLElement {
       this.#damped.unlistenAnimationFrame()
 
       clearInterval(this.#focusTimeoutId)
+      clearInterval(this.#tweenTimeoutId)
 
       this.#setTween.unlistenAnimationFrame()
 
@@ -1078,7 +1118,9 @@ export class ScrollElement extends HTMLElement {
       }
     }
 
-    this.#setTween.unlistenAnimationFrame()
+    if (!this.#tweenTimeoutId) {
+      this.#setTween.unlistenAnimationFrame()
+    }
 
     if (
       !this.#autoplayCSSProperty.current &&
@@ -1101,18 +1143,26 @@ export class ScrollElement extends HTMLElement {
     }
 
     if (
-      type === 'drag' &&
+      type.includes('drag') &&
       !device.isMobile &&
       !this.#mouseDragCSSProperty.current
     ) {
       return
     }
 
-    if (this.#sectionalCSSProperty.current) {
+    if (this.#sectionalCSSProperty.current && type === 'drag-end') {
       const direction = Math.sign(value)
 
       if (this.#sections.length) {
-        this.shiftSections(direction)
+        this.shiftSections(direction, {
+          tween:
+            this.#easingCSSProperty.current || this.#durationCSSProperty.current
+              ? {
+                  easing: this.#easingCSSProperty.current || 'easeInOutCubic',
+                  duration: this.#durationCSSProperty.current || 500,
+                }
+              : undefined,
+        })
       } else {
         this.#damped.shift(direction * this.#viewportSize)
       }
@@ -1194,12 +1244,12 @@ export class ScrollElement extends HTMLElement {
     }
   }
 
-  #findNearestSection() {
+  #findNearestSection(targetScrollValue = this.targetScrollValue) {
     let nearestIndex = null
     let minDiff = Infinity
 
     for (let i = 0; i < this.#sections.length; i++) {
-      const diff = Math.abs(this.#sections[i].position - this.targetScrollValue)
+      const diff = Math.abs(this.#sections[i].position - targetScrollValue)
 
       if (diff < minDiff) {
         minDiff = diff

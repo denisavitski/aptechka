@@ -6,7 +6,7 @@
 
 .global__slider {
   --axis: x;
-  --damping: 10;
+  --damping: 5;
   --auto-size: true;
   --loop: true;
   --gap: 3.2rem;
@@ -15,6 +15,7 @@
   --overflow: hidden;
   height: max-content;
   --mouse-drag: true;
+  --drag-inertion: 1;
 }
 
 .global__slider.triggered {

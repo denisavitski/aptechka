@@ -11,9 +11,12 @@ import {
   AnimationConstructorOptions,
   AnimationOptions,
 } from './Animation'
+import * as easings from '@packages/utils/easings'
+
+export type TweenEasingName = keyof typeof easings
 
 export interface TweenedOptions extends AnimationOptions {
-  easing?: EasingFunction
+  easing?: EasingFunction | TweenEasingName
   duration?: number
 }
 
@@ -33,12 +36,20 @@ export class Tweened extends Animation<TweenedOptions> {
   public override updateOptions(options?: TweenedOptions) {
     super.updateOptions(options)
 
-    this.#easing = nullishCoalescing(options?.easing, this.#easing)
+    this.#easing =
+      typeof options?.easing === 'function'
+        ? options.easing
+        : typeof options?.easing === 'string'
+        ? easings[options.easing as keyof typeof easings] || easings.linear
+        : easings.linear
+
     this.#duration = nullishCoalescing(options?.duration, this.#duration)
   }
 
   protected override handleAnimationFrame(e: TickerCallbackEntry): void {
-    const t = e.timeElapsedSinceSubscription / 1000 / (this.#duration / 1000)
+    const t =
+      e.timeElapsedSinceSubscription / 1000 / (this.#duration / 1000) || 0
+
     const et = this.#easing(clamp(t, 0, 1))
 
     this.current = preciseNumber(this.from + (this.target - this.from) * et, 6)

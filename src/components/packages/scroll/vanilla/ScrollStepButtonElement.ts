@@ -1,12 +1,10 @@
 import { ScrollButtonElement } from './ScrollButtonElement'
-import { ScrollBehaviour } from './ScrollElement'
+import { ScrollSetOptions } from './ScrollElement'
 
 export class ScrollStepButtonElement extends ScrollButtonElement {
-  protected override handleClick() {
+  protected override handleClick(options: ScrollSetOptions) {
     const step = this.getAttribute('step')
-    const behaviour = this.getAttribute('behaviour') as ScrollBehaviour
-
-    this.scrollElement.shiftSections(parseInt(step || '1'), { behaviour })
+    this.scrollElement.shiftSections(parseInt(step || '1'), options)
   }
 }
 
