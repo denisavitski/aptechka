@@ -41,15 +41,15 @@ export class CanvasElement extends HTMLElement {
     if (isBrowser) {
       const shadow = this.attachShadow({ mode: 'open' })
 
-      shadow.adoptedStyleSheets.push(
+      shadow.adoptedStyleSheets = [
         createStylesheet({
           ' :host, canvas': {
             display: 'block',
             width: '100%',
             height: '100%',
           },
-        })
-      )
+        }),
+      ]
 
       this.#canvasElement = document.createElement('canvas')
       this.#context = this.#canvasElement.getContext('2d')!

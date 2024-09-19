@@ -21,7 +21,7 @@ export class ScrollbarElement extends ScrollUserElement {
     if (isBrowser) {
       const shadow = this.attachShadow({ mode: 'open' })
 
-      shadow.adoptedStyleSheets.push(
+      shadow.adoptedStyleSheets = [
         createStylesheet({
           ':host': {
             display: 'inline-block',
@@ -54,8 +54,8 @@ export class ScrollbarElement extends ScrollUserElement {
           '::slotted(*)': {
             touchAction: 'none',
           },
-        })
-      )
+        }),
+      ]
 
       this.#slotElement = document.createElement('slot')
       this.#slotElement.innerHTML = `<div class="default-thumb"></div>`

@@ -199,7 +199,7 @@ export class ScrollElement extends HTMLElement {
 
     if (isBrowser) {
       const shadow = this.attachShadow({ mode: 'open' })
-      shadow.adoptedStyleSheets.push(stylesheet)
+      shadow.adoptedStyleSheets = [stylesheet]
 
       const staticElement = document.createElement('div')
       staticElement.className = 'static'
