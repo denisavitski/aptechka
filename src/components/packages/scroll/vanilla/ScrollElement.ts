@@ -379,7 +379,9 @@ export class ScrollElement extends HTMLElement {
   }
 
   public get limit() {
-    return this.#sections.length - this.#sectionsInViewCSSProperty.current
+    return Math.ceil(
+      this.#sections.length - this.#sectionsInViewCSSProperty.current
+    )
   }
 
   public get distance() {
@@ -1073,7 +1075,6 @@ export class ScrollElement extends HTMLElement {
       }
 
       this.#counter.current = counter
-      console.log(this.#counter.current)
     } else {
       if (this.vertical) {
         this.#contentElement.style.transform = `translate3d(0px, ${
