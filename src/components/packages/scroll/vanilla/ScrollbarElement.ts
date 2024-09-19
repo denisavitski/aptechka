@@ -46,8 +46,8 @@ export class ScrollbarElement extends ScrollUserElement {
           },
 
           '.default-thumb': {
-            backgroundColor: 'black',
-            borderRadius: '0.3vmin',
+            backgroundColor: 'var(--thumb-color, black)',
+            borderRadius: 'var(--thumb-radius, 0px)',
             touchAction: 'none',
           },
 
@@ -82,6 +82,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
     elementResizer.subscribe(this, this.#resizeListener)
+    elementResizer.subscribe(this.scrollElement, this.#resizeListener)
 
     this.scrollElement.onScroll(this.#scrollListener)
 
@@ -90,6 +91,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
   protected disconnectedCallback() {
     this.removeAttribute('drag-dead-zone')
+    this.style.display = ''
 
     this.#thumbElement.removeEventListener('pointerdown', this.#grabListener)
 
@@ -125,6 +127,8 @@ export class ScrollbarElement extends ScrollUserElement {
 
     if (!this.scrollElement.scrollSize) {
       this.style.display = 'none'
+    } else {
+      this.style.display = ''
     }
   }
 
