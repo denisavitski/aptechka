@@ -76,9 +76,9 @@ export class CSSProperty<
   }
 
   public check() {
-    const rawValue = getComputedStyle(this.#element).getPropertyValue(
-      this.#property
-    )
+    const rawValue = getComputedStyle(this.#element)
+      .getPropertyValue(this.#property)
+      .trim()
 
     if (this.#rawValueCheck && this.#currentRawValue === rawValue) {
       return
