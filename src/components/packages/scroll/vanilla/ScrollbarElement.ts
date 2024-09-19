@@ -130,6 +130,8 @@ export class ScrollbarElement extends ScrollUserElement {
     } else {
       this.style.display = ''
     }
+
+    this.#scrollListener()
   }
 
   #scrollListener = () => {
