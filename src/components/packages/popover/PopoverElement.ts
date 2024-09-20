@@ -21,6 +21,7 @@ export class PopoverElement extends HTMLElement {
   #openedIndex = -1
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
+  #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
   #dominance = new CSSProperty(this, '--dominance', 0)
@@ -68,7 +69,7 @@ export class PopoverElement extends HTMLElement {
 
     if (this.#dominance.current) {
       PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
-        if (this.dominance.current >= e.dominance.current) {
+        if (e !== this && this.dominance.current >= e.dominance.current) {
           e.close()
           return false
         }
@@ -112,12 +113,14 @@ export class PopoverElement extends HTMLElement {
           trigger: this.#lastTrigger,
         },
       })
+
+      this.#openTimeoutId = undefined
     }
 
     if (options?.skipTransition) {
       opened()
     } else {
-      setTimeout(opened, 10)
+      this.#openTimeoutId = setTimeout(opened, 10)
     }
   }
 
@@ -126,12 +129,18 @@ export class PopoverElement extends HTMLElement {
       return
     }
 
+    removeEventListener('click', this.#clickOutsideListener)
+    removeEventListener('keydown', this.#keydownListener)
+
     this.#opened.current = false
 
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => {
       if (m === this) {
         return false
-      } else if (m.#dominance.current < this.dominance.current) {
+      } else if (
+        m.#dominance.current < this.dominance.current &&
+        !m.#openTimeoutId
+      ) {
         m.close()
         return false
       }
@@ -148,9 +157,6 @@ export class PopoverElement extends HTMLElement {
     dispatchEvent(this, 'popoverClosing', {
       custom: true,
     })
-
-    removeEventListener('click', this.#clickOutsideListener)
-    removeEventListener('keydown', this.#keydownListener)
 
     setTimeout(() => {
       this.classList.remove('triggered')
@@ -210,8 +216,11 @@ export class PopoverElement extends HTMLElement {
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
     clearTimeout(this.#closeTimeoutId)
+    clearTimeout(this.#openTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
+    removeEventListener('click', this.#clickOutsideListener)
+    removeEventListener('keydown', this.#keydownListener)
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
