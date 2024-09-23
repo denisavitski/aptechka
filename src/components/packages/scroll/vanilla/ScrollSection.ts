@@ -63,6 +63,7 @@ export class ScrollSection {
   public unsetTransform() {
     this.#element.style.transform = ''
     this.mark(null)
+    this.setSize()
   }
 
   public setSize(value?: number) {

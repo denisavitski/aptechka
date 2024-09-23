@@ -54,10 +54,6 @@ const stylesheet = createStylesheet({
     outline: 'none',
   },
 
-  ':host([hibernated="true"])': {
-    display: 'contents',
-  },
-
   '.static': {
     position: 'var(--static-position, absolute)',
     top: 'var(--static-top, 0)',
@@ -82,7 +78,11 @@ const stylesheet = createStylesheet({
     willChange: 'var(--will-change, transform)',
   },
 
-  ':host([hibernated="true"]) .content': {
+  ':host(.hibernated) .content-wrapper': {
+    display: 'contents',
+  },
+
+  ':host(.hibernated) .content': {
     display: 'contents',
   },
 
@@ -164,7 +164,7 @@ export class ScrollElement extends HTMLElement {
   )
 
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
-  #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernated', false)
+  #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernate', false)
 
   #contentWrapperElement: HTMLElement = null!
   #contentElement: HTMLElement = null!
@@ -198,6 +198,8 @@ export class ScrollElement extends HTMLElement {
   #isGrabbing = false
 
   #scrollLine: ScrollLine = null
+
+  #isConnected = false
 
   constructor() {
     super()
@@ -586,7 +588,7 @@ export class ScrollElement extends HTMLElement {
         this.style.touchAction = 'pan-x'
       }
 
-      if (this.isConnected) {
+      if (this.#isConnected) {
         this.#resizeListener()
       }
     })
@@ -603,13 +605,13 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#pagesCSSProperty.subscribe(() => {
-      if (this.isConnected) {
+      if (this.#isConnected) {
         this.#resizeListener()
       }
     })
 
     this.#splitCSSProperty.subscribe(({ current }) => {
-      if (this.isConnected) {
+      if (this.#isConnected) {
         if (current) {
           this.#split()
         } else {
@@ -623,7 +625,7 @@ export class ScrollElement extends HTMLElement {
       this.#dragControls.swipe = e.current
       this.#autoplayControls.interval = e.current
 
-      if (this.isConnected) {
+      if (this.#isConnected) {
         if (e.current && !e.previous && !this.#sections.length) {
           this.#split()
         } else if (!e.current && e.previous && this.#sections.length) {
@@ -633,7 +635,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#autoSizeCSSProperty.subscribe((e) => {
-      if (this.isConnected) {
+      if (this.#isConnected) {
         this.#resizeListener()
         if (e.current && !e.previous && !this.#sections.length) {
           this.#split()
@@ -644,7 +646,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#sectionsInViewCSSProperty.subscribe((e) => {
-      if (this.isConnected) {
+      if (this.#isConnected) {
         this.#resizeListener()
         this.#updateMarks()
       }
@@ -656,7 +658,7 @@ export class ScrollElement extends HTMLElement {
         this.#damped.max = this.#scrollSize
         this.#damped.min = 0
       } else {
-        if (this.isConnected) {
+        if (this.#isConnected) {
           if (!this.#sections.length) {
             this.#splitCSSProperty.current = true
           }
@@ -698,19 +700,19 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#classesCSSProperty.subscribe((e) => {
-      if (this.isConnected) {
+      if (this.#isConnected) {
         this.#updateMarks()
       }
     })
 
     this.#currentIndexStartOffsetCSSProperty.subscribe((e) => {
-      if (this.isConnected && this.#classesCSSProperty.current) {
+      if (this.#isConnected && this.#classesCSSProperty.current) {
         this.#updateMarks()
       }
     })
 
     this.#currentIndexEndOffsetCSSProperty.subscribe((e) => {
-      if (this.isConnected && this.#classesCSSProperty.current) {
+      if (this.#isConnected && this.#classesCSSProperty.current) {
         this.#updateMarks()
       }
     })
@@ -733,16 +735,20 @@ export class ScrollElement extends HTMLElement {
 
     this.#disabledCSSProperty.subscribe((e) => {
       if (e.current && !e.previous) {
+        this.classList.add('disabled')
         this.#disable()
       } else if (!e.current && e.previous) {
+        this.classList.remove('disabled')
         this.#enable()
       }
     })
 
     this.#hibernatedCSSProperty.subscribe((e) => {
       if (e.current && !e.previous) {
+        this.classList.add('hibernated')
         this.#hibernate()
       } else if (!e.current && e.previous) {
+        this.classList.remove('hibernated')
         this.#awake()
       }
     })
@@ -777,14 +783,14 @@ export class ScrollElement extends HTMLElement {
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
-    if (!this.#hibernatedCSSProperty.current) {
-      this.#awake()
-    }
+    windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
   }
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
-    this.classList.remove('has-overflow')
+
+    this.classList.remove('disabled')
+    this.classList.remove('hibernated')
 
     this.#controlsCSSProperty.unobserve()
     this.#axisCSSProperty.unobserve()
@@ -814,6 +820,8 @@ export class ScrollElement extends HTMLElement {
     this.#focusDurationCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
+
+    windowResizer.unsubscribe(this.#connectListener)
 
     this.#hibernate()
   }
@@ -905,6 +913,10 @@ export class ScrollElement extends HTMLElement {
       this.#disable()
 
       this.#contentElement.style.transform = ''
+      this.#contentElement.style.height = ''
+      this.#contentElement.style.width = ''
+
+      this.classList.remove('has-overflow', 'start', 'end')
 
       if (this.#sections.length) {
         this.#unsplit()
@@ -941,6 +953,10 @@ export class ScrollElement extends HTMLElement {
   }
 
   #resizeListener = () => {
+    if (this.#hibernatedCSSProperty.current) {
+      return
+    }
+
     this.#damped.unlistenAnimationFrame()
 
     const prevProgress = this.currentScrollValue / this.#scrollSize || 0
@@ -1053,7 +1069,7 @@ export class ScrollElement extends HTMLElement {
 
     if (!this.#hasOverflow) {
       this.#disable()
-    } else {
+    } else if (!this.#disabledCSSProperty.current) {
       this.#enable()
     }
 
@@ -1061,7 +1077,11 @@ export class ScrollElement extends HTMLElement {
   }
 
   #animatedChangeListener = () => {
-    if (!this.#hasOverflow) {
+    if (
+      !this.#hasOverflow ||
+      this.#hibernatedCSSProperty.current ||
+      this.#disabledCSSProperty.current
+    ) {
       return
     }
 
@@ -1288,6 +1308,14 @@ export class ScrollElement extends HTMLElement {
     }
 
     return nearestIndex !== null ? this.#sections[nearestIndex] : null
+  }
+
+  #connectListener = () => {
+    this.#isConnected = true
+
+    if (!this.hibernatedCSSProperty.current) {
+      this.#awake()
+    }
   }
 }
 
