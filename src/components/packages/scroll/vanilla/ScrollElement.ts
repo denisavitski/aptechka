@@ -469,7 +469,7 @@ export class ScrollElement extends HTMLElement {
 
     const previousCounter = this.#counter.current
 
-    const newCounterValue = this.#updateCounter(sectionIndex)
+    const newCounterValue = this.#clampCounter(sectionIndex)
 
     const previousSection = this.#sections[previousCounter]
     const currentSection = this.#sections[newCounterValue]
@@ -477,7 +477,8 @@ export class ScrollElement extends HTMLElement {
     if (previousSection && currentSection) {
       let shiftValue = 0
 
-      const nearestSection = this.#findNearestSection()
+      const nearestSectionIndex = this.#getNearestSectionIndex()
+      const nearestSection = this.#sections[nearestSectionIndex]
 
       const scrolledFromNearestSection = nearestSection
         ? this.targetScrollValue - nearestSection.position
@@ -664,10 +665,8 @@ export class ScrollElement extends HTMLElement {
           }
         }
 
-        if (this.#sections.length) {
-          this.#damped.max = Infinity
-          this.#damped.min = -Infinity
-        }
+        this.#damped.max = Infinity
+        this.#damped.min = -Infinity
       }
     })
 
@@ -1090,20 +1089,12 @@ export class ScrollElement extends HTMLElement {
     this.#overscroll = Math.max(0, currentScrollValue - this.#scrollSize)
 
     if (this.#sections.length) {
-      let counter = 0
-
-      for (let index = 0; index < this.#sections.length; index++) {
-        const section = this.#sections[index]
-
+      for (let i = 0; i < this.#sections.length; i++) {
+        const section = this.#sections[i]
         section.transform()
-
-        // Change
-        if (this.targetScrollValue + section.size / 2 >= section.position) {
-          counter = index
-        }
       }
 
-      this.#counter.current = counter
+      this.#counter.current = this.#getNearestSectionIndex()
     } else {
       if (this.vertical) {
         this.#contentElement.style.transform = `translate3d(0px, ${
@@ -1123,7 +1114,7 @@ export class ScrollElement extends HTMLElement {
     )
   }
 
-  #updateCounter(value: number) {
+  #clampCounter(value: number) {
     let counter = this.#counter.current
 
     if (this.#loopCSSProperty.current) {
@@ -1163,7 +1154,7 @@ export class ScrollElement extends HTMLElement {
       clearInterval(this.#focusTimeoutId)
 
       this.#focusTimeoutId = setTimeout(() => {
-        const section = this.#findNearestSection()
+        const section = this.#sections[this.#getNearestSectionIndex()]
 
         if (section) {
           this.scrollToSection(section.index, {
@@ -1294,12 +1285,23 @@ export class ScrollElement extends HTMLElement {
     }
   }
 
-  #findNearestSection(targetScrollValue = this.targetScrollValue) {
-    let nearestIndex = null
+  // TODO: Учитывать loop
+  #getNearestSectionIndex() {
+    let scrollValue = this.targetScrollValue
+
     let minDiff = Infinity
+    let nearestIndex = 0
+
+    const dir = this.#damped.direction
 
     for (let i = 0; i < this.#sections.length; i++) {
-      const diff = Math.abs(this.#sections[i].position - targetScrollValue)
+      const section = this.#sections[i]
+
+      let offset = this.#isGrabbing ? section.size * dir * -1 * 0.4 : 0
+
+      let position = section.position
+
+      const diff = Math.abs(position + offset - scrollValue)
 
       if (diff < minDiff) {
         minDiff = diff
@@ -1307,7 +1309,7 @@ export class ScrollElement extends HTMLElement {
       }
     }
 
-    return nearestIndex !== null ? this.#sections[nearestIndex] : null
+    return nearestIndex
   }
 
   #connectListener = () => {

@@ -1,14 +1,13 @@
 e-scroll {
-  --axis: y;
+  --axis: x;
   --damping: 10;
   --auto-size: true;
-  --loop: true;
   --gap: 3.2rem;
-  --sections-in-view: 3;
+  --sections-in-view: 1.2;
   --sectional: true;
   --overflow: hidden;
   --mouse-drag: true;
-  --drag-inertion: 1;
+  --classes: true;
 }
 
 section {

@@ -76,6 +76,9 @@ export class DragControls extends Controls {
 
     document.documentElement.classList.add('grabbing')
 
+    let dx = 0
+    let dy = 0
+
     setupDrag(
       (moveEvent) => {
         if (
@@ -85,8 +88,8 @@ export class DragControls extends Controls {
           return
         }
 
-        const dx = prev.x - moveEvent.x
-        const dy = prev.y - moveEvent.y
+        dx = prev.x - moveEvent.x
+        dy = prev.y - moveEvent.y
 
         if (this.axis === 'x') {
           this.#delta = dx
@@ -109,16 +112,14 @@ export class DragControls extends Controls {
       () => {
         DragControls.#currentElement = null
 
-        if (okToNotify) {
-          if (!this.swipe && this.inertion) {
-            this.#delta = this.#delta * this.inertion
+        if (okToNotify && !this.swipe && this.inertion) {
+          this.#delta = this.#delta * this.inertion
 
-            ticker.subscribe(this.#tickListener, {
-              order: TICK_ORDER.CONTROLS - 1,
-            })
-          } else if (this.swipe) {
-            this.changeEvent.notify('drag-end', this.#delta)
-          }
+          ticker.subscribe(this.#tickListener, {
+            order: TICK_ORDER.CONTROLS - 1,
+          })
+        } else if (this.swipe) {
+          this.changeEvent.notify('drag-end', this.#delta)
         }
 
         document.documentElement.classList.remove('grabbing')
