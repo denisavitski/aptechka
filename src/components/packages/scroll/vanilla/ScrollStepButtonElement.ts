@@ -12,14 +12,19 @@ export class ScrollStepButtonElement extends ScrollButtonElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
-    this.#step.subscribe(() => {
+    if (this.scrollElement) {
+      this.#step.subscribe(() => {
+        this.#scrollLineListener()
+      })
+
+      this.#step.observe()
+
+      this.scrollElement.addEventListener(
+        'scrollLine',
+        this.#scrollLineListener
+      )
       this.#scrollLineListener()
-    })
-
-    this.#step.observe()
-
-    this.scrollElement.addEventListener('scrollLine', this.#scrollLineListener)
-    this.#scrollLineListener()
+    }
   }
 
   protected override disconnectedCallback() {
