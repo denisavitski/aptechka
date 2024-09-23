@@ -63,9 +63,8 @@ export class WheelControls extends Controls {
 
     if (
       (this.axis === 'x' &&
-        Math.abs(event.deltaY) > Math.abs(event.deltaX) * 0.5) ||
-      (this.axis === 'y' &&
-        Math.abs(event.deltaX) > Math.abs(event.deltaY) * 0.5)
+        Math.abs(event.deltaY) > Math.abs(event.deltaX) * 1) ||
+      (this.axis === 'y' && Math.abs(event.deltaX) > Math.abs(event.deltaY) * 1)
     ) {
       return
     }

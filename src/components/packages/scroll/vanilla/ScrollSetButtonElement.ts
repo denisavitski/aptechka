@@ -1,11 +1,22 @@
+import { CSSProperty } from '@packages/css-property'
 import { ScrollButtonElement } from './ScrollButtonElement'
-import { ScrollBehaviour, ScrollSetOptions } from './ScrollElement'
+import { ScrollSetOptions } from './ScrollElement'
 
 export class ScrollSetButtonElement extends ScrollButtonElement {
-  protected override handleClick(options: ScrollSetOptions) {
-    const index = this.getAttribute('index')
+  #set = new CSSProperty(this, '--set', 1)
 
-    this.scrollElement.scrollToSection(parseInt(index || '0'), options)
+  protected override handleClick(options: ScrollSetOptions) {
+    this.scrollElement.scrollToSection(this.#set.current, options)
+  }
+
+  protected override connectedCallback() {
+    super.connectedCallback()
+    this.#set.observe()
+  }
+
+  protected override disconnectedCallback() {
+    super.disconnectedCallback()
+    this.#set.close()
   }
 }
 

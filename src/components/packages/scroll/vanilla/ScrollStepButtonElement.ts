@@ -1,10 +1,43 @@
+import { CSSProperty } from '@packages/css-property'
 import { ScrollButtonElement } from './ScrollButtonElement'
-import { ScrollSetOptions } from './ScrollElement'
+import { ScrollEvents, ScrollSetOptions } from './ScrollElement'
 
 export class ScrollStepButtonElement extends ScrollButtonElement {
+  #step = new CSSProperty(this, '--step', 1)
+
   protected override handleClick(options: ScrollSetOptions) {
-    const step = this.getAttribute('step')
-    this.scrollElement.shiftSections(parseInt(step || '1'), options)
+    this.scrollElement.shiftSections(this.#step.current, options)
+  }
+
+  protected override connectedCallback() {
+    super.connectedCallback()
+
+    this.#step.subscribe(() => {
+      this.#scrollLineListener()
+    })
+
+    this.#step.observe()
+
+    this.scrollElement.addEventListener('scrollLine', this.#scrollLineListener)
+    this.#scrollLineListener()
+  }
+
+  protected override disconnectedCallback() {
+    super.disconnectedCallback()
+    this.#step.close()
+  }
+
+  #scrollLineListener = () => {
+    if (!this.scrollElement.loopCSSProperty.current) {
+      if (
+        (this.#step.current > 0 && this.scrollElement.scrollLine === 'end') ||
+        (this.#step.current < 0 && this.scrollElement.scrollLine === 'start')
+      ) {
+        this.setAttribute('disabled', '')
+      } else {
+        this.removeAttribute('disabled')
+      }
+    }
   }
 }
 

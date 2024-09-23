@@ -26,8 +26,11 @@ import { elementResizer } from '@packages/element-resizer/vanilla'
 import { ScrollSection } from './ScrollSection'
 import { TweenEasingName } from '@packages/animation/Tweened'
 
+export type ScrollLine = 'start' | 'end' | null
+
 export interface ScrollEvents {
   scrollSectionsChange: CustomEvent
+  scrollLine: CustomEvent<{ line: ScrollLine }>
 }
 
 export type ScrollBehaviour = 'smooth' | 'instant'
@@ -35,8 +38,8 @@ export type ScrollBehaviour = 'smooth' | 'instant'
 export interface ScrollSetOptions {
   behaviour?: ScrollBehaviour
   tween?: {
-    easing?: TweenedOptions['easing']
-    duration: number
+    easing?: TweenedOptions['easing'] | false
+    duration?: number | false
   }
 }
 
@@ -101,12 +104,12 @@ export class ScrollElement extends HTMLElement {
   #sectionalCSSProperty = new CSSProperty<boolean>(this, '--sectional', false)
   #easingCSSProperty = new CSSProperty<TweenEasingName | false>(
     this,
-    '--easing',
+    '--tween-easing',
     false
   )
   #durationCSSProperty = new CSSProperty<number | false>(
     this,
-    '--duration',
+    '--tween-duration',
     false
   )
   #autoSizeCSSProperty = new CSSProperty<boolean>(this, '--auto-size', false)
@@ -193,6 +196,8 @@ export class ScrollElement extends HTMLElement {
 
   #setTween = new Tweened()
   #isGrabbing = false
+
+  #scrollLine: ScrollLine = null
 
   constructor() {
     super()
@@ -402,6 +407,10 @@ export class ScrollElement extends HTMLElement {
     return this.#overscroll
   }
 
+  public get scrollLine() {
+    return this.#scrollLine
+  }
+
   public get vertical() {
     return this.#axisCSSProperty.current === 'y'
   }
@@ -458,10 +467,10 @@ export class ScrollElement extends HTMLElement {
 
     const previousCounter = this.#counter.current
 
-    this.#setCounter(sectionIndex)
+    const newCounterValue = this.#updateCounter(sectionIndex)
 
     const previousSection = this.#sections[previousCounter]
-    const currentSection = this.#sections[this.#counter.current]
+    const currentSection = this.#sections[newCounterValue]
 
     if (previousSection && currentSection) {
       let shiftValue = 0
@@ -474,7 +483,7 @@ export class ScrollElement extends HTMLElement {
 
       if (this.#loopCSSProperty.current) {
         if (
-          this.#counter.current === 0 &&
+          newCounterValue === 0 &&
           previousCounter === this.#sections.length - 1
         ) {
           shiftValue =
@@ -483,7 +492,7 @@ export class ScrollElement extends HTMLElement {
             previousSection.position +
             this.#gap
         } else if (
-          this.#counter.current === this.#sections.length - 1 &&
+          newCounterValue === this.#sections.length - 1 &&
           previousCounter === 0
         ) {
           shiftValue =
@@ -521,7 +530,7 @@ export class ScrollElement extends HTMLElement {
 
       this.#tweenTimeoutId = setTimeout(() => {
         this.#tweenTimeoutId = undefined
-      }, options.tween.duration)
+      }, options.tween.duration || 0)
     }
   }
 
@@ -1094,16 +1103,17 @@ export class ScrollElement extends HTMLElement {
     )
   }
 
-  #setCounter(value: number) {
+  #updateCounter(value: number) {
+    let counter = this.#counter.current
+
     if (this.#loopCSSProperty.current) {
-      this.#counter.current = value % this.#sections.length
-      this.#counter.current =
-        this.#counter.current < 0
-          ? this.#sections.length + this.#counter.current
-          : this.#counter.current
+      counter = value % this.#sections.length
+      counter = counter < 0 ? this.#sections.length + counter : counter
     } else {
-      this.#counter.current = clamp(value, 0, this.limit)
+      counter = clamp(value, 0, this.limit)
     }
+
+    return counter
   }
 
   #notAutoplayControlListener = (type: string, value: number) => {
@@ -1211,48 +1221,56 @@ export class ScrollElement extends HTMLElement {
   }
 
   #updateMarks() {
-    if (this.#classesCSSProperty.current && this.#sections.length) {
+    if (this.#sections.length) {
       const counter =
         this.#counter.current + this.#currentIndexStartOffsetCSSProperty.current
 
       if (counter === 0) {
-        this.classList.add('start')
+        this.#scrollLine = 'start'
+      } else if (counter === this.limit) {
+        this.#scrollLine = 'end'
       } else {
-        this.classList.remove('start')
+        this.#scrollLine = null
       }
 
-      if (counter === this.limit) {
-        this.classList.add('end')
-      } else {
-        this.classList.remove('end')
-      }
+      dispatchEvent(this, 'scrollLine', {
+        detail: { line: this.#scrollLine },
+      })
 
-      const sectionsInView =
-        this.#sectionsInViewCSSProperty.current +
-        this.#currentIndexEndOffsetCSSProperty.current
+      if (this.#classesCSSProperty.current) {
+        this.classList.remove('end', 'start')
 
-      this.#sections.forEach((section, index) => {
-        const overflow =
-          counter -
-          this.limit -
-          1 +
+        if (this.#scrollLine) {
+          this.classList.add(this.#scrollLine)
+        }
+
+        const sectionsInView =
+          this.#sectionsInViewCSSProperty.current +
           this.#currentIndexEndOffsetCSSProperty.current
 
-        const currentRange = counter + sectionsInView
+        this.#sections.forEach((section, index) => {
+          const overflow =
+            counter -
+            this.limit -
+            1 +
+            this.#currentIndexEndOffsetCSSProperty.current
 
-        const vv = this.sections.length - currentRange
+          const currentRange = counter + sectionsInView
 
-        if ((index >= counter && index < currentRange) || index <= overflow) {
-          section.mark('current')
-        } else if (
-          (index >= currentRange && index < currentRange + vv / 2) ||
-          index <= overflow + sectionsInView
-        ) {
-          section.mark('next')
-        } else {
-          section.mark('previous')
-        }
-      })
+          const vv = this.sections.length - currentRange
+
+          if ((index >= counter && index < currentRange) || index <= overflow) {
+            section.mark('current')
+          } else if (
+            (index >= currentRange && index < currentRange + vv / 2) ||
+            index <= overflow + sectionsInView
+          ) {
+            section.mark('next')
+          } else {
+            section.mark('previous')
+          }
+        })
+      }
     }
   }
 

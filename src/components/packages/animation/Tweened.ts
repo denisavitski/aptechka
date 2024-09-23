@@ -16,8 +16,8 @@ import * as easings from '@packages/utils/easings'
 export type TweenEasingName = keyof typeof easings
 
 export interface TweenedOptions extends AnimationOptions {
-  easing?: EasingFunction | TweenEasingName
-  duration?: number
+  easing?: EasingFunction | TweenEasingName | false
+  duration?: number | false
 }
 
 export class Tweened extends Animation<TweenedOptions> {
@@ -43,7 +43,10 @@ export class Tweened extends Animation<TweenedOptions> {
         ? easings[options.easing as keyof typeof easings] || easings.linear
         : easings.linear
 
-    this.#duration = nullishCoalescing(options?.duration, this.#duration)
+    this.#duration =
+      options?.duration === false
+        ? 0
+        : nullishCoalescing(options?.duration, this.#duration)
   }
 
   protected override handleAnimationFrame(e: TickerCallbackEntry): void {
