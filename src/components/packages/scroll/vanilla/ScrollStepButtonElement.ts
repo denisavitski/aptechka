@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { ScrollButtonElement } from './ScrollButtonElement'
-import { ScrollEvents, ScrollSetOptions } from './ScrollElement'
+import { ScrollSetOptions } from './ScrollElement'
 
 export class ScrollStepButtonElement extends ScrollButtonElement {
   #step = new CSSProperty(this, '--step', 1)
@@ -24,7 +24,10 @@ export class ScrollStepButtonElement extends ScrollButtonElement {
 
   protected override disconnectedCallback() {
     super.disconnectedCallback()
+
     this.#step.close()
+
+    this.removeAttribute('disabled')
   }
 
   #scrollLineListener = () => {
@@ -37,6 +40,8 @@ export class ScrollStepButtonElement extends ScrollButtonElement {
       } else {
         this.removeAttribute('disabled')
       }
+    } else {
+      this.removeAttribute('disabled')
     }
   }
 }
