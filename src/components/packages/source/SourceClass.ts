@@ -18,7 +18,7 @@ export class Source {
 
     const splitted = url.split('.')
 
-    this.#name = splitted[0]
+    this.#name = splitted.slice(0, -1).join('.')
 
     const xpattern = /\d+x/g
     const xmatch = splitted.find((s) => s.match(xpattern))

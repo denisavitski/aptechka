@@ -3,7 +3,7 @@ e-scroll {
   --damping: 10;
   --auto-size: true;
   --gap: 3.2rem;
-  --sections-in-view: 1.2;
+  --sections-in-view: 4.1;
   --sectional: true;
   --overflow: hidden;
   --mouse-drag: true;
