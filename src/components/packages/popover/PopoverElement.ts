@@ -24,7 +24,8 @@ export class PopoverElement extends HTMLElement {
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
-  #dominance = new CSSProperty<number>(this, '--dominance', -1)
+  #dominance = new CSSProperty(this, '--dominance', 0)
+  #group = new CSSProperty(this, '--group', '')
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #historyAllowed = false
@@ -40,6 +41,10 @@ export class PopoverElement extends HTMLElement {
 
   public get dominance() {
     return this.#dominance
+  }
+
+  public get group() {
+    return this.#group
   }
 
   public get clickOutside() {
@@ -69,11 +74,7 @@ export class PopoverElement extends HTMLElement {
 
     if (this.#dominance.current) {
       PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
-        if (
-          e !== this &&
-          e.dominance.current !== 0 &&
-          this.dominance.current >= e.dominance.current
-        ) {
+        if (e !== this && this.#checkDomination(this, e)) {
           e.close()
           return false
         }
@@ -141,11 +142,7 @@ export class PopoverElement extends HTMLElement {
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => {
       if (m === this) {
         return false
-      } else if (
-        m.#dominance.current !== 0 &&
-        m.#dominance.current < this.dominance.current &&
-        !m.#openTimeoutId
-      ) {
+      } else if (!m.#openTimeoutId && this.#checkDomination(this, m)) {
         m.close()
         return false
       }
@@ -178,6 +175,7 @@ export class PopoverElement extends HTMLElement {
     this.#history.observe()
     this.#restore.observe()
     this.#dominance.observe()
+    this.#group.observe()
     this.#clickOutside.observe()
     this.#escape.observe()
 
@@ -207,11 +205,12 @@ export class PopoverElement extends HTMLElement {
   protected disconnectedCallback() {
     windowResizer.unsubscribe(this.#resizeListener)
 
-    this.#history.unobserve()
-    this.#restore.unobserve()
-    this.#dominance.unobserve()
-    this.#clickOutside.unobserve()
-    this.#escape.unobserve()
+    this.#history.close()
+    this.#restore.close()
+    this.#dominance.close()
+    this.#group.close()
+    this.#clickOutside.close()
+    this.#escape.close()
 
     this.style.opacity = ''
     this.style.display = ''
@@ -335,6 +334,15 @@ export class PopoverElement extends HTMLElement {
   #resize = () => {
     this.style.setProperty('--content-width', this.scrollWidth + 'px')
     this.style.setProperty('--content-height', this.scrollHeight + 'px')
+  }
+
+  #checkDomination(a: PopoverElement, b: PopoverElement) {
+    if (
+      a.#group.current === b.#group.current &&
+      a.dominance.current >= b.dominance.current
+    ) {
+      return true
+    }
   }
 }
 
