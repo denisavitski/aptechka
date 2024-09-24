@@ -96,6 +96,7 @@ export class ScrollElement extends HTMLElement {
 
   #controlsCSSProperty = new CSSProperty<boolean>(this, '--controls', true)
   #axisCSSProperty = new CSSProperty<Axes2D>(this, '--axis', 'y')
+  #reverseCSSProperty = new CSSProperty<boolean>(this, '--reverse', false)
   #directionCSSProperty = new CSSProperty<number>(this, '--direction', 0)
   #pagesCSSProperty = new CSSProperty<number>(this, '--pages', 0, {
     validate: (v) => Math.max(0, v - 1),
@@ -237,6 +238,11 @@ export class ScrollElement extends HTMLElement {
   public get axisCSSProperty() {
     return this.#axisCSSProperty
   }
+
+  public get reverseCSSProperty() {
+    return this.#reverseCSSProperty
+  }
+
   public get directionCSSProperty() {
     return this.#directionCSSProperty
   }
@@ -571,27 +577,12 @@ export class ScrollElement extends HTMLElement {
     })
     this.#autoplayControls.changeEvent.subscribe(this.#controlsListener)
 
-    this.#axisCSSProperty.subscribe(({ current }) => {
-      this.#contentElement.style.flexDirection =
-        current === 'x' ? 'row' : 'column'
+    this.#axisCSSProperty.subscribe(() => {
+      this.#updateAxis()
+    })
 
-      this.#wheelControls.axis = this.#wheelMaxDeltaCSSProperty.current
-        ? 'max'
-        : current
-
-      this.#keyboardControls.dimension = current === 'x' ? 'width' : 'height'
-
-      this.#dragControls.axis = current
-
-      if (current === 'x') {
-        this.style.touchAction = 'pan-y'
-      } else if (current === 'y') {
-        this.style.touchAction = 'pan-x'
-      }
-
-      if (this.#isConnected) {
-        this.#resizeListener()
-      }
+    this.#reverseCSSProperty.subscribe(() => {
+      this.#updateAxis()
     })
 
     this.#wheelMaxDeltaCSSProperty.subscribe((e) => {
@@ -754,6 +745,7 @@ export class ScrollElement extends HTMLElement {
 
     this.#controlsCSSProperty.observe()
     this.#axisCSSProperty.observe()
+    this.#reverseCSSProperty.observe()
     this.#directionCSSProperty.observe()
     this.#pagesCSSProperty.observe()
     this.#splitCSSProperty.observe()
@@ -793,6 +785,7 @@ export class ScrollElement extends HTMLElement {
 
     this.#controlsCSSProperty.unobserve()
     this.#axisCSSProperty.unobserve()
+    this.#reverseCSSProperty.unobserve()
     this.#directionCSSProperty.unobserve()
     this.#pagesCSSProperty.unobserve()
     this.#splitCSSProperty.unobserve()
@@ -823,6 +816,32 @@ export class ScrollElement extends HTMLElement {
     windowResizer.unsubscribe(this.#connectListener)
 
     this.#hibernate()
+  }
+
+  #updateAxis() {
+    const axis = this.#axisCSSProperty.current
+    const reverse = this.#reverseCSSProperty.current ? '-reverse' : ''
+
+    this.#contentElement.style.flexDirection =
+      axis === 'x' ? `row${reverse}` : `column${reverse}`
+
+    this.#wheelControls.axis = this.#wheelMaxDeltaCSSProperty.current
+      ? 'max'
+      : axis
+
+    this.#keyboardControls.dimension = axis === 'x' ? 'width' : 'height'
+
+    this.#dragControls.axis = axis
+
+    if (axis === 'x') {
+      this.style.touchAction = 'pan-y'
+    } else if (axis === 'y') {
+      this.style.touchAction = 'pan-x'
+    }
+
+    if (this.#isConnected) {
+      this.#resizeListener()
+    }
   }
 
   #split() {
