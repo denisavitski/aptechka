@@ -56,6 +56,11 @@ export class Source {
       this.#queryType = 'min'
     }
 
+    this.#name = this.#name.replace(
+      `.${this.#queryValue}${this.#queryType}`,
+      ''
+    )
+
     this.#extension = '.' + splitted[splitted.length - 1]
   }
 
