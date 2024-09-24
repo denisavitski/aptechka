@@ -24,7 +24,7 @@ export class PopoverElement extends HTMLElement {
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
-  #dominance = new CSSProperty(this, '--dominance', 0)
+  #dominance = new CSSProperty<number>(this, '--dominance', -1)
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #historyAllowed = false
@@ -69,7 +69,11 @@ export class PopoverElement extends HTMLElement {
 
     if (this.#dominance.current) {
       PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
-        if (e !== this && this.dominance.current >= e.dominance.current) {
+        if (
+          e !== this &&
+          e.dominance.current !== 0 &&
+          this.dominance.current >= e.dominance.current
+        ) {
           e.close()
           return false
         }
@@ -138,6 +142,7 @@ export class PopoverElement extends HTMLElement {
       if (m === this) {
         return false
       } else if (
+        m.#dominance.current !== 0 &&
         m.#dominance.current < this.dominance.current &&
         !m.#openTimeoutId
       ) {
