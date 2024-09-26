@@ -337,6 +337,7 @@ export class PopoverElement extends HTMLElement {
   }
 
   #checkDomination(a: PopoverElement, b: PopoverElement) {
+    console.log(a.#group.current, b.#group.current)
     if (
       a.#group.current === b.#group.current &&
       a.dominance.current >= b.dominance.current

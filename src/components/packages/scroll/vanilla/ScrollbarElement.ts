@@ -125,7 +125,7 @@ export class ScrollbarElement extends ScrollUserElement {
 
     this.#thumbScrollSize = barSize - this.#thumbSize
 
-    if (!this.scrollElement.scrollSize) {
+    if (this.scrollElement.scrollSize <= 0) {
       this.style.display = 'none'
     } else {
       this.style.display = ''
