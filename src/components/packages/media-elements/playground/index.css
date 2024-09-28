@@ -6,11 +6,11 @@
 
 .scrollable {
   height: 400vh;
-  padding-top: 150vh;
 }
 
-e-video {
+e-youtube {
   display: block;
-  width: 100vw;
+  width: 50vw;
+  height: 50vh;
   border: 1px solid red;
 }

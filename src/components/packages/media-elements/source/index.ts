@@ -31,6 +31,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   #clearTimeoutId: ReturnType<typeof setTimeout> | undefined
 
+  #currentURL: string | null = null
+
   constructor() {
     super()
 
@@ -56,6 +58,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   public get isLazy() {
     return this.#isLazy
+  }
+
+  public get currentURL() {
+    return this.#currentURL
   }
 
   public triggerLazyLoad() {
@@ -151,11 +157,11 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
       this.#status.set('loading', true)
 
-      const url = isKeepSourceParameters
+      this.#currentURL = isKeepSourceParameters
         ? source.url
         : source.name + source.extension
 
-      this.consumeSource(url)
+      this.consumeSource(this.#currentURL)
 
       if (!this.#isLazy && !this.#isFirstLoadHappened) {
         loading.add(this.#idWithUrl)
@@ -170,9 +176,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       }
 
       this.#consumerElement.onerror = () => {
-        this.#errorListener(url)
+        this.#errorListener(this.#currentURL!)
       }
     } else {
+      this.#currentURL = null
       this.consumeSource(null)
     }
   }
@@ -213,10 +220,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       getComputedStyle(this).getPropertyValue('--clear-duration')
 
     if (clearDuration) {
-      this.#clearTimeoutId = setTimeout(
-        () => this.#status.set('clear', true),
-        parseFloat(clearDuration) * 1000
-      )
+      this.#clearTimeoutId = setTimeout(() => {
+        this.#status.set('clear', true)
+      }, parseFloat(clearDuration) * 1000)
     }
 
     this.#isFirstLoadHappened = true

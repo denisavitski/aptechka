@@ -10,15 +10,10 @@ export class Source {
   constructor(url: string) {
     this.#url = url
 
-    const firstQuestionIndex = url.indexOf('?')
-
-    if (firstQuestionIndex >= 0) {
-      url = url.slice(0, firstQuestionIndex)
-    }
-
     const splitted = url.split('.')
 
-    this.#name = splitted.slice(0, -1).join('.')
+    this.#name =
+      splitted.length > 1 ? splitted.slice(0, -1).join('.') : splitted.join('.')
 
     const xpattern = /\d+x/g
     const xmatch = splitted.find((s) => s.match(xpattern))
@@ -61,7 +56,15 @@ export class Source {
       ''
     )
 
-    this.#extension = '.' + splitted[splitted.length - 1]
+    this.#extension =
+      splitted[splitted.length - 1] === this.#name
+        ? ''
+        : '.' + splitted[splitted.length - 1]
+
+    this.#extension = this.#extension.replace(
+      `.${this.#queryValue}${this.#queryType}`,
+      ''
+    )
   }
 
   public get url() {
