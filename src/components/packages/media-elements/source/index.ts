@@ -223,6 +223,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.#clearTimeoutId = setTimeout(() => {
         this.#status.set('clear', true)
       }, parseFloat(clearDuration) * 1000)
+    } else {
+      this.#status.set('clear', true)
     }
 
     this.#isFirstLoadHappened = true
