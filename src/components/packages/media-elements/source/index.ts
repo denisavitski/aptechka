@@ -24,9 +24,12 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     loading: false,
     loaded: false,
     error: false,
+    clear: false,
   })
 
   #intersectionObserver: IntersectionObserver = null!
+
+  #clearTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   constructor() {
     super()
@@ -126,9 +129,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#consumerElement.remove()
 
     this.#status.reset()
+
+    clearTimeout(this.#clearTimeoutId)
   }
 
   #loadSource(source: Source | undefined) {
+    clearTimeout(this.#clearTimeoutId)
+
     this.#consumerElement.onloadeddata = null
     this.#consumerElement.onload = null
     this.#consumerElement.onerror = null
@@ -136,6 +143,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loaded', false)
     this.#status.set('error', false)
     this.#status.set('loading', false)
+    this.#status.set('clear', false)
 
     if (source) {
       this.#idWithUrl = `${this.#id}-${source.url}`
@@ -199,6 +207,16 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
       loading.complete(this.#idWithUrl)
+    }
+
+    const clearDuration =
+      getComputedStyle(this).getPropertyValue('--clear-duration')
+
+    if (clearDuration) {
+      this.#clearTimeoutId = setTimeout(
+        () => this.#status.set('clear', true),
+        parseFloat(clearDuration) * 1000
+      )
     }
 
     this.#isFirstLoadHappened = true
