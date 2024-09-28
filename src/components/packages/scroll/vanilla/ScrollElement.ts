@@ -18,6 +18,7 @@ import {
   easeInOutExpo,
   createStylesheet,
   dispatchEvent,
+  loopNumber,
 } from '@packages/utils'
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
@@ -1137,8 +1138,7 @@ export class ScrollElement extends HTMLElement {
     let counter = this.#counter.current
 
     if (this.#loopCSSProperty.current) {
-      counter = value % this.#sections.length
-      counter = counter < 0 ? this.#sections.length + counter : counter
+      counter = loopNumber(value, this.#sections.length)
     } else {
       counter = clamp(value, 0, this.limit)
     }

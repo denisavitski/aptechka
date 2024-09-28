@@ -20,3 +20,10 @@ export function toStep(value: number, step: number) {
     return Math.ceil(value)
   }
 }
+
+export function loopNumber(value: number, max: number) {
+  value = value % max
+  value = value < 0 ? max + value : value
+
+  return value
+}
