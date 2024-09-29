@@ -88,7 +88,8 @@ export class YouTubeElement extends SourceElement<HTMLDivElement> {
 
   #createPlayer = () => {
     this.#needToPlay =
-      this.hasAttribute('autoplay') && !this.hasAttribute('capture-autoplay')
+      this.#needToPlay ||
+      (this.hasAttribute('autoplay') && !this.hasAttribute('capture-autoplay'))
 
     this.#player = new window.YT.Player(this.#containerId, {
       playerVars: {
