@@ -12,6 +12,7 @@ export class YouTubeElement extends SourceElement<HTMLDivElement> {
   #containerId: string
 
   #needToPlay = false
+  #playerReady = false
 
   constructor() {
     super()
@@ -27,7 +28,7 @@ export class YouTubeElement extends SourceElement<HTMLDivElement> {
 
     this.addEventListener('sourceCapture', () => {
       if (this.hasAttribute('capture-autoplay')) {
-        if (this.#player) {
+        if (this.#playerReady) {
           this.#player.playVideo()
         } else {
           this.#needToPlay = true
@@ -105,6 +106,7 @@ export class YouTubeElement extends SourceElement<HTMLDivElement> {
   }
 
   #playerReadyListener = () => {
+    this.#playerReady = true
     this.#updateVideo()
   }
 
