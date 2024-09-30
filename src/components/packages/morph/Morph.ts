@@ -77,6 +77,13 @@ export class Morph {
       this.#findLinks()
 
       addEventListener('popstate', this.#popStateListener)
+
+      changeHistory(
+        'replace',
+        this.#currentPathname,
+        normalizedPath.parameters,
+        normalizedPath.hash
+      )
     }
   }
 

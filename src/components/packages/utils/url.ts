@@ -52,8 +52,8 @@ export function changeHistory(
   const pathPlus = `${pathname}${h}${p}`
 
   if (action === 'push') {
-    history.pushState(null, '', pathPlus)
+    history.pushState(pathPlus, '', pathPlus)
   } else if (action === 'replace') {
-    history.replaceState(null, '', pathPlus)
+    history.replaceState(pathPlus, '', pathPlus)
   }
 }

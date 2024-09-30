@@ -10,6 +10,7 @@
 
 e-popover {
   --duration: 0.5s;
+  --history: true;
   display: none;
   opacity: 0;
   height: 0;

@@ -1,4 +1,3 @@
-import { Attribute } from '@packages/attribute'
 import { CSSProperty } from '@packages/css-property'
 import { Store } from '@packages/store/vanilla'
 import {
@@ -302,7 +301,6 @@ export class PopoverElement extends HTMLElement {
 
   #popStateListener = () => {
     this.#historyAllowed = false
-
     if (
       this.#opened.current &&
       this.#history.current &&
@@ -316,7 +314,6 @@ export class PopoverElement extends HTMLElement {
     ) {
       this.open()
     }
-
     this.#historyAllowed = true
   }
 
@@ -337,7 +334,6 @@ export class PopoverElement extends HTMLElement {
   }
 
   #checkDomination(a: PopoverElement, b: PopoverElement) {
-    console.log(a.#group.current, b.#group.current)
     if (
       a.#group.current === b.#group.current &&
       a.dominance.current >= b.dominance.current
