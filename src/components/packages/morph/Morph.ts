@@ -313,7 +313,12 @@ export class Morph {
   #findLinks() {
     const linkElements = [
       ...document.documentElement.querySelectorAll('a'),
-    ].filter((a) => a.getAttribute('href')?.startsWith('/'))
+    ].filter(
+      (a) =>
+        a.getAttribute('href')?.startsWith('/') &&
+        !a.hasAttribute('download') &&
+        !a.hasAttribute('data-morph-skip')
+    )
 
     this.#links.forEach((link) => link.destroy())
 
