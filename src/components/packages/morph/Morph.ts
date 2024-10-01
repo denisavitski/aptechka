@@ -49,6 +49,8 @@ export class Morph {
   #cache: Map<string, Document> = new Map()
   #candidatePathname: string | undefined
   #currentPathname: string = null!
+  #previousPathname: string | undefined = undefined
+  #currentState: any
 
   public preprocessor?: MorphPreprocessor
   public postprocessor?: MorphPostprocessor
@@ -97,6 +99,14 @@ export class Morph {
     return this.#currentPathname
   }
 
+  public get previousPathname() {
+    return this.#previousPathname
+  }
+
+  public get currentState() {
+    return this.#currentState
+  }
+
   public get links() {
     return this.#links
   }
@@ -132,6 +142,7 @@ export class Morph {
       return
     }
 
+    this.#currentState = state
     this.#candidatePathname = pathname
 
     const isCached = this.#cache.has(pathname)
@@ -237,6 +248,7 @@ export class Morph {
         }
       })
 
+      this.#previousPathname = this.#currentPathname
       this.#currentPathname = pathname
 
       changeHistory(historyAction, pathname, parameters, hash)
