@@ -6,6 +6,7 @@ export class Link {
   #element: HTMLAnchorElement
   #pathname: string
   #historyAction: ChangeHistoryAction
+  #state: string | undefined
   #matchPaths: Array<string> | undefined
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
@@ -18,6 +19,8 @@ export class Link {
       (this.#element.getAttribute(
         'data-history-action'
       ) as ChangeHistoryAction) || 'push'
+
+    this.#state = this.#element.getAttribute('data-state') || undefined
 
     this.#element.addEventListener('click', this.#clickListener)
 
@@ -70,7 +73,10 @@ export class Link {
       }
     })
 
-    this.#morph.navigate(this.#pathname, this.#historyAction)
+    this.#morph.navigate(this.#pathname, {
+      historyAction: this.#historyAction,
+      state: this.#state,
+    })
   }
 
   #pointerListener = () => {

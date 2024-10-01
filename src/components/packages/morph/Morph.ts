@@ -20,6 +20,7 @@ export interface MorphParameters {
 export interface MorphNavigationEntry {
   pathname: string
   isCached: boolean
+  state?: any
 }
 
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
@@ -32,6 +33,11 @@ export type MorphPreprocessor = (entry: MorphPreprocessorEntry) => void
 export type MorphNavigationCallback = (entry: MorphNavigationEntry) => void
 
 export type MorphPostprocessor = MorphNavigationCallback
+
+export interface MorphNavigateOptions {
+  historyAction?: ChangeHistoryAction
+  state?: any
+}
 
 export class Morph {
   #base: string = null!
@@ -114,7 +120,7 @@ export class Morph {
 
   public async navigate(
     path: string,
-    historyAction: ChangeHistoryAction = 'push'
+    { historyAction = 'push', state }: MorphNavigateOptions = {}
   ) {
     const parts = this.normalizePath(path)
     let { pathname, hash, parameters, leaf } = parts
@@ -138,12 +144,13 @@ export class Morph {
       this.#beforeNavigationEvent.notify({
         pathname,
         isCached,
+        state,
       })
 
       if (this.preprocessor) {
         try {
           await new Promise<void>((resolve, reject) => {
-            this.preprocessor?.({ pathname, resolve, reject, isCached })
+            this.preprocessor?.({ pathname, resolve, reject, isCached, state })
           })
         } catch (e: any) {
           if (e) {
@@ -282,8 +289,8 @@ export class Morph {
 
       document.documentElement.setAttribute('data-current-leaf', leaf)
 
-      this.postprocessor?.({ pathname, isCached })
-      this.#afterNavigationEvent.notify({ pathname, isCached })
+      this.postprocessor?.({ pathname, isCached, state })
+      this.#afterNavigationEvent.notify({ pathname, isCached, state })
       loading.complete('__morph')
     } catch (e) {
       console.error(e)
@@ -361,7 +368,7 @@ export class Morph {
 
   #popStateListener = (event: PopStateEvent) => {
     if (event.state) {
-      this.navigate(event.state, 'none')
+      this.navigate(event.state, { historyAction: 'none' })
     }
   }
 }
