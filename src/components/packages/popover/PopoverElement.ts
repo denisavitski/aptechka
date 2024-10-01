@@ -255,7 +255,7 @@ export class PopoverElement extends HTMLElement {
       const target = path[0]
 
       const containsTarget =
-        target instanceof HTMLElement &&
+        target instanceof Node &&
         (this.contains(target) || this.shadowRoot?.contains(target))
 
       const outsideTarget =
