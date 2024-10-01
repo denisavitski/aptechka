@@ -74,7 +74,7 @@ export class Morph {
         normalizedPath.leaf
       )
 
-      this.#findLinks()
+      this.findLinks()
 
       addEventListener('popstate', this.#popStateListener)
 
@@ -276,7 +276,7 @@ export class Morph {
         morphElement.append(...newMorphElementChildNodes)
       })
 
-      this.#findLinks()
+      this.findLinks()
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
 
@@ -310,7 +310,13 @@ export class Morph {
     return document
   }
 
-  #findLinks() {
+  public addLinks(elements: Array<HTMLAnchorElement>) {
+    elements.forEach((element) => {
+      this.#links.push(new Link(element, this))
+    })
+  }
+
+  public findLinks() {
     const linkElements = [
       ...document.documentElement.querySelectorAll('a'),
     ].filter(
