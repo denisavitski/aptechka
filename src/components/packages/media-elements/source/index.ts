@@ -83,6 +83,14 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     if (!srcset) return
 
+    const notifyElement = this.hasAttribute('notify')
+      ? this.querySelector<HTMLElement>(this.getAttribute('notify')!)
+      : null
+
+    if (notifyElement) {
+      this.#status.addElement(notifyElement)
+    }
+
     this.#consumerElement = this.createConsumer()
 
     this.#consumerElement.style.cssText = `

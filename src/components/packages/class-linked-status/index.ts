@@ -4,12 +4,20 @@ import { camelToKebab } from '@packages/utils'
 export class ClassLinkedStatus<
   T extends { [key in string]: boolean }
 > extends Store<T> {
-  #element: HTMLElement
+  #elements: Array<HTMLElement>
 
-  constructor(element: HTMLElement, value: T) {
+  constructor(element: HTMLElement | Array<HTMLElement>, value: T) {
     super(value)
 
-    this.#element = element
+    this.#elements = Array.isArray(element) ? element : [element]
+  }
+
+  public addElement(element: HTMLElement) {
+    this.#elements.push(element)
+  }
+
+  public removeElement(element: HTMLElement) {
+    this.#elements = this.#elements.filter((el) => el !== element)
   }
 
   public isTrue(key: keyof T) {
@@ -32,9 +40,13 @@ export class ClassLinkedStatus<
     this.current = { ...this.current, [key]: value }
 
     if (value) {
-      this.#element.classList.add(camelToKebab(key as string))
+      this.#elements.forEach((el) =>
+        el.classList.add(camelToKebab(key as string))
+      )
     } else {
-      this.#element.classList.remove(camelToKebab(key as string))
+      this.#elements.forEach((el) =>
+        el.classList.remove(camelToKebab(key as string))
+      )
     }
   }
 }
