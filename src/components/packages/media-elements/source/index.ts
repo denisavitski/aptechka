@@ -39,7 +39,6 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     super()
 
     if (isBrowser && window.IntersectionObserver) {
-      this.#id = `source-consumer-${++id}`
       this.#intersectionObserver = new IntersectionObserver(
         this.#intersectionListener
       )
@@ -85,6 +84,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   protected abstract consumeSource(url: string | null): void
 
   protected connectedCallback() {
+    this.#id = `source-consumer-${++id}`
+
     const srcset = this.getAttribute('srcset')
 
     if (!srcset) return

@@ -1,7 +1,7 @@
 import '@packages/media-elements'
+import '@packages/popover'
 
 import { Morph } from '../Morph'
-import { wait } from '@packages/utils'
 
 const morph = new Morph({
   base: '/components/packages/morph/playground/',

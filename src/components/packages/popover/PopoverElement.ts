@@ -86,7 +86,7 @@ export class PopoverElement extends HTMLElement {
     this.#openedIndex = PopoverElement.__opened.length - 1
 
     if (this.#history.current && this.#historyAllowed) {
-      history.pushState('', '', this.#path)
+      history.pushState(history.state, '', this.#path)
     }
 
     clearTimeout(this.#closeTimeoutId)
@@ -227,6 +227,8 @@ export class PopoverElement extends HTMLElement {
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
+
+    this.#deleteSearchParam()
   }
 
   get #path() {
@@ -271,7 +273,7 @@ export class PopoverElement extends HTMLElement {
     if (this.#history.current) {
       const url = new URL(location.href)
       url.searchParams.delete(this.id)
-      history.replaceState(null, '', url.href)
+      history.replaceState(history.state, '', url.href)
     }
   }
 
