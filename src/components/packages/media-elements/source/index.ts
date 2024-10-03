@@ -9,6 +9,8 @@ let id = 0
 export interface SourceEvents {
   sourceCapture: CustomEvent
   sourceRelease: CustomEvent
+  sourceLoaded: CustomEvent
+  sourceError: CustomEvent
 }
 
 export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
@@ -62,6 +64,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   public get currentURL() {
     return this.#currentURL
+  }
+
+  public get isFirstLoadHappened() {
+    return this.#isFirstLoadHappened
   }
 
   public triggerLazyLoad() {
@@ -224,6 +230,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       loading.complete(this.#idWithUrl)
     }
 
+    dispatchEvent(this, 'sourceLoaded', { custom: true })
+
     const clearDuration =
       getComputedStyle(this).getPropertyValue('--clear-duration')
 
@@ -246,6 +254,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
       loading.error(this.#idWithUrl)
     }
+
+    dispatchEvent(this, 'sourceError', { custom: true })
 
     this.#isFirstLoadHappened = true
   }
