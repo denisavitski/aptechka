@@ -48,7 +48,7 @@ export class PopoverButtonElement extends HTMLElement {
 
   protected connectedCallback() {
     this.#type.subscribe((e) => {
-      if (this.#popoverElement) {
+      if (this.#popoverElement instanceof PopoverElement) {
         if (e.current !== 'close') {
           this.setAttribute('aria-has-popup', 'true')
           this.setAttribute(
@@ -119,7 +119,9 @@ export class PopoverButtonElement extends HTMLElement {
       }
     }
 
-    this.#type.observe()
+    if (this.isConnected) {
+      this.#type.observe()
+    }
   }
 
   protected disconnectedCallback() {

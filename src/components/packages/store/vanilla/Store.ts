@@ -158,6 +158,9 @@ export class Store<StoreType = unknown> {
   public close() {
     this.#callbacks.clear()
 
+    this.#state.previous = undefined
+    this.#state.current = this.#state.initial
+
     unshareStore(this)
   }
 

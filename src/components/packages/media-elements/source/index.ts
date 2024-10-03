@@ -72,13 +72,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   public triggerLazyLoad() {
     if (
+      !this.#lazyLoaded &&
       this.#sourceManager.current &&
       this.#sourceManager.current !== this.#sourceManager.previous
     ) {
+      this.#lazyLoaded = true
       this.#loadSource(this.#sourceManager.current)
     }
-
-    this.#lazyLoaded = true
   }
 
   protected abstract createConsumer(): T
