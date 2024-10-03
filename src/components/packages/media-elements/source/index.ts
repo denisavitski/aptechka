@@ -146,6 +146,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#consumerElement.onload = null
     this.#consumerElement.onerror = null
 
+    this.#isFirstLoadHappened = false
+    this.#lazyLoaded = false
+
     this.#consumerElement.remove()
 
     this.#status.reset()
