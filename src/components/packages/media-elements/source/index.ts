@@ -133,9 +133,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       }
     })
 
-    this.#intersectionObserver.observe(this)
-
     this.#sourceManager.connect()
+
+    this.#intersectionObserver.observe(this)
   }
 
   protected disconnectedCallback() {

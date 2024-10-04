@@ -26,6 +26,7 @@ export class SourceManager extends Store<Source | undefined> {
 
   public connect() {
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SOURCE_MANAGER)
+    this.#resizeListener()
   }
 
   public disconnect() {
