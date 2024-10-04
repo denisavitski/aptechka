@@ -40,8 +40,11 @@ class ScrollEntries {
 
   public update(element: HTMLElement, axis: Axes2D, value: number) {
     const entry = this.#entires.get(element)!
-    entry.axis = axis
-    entry.value = value
+
+    if (entry) {
+      entry.axis = axis
+      entry.value = value
+    }
   }
 
   public hasEntry(element: HTMLElement) {

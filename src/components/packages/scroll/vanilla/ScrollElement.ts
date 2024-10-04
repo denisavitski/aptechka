@@ -1096,11 +1096,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   #animatedChangeListener = () => {
-    if (
-      !this.#hasOverflow ||
-      this.#hibernatedCSSProperty.current ||
-      this.#disabledCSSProperty.current
-    ) {
+    if (!this.#hasOverflow || this.#hibernated || this.#disabled) {
       return
     }
 

@@ -57,3 +57,30 @@ export function changeHistory(
     history.replaceState(pathPlus, '', pathPlus)
   }
 }
+
+export function parseSearchParameters(search: string) {
+  const params = new URLSearchParams(search)
+
+  const values: {
+    [key: string]: string
+  } = {}
+
+  for (const [key, value] of params) {
+    ;(values as any)[key] = value
+  }
+
+  return values
+}
+
+export function updateSearchParameter(
+  parameterName: string,
+  value?: string | number
+) {
+  const url = new URL(location.href)
+
+  const v = value?.toString() || ''
+
+  url.searchParams.set(parameterName, v)
+
+  history.replaceState(history.state, '', url.href)
+}

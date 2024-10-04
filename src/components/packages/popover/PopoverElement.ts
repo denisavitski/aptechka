@@ -4,6 +4,8 @@ import {
   debounce,
   dispatchEvent,
   getElementTransitionDurationMS,
+  parseSearchParameters,
+  updateSearchParameter,
 } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer/vanilla'
 
@@ -16,6 +18,8 @@ export interface PopoverEvents {
 
 export class PopoverElement extends HTMLElement {
   private static __opened: Array<PopoverElement> = []
+
+  public urlValue = ''
 
   #openedIndex = -1
   #opened = new Store(false)
@@ -62,14 +66,24 @@ export class PopoverElement extends HTMLElement {
     return this.#lastTrigger
   }
 
+  public get idWithValue() {
+    return `${this.id}${this.urlValue ? '=' + this.urlValue : ''}`
+  }
+
+  public updateUrlValue(value?: string | number) {
+    this.urlValue = value?.toString() || ''
+
+    if (this.#opened.current) {
+      updateSearchParameter(this.id, value)
+    }
+  }
+
   public open = (options?: { skipTransition?: boolean; trigger?: any }) => {
     if (this.#opened.current) {
       return
     }
 
     this.#lastTrigger = options?.trigger
-
-    this.#opened.current = true
 
     if (this.#dominance.current) {
       PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
@@ -85,10 +99,6 @@ export class PopoverElement extends HTMLElement {
     PopoverElement.__opened.push(this)
     this.#openedIndex = PopoverElement.__opened.length - 1
 
-    if (this.#history.current && this.#historyAllowed) {
-      history.pushState(history.state, '', this.#path)
-    }
-
     clearTimeout(this.#closeTimeoutId)
 
     this.classList.remove('closing')
@@ -101,6 +111,12 @@ export class PopoverElement extends HTMLElement {
         trigger: this.#lastTrigger,
       },
     })
+
+    if (this.#history.current && this.#historyAllowed) {
+      history.pushState(history.state, '', this.#path)
+    }
+
+    this.#opened.current = true
 
     const opened = () => {
       addEventListener('click', this.#clickOutsideListener)
@@ -191,6 +207,7 @@ export class PopoverElement extends HTMLElement {
 
     setTimeout(() => {
       if (this.#restore.current) {
+        this.urlValue = parseSearchParameters(location.search)[this.id]
         this.#popStateListener()
       } else {
         this.#deleteSearchParam()
@@ -234,7 +251,7 @@ export class PopoverElement extends HTMLElement {
   get #path() {
     return `${location.pathname}${
       location.search ? location.search + '&' : '?'
-    }${this.id}`
+    }${this.idWithValue}`
   }
 
   #clickOutsideListener = (event: MouseEvent) => {
@@ -314,7 +331,7 @@ export class PopoverElement extends HTMLElement {
       this.#history.current &&
       location.search.includes(this.id)
     ) {
-      this.open()
+      this.open({ trigger: this.idWithValue })
     }
     this.#historyAllowed = true
   }
