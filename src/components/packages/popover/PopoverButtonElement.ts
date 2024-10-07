@@ -50,14 +50,14 @@ export class PopoverButtonElement extends HTMLElement {
     this.#type.subscribe((e) => {
       if (this.#popoverElement instanceof PopoverElement) {
         if (e.current !== 'close') {
-          this.setAttribute('aria-has-popup', 'true')
+          this.setAttribute('aria-haspopup', 'true')
           this.setAttribute(
             'aria-expanded',
             this.#popoverElement.opened.current ? 'true' : 'false'
           )
           this.setAttribute('aria-controls', this.#popoverElement.id || '')
         } else {
-          this.removeAttribute('aria-has-popup')
+          this.removeAttribute('aria-haspopup')
           this.removeAttribute('aria-expanded')
           this.removeAttribute('aria-controls')
         }
@@ -127,7 +127,7 @@ export class PopoverButtonElement extends HTMLElement {
   protected disconnectedCallback() {
     this.#type.unobserve()
 
-    this.removeAttribute('aria-has-popup')
+    this.removeAttribute('aria-haspopup')
     this.removeAttribute('aria-expanded')
     this.removeAttribute('aria-controls')
 
