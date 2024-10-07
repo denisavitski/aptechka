@@ -135,6 +135,8 @@ export class PopoverElement extends HTMLElement {
       })
 
       this.#openTimeoutId = undefined
+
+      this.setAttribute('aria-hidden', 'false')
     }
 
     if (options?.skipTransition) {
@@ -169,6 +171,7 @@ export class PopoverElement extends HTMLElement {
 
     this.classList.remove('opened')
     this.classList.add('closing')
+    this.setAttribute('aria-hidden', 'true')
     this.style.opacity = '0'
 
     dispatchEvent(this, 'popoverClosing', {
@@ -197,7 +200,9 @@ export class PopoverElement extends HTMLElement {
     this.style.opacity = '0'
     this.style.display = 'none'
 
-    this.setAttribute('popover-target', '')
+    this.setAttribute('role', 'dialog')
+    this.setAttribute('aria-hidden', 'true')
+
     this.classList.remove('closing')
     this.classList.remove('closed')
     this.classList.remove('triggered')
@@ -231,7 +236,8 @@ export class PopoverElement extends HTMLElement {
     this.style.opacity = ''
     this.style.display = ''
 
-    this.removeAttribute('popover-target')
+    this.removeAttribute('role')
+    this.removeAttribute('aria-hidden')
 
     PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
 
