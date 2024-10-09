@@ -1,6 +1,6 @@
 import { SourceElement } from '../source'
 
-export class IFameElement extends SourceElement<HTMLElement> {
+export class IFrameElement extends SourceElement<HTMLElement> {
   #iframeElement: HTMLElement | null = null
 
   protected override createConsumer() {
@@ -37,11 +37,11 @@ export class IFameElement extends SourceElement<HTMLElement> {
 }
 
 if (!customElements.get('e-iframe')) {
-  customElements.define('e-iframe', IFameElement)
+  customElements.define('e-iframe', IFrameElement)
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'e-iframe': IFameElement
+    'e-iframe': IFrameElement
   }
 }
