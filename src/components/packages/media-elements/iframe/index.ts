@@ -3,6 +3,14 @@ import { SourceElement } from '../source'
 export class IFrameElement extends SourceElement<HTMLElement> {
   #iframeElement: HTMLElement | null = null
 
+  constructor() {
+    super({
+      sourceSetOptions: {
+        mediaBuckets: false,
+      },
+    })
+  }
+
   protected override createConsumer() {
     return document.createElement('div')
   }

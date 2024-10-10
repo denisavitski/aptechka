@@ -2,12 +2,13 @@ import { RESIZE_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer/vanilla'
 import { Store } from '@packages/store/vanilla'
 import type { Source } from './SourceClass'
-import { SourceSet, SourceSetMediaSources } from './SourceSet'
+import { SourceSet, SourceSetMediaSources, SourceSetOptions } from './SourceSet'
 
 export type SourceManagerSourceSet = string | Array<string>
 
 export interface SourceManagerParameters {
   srcset: SourceManagerSourceSet
+  sourceSetOptions?: SourceSetOptions
 }
 
 export class SourceManager extends Store<Source | undefined> {
@@ -16,7 +17,7 @@ export class SourceManager extends Store<Source | undefined> {
   constructor(parameters: SourceManagerParameters) {
     super(undefined)
 
-    this.#srcset = new SourceSet(parameters.srcset)
+    this.#srcset = new SourceSet(parameters.srcset, parameters.sourceSetOptions)
   }
 
   public override close() {

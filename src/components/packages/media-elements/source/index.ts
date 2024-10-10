@@ -3,6 +3,7 @@ import { ClassLinkedStatus } from '@packages/class-linked-status'
 import { isBrowser, kebabToCamel } from '@packages/utils'
 import { dispatchEvent } from '@packages/utils'
 import { loading } from '@packages/loading'
+import { SourceSetOptions } from '@packages/source/SourceSet'
 
 let id = 0
 
@@ -11,6 +12,10 @@ export interface SourceEvents {
   sourceRelease: CustomEvent
   sourceLoaded: CustomEvent
   sourceError: CustomEvent
+}
+
+export interface SourceElementOptions {
+  sourceSetOptions?: SourceSetOptions
 }
 
 export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
@@ -35,8 +40,12 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   #currentURL: string | null = null
 
-  constructor() {
+  #sourceSetOptions: SourceSetOptions | undefined
+
+  constructor(options?: SourceElementOptions) {
     super()
+
+    this.#sourceSetOptions = options?.sourceSetOptions
 
     if (isBrowser && window.IntersectionObserver) {
       this.#intersectionObserver = new IntersectionObserver(
@@ -123,6 +132,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     this.#sourceManager = new SourceManager({
       srcset: srcset,
+      sourceSetOptions: this.#sourceSetOptions,
     })
 
     this.#isLazy = this.hasAttribute('lazy')

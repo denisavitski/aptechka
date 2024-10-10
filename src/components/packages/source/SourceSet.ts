@@ -3,19 +3,27 @@ import { Source } from './SourceClass'
 export type SourceSetMediaSources = Array<Source>
 export type SourceSetMediaBucket = Map<string, SourceSetMediaSources>
 
+export interface SourceSetOptions {
+  mediaBuckets?: boolean
+}
+
 export class SourceSet {
   #mediaBuckets: SourceSetMediaBucket
 
-  constructor(sourceSet: string | Array<string>) {
+  constructor(sourceSet: string | Array<string>, options?: SourceSetOptions) {
     this.#mediaBuckets = new Map()
+
+    const allowMediaBuckets = options?.mediaBuckets === false ? false : true
 
     const mediaBuckets =
       typeof sourceSet === 'string'
-        ? sourceSet
-            .trim()
-            .split(',')
-            .map((u) => u.trim())
-            .filter((u) => !!u)
+        ? allowMediaBuckets
+          ? sourceSet
+              .trim()
+              .split(',')
+              .map((u) => u.trim())
+              .filter((u) => !!u)
+          : [sourceSet]
         : sourceSet
 
     const tmp: Array<[string, Source]> = []
