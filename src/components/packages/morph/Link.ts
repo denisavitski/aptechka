@@ -53,6 +53,10 @@ export class Link {
     }
   }
 
+  public get element() {
+    return this.#element
+  }
+
   public destroy() {
     this.#element.removeEventListener('click', this.#clickListener)
     this.#element.removeEventListener('pointerenter', this.#pointerListener)

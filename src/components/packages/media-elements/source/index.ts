@@ -95,9 +95,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   protected connectedCallback() {
     this.#id = `source-consumer-${++id}`
 
-    const srcset = this.getAttribute('srcset')
-
-    if (!srcset) return
+    const srcset = this.getAttribute('srcset') || ''
 
     const notifyElement = this.hasAttribute('notify')
       ? this.closest<HTMLElement>(this.getAttribute('notify')!)
@@ -149,22 +147,23 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   }
 
   protected disconnectedCallback() {
+    clearTimeout(this.#clearTimeoutId)
+
     this.#intersectionObserver.disconnect()
 
-    this.#sourceManager.close()
+    this.#sourceManager?.close()
 
-    this.#consumerElement.onloadeddata = null
-    this.#consumerElement.onload = null
-    this.#consumerElement.onerror = null
+    if (this.#consumerElement) {
+      this.#consumerElement.onloadeddata = null
+      this.#consumerElement.onload = null
+      this.#consumerElement.onerror = null
+      this.#consumerElement.remove()
+    }
 
     this.#isFirstLoadHappened = false
     this.#lazyLoaded = false
 
-    this.#consumerElement.remove()
-
     this.#status.reset()
-
-    clearTimeout(this.#clearTimeoutId)
   }
 
   #loadSource(source: Source | undefined) {

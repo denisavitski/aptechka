@@ -329,9 +329,24 @@ export class Morph {
     return document
   }
 
+  public addLink(element: HTMLAnchorElement) {
+    this.#links.push(new Link(element, this))
+  }
+
   public addLinks(elements: Array<HTMLAnchorElement>) {
     elements.forEach((element) => {
-      this.#links.push(new Link(element, this))
+      this.addLink(element)
+    })
+  }
+
+  public removeLink(element: HTMLAnchorElement) {
+    this.#links = this.#links.filter((link) => {
+      if (link.element === element) {
+        link.destroy()
+        return false
+      }
+
+      return true
     })
   }
 
@@ -351,7 +366,9 @@ export class Morph {
   }
 
   #getMorphElements(el: HTMLElement) {
-    return [...el.querySelectorAll<HTMLElement>('[data-morph]')] || [el]
+    const morphElements = [...el.querySelectorAll<HTMLElement>('[data-morph]')]
+
+    return morphElements.length ? morphElements : [el]
   }
 
   #intersectElements(
