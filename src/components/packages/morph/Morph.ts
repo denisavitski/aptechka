@@ -3,6 +3,7 @@ import { Notifier } from '@packages/notifier'
 import {
   ChangeHistoryAction,
   changeHistory,
+  dispatchEvent,
   isBrowser,
   normalizeBase,
   splitPath,
@@ -18,6 +19,13 @@ export interface MorphParameters {
 }
 
 export interface MorphNavigationEntry {
+  pathname: string
+  isCached: boolean
+  state?: any
+}
+
+export interface MorphElementSwitchEntry {
+  element: HTMLElement
   pathname: string
   isCached: boolean
   state?: any
@@ -39,6 +47,13 @@ export interface MorphNavigateOptions {
   state?: any
 }
 
+export interface MorphEvents {
+  morphBeforeNavigation: CustomEvent<MorphNavigationEntry>
+  morphAfterNavigation: CustomEvent<MorphNavigationEntry>
+  morphBeforeElementOut: CustomEvent<MorphElementSwitchEntry>
+  morphAfterElementOut: CustomEvent<MorphElementSwitchEntry>
+}
+
 export class Morph {
   #base: string = null!
   #waitForHeadToLoad: boolean = null!
@@ -51,12 +66,10 @@ export class Morph {
   #currentPathname: string = null!
   #previousPathname: string | undefined = undefined
   #currentState: any
+  #timeoutIds: Array<ReturnType<typeof setTimeout>> = []
 
   public preprocessor?: MorphPreprocessor
   public postprocessor?: MorphPostprocessor
-
-  #beforeNavigationEvent = new Notifier<MorphNavigationCallback>()
-  #afterNavigationEvent = new Notifier<MorphNavigationCallback>()
 
   constructor(parameters?: MorphParameters) {
     if (isBrowser) {
@@ -92,6 +105,15 @@ export class Morph {
         normalizedPath.parameters,
         normalizedPath.hash
       )
+
+      this.#morphElements
+        .map((e) => [...e.children])
+        .flat()
+        .forEach((e) => {
+          if (e instanceof HTMLElement) {
+            e.classList.add('current')
+          }
+        })
     }
   }
 
@@ -115,14 +137,6 @@ export class Morph {
     return splitPath(path, this.#base)
   }
 
-  public beforeNavigationEvent(callback: MorphNavigationCallback) {
-    return this.#beforeNavigationEvent.subscribe(callback)
-  }
-
-  public afterNavigationEvent(callback: MorphNavigationCallback) {
-    return this.#afterNavigationEvent.subscribe(callback)
-  }
-
   public async prefetch(path: string) {
     const parts = this.normalizePath(path)
     return this.#fetchDocument(parts.pathname)
@@ -132,6 +146,10 @@ export class Morph {
     path: string,
     { historyAction = 'push', state }: MorphNavigateOptions = {}
   ) {
+    if (this.#timeoutIds.length) {
+      return
+    }
+
     const parts = this.normalizePath(path)
     let { pathname, hash, parameters, leaf } = parts
 
@@ -152,10 +170,12 @@ export class Morph {
 
       let isOkToSwitch = true
 
-      this.#beforeNavigationEvent.notify({
-        pathname,
-        isCached,
-        state,
+      dispatchEvent(document, 'morphBeforeNavigation', {
+        detail: {
+          pathname,
+          isCached,
+          state,
+        },
       })
 
       if (this.preprocessor) {
@@ -257,42 +277,75 @@ export class Morph {
         newDocument.body.cloneNode(true) as HTMLElement
       )
 
+      this.#timeoutIds.forEach((id) => clearTimeout(id))
+      this.#timeoutIds = []
+
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
 
-        let currentMorphElementChildNodes = [...morphElement.childNodes]
-        let newMorphElementChildNodes = [...newMorphElement.childNodes]
+        const duration =
+          getComputedStyle(morphElement).getPropertyValue('--morph-duration')
 
-        currentMorphElementChildNodes.forEach((childNode) => {
-          if (childNode instanceof HTMLElement) {
-            const remain = childNode.getAttribute('data-remain')
+        const newMorphElementChildNodes = [...newMorphElement.childNodes]
 
-            let founded: HTMLElement | undefined
+        if (duration) {
+          const currentMorphElementChildNodes = [...morphElement.childNodes]
 
-            newMorphElementChildNodes = newMorphElementChildNodes.filter(
-              (child) => {
-                if (
-                  child instanceof HTMLElement &&
-                  remain &&
-                  child.getAttribute('data-remain') === remain
-                ) {
-                  founded = child
-                  return false
-                }
-
-                return true
-              }
-            )
-
-            if (!(remain && founded)) {
-              childNode.remove()
+          currentMorphElementChildNodes.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              element.classList.add('old')
             }
-          } else {
-            childNode.remove()
-          }
-        })
+          })
 
-        morphElement.append(...newMorphElementChildNodes)
+          newMorphElementChildNodes.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              element.classList.add('new')
+            }
+          })
+
+          morphElement.append(...newMorphElementChildNodes)
+
+          setTimeout(() => {
+            newMorphElementChildNodes.forEach((element) => {
+              if (element instanceof HTMLElement) {
+                element.classList.add('in')
+              }
+            })
+          }, 10)
+
+          const detail = {
+            element: morphElement,
+            pathname,
+            isCached,
+            state,
+          }
+
+          dispatchEvent(document, 'morphBeforeElementOut', {
+            detail,
+          })
+
+          const timeoutId = setTimeout(() => {
+            currentMorphElementChildNodes.forEach((el) => el.remove())
+
+            newMorphElementChildNodes.forEach((element) => {
+              if (element instanceof HTMLElement) {
+                element.classList.remove('new', 'in')
+                element.classList.add('current')
+              }
+            })
+
+            dispatchEvent(document, 'morphAfterElementOut', {
+              detail,
+            })
+
+            this.#timeoutIds = this.#timeoutIds.filter((t) => t !== timeoutId)
+          }, (parseFloat(duration) || 0) * 1000 + 10)
+
+          this.#timeoutIds.push(timeoutId)
+        } else {
+          morphElement.innerHTML = ''
+          morphElement.append(...newMorphElementChildNodes)
+        }
       })
 
       this.findLinks()
@@ -302,7 +355,15 @@ export class Morph {
       document.documentElement.setAttribute('data-current-leaf', leaf)
 
       this.postprocessor?.({ pathname, isCached, state })
-      this.#afterNavigationEvent.notify({ pathname, isCached, state })
+
+      dispatchEvent(document, 'morphAfterNavigation', {
+        detail: {
+          pathname,
+          isCached,
+          state,
+        },
+      })
+
       loading.complete('__morph')
     } catch (e) {
       console.error(e)
@@ -400,4 +461,8 @@ export class Morph {
       this.navigate(event.state, { historyAction: 'none' })
     }
   }
+}
+
+declare global {
+  interface DocumentEventMap extends MorphEvents {}
 }

@@ -2,9 +2,18 @@ import '@packages/media-elements'
 import '@packages/popover'
 
 import { Morph } from '../Morph'
+import { wait } from '@packages/utils'
 
 const morph = new Morph({
   base: '/components/packages/morph/playground/',
+})
+
+document.addEventListener('morphBeforeElementSwitch', () => {
+  document.documentElement.classList.add('switch')
+})
+
+document.addEventListener('morphAfterElementSwitch', () => {
+  document.documentElement.classList.remove('switch')
 })
 
 addEventListener('loadingStart', (e) => {

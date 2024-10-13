@@ -34,7 +34,6 @@ class En3 {
   #maxPixelRatio = 2
 
   #isCreated = false
-  #cacheAssets = false
 
   #composer: EffectComposer = null!
 

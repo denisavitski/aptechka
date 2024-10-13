@@ -1,7 +1,10 @@
 export function dispatchEvent<
-  K extends keyof HTMLElementEventMap | keyof WindowEventMap
+  K extends
+    | keyof HTMLElementEventMap
+    | keyof WindowEventMap
+    | keyof DocumentEventMap
 >(
-  from: HTMLElement | Window,
+  from: HTMLElement | Window | Document,
   name: K,
   init?: CustomEventInit<
     K extends keyof HTMLElementEventMap
