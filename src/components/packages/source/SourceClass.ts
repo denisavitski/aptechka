@@ -70,6 +70,10 @@ export class Source {
       `.${this.#queryValue}${this.#queryType}`,
       ''
     )
+
+    if (xmatch) {
+      this.#extension = this.#extension.replace(`.${xmatch}`, '')
+    }
   }
 
   public get url() {
