@@ -17,7 +17,12 @@ export class Source {
 
     const xpattern = /\d+x/g
     const xmatch = splitted.find((s) => s.match(xpattern))
+
     this.#density = xmatch ? parseInt(xmatch) : 1
+
+    if (xmatch) {
+      this.#name = this.#name.replace(`.${xmatch}`, '')
+    }
 
     const maxpattern = /\d+max/g
     const minpattern = /\d+min/g
