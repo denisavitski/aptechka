@@ -10,10 +10,7 @@ export class Source {
   constructor(url: string) {
     this.#url = url
 
-    const splitted = url.split('.')
-
-    this.#name =
-      splitted.length > 1 ? splitted.slice(0, -1).join('.') : splitted.join('.')
+    let splitted = url.split('.')
 
     const xpattern = /\d+x/g
     const xmatch = splitted.find((s) => s.match(xpattern))
@@ -21,8 +18,11 @@ export class Source {
     this.#density = xmatch ? parseInt(xmatch) : 1
 
     if (xmatch) {
-      this.#name = this.#name.replace(`.${xmatch}`, '')
+      splitted = splitted.slice(0, -1)
     }
+
+    this.#name =
+      splitted.length > 1 ? splitted.slice(0, -1).join('.') : splitted.join('.')
 
     const maxpattern = /\d+max/g
     const minpattern = /\d+min/g
@@ -70,10 +70,6 @@ export class Source {
       `.${this.#queryValue}${this.#queryType}`,
       ''
     )
-
-    if (xmatch) {
-      this.#extension = this.#extension.replace(`.${xmatch}`, '')
-    }
   }
 
   public get url() {
