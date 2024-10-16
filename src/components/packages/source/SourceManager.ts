@@ -60,7 +60,6 @@ export class SourceManager extends Store<Source | undefined> {
     if (matchedSources?.length && !matchedSouce) {
       matchedSouce = matchedSources[0]
     }
-    console.log(matchedSouce?.name)
 
     this.current = matchedSouce
   }
