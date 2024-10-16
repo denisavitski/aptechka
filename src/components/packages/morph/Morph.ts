@@ -418,7 +418,8 @@ export class Morph {
       (a) =>
         a.getAttribute('href')?.startsWith('/') &&
         !a.hasAttribute('download') &&
-        !a.hasAttribute('data-morph-skip')
+        !a.hasAttribute('data-morph-skip') &&
+        !a.closest('[data-morph-skip]')
     )
 
     this.#links.forEach((link) => link.destroy())
