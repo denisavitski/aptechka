@@ -12,8 +12,8 @@ export class Source {
 
     let splitted = url.split('.')
 
-    const xpattern = /\d+x/g
-    const xmatch = splitted.find((s) => s.match(xpattern))
+    const xpattern = /\b\d{1,2}x\b/g
+    const xmatch = splitted.find((s) => s.match(xpattern) && parseInt(s))
 
     this.#density = xmatch ? parseInt(xmatch) : 1
 
