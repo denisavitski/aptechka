@@ -1,4 +1,4 @@
-import { storeRegistry } from '@packages/store/vanilla'
+import { storeRegistry } from '@packages/store'
 
 export type TweakerOpenedPanels = Array<string>
 export type TweakerChangedSizes = { [key: string]: number }

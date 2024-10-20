@@ -1,5 +1,5 @@
 import { aptechkaTheme } from './theme'
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 import { createStylesheet, element, input } from './element-constructor'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 

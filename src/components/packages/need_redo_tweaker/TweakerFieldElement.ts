@@ -1,4 +1,4 @@
-import { Store, activeStores } from '@packages/store/vanilla'
+import { Store, activeStores } from '@packages/store'
 
 import { div, element, createStylesheet, button } from './element-constructor'
 

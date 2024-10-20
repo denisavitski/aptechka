@@ -1,12 +1,8 @@
 import { cssValueParser } from '@packages/css-value-parser'
 import { RESIZE_ORDER } from '@packages/order'
-import {
-  Store,
-  StoreSubscribeCallback,
-  StoreOptions,
-} from '@packages/store/vanilla'
+import { Store, StoreSubscribeCallback, StoreOptions } from '@packages/store'
 import { ElementOrSelector, getElement } from '@packages/utils'
-import { windowResizer } from '@packages/window-resizer/vanilla'
+import { windowResizer } from '@packages/window-resizer'
 
 export interface CSSPropertyOptions<StoreType extends number | boolean | string>
   extends StoreOptions<StoreType> {

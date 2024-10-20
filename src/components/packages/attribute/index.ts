@@ -1,8 +1,4 @@
-import {
-  Store,
-  StoreSubscribeCallback,
-  StoreOptions,
-} from '@packages/store/vanilla'
+import { Store, StoreSubscribeCallback, StoreOptions } from '@packages/store'
 import {
   ElementOrSelector,
   isBrowser,

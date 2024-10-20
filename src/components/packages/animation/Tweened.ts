@@ -1,4 +1,4 @@
-import { TickerCallbackEntry } from '@packages/ticker/vanilla'
+import { TickerCallbackEntry } from '@packages/ticker'
 import {
   EasingFunction,
   clamp,

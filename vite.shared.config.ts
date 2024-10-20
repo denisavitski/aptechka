@@ -1,10 +1,9 @@
 import { resolve } from 'path'
 import { UserConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
 export function sharedConfig() {
   const config: UserConfig = {
-    plugins: [react()],
+    plugins: [],
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',

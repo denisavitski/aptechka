@@ -8,8 +8,8 @@ import {
   normalize,
   screenToCartesian,
 } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer/vanilla'
-import { windowResizer } from '@packages/window-resizer/vanilla'
+import { elementResizer } from '@packages/element-resizer'
+import { windowResizer } from '@packages/window-resizer'
 
 export interface PointerParameters {
   element: ElementOrSelector<HTMLElement>

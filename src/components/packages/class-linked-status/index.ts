@@ -1,4 +1,4 @@
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 import { camelToKebab } from '@packages/utils'
 
 export class ClassLinkedStatus<

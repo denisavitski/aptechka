@@ -39,53 +39,47 @@ export function libConfig() {
             './src/components/packages/css-unit-parser/index.ts',
           'css-value-parser/index':
             './src/components/packages/css-value-parser/index.ts',
+          'custom-scrollbar/index':
+            './src/components/packages/custom-scrollbar/index.ts',
           'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
-          'element-resizer/vanilla/index':
-            './src/components/packages/element-resizer/vanilla/index.ts',
-          'element-resizer/react/index':
-            './src/components/packages/element-resizer/react/index.ts',
+          'element-resizer/index':
+            './src/components/packages/element-resizer/index.ts',
           'en3/index': './src/components/packages/en3/index.ts',
-          'intersector/vanilla/index':
-            './src/components/packages/intersector/vanilla/index.ts',
-          'intersector/react/index':
-            './src/components/packages/intersector/react/index.ts',
+          'image/index': './src/components/packages/image/index.ts',
+          'iframe/index': './src/components/packages/iframe/index.ts',
+          'intersector/index': './src/components/packages/intersector/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
+          'masonry-layout/index':
+            './src/components/packages/masonry-layout/index.ts',
           'media/index': './src/components/packages/media/index.ts',
-          'media-elements/index':
-            './src/components/packages/media-elements/index.ts',
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
           'router/index': './src/components/packages/router/index.ts',
-          'scroll/vanilla/index':
-            './src/components/packages/scroll/vanilla/index.ts',
-          'scroll/react/index':
-            './src/components/packages/scroll/react/index.ts',
+          'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
           'scroll-segment/index':
             './src/components/packages/scroll-segment/index.ts',
+          'sequence/index': './src/components/packages/sequence/index.ts',
+          'size-element/index':
+            './src/components/packages/size-element/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
-          'store/vanilla/index':
-            './src/components/packages/store/vanilla/index.ts',
-          'store/react/index': './src/components/packages/store/react/index.ts',
-          'ticker/vanilla/index':
-            './src/components/packages/ticker/vanilla/index.ts',
-          'ticker/react/index':
-            './src/components/packages/ticker/react/index.ts',
+          'store/index': './src/components/packages/store/index.ts',
+          'ticker/index': './src/components/packages/ticker/index.ts',
           'need_redo_tweaker/index':
             './src/components/packages/need_redo_tweaker/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
-          'window-resizer/vanilla/index':
-            './src/components/packages/window-resizer/vanilla/index.ts',
-          'window-resizer/react/index':
-            './src/components/packages/window-resizer/react/index.ts',
+          'video/index': './src/components/packages/video/index.ts',
+          'window-resizer/index':
+            './src/components/packages/window-resizer/index.ts',
+          'youtube/index': './src/components/packages/youtube/index.ts',
         },
         formats: ['es', 'cjs'],
         fileName: (format, entryName) =>

@@ -1,13 +1,13 @@
 import { CSSProperty } from '@packages/css-property'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer/vanilla'
+import { windowResizer } from '@packages/window-resizer'
 import {
   dispatchEvent,
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
   step,
 } from '@packages/utils'
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'

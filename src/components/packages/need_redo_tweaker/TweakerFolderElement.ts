@@ -1,5 +1,5 @@
 import { div, element, createStylesheet } from './element-constructor'
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 
 import arrowIcon from '@assets/icons/arrow.svg?raw'
 

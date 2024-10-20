@@ -1,4 +1,4 @@
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'

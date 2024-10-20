@@ -1,4 +1,4 @@
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 
 export class TweakerStoreManagerElement<
   S extends Store<any>

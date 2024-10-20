@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.41.7",
+  "version": "0.42.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -68,6 +68,11 @@
       "default": "./lib/css-value-parser/index.js",
       "types": "./lib/css-value-parser/index.d.ts"
     },
+    "./custom-scrollbar": {
+      "require": "./lib/custom-scrollbar/index.cjs",
+      "default": "./lib/custom-scrollbar/index.js",
+      "types": "./lib/custom-scrollbar/index.d.ts"
+    },
     "./dev": {
       "require": "./lib/dev/index.cjs",
       "default": "./lib/dev/index.js",
@@ -78,30 +83,30 @@
       "default": "./lib/device/index.js",
       "types": "./lib/device/index.d.ts"
     },
-    "./element-resizer/vanilla": {
-      "require": "./lib/element-resizer/vanilla/index.cjs",
-      "default": "./lib/element-resizer/vanilla/index.js",
-      "types": "./lib/element-resizer/vanilla/index.d.ts"
-    },
-    "./element-resizer/react": {
-      "require": "./lib/element-resizer/react/index.cjs",
-      "default": "./lib/element-resizer/react/index.js",
-      "types": "./lib/element-resizer/react/index.d.ts"
+    "./element-resizer": {
+      "require": "./lib/element-resizer/index.cjs",
+      "default": "./lib/element-resizer/index.js",
+      "types": "./lib/element-resizer/index.d.ts"
     },
     "./en3": {
       "require": "./lib/en3/index.cjs",
       "default": "./lib/en3/index.js",
       "types": "./lib/en3/index.d.ts"
     },
-    "./intersector/vanilla": {
-      "require": "./lib/intersector/vanilla/index.cjs",
-      "default": "./lib/intersector/vanilla/index.js",
-      "types": "./lib/intersector/vanilla/index.d.ts"
+    "./iframe": {
+      "require": "./lib/iframe/index.cjs",
+      "default": "./lib/iframe/index.js",
+      "types": "./lib/iframe/index.d.ts"
     },
-    "./intersector/react": {
-      "require": "./lib/intersector/react/index.cjs",
-      "default": "./lib/intersector/react/index.js",
-      "types": "./lib/intersector/react/index.d.ts"
+    "./image": {
+      "require": "./lib/image/index.cjs",
+      "default": "./lib/image/index.js",
+      "types": "./lib/image/index.d.ts"
+    },
+    "./intersector": {
+      "require": "./lib/intersector/index.cjs",
+      "default": "./lib/intersector/index.js",
+      "types": "./lib/intersector/index.d.ts"
     },
     "./ladder": {
       "require": "./lib/ladder/index.cjs",
@@ -118,15 +123,15 @@
       "default": "./lib/loading/index.js",
       "types": "./lib/loading/index.d.ts"
     },
+    "./masonry-layout": {
+      "require": "./lib/masonry-layout/index.cjs",
+      "default": "./lib/masonry-layout/index.js",
+      "types": "./lib/masonry-layout/index.d.ts"
+    },
     "./media": {
       "require": "./lib/media/index.cjs",
       "default": "./lib/media/index.js",
       "types": "./lib/media/index.d.ts"
-    },
-    "./media-elements": {
-      "require": "./lib/media-elements/index.cjs",
-      "default": "./lib/media-elements/index.js",
-      "types": "./lib/media-elements/index.d.ts"
     },
     "./morph": {
       "require": "./lib/morph/index.cjs",
@@ -158,15 +163,10 @@
       "default": "./lib/router/index.js",
       "types": "./lib/router/index.d.ts"
     },
-    "./scroll/vanilla": {
-      "require": "./lib/scroll/vanilla/index.cjs",
-      "default": "./lib/scroll/vanilla/index.js",
-      "types": "./lib/scroll/vanilla/index.d.ts"
-    },
-    "./scroll/react": {
-      "require": "./lib/scroll/react/index.cjs",
-      "default": "./lib/scroll/react/index.js",
-      "types": "./lib/scroll/react/index.d.ts"
+    "./scroll": {
+      "require": "./lib/scroll/index.cjs",
+      "default": "./lib/scroll/index.js",
+      "types": "./lib/scroll/index.d.ts"
     },
     "./scroll-entries": {
       "require": "./lib/scroll-entries/index.cjs",
@@ -178,6 +178,16 @@
       "default": "./lib/scroll-segment/index.js",
       "types": "./lib/scroll-segment/index.d.ts"
     },
+    "./sequence": {
+      "require": "./lib/sequence/index.cjs",
+      "default": "./lib/sequence/index.js",
+      "types": "./lib/sequence/index.d.ts"
+    },
+    "./size-element": {
+      "require": "./lib/size-element/index.cjs",
+      "default": "./lib/size-element/index.js",
+      "types": "./lib/size-element/index.d.ts"
+    },
     "./slicer": {
       "require": "./lib/slicer/index.cjs",
       "default": "./lib/slicer/index.js",
@@ -188,25 +198,15 @@
       "default": "./lib/source/index.js",
       "types": "./lib/source/index.d.ts"
     },
-    "./store/vanilla": {
-      "require": "./lib/store/vanilla/index.cjs",
-      "default": "./lib/store/vanilla/index.js",
-      "types": "./lib/store/vanilla/index.d.ts"
+    "./store": {
+      "require": "./lib/store/index.cjs",
+      "default": "./lib/store/index.js",
+      "types": "./lib/store/index.d.ts"
     },
-    "./store/react": {
-      "require": "./lib/store/react/index.cjs",
-      "default": "./lib/store/react/index.js",
-      "types": "./lib/store/react/index.d.ts"
-    },
-    "./ticker/vanilla": {
-      "require": "./lib/ticker/vanilla/index.cjs",
-      "default": "./lib/ticker/vanilla/index.js",
-      "types": "./lib/ticker/vanilla/index.d.ts"
-    },
-    "./ticker/react": {
-      "require": "./lib/ticker/react/index.cjs",
-      "default": "./lib/ticker/react/index.js",
-      "types": "./lib/ticker/react/index.d.ts"
+    "./ticker": {
+      "require": "./lib/ticker/index.cjs",
+      "default": "./lib/ticker/index.js",
+      "types": "./lib/ticker/index.d.ts"
     },
     "./need_redo_tweaker": {
       "require": "./lib/need_redo_tweaker/index.cjs",
@@ -218,15 +218,20 @@
       "default": "./lib/utils/index.js",
       "types": "./lib/utils/index.d.ts"
     },
-    "./window-resizer/vanilla": {
-      "require": "./lib/window-resizer/vanilla/index.cjs",
-      "default": "./lib/window-resizer/vanilla/index.js",
-      "types": "./lib/window-resizer/vanilla/index.d.ts"
+    "./video": {
+      "require": "./lib/video/index.cjs",
+      "default": "./lib/video/index.js",
+      "types": "./lib/video/index.d.ts"
     },
-    "./window-resizer/react": {
-      "require": "./lib/window-resizer/react/index.cjs",
-      "default": "./lib/window-resizer/react/index.js",
-      "types": "./lib/window-resizer/react/index.d.ts"
+    "./window-resizer": {
+      "require": "./lib/window-resizer/index.cjs",
+      "default": "./lib/window-resizer/index.js",
+      "types": "./lib/window-resizer/index.d.ts"
+    },
+    "./youtube": {
+      "require": "./lib/youtube/index.cjs",
+      "default": "./lib/youtube/index.js",
+      "types": "./lib/youtube/index.d.ts"
     }
   },
   "typesVersions": {
@@ -264,26 +269,29 @@
       "css-value-parser": [
         "lib/css-value-parser/index.d.ts"
       ],
+      "custom-scrollbar": [
+        "lib/custom-scrollbar/index.d.ts"
+      ],
       "dev": [
         "lib/dev/index.d.ts"
       ],
       "device": [
         "lib/device/index.d.ts"
       ],
-      "element-resizer/vanilla": [
-        "lib/element-resizer/vanilla/index.d.ts"
-      ],
-      "element-resizer/react": [
-        "lib/element-resizer/react/index.d.ts"
+      "element-resizer": [
+        "lib/element-resizer/index.d.ts"
       ],
       "en3": [
         "lib/en3/index.d.ts"
       ],
-      "intersector/vanilla": [
-        "lib/intersector/vanilla/index.d.ts"
+      "iframe": [
+        "lib/iframe/index.d.ts"
       ],
-      "intersector/react": [
-        "lib/intersector/react/index.d.ts"
+      "image": [
+        "lib/image/index.d.ts"
+      ],
+      "intersector": [
+        "lib/intersector/index.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"
@@ -294,11 +302,11 @@
       "loading": [
         "lib/loading/index.d.ts"
       ],
+      "masonry-layout": [
+        "lib/masonry-layout/index.d.ts"
+      ],
       "media": [
         "lib/media/index.d.ts"
-      ],
-      "media-elements": [
-        "lib/media-elements/index.d.ts"
       ],
       "morph": [
         "lib/morph/index.d.ts"
@@ -318,11 +326,8 @@
       "router": [
         "lib/router/index.d.ts"
       ],
-      "scroll/vanilla": [
-        "lib/scroll/vanilla/index.d.ts"
-      ],
-      "scroll/react": [
-        "lib/scroll/react/index.d.ts"
+      "scroll": [
+        "lib/scroll/index.d.ts"
       ],
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"
@@ -330,23 +335,23 @@
       "scroll-segment": [
         "lib/scroll-segment/index.d.ts"
       ],
+      "sequence": [
+        "lib/sequence/index.d.ts"
+      ],
+      "size-element": [
+        "lib/size-element/index.d.ts"
+      ],
       "slicer": [
         "lib/slicer/index.d.ts"
       ],
       "source": [
         "lib/source/index.d.ts"
       ],
-      "store/vanilla": [
-        "lib/store/vanilla/index.d.ts"
+      "store": [
+        "lib/store/index.d.ts"
       ],
-      "store/react": [
-        "lib/store/react/index.d.ts"
-      ],
-      "ticker/vanilla": [
-        "lib/ticker/vanilla/index.d.ts"
-      ],
-      "ticker/react": [
-        "lib/ticker/react/index.d.ts"
+      "ticker": [
+        "lib/ticker/index.d.ts"
       ],
       "need_redo_tweaker": [
         "lib/need_redo_tweaker/index.d.ts"
@@ -354,8 +359,14 @@
       "utils": [
         "lib/utils/index.d.ts"
       ],
+      "video": [
+        "lib/video/index.d.ts"
+      ],
       "window-resizer": [
         "lib/window-resizer/index.d.ts"
+      ],
+      "youtube": [
+        "lib/youtube/index.d.ts"
       ]
     }
   },
@@ -367,26 +378,17 @@
   },
   "devDependencies": {
     "@types/node": "^22.2.0",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
     "@types/three": "^0.167.1",
-    "@vitejs/plugin-react": "^4.3.1",
     "tsx": "^4.17.0",
     "vite": "^5.4.8",
     "vite-plugin-dts": "^4.2.4",
     "vite-plugin-htmc": "0.1.15"
   },
   "dependencies": {
-    "meshline": "^3.3.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "three": "^0.167.1",
-    "typograf": "^7.4.1",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "three": "^0.167.1",
     "urlpattern-polyfill": "^10.0.0"
   }

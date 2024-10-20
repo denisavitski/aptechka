@@ -1,10 +1,10 @@
-import { Store, StoreOptions } from '@packages/store/vanilla'
+import { Store, StoreOptions } from '@packages/store'
 import {
   TickerAddOptions,
   TickerCallback,
   TickerCallbackEntry,
   ticker,
-} from '@packages/ticker/vanilla'
+} from '@packages/ticker'
 import {
   ElementOrSelector,
   clamp,

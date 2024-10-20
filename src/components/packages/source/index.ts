@@ -1,5 +1,10 @@
 export { Source } from './SourceClass'
 export {
+  SourceElement,
+  type SourceElementOptions,
+  type SourceEvents,
+} from './SourceElement'
+export {
   SourceSet,
   type SourceSetMediaSources,
   type SourceSetMediaBucket,

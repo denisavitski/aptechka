@@ -1,6 +1,6 @@
 import { RESIZE_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer/vanilla'
-import { Store } from '@packages/store/vanilla'
+import { windowResizer } from '@packages/window-resizer'
+import { Store } from '@packages/store'
 import { isBrowser } from '@packages/utils'
 
 export enum ViewportBreakpoints {

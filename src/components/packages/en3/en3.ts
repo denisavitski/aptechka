@@ -1,6 +1,6 @@
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer/vanilla'
-import { ticker, TickerCallback } from '@packages/ticker/vanilla'
+import { windowResizer } from '@packages/window-resizer'
+import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
 import { En3View, En3ViewOptions } from './En3View'

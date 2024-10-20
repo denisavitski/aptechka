@@ -1,5 +1,5 @@
 import { CSSProperty } from '@packages/css-property'
-import { Store } from '@packages/store/vanilla'
+import { Store } from '@packages/store'
 import {
   debounce,
   dispatchEvent,
@@ -7,7 +7,7 @@ import {
   parseSearchParameters,
   updateSearchParameter,
 } from '@packages/utils'
-import { windowResizer } from '@packages/window-resizer/vanilla'
+import { windowResizer } from '@packages/window-resizer'
 
 export interface PopoverEvents {
   popoverTriggered: CustomEvent<{ trigger: any }>

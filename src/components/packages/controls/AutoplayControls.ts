@@ -1,8 +1,4 @@
-import {
-  ticker,
-  TickerAddOptions,
-  TickerCallback,
-} from '@packages/ticker/vanilla'
+import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 import { Tweened } from '@packages/animation'
 import { easeInQuad } from '@packages/utils'
 import { Controls } from './Controls'
