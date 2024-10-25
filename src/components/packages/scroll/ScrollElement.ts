@@ -1184,7 +1184,7 @@ export class ScrollElement extends HTMLElement {
 
     if (
       type.includes('drag') &&
-      !device.isMobile &&
+      !device.isTouch &&
       !this.#mouseDragCSSProperty.current
     ) {
       return
