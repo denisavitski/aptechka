@@ -228,6 +228,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     } else {
       if (this.hasAttribute('reload-source')) {
         this.#loadSource(undefined)
+        this.#lazyLoaded = false
       }
 
       dispatchEvent(this, 'sourceRelease', { custom: true })

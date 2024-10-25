@@ -11,16 +11,23 @@ export interface VideoEvents {
 
 export class VideoElement extends SourceElement<HTMLVideoElement> {
   #progress = 0
+  #needToPlay = false
 
   protected override connectedCallback() {
     super.connectedCallback()
 
     this.addEventListener('sourceCapture', () => {
-      ticker.subscribe(this.#checkReady)
+      this.#needToPlay = false
 
       if (this.hasAttribute('capture-autoplay')) {
-        this.consumerElement.play()
+        if (this.sourceManager.current) {
+          this.consumerElement.play()
+        } else {
+          this.#needToPlay = true
+        }
       }
+
+      ticker.subscribe(this.#checkReady)
     })
 
     this.addEventListener('sourceRelease', () => {
@@ -58,7 +65,6 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
   protected override consumeSource(url: string | null) {
     this.consumerElement.src = url || ''
-    this.consumerElement.autoplay = true
   }
 
   #checkReady = () => {
@@ -79,6 +85,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
     if (this.consumerElement.readyState === 4) {
       ticker.unsubscribe(this.#checkReady)
+
+      if (this.#needToPlay && this.sourceManager.current) {
+        this.consumerElement.play()
+      }
     }
   }
 }
