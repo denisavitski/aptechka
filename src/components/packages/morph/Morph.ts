@@ -240,6 +240,7 @@ export class Morph {
 
       const elementsWithLoad = addHeadChildren.filter(
         (child) =>
+          !child.hasAttribute('data-no-waiting') &&
           (child.tagName === 'STYLE' ||
             child.tagName === 'SCRIPT' ||
             child.tagName === 'LINK') &&
