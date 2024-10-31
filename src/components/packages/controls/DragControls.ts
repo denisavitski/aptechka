@@ -104,6 +104,8 @@ export class DragControls extends Controls {
           (this.axis === 'y' && Math.abs(dy) > Math.abs(dx))
 
         if (okToNotify) {
+          document.documentElement.classList.add('dragging')
+
           DragControls.#currentElement = this.#element
 
           this.changeEvent.notify('drag', this.#delta)
@@ -123,6 +125,7 @@ export class DragControls extends Controls {
         }
 
         document.documentElement.classList.remove('grabbing')
+        document.documentElement.classList.remove('dragging')
       }
     )
   }
