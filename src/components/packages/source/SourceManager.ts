@@ -20,6 +20,11 @@ export class SourceManager extends Store<Source | undefined> {
     this.#srcset = new SourceSet(parameters.srcset, parameters.sourceSetOptions)
   }
 
+  public updateSource(parameters: SourceManagerParameters) {
+    this.#srcset = new SourceSet(parameters.srcset, parameters.sourceSetOptions)
+    this.#resizeListener()
+  }
+
   public override close() {
     super.close()
     this.disconnect()
