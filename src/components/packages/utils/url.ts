@@ -1,4 +1,4 @@
-export function splitPath(value: string, base = '') {
+export function splitPath(value: string, base = '', trailingSlash = false) {
   base = base.endsWith('/') ? base.slice(0, -1) : base
 
   value = value.replace(base, '')
@@ -11,7 +11,13 @@ export function splitPath(value: string, base = '') {
   const split2 = split1[0].split('?')
 
   let leaf = !split2[0].startsWith('/') ? '/' + split2[0] : split2[0]
-  leaf = leaf.endsWith('/') && leaf !== '/' ? leaf.slice(0, -1) : leaf
+
+  if (trailingSlash) {
+    leaf = !leaf.endsWith('/') && leaf !== '/' ? leaf + '/' : leaf
+  } else {
+    leaf = leaf.endsWith('/') && leaf !== '/' ? leaf.slice(0, -1) : leaf
+  }
+
   const pathname = base + leaf
   const parameters = split2?.[1]
   const hash = split1?.[1]

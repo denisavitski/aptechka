@@ -16,6 +16,7 @@ export interface MorphParameters {
   base?: string
   waitForHeadToLoad?: boolean
   cachePages?: boolean
+  trailingSlash?: boolean
 }
 
 export interface MorphNavigationEntry {
@@ -58,6 +59,7 @@ export class Morph {
   #base: string = null!
   #waitForHeadToLoad: boolean = null!
   #cachePages: boolean = null!
+  #trailingSlash = false
   #morphElements: Array<HTMLElement> = null!
   #links: Array<Link> = []
   #domParser: DOMParser = new DOMParser()
@@ -77,7 +79,10 @@ export class Morph {
 
       this.#waitForHeadToLoad =
         parameters?.waitForHeadToLoad === false ? false : true
+
       this.#cachePages = parameters?.cachePages === false ? false : true
+
+      this.#trailingSlash = parameters?.trailingSlash || false
 
       this.#morphElements = this.#getMorphElements(document.body)
 
@@ -134,7 +139,7 @@ export class Morph {
   }
 
   public normalizePath(path: string) {
-    return splitPath(path, this.#base)
+    return splitPath(path, this.#base, this.#trailingSlash)
   }
 
   public async prefetch(path: string) {
