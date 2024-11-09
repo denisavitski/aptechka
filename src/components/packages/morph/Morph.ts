@@ -26,7 +26,7 @@ export interface MorphNavigationEntry {
   state?: any
 }
 
-export interface MorphNavigationDocumentEntry extends MorphNavigationEntry {
+export interface MorphTransitionEntry extends MorphNavigationEntry {
   newDocument: Document
 }
 
@@ -54,8 +54,8 @@ export interface MorphNavigateOptions {
 }
 
 export interface MorphEvents {
-  morphBeforeNavigation: CustomEvent<MorphNavigationDocumentEntry>
-  morphAfterNavigation: CustomEvent<MorphNavigationDocumentEntry>
+  morphStart: CustomEvent<MorphTransitionEntry>
+  morphComplete: CustomEvent<MorphTransitionEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
 }
@@ -220,7 +220,7 @@ export class Morph {
 
       document.body.appendChild(this.#announcer)
 
-      dispatchEvent(document, 'morphBeforeNavigation', {
+      dispatchEvent(document, 'morphStart', {
         detail: {
           pathname,
           isCached,
@@ -401,7 +401,7 @@ export class Morph {
 
       this.postprocessor?.({ pathname, isCached, state })
 
-      dispatchEvent(document, 'morphAfterNavigation', {
+      dispatchEvent(document, 'morphComplete', {
         detail: {
           pathname,
           isCached,
