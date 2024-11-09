@@ -1,4 +1,4 @@
-import { Notifier } from '@packages/notifier'
+import './MorphAnnouncer'
 
 import {
   ChangeHistoryAction,
@@ -9,8 +9,9 @@ import {
   splitPath,
 } from '@packages/utils'
 
-import { Link } from './Link'
+import { MorphLink } from './MorphLink'
 import { loading } from '@packages/loading'
+import { MorphAnnouncer } from './MorphAnnouncer'
 
 export interface MorphParameters {
   base?: string
@@ -61,17 +62,19 @@ export class Morph {
   #cachePages: boolean = null!
   #trailingSlash = false
   #morphElements: Array<HTMLElement> = null!
-  #links: Array<Link> = []
+  #links: Array<MorphLink> = []
   #domParser: DOMParser = new DOMParser()
   #cache: Map<string, Document> = new Map()
   #candidatePathname: string | undefined
   #currentPathname: string = null!
   #previousPathname: string | undefined = undefined
   #currentState: any
-  #timeoutIds: Array<ReturnType<typeof setTimeout>> = []
+  #promises: Array<Promise<void>> = []
 
   public preprocessor?: MorphPreprocessor
   public postprocessor?: MorphPostprocessor
+
+  #announcer: MorphAnnouncer = null!
 
   constructor(parameters?: MorphParameters) {
     if (isBrowser) {
@@ -119,6 +122,8 @@ export class Morph {
             e.classList.add('current')
           }
         })
+
+      this.#announcer = new MorphAnnouncer()
     }
   }
 
@@ -151,7 +156,7 @@ export class Morph {
     path: string,
     { historyAction = 'push', state }: MorphNavigateOptions = {}
   ) {
-    if (this.#timeoutIds.length) {
+    if (this.#promises.length) {
       return
     }
 
@@ -208,6 +213,16 @@ export class Morph {
       if (this.#candidatePathname !== pathname) {
         return
       }
+
+      if (newDocument.title) {
+        this.#announcer.textContent = newDocument.title
+      } else {
+        const h1 = newDocument.querySelector('h1')
+        const title = h1?.innerText || h1?.textContent || pathname
+        this.#announcer.textContent = title
+      }
+
+      document.body.appendChild(this.#announcer)
 
       const currentHeadChildren = Array.from(document.head.children)
 
@@ -268,8 +283,20 @@ export class Morph {
         })
       }
 
+      const oldStyleScriptChildren: Array<Element> = []
+
       removeHeadChildren.forEach((child) => {
-        if (!child.hasAttribute('data-permanent')) {
+        if (child.hasAttribute('data-permanent')) {
+          return
+        }
+
+        if (
+          child.tagName === 'SCRIPT' ||
+          child.tagName === 'STYLE' ||
+          child.getAttribute('rel') === 'stylesheet'
+        ) {
+          oldStyleScriptChildren.push(child)
+        } else {
           child.remove()
         }
       })
@@ -283,11 +310,8 @@ export class Morph {
         newDocument.body.cloneNode(true) as HTMLElement
       )
 
-      this.#timeoutIds.forEach((id) => clearTimeout(id))
-      this.#timeoutIds = []
-
       this.#morphElements.forEach((morphElement, i) => {
-        const newMorphElement = newMorphElements[i]!
+        const newMorphElement = newMorphElements[i++]!
 
         const duration =
           getComputedStyle(morphElement).getPropertyValue('--morph-duration')
@@ -330,35 +354,45 @@ export class Morph {
             detail,
           })
 
-          const timeoutId = setTimeout(() => {
-            currentMorphElementChildNodes.forEach((el) => el.remove())
+          const promise = new Promise<void>((res) => {
+            setTimeout(() => {
+              currentMorphElementChildNodes.forEach((el) => el.remove())
 
-            newMorphElementChildNodes.forEach((element) => {
-              if (element instanceof HTMLElement) {
-                element.classList.remove('new', 'in')
-                element.classList.add('current')
-              }
-            })
+              newMorphElementChildNodes.forEach((element) => {
+                if (element instanceof HTMLElement) {
+                  element.classList.remove('new', 'in')
+                  element.classList.add('current')
+                }
+              })
 
-            dispatchEvent(document, 'morphAfterElementOut', {
-              detail,
-            })
+              dispatchEvent(document, 'morphAfterElementOut', {
+                detail,
+              })
 
-            this.#timeoutIds = this.#timeoutIds.filter((t) => t !== timeoutId)
-          }, (parseFloat(duration) || 0) * 1000 + 10)
+              res()
+            }, (parseFloat(duration) || 0) * 1000 + 10)
+          })
 
-          this.#timeoutIds.push(timeoutId)
+          this.#promises.push(promise)
         } else {
           morphElement.innerHTML = ''
           morphElement.append(...newMorphElementChildNodes)
         }
       })
 
+      await Promise.all(this.#promises)
+
+      oldStyleScriptChildren.forEach((child) => child.remove())
+
+      this.#promises = []
+
       this.findLinks()
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
 
       document.documentElement.setAttribute('data-current-leaf', leaf)
+
+      this.#announcer.remove()
 
       this.postprocessor?.({ pathname, isCached, state })
 
@@ -397,7 +431,7 @@ export class Morph {
   }
 
   public addLink(element: HTMLAnchorElement) {
-    this.#links.push(new Link(element, this))
+    this.#links.push(new MorphLink(element, this))
   }
 
   public addLinks(elements: Array<HTMLAnchorElement>) {
@@ -430,7 +464,7 @@ export class Morph {
 
     this.#links.forEach((link) => link.destroy())
 
-    this.#links = linkElements.map((element) => new Link(element, this))
+    this.#links = linkElements.map((element) => new MorphLink(element, this))
   }
 
   #getMorphElements(el: HTMLElement) {

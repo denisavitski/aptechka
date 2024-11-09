@@ -1,7 +1,7 @@
 import { ChangeHistoryAction } from '@packages/utils'
 import { Morph } from './Morph'
 
-export class Link {
+export class MorphLink {
   #morph: Morph
   #element: HTMLAnchorElement
   #pathname: string
