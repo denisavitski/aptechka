@@ -206,33 +206,37 @@ export class Morph {
       const newDocument =
         this.#cache.get(pathname) || (await this.#fetchDocument(pathname))
 
+      const clonedNewDocument = newDocument.cloneNode(true) as Document
+
       if (this.#candidatePathname !== pathname) {
         return
       }
 
-      if (newDocument.title) {
-        this.#announcer.textContent = newDocument.title
+      if (clonedNewDocument.title) {
+        this.#announcer.textContent = clonedNewDocument.title
       } else {
-        const h1 = newDocument.querySelector('h1')
+        const h1 = clonedNewDocument.querySelector('h1')
         const title = h1?.innerText || h1?.textContent || pathname
         this.#announcer.textContent = title
       }
 
       document.body.appendChild(this.#announcer)
 
+      const transitionDetail: MorphTransitionEntry = {
+        pathname,
+        isCached,
+        state,
+        newDocument: clonedNewDocument,
+      }
+
       dispatchEvent(document, 'morphStart', {
-        detail: {
-          pathname,
-          isCached,
-          state,
-          newDocument,
-        },
+        detail: transitionDetail,
       })
 
       const currentHeadChildren = Array.from(document.head.children)
 
       const newHeadChildren = Array.from(
-        (newDocument.head.cloneNode(true) as HTMLElement).children
+        (clonedNewDocument.head as HTMLElement).children
       )
 
       const identicalHeadChildren = this.#intersectElements(
@@ -312,7 +316,7 @@ export class Morph {
       changeHistory(historyAction, pathname, parameters, hash)
 
       const newMorphElements = this.#getMorphElements(
-        newDocument.body.cloneNode(true) as HTMLElement
+        clonedNewDocument.body as HTMLElement
       )
 
       this.#morphElements.forEach((morphElement, i) => {
@@ -402,11 +406,7 @@ export class Morph {
       this.postprocessor?.({ pathname, isCached, state })
 
       dispatchEvent(document, 'morphComplete', {
-        detail: {
-          pathname,
-          isCached,
-          state,
-        },
+        detail: transitionDetail,
       })
 
       loading.complete('__morph')
