@@ -26,7 +26,11 @@ export interface MorphNavigationEntry {
   state?: any
 }
 
-export interface MorphElementSwitchEntry {
+export interface MorphNavigationDocumentEntry extends MorphNavigationEntry {
+  newDocument: Document
+}
+
+export interface MorphChildrenActionEntry {
   element: HTMLElement
   pathname: string
   isCached: boolean
@@ -50,10 +54,10 @@ export interface MorphNavigateOptions {
 }
 
 export interface MorphEvents {
-  morphBeforeNavigation: CustomEvent<MorphNavigationEntry>
-  morphAfterNavigation: CustomEvent<MorphNavigationEntry>
-  morphBeforeElementOut: CustomEvent<MorphElementSwitchEntry>
-  morphAfterElementOut: CustomEvent<MorphElementSwitchEntry>
+  morphBeforeNavigation: CustomEvent<MorphNavigationDocumentEntry>
+  morphAfterNavigation: CustomEvent<MorphNavigationDocumentEntry>
+  morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
+  morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
 }
 
 export class Morph {
@@ -180,14 +184,6 @@ export class Morph {
 
       let isOkToSwitch = true
 
-      dispatchEvent(document, 'morphBeforeNavigation', {
-        detail: {
-          pathname,
-          isCached,
-          state,
-        },
-      })
-
       if (this.preprocessor) {
         try {
           await new Promise<void>((resolve, reject) => {
@@ -223,6 +219,15 @@ export class Morph {
       }
 
       document.body.appendChild(this.#announcer)
+
+      dispatchEvent(document, 'morphBeforeNavigation', {
+        detail: {
+          pathname,
+          isCached,
+          state,
+          newDocument,
+        },
+      })
 
       const currentHeadChildren = Array.from(document.head.children)
 
@@ -343,14 +348,14 @@ export class Morph {
             })
           }, 10)
 
-          const detail = {
+          const detail: MorphChildrenActionEntry = {
             element: morphElement,
             pathname,
             isCached,
             state,
           }
 
-          dispatchEvent(document, 'morphBeforeElementOut', {
+          dispatchEvent(document, 'morphNewChildrenAdded', {
             detail,
           })
 
@@ -365,7 +370,7 @@ export class Morph {
                 }
               })
 
-              dispatchEvent(document, 'morphAfterElementOut', {
+              dispatchEvent(document, 'morphOldChildrenRemoved', {
                 detail,
               })
 
