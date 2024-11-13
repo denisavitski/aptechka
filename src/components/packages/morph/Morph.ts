@@ -93,7 +93,9 @@ export class Morph {
 
       this.#morphElements = this.#getMorphElements(document.body)
 
-      const normalizedPath = this.normalizePath(location.pathname)
+      const normalizedPath = this.normalizePath(
+        location.pathname + location.hash
+      )
 
       this.#currentPathname = normalizedPath.pathname
 
