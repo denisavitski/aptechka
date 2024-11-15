@@ -193,7 +193,7 @@ export class SelectElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-select')) {
+if (isBrowser && !customElements.get('e-select')) {
   customElements.define('e-select', SelectElement)
 }
 

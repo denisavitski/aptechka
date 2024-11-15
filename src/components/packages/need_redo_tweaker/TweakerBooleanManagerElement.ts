@@ -3,6 +3,7 @@ import { Store } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element } from './element-constructor'
 import { aptechkaTheme } from './theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -44,7 +45,7 @@ export class TweakerBooleanManagerElement extends TweakerStoreManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-boolean-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-boolean-manager')) {
   customElements.define(
     'e-tweaker-boolean-manager',
     TweakerBooleanManagerElement

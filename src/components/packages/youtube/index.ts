@@ -1,5 +1,5 @@
 import { SourceElement } from '@packages/source'
-import { dispatchEvent, generateId } from '@packages/utils'
+import { dispatchEvent, generateId, isBrowser } from '@packages/utils'
 
 export class YouTubeElement extends SourceElement<HTMLDivElement> {
   static __apiReady = false
@@ -138,7 +138,7 @@ export class YouTubeElement extends SourceElement<HTMLDivElement> {
   }
 }
 
-if (!customElements.get('e-youtube')) {
+if (isBrowser && !customElements.get('e-youtube')) {
   customElements.define('e-youtube', YouTubeElement)
 }
 

@@ -1,3 +1,4 @@
+import { isBrowser } from '@packages/utils'
 import {
   createStylesheet,
   element,
@@ -141,7 +142,7 @@ export class CheckboxElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-checkbox')) {
+if (isBrowser && !customElements.get('e-checkbox')) {
   customElements.define('e-checkbox', CheckboxElement)
 }
 

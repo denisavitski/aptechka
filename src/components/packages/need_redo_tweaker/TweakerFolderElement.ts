@@ -8,6 +8,7 @@ import { tweakerStorage } from './tweakerStorage'
 import { TweakerFieldElement } from './TweakerFieldElement'
 import { StoreBox } from './TweakerElement'
 import { aptechkaTheme } from './theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   '.wrapper': {
@@ -254,7 +255,7 @@ export class TweakerFolderElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-tweaker-folder')) {
+if (isBrowser && !customElements.get('e-tweaker-folder')) {
   customElements.define('e-tweaker-folder', TweakerFolderElement)
 }
 

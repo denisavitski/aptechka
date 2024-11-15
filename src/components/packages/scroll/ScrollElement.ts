@@ -1336,7 +1336,7 @@ export class ScrollElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-scroll')) {
+if (isBrowser && !customElements.get('e-scroll')) {
   customElements.define('e-scroll', ScrollElement)
 }
 

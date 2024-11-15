@@ -173,7 +173,7 @@ export class CanvasElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-canvas')) {
+if (isBrowser && !customElements.get('e-canvas')) {
   customElements.define('e-canvas', CanvasElement)
 }
 

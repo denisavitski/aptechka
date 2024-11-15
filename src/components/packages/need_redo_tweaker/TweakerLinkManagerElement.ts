@@ -1,6 +1,7 @@
 import { Store } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { a, createStylesheet, element } from './element-constructor'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   a: {
@@ -30,7 +31,7 @@ export class TweakerLinkManagerElement extends TweakerStoreManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-link-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-link-manager')) {
   customElements.define('e-tweaker-link-manager', TweakerLinkManagerElement)
 }
 

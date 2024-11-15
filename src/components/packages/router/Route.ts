@@ -1,3 +1,5 @@
+// TODO: обновить все до уровня morph
+
 import { isBrowser, isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<any>

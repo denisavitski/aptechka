@@ -1,5 +1,5 @@
 import { ScrollSegmentElement as ScrollSeg } from '@packages/scroll-segment'
-import { findParentElement } from '@packages/utils'
+import { findParentElement, isBrowser } from '@packages/utils'
 import { ScrollElement } from './ScrollElement'
 
 export class ScrollSegmentElement extends ScrollSeg {
@@ -19,7 +19,7 @@ export class ScrollSegmentElement extends ScrollSeg {
   }
 }
 
-if (!customElements.get('e-scroll-segment')) {
+if (isBrowser && !customElements.get('e-scroll-segment')) {
   customElements.define('e-scroll-segment', ScrollSegmentElement)
 }
 

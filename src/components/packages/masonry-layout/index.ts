@@ -1,5 +1,5 @@
 import { CSSProperty } from '@packages/css-property'
-import { createStylesheet } from '@packages/utils'
+import { createStylesheet, isBrowser } from '@packages/utils'
 
 export class MasonryLayoutElement extends HTMLElement {
   #columns = new CSSProperty<number>(this, '--columns', 2)
@@ -79,7 +79,7 @@ export class MasonryLayoutElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-masonry-layout')) {
+if (isBrowser && !customElements.get('e-masonry-layout')) {
   customElements.define('e-masonry-layout', MasonryLayoutElement)
 }
 

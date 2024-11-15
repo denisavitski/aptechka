@@ -218,7 +218,7 @@ export class SequenceElement extends SourceElement<CanvasElement> {
   }
 }
 
-if (!customElements.get('e-sequence')) {
+if (isBrowser && !customElements.get('e-sequence')) {
   customElements.define('e-sequence', SequenceElement)
 }
 

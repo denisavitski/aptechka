@@ -90,7 +90,7 @@ export class SelectHeadElement extends SelectUserElement {
   }
 }
 
-if (!customElements.get('e-select-head')) {
+if (isBrowser && !customElements.get('e-select-head')) {
   customElements.define('e-select-head', SelectHeadElement)
 }
 

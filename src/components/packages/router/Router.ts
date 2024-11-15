@@ -157,7 +157,7 @@ export class Router {
   }
 
   public normalizePath(path: string) {
-    return splitPath(path, this.#base)
+    return splitPath(path, { base: this.#base })
   }
 
   #start = debounce(() => {

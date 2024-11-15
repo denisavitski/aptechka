@@ -92,7 +92,7 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
   }, 0)
 }
 
-if (!customElements.get('e-scroll-bullet-buttons')) {
+if (isBrowser && !customElements.get('e-scroll-bullet-buttons')) {
   customElements.define('e-scroll-bullet-buttons', ScrollBulletButtonsElement)
 }
 

@@ -1,5 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { Pointer } from './Pointer'
+import { isBrowser } from '@packages/utils'
 
 export class PointerElement extends HTMLElement {
   #pointer: Pointer
@@ -81,7 +82,7 @@ export class PointerElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-pointer')) {
+if (isBrowser && !customElements.get('e-pointer')) {
   customElements.define('e-pointer', PointerElement)
 }
 

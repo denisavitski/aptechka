@@ -2,7 +2,13 @@ import { Store, StoreMiddleware } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, div, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'
-import { clamp, nullishCoalescing, setupDrag, toStep } from '@packages/utils'
+import {
+  clamp,
+  isBrowser,
+  nullishCoalescing,
+  setupDrag,
+  toStep,
+} from '@packages/utils'
 import { elementResizer } from '@packages/element-resizer'
 
 const stylesheet = createStylesheet({
@@ -302,7 +308,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-number-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-number-manager')) {
   customElements.define('e-tweaker-number-manager', TweakerNumberManagerElement)
 }
 

@@ -5,6 +5,7 @@ import {
   dispatchEvent,
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
+  isBrowser,
   step,
 } from '@packages/utils'
 import { Store } from '@packages/store'
@@ -889,7 +890,7 @@ export class ScrollSegmentElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('scroll-segment')) {
+if (isBrowser && !customElements.get('scroll-segment')) {
   customElements.define('scroll-segment', ScrollSegmentElement)
 }
 

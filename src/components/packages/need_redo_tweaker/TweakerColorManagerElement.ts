@@ -2,6 +2,7 @@ import { Store } from '@packages/store'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -52,7 +53,7 @@ export class TweakerColorManagerElement extends TweakerStoreManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-color-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-color-manager')) {
   customElements.define('e-tweaker-color-manager', TweakerColorManagerElement)
 }
 

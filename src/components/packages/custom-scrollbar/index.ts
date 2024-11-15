@@ -4,7 +4,7 @@
 
 import { elementResizer } from '@packages/element-resizer'
 import { windowResizer } from '@packages/window-resizer'
-import { findScrollParentElement, setupDrag } from '@packages/utils'
+import { findScrollParentElement, isBrowser, setupDrag } from '@packages/utils'
 
 export class CustomScrollbarElement extends HTMLElement {
   #scrollElement: HTMLElement = null!
@@ -100,7 +100,7 @@ export class CustomScrollbarElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-custom-scrollbar')) {
+if (isBrowser && !customElements.get('e-custom-scrollbar')) {
   customElements.define('e-custom-scrollbar', CustomScrollbarElement)
 }
 

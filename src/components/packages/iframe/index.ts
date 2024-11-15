@@ -1,4 +1,5 @@
 import { SourceElement } from '@packages/source'
+import { isBrowser } from '@packages/utils'
 
 export class IFrameElement extends SourceElement<HTMLElement> {
   #iframeElement: HTMLElement | null = null
@@ -44,7 +45,7 @@ export class IFrameElement extends SourceElement<HTMLElement> {
   }
 }
 
-if (!customElements.get('e-iframe')) {
+if (isBrowser && !customElements.get('e-iframe')) {
   customElements.define('e-iframe', IFrameElement)
 }
 

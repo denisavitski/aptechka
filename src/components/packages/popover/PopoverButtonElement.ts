@@ -175,7 +175,7 @@ export class PopoverButtonElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-popover-button')) {
+if (isBrowser && !customElements.get('e-popover-button')) {
   customElements.define('e-popover-button', PopoverButtonElement)
 }
 

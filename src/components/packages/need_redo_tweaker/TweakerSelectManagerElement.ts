@@ -6,6 +6,7 @@ import { createStylesheet, element, span } from './element-constructor'
 
 import { SelectElement } from './select'
 import { aptechkaTheme } from './theme'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   'e-select': {
@@ -86,7 +87,7 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-select-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-select-manager')) {
   customElements.define('e-tweaker-select-manager', TweakerSelectManagerElement)
 }
 

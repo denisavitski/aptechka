@@ -1,7 +1,6 @@
+import { isBrowser } from '@packages/utils'
+
 export class MorphAnnouncer extends HTMLElement {
-  constructor() {
-    super()
-  }
   connectedCallback() {
     const attrs = {
       'aria-live': 'assertive',
@@ -16,7 +15,7 @@ export class MorphAnnouncer extends HTMLElement {
   }
 }
 
-if (!customElements.get('morph-announcer')) {
+if (isBrowser && !customElements.get('morph-announcer')) {
   customElements.define('morph-announcer', MorphAnnouncer)
 }
 

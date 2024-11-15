@@ -1,5 +1,4 @@
-import './MorphAnnouncer'
-
+import { loading } from '@packages/loading'
 import {
   ChangeHistoryAction,
   changeHistory,
@@ -10,8 +9,9 @@ import {
 } from '@packages/utils'
 
 import { MorphLink } from './MorphLink'
-import { loading } from '@packages/loading'
 import { MorphAnnouncer } from './MorphAnnouncer'
+
+import './MorphAnnouncer'
 
 export interface MorphParameters {
   base?: string
@@ -163,7 +163,10 @@ export class Morph {
   }
 
   public normalizePath(path: string) {
-    return splitPath(path, this.#base, this.#trailingSlash)
+    return splitPath(path, {
+      base: this.#base,
+      trailingSlash: this.#trailingSlash,
+    })
   }
 
   public async prefetch(path: string) {

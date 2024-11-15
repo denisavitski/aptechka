@@ -282,7 +282,7 @@ export class AccordionElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-accordion')) {
+if (isBrowser && !customElements.get('e-accordion')) {
   customElements.define('e-accordion', AccordionElement)
 }
 

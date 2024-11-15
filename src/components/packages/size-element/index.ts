@@ -1,4 +1,5 @@
 import { elementResizer } from '@packages/element-resizer'
+import { isBrowser } from '@packages/utils'
 
 export class SizeElement extends HTMLElement {
   #targetElement: HTMLElement = this
@@ -38,7 +39,7 @@ export class SizeElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-size-element')) {
+if (isBrowser && !customElements.get('e-size-element')) {
   customElements.define('e-size-element', SizeElement)
 }
 

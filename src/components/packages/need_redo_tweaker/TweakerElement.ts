@@ -7,7 +7,12 @@ import {
   label,
 } from './element-constructor'
 import { Store, activeStores, storeRegistry } from '@packages/store'
-import { createJSONAndSave, debounce, setupDrag } from '@packages/utils'
+import {
+  createJSONAndSave,
+  debounce,
+  isBrowser,
+  setupDrag,
+} from '@packages/utils'
 import { ViewportMediaRules } from '@packages/device'
 import { aptechkaTheme } from './theme'
 
@@ -305,7 +310,7 @@ export class TweakerElement extends TweakerFolderElement {
   }, 10)
 }
 
-if (!customElements.get('e-tweaker')) {
+if (isBrowser && !customElements.get('e-tweaker')) {
   customElements.define('e-tweaker', TweakerElement)
 }
 

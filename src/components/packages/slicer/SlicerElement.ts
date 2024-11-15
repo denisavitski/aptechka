@@ -1,6 +1,7 @@
-import { Word } from './Word.js'
-import { Letter } from './Letter.js'
+import { Word } from './Word'
+import { Letter } from './Letter'
 import { Media } from '@packages/media'
+import { isBrowser } from '@packages/utils'
 
 export class SlicerElement extends HTMLElement {
   #originalHTML = ''
@@ -114,7 +115,7 @@ export class SlicerElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-slicer')) {
+if (isBrowser && !customElements.get('e-slicer')) {
   customElements.define('e-slicer', SlicerElement)
 }
 

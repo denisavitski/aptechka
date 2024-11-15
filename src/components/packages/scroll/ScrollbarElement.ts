@@ -174,7 +174,7 @@ export class ScrollbarElement extends ScrollUserElement {
   }
 }
 
-if (!customElements.get('e-scrollbar')) {
+if (isBrowser && !customElements.get('e-scrollbar')) {
   customElements.define('e-scrollbar', ScrollbarElement)
 }
 

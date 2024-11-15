@@ -1,5 +1,6 @@
 import { device } from '@packages/device'
 import { SourceElement } from '@packages/source'
+import { isBrowser } from '@packages/utils'
 
 export class ImageElement extends SourceElement<HTMLImageElement> {
   protected override createConsumer() {
@@ -17,7 +18,7 @@ export class ImageElement extends SourceElement<HTMLImageElement> {
   }
 }
 
-if (!customElements.get('e-image')) {
+if (isBrowser && !customElements.get('e-image')) {
   customElements.define('e-image', ImageElement)
 }
 

@@ -2,6 +2,7 @@ import { aptechkaTheme } from './theme'
 import { Store } from '@packages/store'
 import { createStylesheet, element, input } from './element-constructor'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -57,7 +58,7 @@ export class TweakerStringManagerElement<
   }
 }
 
-if (!customElements.get('e-tweaker-string-manager')) {
+if (isBrowser && !customElements.get('e-tweaker-string-manager')) {
   customElements.define('e-tweaker-string-manager', TweakerStringManagerElement)
 }
 

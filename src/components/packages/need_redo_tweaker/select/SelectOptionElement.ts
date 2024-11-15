@@ -76,7 +76,7 @@ export class SelectOptionElement extends SelectUserElement {
   }
 }
 
-if (!customElements.get('e-select-option')) {
+if (isBrowser && !customElements.get('e-select-option')) {
   customElements.define('e-select-option', SelectOptionElement)
 }
 

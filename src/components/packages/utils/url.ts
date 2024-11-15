@@ -1,4 +1,12 @@
-export function splitPath(value: string, base = '', trailingSlash = false) {
+export interface SplitPathOptions {
+  base?: string
+  trailingSlash?: boolean
+}
+
+export function splitPath(
+  value: string,
+  { base = '', trailingSlash = false }: SplitPathOptions = {}
+) {
   base = base.endsWith('/') ? base.slice(0, -1) : base
 
   value = value.replace(base, '')

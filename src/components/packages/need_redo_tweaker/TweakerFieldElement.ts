@@ -9,6 +9,7 @@ import { tweakerManagerConstructors } from './tweakerManagerConstructors'
 import { aptechkaTheme } from './theme'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { dispatchSizeChangeEvent } from './events'
+import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -182,7 +183,7 @@ export class TweakerFieldElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-tweaker-field')) {
+if (isBrowser && !customElements.get('e-tweaker-field')) {
   customElements.define('e-tweaker-field', TweakerFieldElement)
 }
 

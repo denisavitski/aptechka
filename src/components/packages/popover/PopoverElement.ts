@@ -4,6 +4,7 @@ import {
   debounce,
   dispatchEvent,
   getElementTransitionDurationMS,
+  isBrowser,
   parseSearchParameters,
   updateSearchParameter,
 } from '@packages/utils'
@@ -368,7 +369,7 @@ export class PopoverElement extends HTMLElement {
   }
 }
 
-if (!customElements.get('e-popover')) {
+if (isBrowser && !customElements.get('e-popover')) {
   customElements.define('e-popover', PopoverElement)
 }
 

@@ -1,6 +1,6 @@
 import { SourceElement } from '@packages/source'
 import { ticker } from '@packages/ticker'
-import { dispatchEvent } from '@packages/utils'
+import { dispatchEvent, isBrowser } from '@packages/utils'
 
 export interface VideoEvents {
   videoReadyStateChange: CustomEvent<{
@@ -93,7 +93,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   }
 }
 
-if (!customElements.get('e-video')) {
+if (isBrowser && !customElements.get('e-video')) {
   customElements.define('e-video', VideoElement)
 }
 

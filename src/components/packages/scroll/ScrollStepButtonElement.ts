@@ -1,6 +1,7 @@
 import { CSSProperty } from '@packages/css-property'
 import { ScrollButtonElement } from './ScrollButtonElement'
 import { ScrollSetOptions } from './ScrollElement'
+import { isBrowser } from '@packages/utils'
 
 export class ScrollStepButtonElement extends ScrollButtonElement {
   #step = new CSSProperty(this, '--step', 1)
@@ -51,7 +52,7 @@ export class ScrollStepButtonElement extends ScrollButtonElement {
   }
 }
 
-if (!customElements.get('e-scroll-step-button')) {
+if (isBrowser && !customElements.get('e-scroll-step-button')) {
   customElements.define('e-scroll-step-button', ScrollStepButtonElement)
 }
 
