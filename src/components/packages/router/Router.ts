@@ -142,7 +142,7 @@ export class Router {
 
       this.#currentPathname = pathname
 
-      changeHistory(action, pathname, parameters, hash)
+      changeHistory({ action, pathname, searchParameters: parameters, hash })
 
       for await (const route of newRoutes) {
         await route.render(this.#lastRoute?.nest || this.#rootElement, pathname)
@@ -196,8 +196,8 @@ export class Router {
   }
 
   #popStateListener = (event: PopStateEvent) => {
-    if (event.state) {
-      this.navigate(event.state, 'none')
+    if (event.state?.path) {
+      this.navigate(event.state.path, 'none')
     }
   }
 }

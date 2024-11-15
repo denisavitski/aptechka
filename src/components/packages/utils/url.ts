@@ -44,23 +44,25 @@ export function normalizeBase(base: string = '/') {
 
 export type ChangeHistoryAction = 'replace' | 'push' | 'none'
 
-export function changeHistory(
-  action: ChangeHistoryAction,
-  pathname: string,
-  parameters?: string | undefined,
+export interface ChangeHistoryParameters {
+  action: ChangeHistoryAction
+  pathname: string
+  searchParameters?: string | undefined
   hash?: string | undefined
-) {
-  const por = parameters || location.search
+  state?: { [key: string]: any }
+}
 
-  const h = hash ? (hash.startsWith('#') ? hash : '#' + hash) : ''
-  const p = por ? (por.startsWith('?') ? por : '?' + por) : ''
+export function changeHistory(p: ChangeHistoryParameters) {
+  const por = p?.searchParameters || location.search
+  const hash = p.hash ? (p.hash.startsWith('#') ? p.hash : '#' + p.hash) : ''
+  const searhParameters = por ? (por.startsWith('?') ? por : '?' + por) : ''
+  const pathPlus = `${p.pathname}${hash}${searhParameters}`
+  const hstate = { ...p.state, path: pathPlus }
 
-  const pathPlus = `${pathname}${h}${p}`
-
-  if (action === 'push') {
-    history.pushState(pathPlus, '', pathPlus)
-  } else if (action === 'replace') {
-    history.replaceState(pathPlus, '', pathPlus)
+  if (p.action === 'push') {
+    history.pushState(hstate, '', pathPlus)
+  } else if (p.action === 'replace') {
+    history.replaceState(hstate, '', pathPlus)
   }
 }
 

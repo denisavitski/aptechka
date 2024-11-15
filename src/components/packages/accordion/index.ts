@@ -66,6 +66,7 @@ class AccordionItem {
   public destroy() {
     if (this.#headElement) {
       this.#element.classList.remove('opened', 'triggered')
+      this.#element.removeAttribute('data-opened')
       this.#headElement.style.cursor = ''
       this.#setScrollSize(undefined)
 
@@ -95,6 +96,7 @@ class AccordionItem {
 
     setTimeout(() => {
       this.#element.classList.add('opened')
+      this.#element.setAttribute('data-opened', '')
     }, 0)
 
     dispatchEvent(this.element, 'accordionItemToggle', {

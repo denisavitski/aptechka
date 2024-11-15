@@ -1,11 +1,15 @@
-import { ChangeHistoryAction } from '@packages/utils'
-import { Morph } from './Morph'
+import { ChangeHistoryAction, findScrollParentElement } from '@packages/utils'
+import { Morph, MorphNavigateOptions } from './Morph'
 
 export class MorphLink {
   #morph: Morph
   #element: HTMLAnchorElement
   #pathname: string
   #historyAction: ChangeHistoryAction
+  #saveScrollElement: HTMLElement | null = null
+  #saveDocumentState: boolean = false
+  #restoreScrollState: boolean = false
+  #restoreDocumentState: boolean = false
   #state: string | undefined
   #matchPaths: Array<string> | undefined
 
@@ -19,6 +23,30 @@ export class MorphLink {
       (this.#element.getAttribute(
         'data-history-action'
       ) as ChangeHistoryAction) || 'push'
+
+    const saveScrollStateAttr = this.#element.getAttribute(
+      'data-save-scroll-state'
+    )
+
+    if (typeof saveScrollStateAttr === 'string') {
+      if (saveScrollStateAttr === '') {
+        this.#saveScrollElement = findScrollParentElement(this.#element)
+      } else {
+        this.#saveScrollElement = document.getElementById(saveScrollStateAttr)
+      }
+    }
+
+    this.#saveDocumentState = this.#element.hasAttribute(
+      'data-save-document-state'
+    )
+
+    this.#restoreDocumentState = this.#element.hasAttribute(
+      'data-restore-document-state'
+    )
+
+    this.#restoreScrollState = this.#element.hasAttribute(
+      'data-restore-scroll-state'
+    )
 
     this.#state = this.#element.getAttribute('data-state') || undefined
 
@@ -77,9 +105,25 @@ export class MorphLink {
       }
     })
 
+    let saveScrollState: MorphNavigateOptions['saveScrollState'] | undefined
+
+    if (this.#saveScrollElement) {
+      saveScrollState = {
+        x: this.#saveScrollElement.scrollLeft,
+        y: this.#saveScrollElement.scrollTop,
+        selector: this.#saveScrollElement.id
+          ? '#' + this.#saveScrollElement.id
+          : '',
+      }
+    }
+
     this.#morph.navigate(this.#pathname, {
       historyAction: this.#historyAction,
       state: this.#state,
+      saveScrollState,
+      saveDocumentState: this.#saveDocumentState,
+      restoreDocumentState: this.#restoreDocumentState,
+      restoreScrollState: this.#restoreScrollState,
     })
   }
 

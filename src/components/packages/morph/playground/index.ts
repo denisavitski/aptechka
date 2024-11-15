@@ -1,8 +1,7 @@
-import '@packages/media-elements'
+import '@packages/image'
 import '@packages/popover'
 
 import { Morph } from '../Morph'
-import { wait } from '@packages/utils'
 
 const morph = new Morph({
   base: '/components/packages/morph/playground/',
@@ -16,15 +15,16 @@ document.addEventListener('morphAfterElementSwitch', () => {
   document.documentElement.classList.remove('switch')
 })
 
-addEventListener('loadingStart', (e) => {
-  console.log('-----')
-  console.log('loadingStart', JSON.stringify(e.detail))
-})
+addEventListener('loadingStart', (e) => {})
 
-addEventListener('loadingProgress', (e) => {
-  console.log('loadingProgress', JSON.stringify(e.detail))
-})
+addEventListener('loadingProgress', (e) => {})
 
-addEventListener('loadingComplete', (e) => {
-  console.log('loadingComplete', JSON.stringify(e.detail))
+addEventListener('loadingComplete', (e) => {})
+
+addEventListener('keydown', (e) => {
+  if (e.code === 'KeyH') {
+    const el = document.createElement('div')
+    el.innerHTML = Math.random().toString()
+    document.querySelector('.content')?.prepend(el)
+  }
 })

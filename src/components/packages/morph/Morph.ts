@@ -31,7 +31,7 @@ export interface MorphTransitionEntry extends MorphNavigationEntry {
 }
 
 export interface MorphChildrenActionEntry {
-  element: HTMLElement
+  morphElement: HTMLElement
   pathname: string
   isCached: boolean
   state?: any
@@ -48,9 +48,19 @@ export type MorphNavigationCallback = (entry: MorphNavigationEntry) => void
 
 export type MorphPostprocessor = MorphNavigationCallback
 
+export interface MorphScrollState {
+  x: number
+  y: number
+  selector: string
+}
+
 export interface MorphNavigateOptions {
   historyAction?: ChangeHistoryAction
   state?: any
+  saveScrollState?: MorphScrollState
+  saveDocumentState?: boolean
+  restoreScrollState?: boolean
+  restoreDocumentState?: boolean
 }
 
 export interface MorphEvents {
@@ -74,6 +84,9 @@ export class Morph {
   #previousPathname: string | undefined = undefined
   #currentState: any
   #promises: Array<Promise<void>> = []
+  #savedScrollState: MorphScrollState | undefined
+  #savedDocumentState: Document | undefined
+  #isPopstateNavigation = false
 
   public preprocessor?: MorphPreprocessor
   public postprocessor?: MorphPostprocessor
@@ -113,12 +126,12 @@ export class Morph {
 
       addEventListener('popstate', this.#popStateListener)
 
-      changeHistory(
-        'replace',
-        this.#currentPathname,
-        normalizedPath.parameters,
-        normalizedPath.hash
-      )
+      changeHistory({
+        action: 'replace',
+        pathname: this.#currentPathname,
+        searchParameters: normalizedPath.parameters,
+        hash: normalizedPath.hash,
+      })
 
       this.#morphElements
         .map((e) => [...e.children])
@@ -160,10 +173,27 @@ export class Morph {
 
   public async navigate(
     path: string,
-    { historyAction = 'push', state }: MorphNavigateOptions = {}
+    {
+      historyAction = 'push',
+      state,
+      saveScrollState,
+      saveDocumentState,
+      restoreDocumentState,
+      restoreScrollState,
+    }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
       return
+    }
+
+    if (!this.#isPopstateNavigation) {
+      if (!restoreDocumentState) {
+        this.#savedDocumentState = undefined
+      }
+
+      if (!restoreScrollState) {
+        this.#savedScrollState = undefined
+      }
     }
 
     const parts = this.normalizePath(path)
@@ -206,13 +236,19 @@ export class Morph {
       }
 
       const newDocument =
-        this.#cache.get(pathname) || (await this.#fetchDocument(pathname))
+        this.#savedDocumentState ||
+        this.#cache.get(pathname) ||
+        (await this.#fetchDocument(pathname))
 
       const clonedNewDocument = newDocument.cloneNode(true) as Document
 
       if (this.#candidatePathname !== pathname) {
         return
       }
+
+      this.#savedDocumentState = saveDocumentState
+        ? (document.cloneNode(true) as Document)
+        : undefined
 
       if (clonedNewDocument.title) {
         this.#announcer.textContent = clonedNewDocument.title
@@ -315,7 +351,12 @@ export class Morph {
       this.#previousPathname = this.#currentPathname
       this.#currentPathname = pathname
 
-      changeHistory(historyAction, pathname, parameters, hash)
+      changeHistory({
+        action: historyAction,
+        pathname,
+        searchParameters: parameters,
+        hash,
+      })
 
       const newMorphElements = this.#getMorphElements(
         clonedNewDocument.body as HTMLElement
@@ -340,11 +381,26 @@ export class Morph {
 
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
+              element.classList.remove('current')
               element.classList.add('new')
             }
           })
 
-          morphElement.append(...newMorphElementChildNodes)
+          morphElement.prepend(...newMorphElementChildNodes)
+
+          if (this.#savedScrollState) {
+            const element = document.querySelector(
+              this.#savedScrollState.selector
+            )
+
+            if (element) {
+              element.scroll({
+                top: this.#savedScrollState.y,
+                left: this.#savedScrollState.x,
+                behavior: 'auto',
+              })
+            }
+          }
 
           setTimeout(() => {
             newMorphElementChildNodes.forEach((element) => {
@@ -355,7 +411,7 @@ export class Morph {
           }, 10)
 
           const detail: MorphChildrenActionEntry = {
-            element: morphElement,
+            morphElement,
             pathname,
             isCached,
             state,
@@ -396,6 +452,8 @@ export class Morph {
       oldStyleScriptChildren.forEach((child) => child.remove())
 
       this.#promises = []
+
+      this.#savedScrollState = saveScrollState
 
       this.findLinks()
 
@@ -505,8 +563,10 @@ export class Morph {
   }
 
   #popStateListener = (event: PopStateEvent) => {
-    if (event.state) {
-      this.navigate(event.state, { historyAction: 'none' })
+    if (event.state?.path) {
+      this.#isPopstateNavigation = true
+      this.navigate(event.state.path, { historyAction: 'none' })
+      this.#isPopstateNavigation = false
     }
   }
 }
