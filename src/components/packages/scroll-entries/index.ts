@@ -20,22 +20,26 @@ class ScrollEntries {
   }
 
   public register(element: HTMLElement) {
-    this.#entires.set(element, {
-      axis: 'y',
-      value: 0,
-      element,
-    })
+    if (!this.#entires.has(element)) {
+      this.#entires.set(element, {
+        axis: 'y',
+        value: 0,
+        element,
+      })
 
-    this.#elements.add(element)
+      this.#elements.add(element)
 
-    this.#notifier.notify()
+      this.#notifier.notify()
+    }
   }
 
   public unregister(element: HTMLElement) {
-    this.#entires.delete(element)
-    this.#elements.delete(element)
+    if (this.#entires.has(element) && this.#elements.has(element)) {
+      this.#entires.delete(element)
+      this.#elements.delete(element)
 
-    this.#notifier.notify()
+      this.#notifier.notify()
+    }
   }
 
   public update(element: HTMLElement, axis: Axes2D, value: number) {
