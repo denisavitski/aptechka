@@ -903,6 +903,8 @@ export class ScrollElement extends HTMLElement {
         this.sections.forEach((section) => {
           section.unsetTransform()
         })
+
+        this.#resizeListener()
       }
     }
   }
