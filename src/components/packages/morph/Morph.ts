@@ -3,6 +3,7 @@ import {
   ElementOrSelector,
   changeHistory,
   dispatchEvent,
+  isBrowser,
   normalizeBase,
   requestIdleCallback,
   scrollToElement,
@@ -61,7 +62,7 @@ export interface MorphEvents {
 export class Morph {
   public preprocessor?: MorphPreprocessor
 
-  #options: MorphOptions
+  #options: MorphOptions = null!
   #morphElements: Array<HTMLElement> = null!
   #links: Array<MorphLink> = []
   #domParser: DOMParser = new DOMParser()
@@ -75,49 +76,54 @@ export class Morph {
   #announcer: MorphAnnouncer = null!
 
   constructor(parameters?: Partial<MorphOptions>) {
-    this.#options = {
-      base: normalizeBase(parameters?.base),
-      waitForHeadToLoad: parameters?.waitForHeadToLoad === false ? false : true,
-      cachePages: parameters?.cachePages === false ? false : true,
-      trailingSlash: parameters?.trailingSlash || false,
-      scrollSelector: parameters?.scrollSelector || 'body',
+    if (isBrowser) {
+      this.#options = {
+        base: normalizeBase(parameters?.base),
+        waitForHeadToLoad:
+          parameters?.waitForHeadToLoad === false ? false : true,
+        cachePages: parameters?.cachePages === false ? false : true,
+        trailingSlash: parameters?.trailingSlash || false,
+        scrollSelector: parameters?.scrollSelector || 'body',
+      }
+
+      this.#morphElements = this.#getMorphElements(document.body)
+
+      const normalizedPath = this.normalizePath(
+        location.pathname + location.hash
+      )
+
+      this.#currentPathname = normalizedPath.pathname
+
+      this.#routes.set(
+        this.#currentPathname,
+        new MorphRoute(this, this.#currentPathname, document)
+      )
+
+      document.documentElement.setAttribute(
+        'data-current-pathname',
+        this.#currentPathname
+      )
+
+      document.documentElement.setAttribute(
+        'data-current-leaf',
+        normalizedPath.leaf
+      )
+
+      this.findLinks()
+
+      addEventListener('popstate', this.#popStateListener)
+
+      changeHistory({
+        action: 'replace',
+        pathname: this.#currentPathname,
+        searchParameters: normalizedPath.parameters,
+        hash: normalizedPath.hash,
+      })
+
+      this.#announcer = new MorphAnnouncer()
+
+      this.#updateCurrentScrollElement()
     }
-
-    this.#morphElements = this.#getMorphElements(document.body)
-
-    const normalizedPath = this.normalizePath(location.pathname + location.hash)
-
-    this.#currentPathname = normalizedPath.pathname
-
-    this.#routes.set(
-      this.#currentPathname,
-      new MorphRoute(this, this.#currentPathname, document)
-    )
-
-    document.documentElement.setAttribute(
-      'data-current-pathname',
-      this.#currentPathname
-    )
-
-    document.documentElement.setAttribute(
-      'data-current-leaf',
-      normalizedPath.leaf
-    )
-
-    this.findLinks()
-
-    addEventListener('popstate', this.#popStateListener)
-
-    changeHistory({
-      action: 'replace',
-      pathname: this.#currentPathname,
-      searchParameters: normalizedPath.parameters,
-      hash: normalizedPath.hash,
-    })
-
-    this.#announcer = new MorphAnnouncer()
-
-    this.#updateCurrentScrollElement()
   }
 
   public get currentPathname() {
