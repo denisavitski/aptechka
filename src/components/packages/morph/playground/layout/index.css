@@ -6,24 +6,14 @@ nav {
   transform: translateX(-50%);
 }
 
-.wrap {
+.morph {
   width: 100%;
   height: 100%;
-  display: grid;
-}
-
-[data-morph] {
-  grid-column: 1/1;
-  grid-row: 1/1;
-  overflow: hidden;
-}
-
-[data-morph] {
   display: grid;
   --morph-duration: 0.5s;
 }
 
-.x {
+.morph__content {
   position: relative;
   grid-column: 1/1;
   grid-row: 1/1;
@@ -36,24 +26,29 @@ nav {
   overflow: hidden auto;
 }
 
-.content {
-  padding-top: 50vh;
-}
-
-.x.old {
+.morph__content.old {
   transition: var(--morph-duration);
   transform: translateY(-10%) scale(0.9);
   transform-origin: top;
 }
 
-.x.new {
+.morph__content.new {
   z-index: 111;
   transform: translateY(10%) scale(1.1);
   opacity: 0;
 }
 
-.x.in {
+.morph__content.in {
   transform: translateY(0%);
   transition: var(--morph-duration);
   opacity: 1;
+}
+
+.page {
+  width: 100%;
+  min-height: 150vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

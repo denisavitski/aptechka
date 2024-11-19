@@ -11,16 +11,18 @@ export function scrollToElement(
     behaviour = 'instant',
     offset = 0,
     center = false,
+    scrollElement,
   }: {
     behaviour?: ScrollBehavior
     offset?: number | ElementOrSelector<HTMLElement>
     center?: boolean
+    scrollElement?: HTMLElement
   } = {}
 ) {
   const element = getElement(elementOrSelector)
 
   if (element) {
-    const parent = findScrollParentElement(element)
+    const parent = scrollElement || findScrollParentElement(element)
 
     const top = getCumulativeOffsetTop(element)
 

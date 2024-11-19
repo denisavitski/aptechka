@@ -1,9 +1,12 @@
 export {
   Morph,
-  type MorphPostprocessor,
   type MorphNavigationCallback,
   type MorphPreprocessor,
   type MorphPreprocessorEntry,
   type MorphNavigationEntry,
-  type MorphParameters,
+  type MorphOptions,
+  type MorphTransitionEntry,
+  type MorphChildrenActionEntry,
+  type MorphNavigateOptions,
+  type MorphEvents,
 } from './Morph'

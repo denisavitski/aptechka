@@ -1,10 +1,8 @@
-import '@packages/image'
-import '@packages/popover'
-
-import { Morph } from '../Morph'
+import { Morph } from '../index'
 
 const morph = new Morph({
   base: '/components/packages/morph/playground/',
+  scrollSelector: '#scroll',
 })
 
 document.addEventListener('morphBeforeElementSwitch', () => {
@@ -25,6 +23,6 @@ addEventListener('keydown', (e) => {
   if (e.code === 'KeyH') {
     const el = document.createElement('div')
     el.innerHTML = Math.random().toString()
-    document.querySelector('.content')?.prepend(el)
+    document.querySelector('.page')?.prepend(el)
   }
 })

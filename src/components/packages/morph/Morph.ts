@@ -1,40 +1,38 @@
-import { loading } from '@packages/loading'
 import {
   ChangeHistoryAction,
+  ElementOrSelector,
   changeHistory,
   dispatchEvent,
-  isBrowser,
   normalizeBase,
+  requestIdleCallback,
+  scrollToElement,
   splitPath,
 } from '@packages/utils'
 
+import './MorphAnnouncer'
 import { MorphLink } from './MorphLink'
+
 import { MorphAnnouncer } from './MorphAnnouncer'
 
-import './MorphAnnouncer'
+import { MorphRoute } from './MorphRoute'
 
-export interface MorphParameters {
-  base?: string
-  waitForHeadToLoad?: boolean
-  cachePages?: boolean
-  trailingSlash?: boolean
+export interface MorphOptions {
+  base: string
+  waitForHeadToLoad: boolean
+  cachePages: boolean
+  trailingSlash: boolean
+  scrollSelector: string
 }
 
 export interface MorphNavigationEntry {
   pathname: string
-  isCached: boolean
-  state?: any
 }
 
-export interface MorphTransitionEntry extends MorphNavigationEntry {
-  newDocument: Document
-}
+export interface MorphTransitionEntry extends MorphNavigationEntry {}
 
 export interface MorphChildrenActionEntry {
   morphElement: HTMLElement
   pathname: string
-  isCached: boolean
-  state?: any
 }
 
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
@@ -46,21 +44,11 @@ export type MorphPreprocessor = (entry: MorphPreprocessorEntry) => void
 
 export type MorphNavigationCallback = (entry: MorphNavigationEntry) => void
 
-export type MorphPostprocessor = MorphNavigationCallback
-
-export interface MorphScrollState {
-  x: number
-  y: number
-  selector: string
-}
-
 export interface MorphNavigateOptions {
   historyAction?: ChangeHistoryAction
-  state?: any
-  saveScrollState?: MorphScrollState
-  saveDocumentState?: boolean
-  restoreScrollState?: boolean
-  restoreDocumentState?: boolean
+  centerScroll?: boolean
+  offsetScroll?: number | ElementOrSelector<HTMLElement>
+  revalidate?: boolean
 }
 
 export interface MorphEvents {
@@ -71,79 +59,65 @@ export interface MorphEvents {
 }
 
 export class Morph {
-  #base: string = null!
-  #waitForHeadToLoad: boolean = null!
-  #cachePages: boolean = null!
-  #trailingSlash = false
+  public preprocessor?: MorphPreprocessor
+
+  #options: MorphOptions
   #morphElements: Array<HTMLElement> = null!
   #links: Array<MorphLink> = []
   #domParser: DOMParser = new DOMParser()
-  #cache: Map<string, Document> = new Map()
   #candidatePathname: string | undefined
   #currentPathname: string = null!
   #previousPathname: string | undefined = undefined
-  #currentState: any
   #promises: Array<Promise<void>> = []
-  #savedScrollState: MorphScrollState | undefined
-  #savedDocumentState: Document | undefined
   #isPopstateNavigation = false
-
-  public preprocessor?: MorphPreprocessor
-  public postprocessor?: MorphPostprocessor
-
+  #currentScrollElement: HTMLElement = null!
+  #routes = new Map<string, MorphRoute>()
   #announcer: MorphAnnouncer = null!
 
-  constructor(parameters?: MorphParameters) {
-    if (isBrowser) {
-      this.#base = normalizeBase(parameters?.base)
-
-      this.#waitForHeadToLoad =
-        parameters?.waitForHeadToLoad === false ? false : true
-
-      this.#cachePages = parameters?.cachePages === false ? false : true
-
-      this.#trailingSlash = parameters?.trailingSlash || false
-
-      this.#morphElements = this.#getMorphElements(document.body)
-
-      const normalizedPath = this.normalizePath(
-        location.pathname + location.hash
-      )
-
-      this.#currentPathname = normalizedPath.pathname
-
-      document.documentElement.setAttribute(
-        'data-current-pathname',
-        this.#currentPathname
-      )
-
-      document.documentElement.setAttribute(
-        'data-current-leaf',
-        normalizedPath.leaf
-      )
-
-      this.findLinks()
-
-      addEventListener('popstate', this.#popStateListener)
-
-      changeHistory({
-        action: 'replace',
-        pathname: this.#currentPathname,
-        searchParameters: normalizedPath.parameters,
-        hash: normalizedPath.hash,
-      })
-
-      this.#morphElements
-        .map((e) => [...e.children])
-        .flat()
-        .forEach((e) => {
-          if (e instanceof HTMLElement) {
-            e.classList.add('current')
-          }
-        })
-
-      this.#announcer = new MorphAnnouncer()
+  constructor(parameters?: Partial<MorphOptions>) {
+    this.#options = {
+      base: normalizeBase(parameters?.base),
+      waitForHeadToLoad: parameters?.waitForHeadToLoad === false ? false : true,
+      cachePages: parameters?.cachePages === false ? false : true,
+      trailingSlash: parameters?.trailingSlash || false,
+      scrollSelector: parameters?.scrollSelector || 'body',
     }
+
+    this.#morphElements = this.#getMorphElements(document.body)
+
+    const normalizedPath = this.normalizePath(location.pathname + location.hash)
+
+    this.#currentPathname = normalizedPath.pathname
+
+    this.#routes.set(
+      this.#currentPathname,
+      new MorphRoute(this, this.#currentPathname, document)
+    )
+
+    document.documentElement.setAttribute(
+      'data-current-pathname',
+      this.#currentPathname
+    )
+
+    document.documentElement.setAttribute(
+      'data-current-leaf',
+      normalizedPath.leaf
+    )
+
+    this.findLinks()
+
+    addEventListener('popstate', this.#popStateListener)
+
+    changeHistory({
+      action: 'replace',
+      pathname: this.#currentPathname,
+      searchParameters: normalizedPath.parameters,
+      hash: normalizedPath.hash,
+    })
+
+    this.#announcer = new MorphAnnouncer()
+
+    this.#updateCurrentScrollElement()
   }
 
   public get currentPathname() {
@@ -154,52 +128,41 @@ export class Morph {
     return this.#previousPathname
   }
 
-  public get currentState() {
-    return this.#currentState
-  }
-
   public get links() {
     return this.#links
   }
 
+  public get scrollElement() {
+    return this.#currentScrollElement
+  }
+
   public normalizePath(path: string) {
     return splitPath(path, {
-      base: this.#base,
-      trailingSlash: this.#trailingSlash,
+      base: this.#options.base,
+      trailingSlash: this.#options.trailingSlash,
     })
   }
 
   public async prefetch(path: string) {
     const parts = this.normalizePath(path)
-    return this.#fetchDocument(parts.pathname)
+    this.#createRoute(parts.pathname)
   }
 
   public async navigate(
     path: string,
     {
       historyAction = 'push',
-      state,
-      saveScrollState,
-      saveDocumentState,
-      restoreDocumentState,
-      restoreScrollState,
+      centerScroll,
+      offsetScroll,
+      revalidate,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
       return
     }
 
-    if (!this.#isPopstateNavigation) {
-      if (!restoreDocumentState) {
-        this.#savedDocumentState = undefined
-      }
-
-      if (!restoreScrollState) {
-        this.#savedScrollState = undefined
-      }
-    }
-
     const parts = this.normalizePath(path)
+
     let { pathname, hash, parameters, leaf } = parts
 
     if (
@@ -209,20 +172,19 @@ export class Morph {
       return
     }
 
-    this.#currentState = state
     this.#candidatePathname = pathname
 
-    const isCached = this.#cache.has(pathname)
-
     try {
-      loading.add('__morph')
-
-      let isOkToSwitch = true
+      let preprocessedSuccesfully = true
 
       if (this.preprocessor) {
         try {
           await new Promise<void>((resolve, reject) => {
-            this.preprocessor?.({ pathname, resolve, reject, isCached, state })
+            this.preprocessor?.({
+              pathname,
+              resolve,
+              reject,
+            })
           })
         } catch (e: any) {
           if (e) {
@@ -230,44 +192,37 @@ export class Morph {
           } else {
             console.log('Route change canceled')
           }
-          isOkToSwitch = false
+          preprocessedSuccesfully = false
         }
       }
 
-      if (!isOkToSwitch || this.#candidatePathname !== pathname) {
+      if (!preprocessedSuccesfully || this.#candidatePathname !== pathname) {
         return
       }
 
-      const newDocument =
-        this.#savedDocumentState ||
-        this.#cache.get(pathname) ||
-        (await this.#fetchDocument(pathname))
-
-      const clonedNewDocument = newDocument.cloneNode(true) as Document
+      const currentRoute = await this.#getRoute(this.#currentPathname)
+      const fetchedRoute = await this.#getRoute(pathname, revalidate)
 
       if (this.#candidatePathname !== pathname) {
         return
       }
 
-      this.#savedDocumentState = saveDocumentState
-        ? (document.cloneNode(true) as Document)
-        : undefined
+      currentRoute.saveScrollState()
+      currentRoute.saveDocumentState()
 
-      if (clonedNewDocument.title) {
-        this.#announcer.textContent = clonedNewDocument.title
-      } else {
-        const h1 = clonedNewDocument.querySelector('h1')
-        const title = h1?.innerText || h1?.textContent || pathname
-        this.#announcer.textContent = title
+      if (!this.#isPopstateNavigation) {
+        fetchedRoute.clearScrollState()
+        fetchedRoute.clearDocumentState()
       }
+
+      fetchedRoute.cloneDocument()
+
+      this.#announcer.textContent = fetchedRoute.title
 
       document.body.appendChild(this.#announcer)
 
       const transitionDetail: MorphTransitionEntry = {
         pathname,
-        isCached,
-        state,
-        newDocument: clonedNewDocument,
       }
 
       dispatchEvent(document, 'morphStart', {
@@ -275,10 +230,7 @@ export class Morph {
       })
 
       const currentHeadChildren = Array.from(document.head.children)
-
-      const newHeadChildren = Array.from(
-        (clonedNewDocument.head as HTMLElement).children
-      )
+      const newHeadChildren = Array.from(fetchedRoute.document.head.children)
 
       const identicalHeadChildren = this.#intersectElements(
         currentHeadChildren,
@@ -308,16 +260,15 @@ export class Morph {
         document.head.appendChild(child)
       })
 
-      const elementsWithLoad = addHeadChildren.filter(
-        (child) =>
-          !child.hasAttribute('data-no-waiting') &&
-          (child.tagName === 'STYLE' ||
-            child.tagName === 'SCRIPT' ||
-            child.tagName === 'LINK') &&
-          child.getAttribute('rel') !== 'canonical'
-      ) as Array<HTMLLinkElement>
+      const elementsWithLoad = addHeadChildren.filter((child) => {
+        if (child.hasAttribute('data-no-waiting')) {
+          return false
+        } else if (this.#isElementEmitsLoadEvent(child)) {
+          return true
+        }
+      }) as Array<HTMLLinkElement>
 
-      if (this.#waitForHeadToLoad && elementsWithLoad.length) {
+      if (this.#options.waitForHeadToLoad && elementsWithLoad.length) {
         await new Promise<void>(async (res) => {
           let counter = 0
 
@@ -333,40 +284,26 @@ export class Morph {
         })
       }
 
-      const oldStyleScriptChildren: Array<Element> = []
+      const oldElementsWithLoadEvent: Array<Element> = []
 
       removeHeadChildren.forEach((child) => {
         if (child.hasAttribute('data-permanent')) {
           return
         }
 
-        if (
-          child.tagName === 'SCRIPT' ||
-          child.tagName === 'STYLE' ||
-          child.getAttribute('rel') === 'stylesheet'
-        ) {
-          oldStyleScriptChildren.push(child)
+        if (this.#isElementEmitsLoadEvent(child)) {
+          oldElementsWithLoadEvent.push(child)
         } else {
           child.remove()
         }
       })
 
-      this.#previousPathname = this.#currentPathname
-      this.#currentPathname = pathname
-
-      changeHistory({
-        action: historyAction,
-        pathname,
-        searchParameters: parameters,
-        hash,
-      })
-
       const newMorphElements = this.#getMorphElements(
-        clonedNewDocument.body as HTMLElement
+        fetchedRoute.document.body as HTMLElement
       )
 
       this.#morphElements.forEach((morphElement, i) => {
-        const newMorphElement = newMorphElements[i++]!
+        const newMorphElement = newMorphElements[i]!
 
         const duration =
           getComputedStyle(morphElement).getPropertyValue('--morph-duration')
@@ -384,40 +321,23 @@ export class Morph {
 
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
-              element.classList.remove('current')
               element.classList.add('new')
             }
           })
 
           morphElement.prepend(...newMorphElementChildNodes)
 
-          if (this.#savedScrollState) {
-            const element = document.querySelector(
-              this.#savedScrollState.selector
-            )
-
-            if (element) {
-              element.scroll({
-                top: this.#savedScrollState.y,
-                left: this.#savedScrollState.x,
-                behavior: 'auto',
-              })
-            }
-          }
-
-          setTimeout(() => {
+          requestIdleCallback(() => {
             newMorphElementChildNodes.forEach((element) => {
               if (element instanceof HTMLElement) {
                 element.classList.add('in')
               }
             })
-          }, 10)
+          })
 
           const detail: MorphChildrenActionEntry = {
             morphElement,
             pathname,
-            isCached,
-            state,
           }
 
           dispatchEvent(document, 'morphNewChildrenAdded', {
@@ -430,8 +350,7 @@ export class Morph {
 
               newMorphElementChildNodes.forEach((element) => {
                 if (element instanceof HTMLElement) {
-                  element.classList.remove('new', 'in')
-                  element.classList.add('current')
+                  element.classList.remove('in', 'new')
                 }
               })
 
@@ -450,52 +369,55 @@ export class Morph {
         }
       })
 
+      this.#updateCurrentScrollElement()
+
+      if (hash) {
+        fetchedRoute.clearScrollState()
+
+        const element = document.getElementById(hash)
+
+        if (element instanceof HTMLElement) {
+          scrollToElement(element, {
+            scrollElement: this.#currentScrollElement,
+            behaviour: 'instant',
+            center: centerScroll,
+            offset: offsetScroll,
+          })
+        }
+      } else if (this.#isPopstateNavigation) {
+        fetchedRoute.restoreScrollPosition()
+      }
+
       await Promise.all(this.#promises)
 
-      oldStyleScriptChildren.forEach((child) => child.remove())
+      oldElementsWithLoadEvent.forEach((child) => child.remove())
 
+      this.#previousPathname = this.#currentPathname
+      this.#currentPathname = pathname
       this.#promises = []
-
-      this.#savedScrollState = saveScrollState
 
       this.findLinks()
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
-
       document.documentElement.setAttribute('data-current-leaf', leaf)
 
       this.#announcer.remove()
 
-      this.postprocessor?.({ pathname, isCached, state })
+      changeHistory({
+        action: historyAction,
+        pathname,
+        searchParameters: parameters,
+        hash,
+      })
 
       dispatchEvent(document, 'morphComplete', {
         detail: transitionDetail,
       })
-
-      loading.complete('__morph')
     } catch (e) {
       console.error(e)
     }
 
     this.#candidatePathname = undefined
-  }
-
-  async #fetchDocument(pathname: string) {
-    const cahcnedDocument = this.#cache.get(pathname)
-
-    if (cahcnedDocument) {
-      return cahcnedDocument
-    }
-
-    const fetchResult = await fetch(pathname)
-    const text = await fetchResult.text()
-    const document = this.#domParser.parseFromString(text, 'text/html')
-
-    if (this.#cachePages) {
-      this.#cache.set(pathname, document)
-    }
-
-    return document
   }
 
   public addLink(element: HTMLAnchorElement) {
@@ -535,6 +457,28 @@ export class Morph {
     this.#links = linkElements.map((element) => new MorphLink(element, this))
   }
 
+  async #getRoute(pathname: string, revalidate = false) {
+    let route = this.#routes.get(pathname)
+
+    if (!route || revalidate) {
+      route = await this.#createRoute(pathname)
+    }
+
+    return route
+  }
+
+  async #createRoute(pathname: string) {
+    const fetchResult = await fetch(pathname)
+    const text = await fetchResult.text()
+    const document = this.#domParser.parseFromString(text, 'text/html')
+
+    const route = new MorphRoute(this, pathname, document)
+
+    this.#routes.set(pathname, route)
+
+    return route
+  }
+
   #getMorphElements(el: HTMLElement) {
     const morphElements = [...el.querySelectorAll<HTMLElement>('[data-morph]')]
 
@@ -565,10 +509,25 @@ export class Morph {
     )
   }
 
-  #popStateListener = (event: PopStateEvent) => {
+  #isElementEmitsLoadEvent(element: Element) {
+    return (
+      element.tagName === 'SCRIPT' ||
+      element.tagName === 'STYLE' ||
+      (element.tagName === 'LINK' &&
+        element.getAttribute('rel') === 'stylesheet')
+    )
+  }
+
+  #updateCurrentScrollElement() {
+    this.#currentScrollElement =
+      document.querySelector(this.#options.scrollSelector) ||
+      document.documentElement
+  }
+
+  #popStateListener = async (event: PopStateEvent) => {
     if (event.state?.path) {
       this.#isPopstateNavigation = true
-      this.navigate(event.state.path, { historyAction: 'none' })
+      await this.navigate(event.state.path, { historyAction: 'none' })
       this.#isPopstateNavigation = false
     }
   }

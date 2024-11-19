@@ -1,5 +1,3 @@
-import { isBrowser } from '@packages/utils'
-
 export class MorphAnnouncer extends HTMLElement {
   connectedCallback() {
     const attrs = {
@@ -15,7 +13,7 @@ export class MorphAnnouncer extends HTMLElement {
   }
 }
 
-if (isBrowser && !customElements.get('morph-announcer')) {
+if (!customElements.get('morph-announcer')) {
   customElements.define('morph-announcer', MorphAnnouncer)
 }
 

@@ -1,17 +1,11 @@
-import { ChangeHistoryAction, findScrollParentElement } from '@packages/utils'
-import { Morph, MorphNavigateOptions } from './Morph'
+import { ChangeHistoryAction } from '@packages/utils'
+import { Morph } from './Morph'
+import { cssValueParser } from '@packages/css-value-parser'
 
 export class MorphLink {
   #morph: Morph
   #element: HTMLAnchorElement
   #pathname: string
-  #historyAction: ChangeHistoryAction
-  #saveScrollElement: HTMLElement | null = null
-  #saveDocumentState: boolean = false
-  #restoreScrollState: boolean = false
-  #restoreDocumentState: boolean = false
-  #state: string | undefined
-  #matchPaths: Array<string> | undefined
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
     this.#morph = morph
@@ -19,61 +13,18 @@ export class MorphLink {
 
     this.#pathname = this.#element.getAttribute('href') || '/'
 
-    this.#historyAction =
-      (this.#element.getAttribute(
-        'data-history-action'
-      ) as ChangeHistoryAction) || 'push'
-
-    const saveScrollStateAttr = this.#element.getAttribute(
-      'data-save-scroll-state'
-    )
-
-    if (typeof saveScrollStateAttr === 'string') {
-      if (saveScrollStateAttr === '') {
-        this.#saveScrollElement = findScrollParentElement(this.#element)
-      } else {
-        this.#saveScrollElement = document.getElementById(saveScrollStateAttr)
-      }
-    }
-
-    this.#saveDocumentState = this.#element.hasAttribute(
-      'data-save-document-state'
-    )
-
-    this.#restoreDocumentState = this.#element.hasAttribute(
-      'data-restore-document-state'
-    )
-
-    this.#restoreScrollState = this.#element.hasAttribute(
-      'data-restore-scroll-state'
-    )
-
-    this.#state = this.#element.getAttribute('data-state') || undefined
-
     this.#element.addEventListener('click', this.#clickListener)
 
     const p1 = morph.normalizePath(this.#pathname)
     const p2 = morph.normalizePath(location.pathname)
 
-    this.#matchPaths = this.#element
-      .getAttribute('data-match-paths')
-      ?.split(',')
-      .map((v) => morph.normalizePath(v.trim()).pathname)
-
-    if (this.#element.hasAttribute('data-include')) {
-      if (p2.pathname.includes(p1.pathname)) {
-        this.#element.classList.add('current')
-      }
-    } else {
-      if (
-        p1.pathname === p2.pathname ||
-        this.#matchPaths?.includes(p2.pathname)
-      ) {
-        this.#element.classList.add('current')
-        this.#element.classList.add('clicked')
-      } else {
-        this.#element.classList.remove('clicked')
-      }
+    if (
+      this.#element.hasAttribute('data-include') &&
+      p2.pathname.includes(p1.pathname)
+    ) {
+      this.#element.classList.add('current')
+    } else if (p1.pathname === p2.pathname) {
+      this.#element.classList.add('current')
     }
 
     if (this.#element.hasAttribute('data-prefetch')) {
@@ -94,36 +45,28 @@ export class MorphLink {
   #clickListener = (e: MouseEvent) => {
     e.preventDefault()
 
-    this.#morph.links.forEach((link) => {
-      if (
-        this.#pathname === link.#pathname ||
-        link.#matchPaths?.includes(this.#pathname)
-      ) {
-        link.#element.classList.add('clicked')
-      } else {
-        link.#element.classList.remove('clicked')
-      }
-    })
+    const historyAction =
+      (this.#element.getAttribute(
+        'data-history-action'
+      ) as ChangeHistoryAction) || 'push'
 
-    let saveScrollState: MorphNavigateOptions['saveScrollState'] | undefined
+    const centerScroll = this.#element.hasAttribute('data-center-scroll')
 
-    if (this.#saveScrollElement) {
-      saveScrollState = {
-        x: this.#saveScrollElement.scrollLeft,
-        y: this.#saveScrollElement.scrollTop,
-        selector: this.#saveScrollElement.id
-          ? '#' + this.#saveScrollElement.id
-          : '',
-      }
-    }
+    const offsetScrollRawValue = getComputedStyle(this.#element)
+      .getPropertyValue('--offset-scroll')
+      .trim()
+
+    const offsetScroll = offsetScrollRawValue
+      ? cssValueParser.parse(offsetScrollRawValue)
+      : undefined
+
+    const revalidate = this.#element.hasAttribute('data-revalidate')
 
     this.#morph.navigate(this.#pathname, {
-      historyAction: this.#historyAction,
-      state: this.#state,
-      saveScrollState,
-      saveDocumentState: this.#saveDocumentState,
-      restoreDocumentState: this.#restoreDocumentState,
-      restoreScrollState: this.#restoreScrollState,
+      historyAction,
+      centerScroll,
+      offsetScroll,
+      revalidate,
     })
   }
 
