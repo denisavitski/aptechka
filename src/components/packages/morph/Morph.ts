@@ -419,6 +419,8 @@ export class Morph {
       dispatchEvent(document, 'morphComplete', {
         detail: transitionDetail,
       })
+
+      window.dispatchEvent(new Event('resize'))
     } catch (e) {
       console.error(e)
     }
