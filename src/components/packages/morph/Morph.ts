@@ -122,7 +122,7 @@ export class Morph {
 
       this.#announcer = new MorphAnnouncer()
 
-      this.#updateCurrentScrollElement()
+      this.#updateCurrentScrollElement(document)
     }
   }
 
@@ -308,6 +308,23 @@ export class Morph {
         fetchedRoute.document.body as HTMLElement
       )
 
+      this.#updateCurrentScrollElement(fetchedRoute.document)
+
+      document.documentElement.setAttribute('data-current-pathname', pathname)
+      document.documentElement.setAttribute('data-current-leaf', leaf)
+
+      changeHistory({
+        action: historyAction,
+        pathname,
+        searchParameters: parameters,
+        hash,
+      })
+
+      this.#announcer.remove()
+
+      this.#previousPathname = this.#currentPathname
+      this.#currentPathname = pathname
+
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
 
@@ -375,8 +392,6 @@ export class Morph {
         }
       })
 
-      this.#updateCurrentScrollElement()
-
       if (hash) {
         fetchedRoute.clearScrollState()
 
@@ -398,23 +413,9 @@ export class Morph {
 
       oldElementsWithLoadEvent.forEach((child) => child.remove())
 
-      this.#previousPathname = this.#currentPathname
-      this.#currentPathname = pathname
       this.#promises = []
 
       this.findLinks()
-
-      document.documentElement.setAttribute('data-current-pathname', pathname)
-      document.documentElement.setAttribute('data-current-leaf', leaf)
-
-      this.#announcer.remove()
-
-      changeHistory({
-        action: historyAction,
-        pathname,
-        searchParameters: parameters,
-        hash,
-      })
 
       dispatchEvent(document, 'morphComplete', {
         detail: transitionDetail,
@@ -526,7 +527,7 @@ export class Morph {
     )
   }
 
-  #updateCurrentScrollElement() {
+  #updateCurrentScrollElement(document: Document) {
     this.#currentScrollElement =
       document.querySelector(this.#options.scrollSelector) ||
       document.documentElement

@@ -132,10 +132,6 @@ class AccordionItem {
     })
   }
 
-  get #root() {
-    return this.#element.parentElement || this.#element.getRootNode()
-  }
-
   get #scrollSize() {
     return this.#accordionElement.axisAttribute.current === 'x'
       ? this.#bodyElement.scrollWidth
