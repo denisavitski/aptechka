@@ -12,8 +12,6 @@ export type DeviceOS =
 
 class Device {
   #OS = 'unknown'
-  #gpu = 'unknown'
-  #gpuTier = 0
   #isMobile = false
   #isTouch = false
   #isWebgl = false
@@ -74,14 +72,6 @@ class Device {
 
   public get OS() {
     return this.#OS
-  }
-
-  public get gpu() {
-    return this.#gpu
-  }
-
-  public get gpuTier() {
-    return this.#gpuTier
   }
 
   public get isMobile() {
