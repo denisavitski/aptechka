@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.47.1",
+  "version": "0.47.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -19,224 +19,224 @@
   "type": "module",
   "exports": {
     "./accordion": {
+      "types": "./lib/accordion/index.d.ts",
       "require": "./lib/accordion/index.cjs",
-      "default": "./lib/accordion/index.js",
-      "types": "./lib/accordion/index.d.ts"
+      "default": "./lib/accordion/index.js"
     },
     "./animation": {
+      "types": "./lib/animation/index.d.ts",
       "require": "./lib/animation/index.cjs",
-      "default": "./lib/animation/index.js",
-      "types": "./lib/animation/index.d.ts"
+      "default": "./lib/animation/index.js"
     },
     "./attribute": {
+      "types": "./lib/attribute/index.d.ts",
       "require": "./lib/attribute/index.cjs",
-      "default": "./lib/attribute/index.js",
-      "types": "./lib/attribute/index.d.ts"
+      "default": "./lib/attribute/index.js"
     },
     "./billboard": {
+      "types": "./lib/billboard/index.d.ts",
       "require": "./lib/billboard/index.cjs",
-      "default": "./lib/billboard/index.js",
-      "types": "./lib/billboard/index.d.ts"
+      "default": "./lib/billboard/index.js"
     },
     "./canvas": {
+      "types": "./lib/canvas/index.d.ts",
       "require": "./lib/canvas/index.cjs",
-      "default": "./lib/canvas/index.js",
-      "types": "./lib/canvas/index.d.ts"
+      "default": "./lib/canvas/index.js"
     },
     "./class-linked-status": {
+      "types": "./lib/class-linked-status/index.d.ts",
       "require": "./lib/class-linked-status/index.cjs",
-      "default": "./lib/class-linked-status/index.js",
-      "types": "./lib/class-linked-status/index.d.ts"
+      "default": "./lib/class-linked-status/index.js"
     },
     "./connector": {
+      "types": "./lib/connector/index.d.ts",
       "require": "./lib/connector/index.cjs",
-      "default": "./lib/connector/index.js",
-      "types": "./lib/connector/index.d.ts"
+      "default": "./lib/connector/index.js"
     },
     "./controls": {
+      "types": "./lib/controls/index.d.ts",
       "require": "./lib/controls/index.cjs",
-      "default": "./lib/controls/index.js",
-      "types": "./lib/controls/index.d.ts"
+      "default": "./lib/controls/index.js"
     },
     "./css-property": {
+      "types": "./lib/css-property/index.d.ts",
       "require": "./lib/css-property/index.cjs",
-      "default": "./lib/css-property/index.js",
-      "types": "./lib/css-property/index.d.ts"
+      "default": "./lib/css-property/index.js"
     },
     "./css-unit-parser": {
+      "types": "./lib/css-unit-parser/index.d.ts",
       "require": "./lib/css-unit-parser/index.cjs",
-      "default": "./lib/css-unit-parser/index.js",
-      "types": "./lib/css-unit-parser/index.d.ts"
+      "default": "./lib/css-unit-parser/index.js"
     },
     "./css-value-parser": {
+      "types": "./lib/css-value-parser/index.d.ts",
       "require": "./lib/css-value-parser/index.cjs",
-      "default": "./lib/css-value-parser/index.js",
-      "types": "./lib/css-value-parser/index.d.ts"
+      "default": "./lib/css-value-parser/index.js"
     },
     "./custom-scrollbar": {
+      "types": "./lib/custom-scrollbar/index.d.ts",
       "require": "./lib/custom-scrollbar/index.cjs",
-      "default": "./lib/custom-scrollbar/index.js",
-      "types": "./lib/custom-scrollbar/index.d.ts"
+      "default": "./lib/custom-scrollbar/index.js"
     },
     "./dev": {
+      "types": "./lib/dev/index.d.ts",
       "require": "./lib/dev/index.cjs",
-      "default": "./lib/dev/index.js",
-      "types": "./lib/dev/index.d.ts"
+      "default": "./lib/dev/index.js"
     },
     "./device": {
+      "types": "./lib/device/index.d.ts",
       "require": "./lib/device/index.cjs",
-      "default": "./lib/device/index.js",
-      "types": "./lib/device/index.d.ts"
+      "default": "./lib/device/index.js"
     },
     "./element-resizer": {
+      "types": "./lib/element-resizer/index.d.ts",
       "require": "./lib/element-resizer/index.cjs",
-      "default": "./lib/element-resizer/index.js",
-      "types": "./lib/element-resizer/index.d.ts"
+      "default": "./lib/element-resizer/index.js"
     },
     "./en3": {
+      "types": "./lib/en3/index.d.ts",
       "require": "./lib/en3/index.cjs",
-      "default": "./lib/en3/index.js",
-      "types": "./lib/en3/index.d.ts"
+      "default": "./lib/en3/index.js"
     },
     "./iframe": {
+      "types": "./lib/iframe/index.d.ts",
       "require": "./lib/iframe/index.cjs",
-      "default": "./lib/iframe/index.js",
-      "types": "./lib/iframe/index.d.ts"
+      "default": "./lib/iframe/index.js"
     },
     "./image": {
+      "types": "./lib/image/index.d.ts",
       "require": "./lib/image/index.cjs",
-      "default": "./lib/image/index.js",
-      "types": "./lib/image/index.d.ts"
+      "default": "./lib/image/index.js"
     },
     "./intersector": {
+      "types": "./lib/intersector/index.d.ts",
       "require": "./lib/intersector/index.cjs",
-      "default": "./lib/intersector/index.js",
-      "types": "./lib/intersector/index.d.ts"
+      "default": "./lib/intersector/index.js"
     },
     "./ladder": {
+      "types": "./lib/ladder/index.d.ts",
       "require": "./lib/ladder/index.cjs",
-      "default": "./lib/ladder/index.js",
-      "types": "./lib/ladder/index.d.ts"
+      "default": "./lib/ladder/index.js"
     },
     "./layout-box": {
+      "types": "./lib/layout-box/index.d.ts",
       "require": "./lib/layout-box/index.cjs",
-      "default": "./lib/layout-box/index.js",
-      "types": "./lib/layout-box/index.d.ts"
+      "default": "./lib/layout-box/index.js"
     },
     "./loading": {
+      "types": "./lib/loading/index.d.ts",
       "require": "./lib/loading/index.cjs",
-      "default": "./lib/loading/index.js",
-      "types": "./lib/loading/index.d.ts"
+      "default": "./lib/loading/index.js"
     },
     "./masonry-layout": {
+      "types": "./lib/masonry-layout/index.d.ts",
       "require": "./lib/masonry-layout/index.cjs",
-      "default": "./lib/masonry-layout/index.js",
-      "types": "./lib/masonry-layout/index.d.ts"
+      "default": "./lib/masonry-layout/index.js"
     },
     "./media": {
+      "types": "./lib/media/index.d.ts",
       "require": "./lib/media/index.cjs",
-      "default": "./lib/media/index.js",
-      "types": "./lib/media/index.d.ts"
+      "default": "./lib/media/index.js"
     },
     "./morph": {
+      "types": "./lib/morph/index.d.ts",
       "require": "./lib/morph/index.cjs",
-      "default": "./lib/morph/index.js",
-      "types": "./lib/morph/index.d.ts"
+      "default": "./lib/morph/index.js"
     },
     "./notifier": {
+      "types": "./lib/notifier/index.d.ts",
       "require": "./lib/notifier/index.cjs",
-      "default": "./lib/notifier/index.js",
-      "types": "./lib/notifier/index.d.ts"
+      "default": "./lib/notifier/index.js"
     },
     "./order": {
+      "types": "./lib/order/index.d.ts",
       "require": "./lib/order/index.cjs",
-      "default": "./lib/order/index.js",
-      "types": "./lib/order/index.d.ts"
+      "default": "./lib/order/index.js"
     },
     "./pointer": {
+      "types": "./lib/pointer/index.d.ts",
       "require": "./lib/pointer/index.cjs",
-      "default": "./lib/pointer/index.js",
-      "types": "./lib/pointer/index.d.ts"
+      "default": "./lib/pointer/index.js"
     },
     "./popover": {
+      "types": "./lib/popover/index.d.ts",
       "require": "./lib/popover/index.cjs",
-      "default": "./lib/popover/index.js",
-      "types": "./lib/popover/index.d.ts"
+      "default": "./lib/popover/index.js"
     },
     "./router": {
+      "types": "./lib/router/index.d.ts",
       "require": "./lib/router/index.cjs",
-      "default": "./lib/router/index.js",
-      "types": "./lib/router/index.d.ts"
+      "default": "./lib/router/index.js"
     },
     "./scroll": {
+      "types": "./lib/scroll/index.d.ts",
       "require": "./lib/scroll/index.cjs",
-      "default": "./lib/scroll/index.js",
-      "types": "./lib/scroll/index.d.ts"
+      "default": "./lib/scroll/index.js"
     },
     "./scroll-entries": {
+      "types": "./lib/scroll-entries/index.d.ts",
       "require": "./lib/scroll-entries/index.cjs",
-      "default": "./lib/scroll-entries/index.js",
-      "types": "./lib/scroll-entries/index.d.ts"
+      "default": "./lib/scroll-entries/index.js"
     },
     "./scroll-segment": {
+      "types": "./lib/scroll-segment/index.d.ts",
       "require": "./lib/scroll-segment/index.cjs",
-      "default": "./lib/scroll-segment/index.js",
-      "types": "./lib/scroll-segment/index.d.ts"
+      "default": "./lib/scroll-segment/index.js"
     },
     "./sequence": {
+      "types": "./lib/sequence/index.d.ts",
       "require": "./lib/sequence/index.cjs",
-      "default": "./lib/sequence/index.js",
-      "types": "./lib/sequence/index.d.ts"
+      "default": "./lib/sequence/index.js"
     },
     "./size-element": {
+      "types": "./lib/size-element/index.d.ts",
       "require": "./lib/size-element/index.cjs",
-      "default": "./lib/size-element/index.js",
-      "types": "./lib/size-element/index.d.ts"
+      "default": "./lib/size-element/index.js"
     },
     "./slicer": {
+      "types": "./lib/slicer/index.d.ts",
       "require": "./lib/slicer/index.cjs",
-      "default": "./lib/slicer/index.js",
-      "types": "./lib/slicer/index.d.ts"
+      "default": "./lib/slicer/index.js"
     },
     "./source": {
+      "types": "./lib/source/index.d.ts",
       "require": "./lib/source/index.cjs",
-      "default": "./lib/source/index.js",
-      "types": "./lib/source/index.d.ts"
+      "default": "./lib/source/index.js"
     },
     "./store": {
+      "types": "./lib/store/index.d.ts",
       "require": "./lib/store/index.cjs",
-      "default": "./lib/store/index.js",
-      "types": "./lib/store/index.d.ts"
+      "default": "./lib/store/index.js"
     },
     "./ticker": {
+      "types": "./lib/ticker/index.d.ts",
       "require": "./lib/ticker/index.cjs",
-      "default": "./lib/ticker/index.js",
-      "types": "./lib/ticker/index.d.ts"
+      "default": "./lib/ticker/index.js"
     },
     "./need_redo_tweaker": {
+      "types": "./lib/need_redo_tweaker/index.d.ts",
       "require": "./lib/need_redo_tweaker/index.cjs",
-      "default": "./lib/need_redo_tweaker/index.js",
-      "types": "./lib/need_redo_tweaker/index.d.ts"
+      "default": "./lib/need_redo_tweaker/index.js"
     },
     "./utils": {
+      "types": "./lib/utils/index.d.ts",
       "require": "./lib/utils/index.cjs",
-      "default": "./lib/utils/index.js",
-      "types": "./lib/utils/index.d.ts"
+      "default": "./lib/utils/index.js"
     },
     "./video": {
+      "types": "./lib/video/index.d.ts",
       "require": "./lib/video/index.cjs",
-      "default": "./lib/video/index.js",
-      "types": "./lib/video/index.d.ts"
+      "default": "./lib/video/index.js"
     },
     "./window-resizer": {
+      "types": "./lib/window-resizer/index.d.ts",
       "require": "./lib/window-resizer/index.cjs",
-      "default": "./lib/window-resizer/index.js",
-      "types": "./lib/window-resizer/index.d.ts"
+      "default": "./lib/window-resizer/index.js"
     },
     "./youtube": {
+      "types": "./lib/youtube/index.d.ts",
       "require": "./lib/youtube/index.cjs",
-      "default": "./lib/youtube/index.js",
-      "types": "./lib/youtube/index.d.ts"
+      "default": "./lib/youtube/index.js"
     }
   },
   "typesVersions": {
