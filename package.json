@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.46.1",
+  "version": "0.47.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -32,6 +32,11 @@
       "require": "./lib/attribute/index.cjs",
       "default": "./lib/attribute/index.js",
       "types": "./lib/attribute/index.d.ts"
+    },
+    "./billboard": {
+      "require": "./lib/billboard/index.cjs",
+      "default": "./lib/billboard/index.js",
+      "types": "./lib/billboard/index.d.ts"
     },
     "./canvas": {
       "require": "./lib/canvas/index.cjs",
@@ -244,6 +249,9 @@
       ],
       "attribute": [
         "lib/attribute/index.d.ts"
+      ],
+      "billboard": [
+        "lib/billboard/index.d.ts"
       ],
       "canvas": [
         "lib/canvas/index.d.ts"
