@@ -1,6 +1,6 @@
-import { CSSProperty } from 'aptechka/css-property'
-import { intersector } from 'aptechka/intersector'
-import { loopNumber } from 'aptechka/utils'
+import { CSSProperty } from '@packages/css-property'
+import { intersector } from '@packages/intersector'
+import { loopNumber } from '@packages/utils'
 
 export class BillboardElement extends HTMLElement {
   #delay = new CSSProperty(this, '--delay', '2s')
