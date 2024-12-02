@@ -9,7 +9,7 @@ export interface BillboardEvents {
 }
 
 export class BillboardElement extends HTMLElement {
-  #delay = new CSSProperty(this, '--delay', '2s')
+  #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
   #itemElements: Array<HTMLElement> = []
@@ -25,7 +25,7 @@ export class BillboardElement extends HTMLElement {
 
   public set(value: number) {
     this.#updateCounter(value)
-    this.#clearAndSpawnInterval()
+    this.#tryAutoplay()
   }
 
   public shift(value: number) {
@@ -39,27 +39,33 @@ export class BillboardElement extends HTMLElement {
 
     this.#itemElements[0]?.classList.add('current')
 
-    this.#delay.subscribe(() => {
-      this.#clearAndSpawnInterval()
+    this.#autoplay.subscribe((e) => {
+      this.#tryAutoplay()
     })
 
-    this.#delay.observe()
+    this.#autoplay.observe()
 
     intersector.subscribe(this, this.#intersectionListener)
   }
 
   protected disconnectedCallback() {
-    this.#delay.unobserve()
+    this.#autoplay.unobserve()
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
+  }
+
+  #tryAutoplay() {
+    if (this.#autoplay.current !== false) {
+      this.#clearAndSpawnInterval()
+    }
   }
 
   #intersectionListener = (e: IntersectionObserverEntry) => {
     this.#isIntersecting = e.isIntersecting
 
     if (this.#isIntersecting) {
-      this.#clearAndSpawnInterval()
+      this.#tryAutoplay()
     } else {
       clearInterval(this.#intervalId)
     }
@@ -71,7 +77,7 @@ export class BillboardElement extends HTMLElement {
     if (this.#isIntersecting) {
       this.#intervalId = setInterval(
         this.#tick,
-        parseFloat(this.#delay.current || '0') * 1000
+        parseFloat(this.#autoplay.current || '0') * 1000
       )
     }
   }

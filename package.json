@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.47.2",
+  "version": "0.47.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -393,10 +393,12 @@
     "vite-plugin-htmc": "0.1.15"
   },
   "dependencies": {
+    "construct-style-sheets-polyfill": "^3.1.0",
     "three": "^0.170.0",
     "urlpattern-polyfill": "^10.0.0"
   },
   "peerDependencies": {
+    "construct-style-sheets-polyfill": "^3.1.0",
     "three": "^0.170.0",
     "urlpattern-polyfill": "^10.0.0"
   }
