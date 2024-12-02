@@ -23,6 +23,11 @@ export class BillboardElement extends HTMLElement {
     return this.#itemElements
   }
 
+  public addItem(element: HTMLElement) {
+    this.#itemElements.push(element)
+    this.#checkLength()
+  }
+
   public set(value: number) {
     this.#updateCounter(value)
     this.#tryAutoplay()
@@ -38,6 +43,8 @@ export class BillboardElement extends HTMLElement {
     ]
 
     this.#itemElements[0]?.classList.add('current')
+
+    this.#checkLength()
 
     this.#autoplay.subscribe((e) => {
       if (e.current) {
@@ -59,6 +66,14 @@ export class BillboardElement extends HTMLElement {
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
+  }
+
+  #checkLength() {
+    if (this.#itemElements.length > 1) {
+      this.classList.add('has-length')
+    } else {
+      this.classList.remove('has-length')
+    }
   }
 
   #tryAutoplay() {
