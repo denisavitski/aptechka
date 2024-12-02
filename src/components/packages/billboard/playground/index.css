@@ -1,3 +1,11 @@
+e-billboard {
+  --autoplay: 2s;
+
+  @media (max-width: 768px) {
+    --autoplay: false;
+  }
+}
+
 button {
   width: 100px;
   height: 100px;

@@ -40,12 +40,18 @@ export class BillboardElement extends HTMLElement {
     this.#itemElements[0]?.classList.add('current')
 
     this.#autoplay.subscribe((e) => {
-      this.#tryAutoplay()
+      if (e.current) {
+        intersector.subscribe(this, this.#intersectionListener)
+        this.#tryAutoplay()
+      } else {
+        this.#isIntersecting = true
+        intersector.unsubscribe(this.#intersectionListener)
+        clearInterval(this.#intervalId)
+        this.#updateCounter(0)
+      }
     })
 
     this.#autoplay.observe()
-
-    intersector.subscribe(this, this.#intersectionListener)
   }
 
   protected disconnectedCallback() {
