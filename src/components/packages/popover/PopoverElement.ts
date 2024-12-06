@@ -18,7 +18,8 @@ export interface PopoverEvents {
 }
 
 export class PopoverElement extends HTMLElement {
-  private static __opened: Array<PopoverElement> = []
+  private static __openedElements: Array<PopoverElement> = []
+  private static __openedCounter = 0
 
   public urlValue = ''
 
@@ -28,7 +29,7 @@ export class PopoverElement extends HTMLElement {
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
-  #dominance = new CSSProperty(this, '--dominance', 0)
+  #dominance = new CSSProperty<number>(this, '--dominance', 0)
   #group = new CSSProperty(this, '--group', '')
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
@@ -87,18 +88,21 @@ export class PopoverElement extends HTMLElement {
     this.#lastTrigger = options?.trigger
 
     if (this.#dominance.current) {
-      PopoverElement.__opened = PopoverElement.__opened.filter((e) => {
-        if (e !== this && this.#checkDomination(this, e)) {
-          e.close()
-          return false
-        }
+      PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
+        (e) => {
+          if (e !== this && this.#checkDomination(this, e)) {
+            e.close()
+            return false
+          }
 
-        return true
-      })
+          return true
+        }
+      )
     }
 
-    PopoverElement.__opened.push(this)
-    this.#openIndex = PopoverElement.__opened.length - 1
+    PopoverElement.__openedElements.push(this)
+    this.#openIndex = ++PopoverElement.__openedCounter
+
     this.style.setProperty('--open-index', this.#openIndex.toString())
 
     clearTimeout(this.#closeTimeoutId)
@@ -158,16 +162,18 @@ export class PopoverElement extends HTMLElement {
 
     this.#opened.current = false
 
-    PopoverElement.__opened = PopoverElement.__opened.filter((m) => {
-      if (m === this) {
-        return false
-      } else if (!m.#openTimeoutId && this.#checkDomination(this, m)) {
-        m.close()
-        return false
-      }
+    PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
+      (m) => {
+        if (m === this) {
+          return false
+        } else if (!m.#openTimeoutId && this.#checkDomination(this, m)) {
+          m.close()
+          return false
+        }
 
-      return true
-    })
+        return true
+      }
+    )
 
     this.#deleteSearchParam()
 
@@ -185,6 +191,9 @@ export class PopoverElement extends HTMLElement {
       this.classList.remove('closing')
       this.style.display = 'none'
       this.style.removeProperty('--open-index')
+
+      PopoverElement.__openedCounter--
+      this.#openIndex = -1
 
       dispatchEvent(this, 'popoverClosed', {
         custom: true,
@@ -242,7 +251,10 @@ export class PopoverElement extends HTMLElement {
     this.removeAttribute('role')
     this.removeAttribute('aria-hidden')
 
-    PopoverElement.__opened = PopoverElement.__opened.filter((m) => m !== this)
+    PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
+      (m) => m !== this
+    )
+    PopoverElement.__openedCounter--
 
     clearTimeout(this.#closeTimeoutId)
     clearTimeout(this.#openTimeoutId)
@@ -264,7 +276,7 @@ export class PopoverElement extends HTMLElement {
   }
 
   get #isLast() {
-    return this.#openIndex === PopoverElement.__opened.length - 1
+    return this.#openIndex === PopoverElement.__openedCounter
   }
 
   #clickOutsideListener = (event: MouseEvent) => {
@@ -321,9 +333,9 @@ export class PopoverElement extends HTMLElement {
 
   #withOrder(okCallback: Function) {
     if (
-      PopoverElement.__opened[this.#openIndex - 1] ||
-      PopoverElement.__opened.length === 1 ||
-      PopoverElement.__opened
+      PopoverElement.__openedElements[this.#openIndex - 1] ||
+      PopoverElement.__openedElements.length === 1 ||
+      PopoverElement.__openedElements
         .filter((e) => e !== this)
         .every((e) => this.#dominance.current > e.dominance.current)
     ) {
@@ -368,6 +380,8 @@ export class PopoverElement extends HTMLElement {
   #checkDomination(a: PopoverElement, b: PopoverElement) {
     if (
       a.#group.current === b.#group.current &&
+      a.dominance.current !== -1 &&
+      b.dominance.current !== -1 &&
       a.dominance.current >= b.dominance.current
     ) {
       return true
