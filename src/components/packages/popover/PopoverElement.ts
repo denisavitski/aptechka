@@ -22,7 +22,7 @@ export class PopoverElement extends HTMLElement {
 
   public urlValue = ''
 
-  #openedIndex = -1
+  #openIndex = -1
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
@@ -98,7 +98,8 @@ export class PopoverElement extends HTMLElement {
     }
 
     PopoverElement.__opened.push(this)
-    this.#openedIndex = PopoverElement.__opened.length - 1
+    this.#openIndex = PopoverElement.__opened.length - 1
+    this.style.setProperty('--open-index', this.#openIndex.toString())
 
     clearTimeout(this.#closeTimeoutId)
 
@@ -183,6 +184,7 @@ export class PopoverElement extends HTMLElement {
       this.classList.remove('triggered')
       this.classList.remove('closing')
       this.style.display = 'none'
+      this.style.removeProperty('--open-index')
 
       dispatchEvent(this, 'popoverClosed', {
         custom: true,
@@ -315,7 +317,7 @@ export class PopoverElement extends HTMLElement {
 
   #withOrder(okCallback: Function) {
     if (
-      PopoverElement.__opened[this.#openedIndex - 1] ||
+      PopoverElement.__opened[this.#openIndex - 1] ||
       PopoverElement.__opened.length === 1 ||
       PopoverElement.__opened
         .filter((e) => e !== this)
