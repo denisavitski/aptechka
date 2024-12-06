@@ -263,8 +263,12 @@ export class PopoverElement extends HTMLElement {
     }${this.idWithValue}`
   }
 
+  get #isLast() {
+    return this.#openIndex === PopoverElement.__opened.length - 1
+  }
+
   #clickOutsideListener = (event: MouseEvent) => {
-    if (!this.#clickOutside.current) {
+    if (!this.#clickOutside.current || !this.#isLast) {
       return
     }
 
@@ -304,7 +308,7 @@ export class PopoverElement extends HTMLElement {
   }
 
   #keydownListener = (event: KeyboardEvent) => {
-    if (!this.#escape.current) {
+    if (!this.#escape.current || !this.#isLast) {
       return
     }
 
