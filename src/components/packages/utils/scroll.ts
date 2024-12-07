@@ -6,38 +6,48 @@ import {
 } from '@packages/utils'
 
 export function scrollToElement(
-  elementOrSelector: ElementOrSelector<HTMLElement>,
+  elementOrSelectorOrNumber: ElementOrSelector<HTMLElement> | number,
   {
-    behaviour = 'instant',
+    behavior = 'instant',
     offset = 0,
     center = false,
     scrollElement,
   }: {
-    behaviour?: ScrollBehavior
+    behavior?: ScrollBehavior
     offset?: number | ElementOrSelector<HTMLElement>
     center?: boolean
     scrollElement?: HTMLElement
   } = {}
 ) {
-  const element = getElement(elementOrSelector)
+  let start
+  let centerElement = scrollElement
+  let scrollContainerElement = scrollElement
 
-  if (element) {
-    const parent = scrollElement || findScrollParentElement(element)
+  if (typeof elementOrSelectorOrNumber === 'number') {
+    start = elementOrSelectorOrNumber
+  } else {
+    const element = getElement(elementOrSelectorOrNumber)
 
-    const top = getCumulativeOffsetTop(element)
+    if (element) {
+      centerElement = element
+      scrollContainerElement = scrollElement || findScrollParentElement(element)
+      start = getCumulativeOffsetTop(element)
+    }
+  }
 
+  if (centerElement && scrollContainerElement && typeof start === 'number') {
     const offsetValue =
       (typeof offset === 'number'
         ? offset
         : getElement(offset)?.offsetHeight || 0) * -1
 
     const centerValue = center
-      ? (innerHeight / 2) * -1 + element.offsetHeight / 2
+      ? (innerHeight / 2) * -1 + centerElement.offsetHeight / 2
       : 0
 
-    parent?.scroll({
-      top: top + offsetValue + centerValue,
-      behavior: behaviour,
+    scrollContainerElement.scroll({
+      top: start + offsetValue + centerValue,
+      behavior: behavior,
     })
   }
 }

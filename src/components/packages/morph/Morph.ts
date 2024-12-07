@@ -59,6 +59,11 @@ export interface MorphEvents {
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
 }
 
+interface ScrollToElementOptions
+  extends Pick<MorphNavigateOptions, 'centerScroll' | 'offsetScroll'> {
+  behavior?: ScrollBehavior
+}
+
 export class Morph {
   public preprocessor?: MorphPreprocessor
 
@@ -175,6 +180,11 @@ export class Morph {
       this.#candidatePathname === pathname ||
       this.#currentPathname === pathname
     ) {
+      this.#tryScrollToElement(hash || 0, {
+        centerScroll,
+        offsetScroll,
+        behavior: 'smooth',
+      })
       return
     }
 
@@ -395,16 +405,7 @@ export class Morph {
       if (hash) {
         fetchedRoute.clearScrollState()
 
-        const element = document.getElementById(hash)
-
-        if (element instanceof HTMLElement) {
-          scrollToElement(element, {
-            scrollElement: this.#currentScrollElement,
-            behaviour: 'instant',
-            center: centerScroll,
-            offset: offsetScroll,
-          })
-        }
+        this.#tryScrollToElement(hash, { centerScroll, offsetScroll })
       } else if (this.#isPopstateNavigation) {
         fetchedRoute.restoreScrollPosition()
       }
@@ -531,6 +532,19 @@ export class Morph {
     this.#currentScrollElement =
       document.querySelector(this.#options.scrollSelector) ||
       document.documentElement
+  }
+
+  #tryScrollToElement(id: string | number, options?: ScrollToElementOptions) {
+    const value = typeof id === 'string' ? document.getElementById(id) : id
+
+    if (typeof value === 'number' || value) {
+      scrollToElement(value, {
+        scrollElement: this.#currentScrollElement,
+        behavior: options?.behavior || 'instant',
+        center: options?.centerScroll,
+        offset: options?.offsetScroll,
+      })
+    }
   }
 
   #popStateListener = async (event: PopStateEvent) => {
