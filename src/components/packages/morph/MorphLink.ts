@@ -15,17 +15,7 @@ export class MorphLink {
 
     this.#element.addEventListener('click', this.#clickListener)
 
-    const p1 = morph.normalizePath(this.#pathname)
-    const p2 = morph.normalizePath(location.pathname)
-
-    if (
-      this.#element.hasAttribute('data-include') &&
-      p2.pathname.includes(p1.pathname)
-    ) {
-      this.#element.classList.add('current')
-    } else if (p1.pathname === p2.pathname) {
-      this.#element.classList.add('current')
-    }
+    this.checkCurrent(this.#morph.normalizePath(this.#pathname).pathname)
 
     if (this.#element.hasAttribute('data-prefetch')) {
       this.#element.addEventListener('pointerenter', this.#pointerListener)
@@ -34,6 +24,19 @@ export class MorphLink {
 
   public get element() {
     return this.#element
+  }
+
+  public checkCurrent(pathname: string) {
+    const locationUrl = this.#morph.normalizePath(location.pathname)
+
+    if (
+      this.#element.hasAttribute('data-include') &&
+      locationUrl.pathname.includes(pathname)
+    ) {
+      this.#element.classList.add('current')
+    } else if (pathname === locationUrl.pathname) {
+      this.#element.classList.add('current')
+    }
   }
 
   public destroy() {

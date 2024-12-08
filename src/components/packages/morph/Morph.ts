@@ -191,6 +191,10 @@ export class Morph {
       return
     }
 
+    this.#links.forEach((link) => {
+      link.checkCurrent(pathname)
+    })
+
     this.#candidatePathname = pathname
 
     try {
@@ -216,6 +220,10 @@ export class Morph {
       }
 
       if (!preprocessedSuccesfully || this.#candidatePathname !== pathname) {
+        this.#links.forEach((link) => {
+          link.checkCurrent(this.#currentPathname)
+        })
+
         return
       }
 
@@ -223,6 +231,10 @@ export class Morph {
       const fetchedRoute = await this.#getRoute(pathname, revalidate)
 
       if (this.#candidatePathname !== pathname) {
+        this.#links.forEach((link) => {
+          link.checkCurrent(this.#currentPathname)
+        })
+
         return
       }
 
