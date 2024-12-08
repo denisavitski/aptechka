@@ -191,11 +191,11 @@ export class Morph {
       return
     }
 
+    this.#candidatePathname = pathname
+
     this.#links.forEach((link) => {
       link.checkCurrent(pathname)
     })
-
-    this.#candidatePathname = pathname
 
     try {
       let preprocessedSuccesfully = true
