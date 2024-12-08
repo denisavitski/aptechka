@@ -180,11 +180,14 @@ export class Morph {
       this.#candidatePathname === pathname ||
       this.#currentPathname === pathname
     ) {
-      this.#tryScrollToElement(hash || 0, {
-        centerScroll,
-        offsetScroll,
-        behavior: 'smooth',
-      })
+      if (!this.#isPopstateNavigation) {
+        this.#tryScrollToElement(hash || 0, {
+          centerScroll,
+          offsetScroll,
+          behavior: 'smooth',
+        })
+      }
+
       return
     }
 
