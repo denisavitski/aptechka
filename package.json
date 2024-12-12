@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.48.0",
+  "version": "0.49.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -152,6 +152,11 @@
       "types": "./lib/order/index.d.ts",
       "require": "./lib/order/index.cjs",
       "default": "./lib/order/index.js"
+    },
+    "./pixel-perfect": {
+      "types": "./lib/pixel-perfect/index.d.ts",
+      "require": "./lib/pixel-perfect/index.cjs",
+      "default": "./lib/pixel-perfect/index.js"
     },
     "./pointer": {
       "types": "./lib/pointer/index.d.ts",
@@ -329,6 +334,9 @@
       ],
       "order": [
         "lib/order/index.d.ts"
+      ],
+      "pixel-perfect": [
+        "lib/pixel-perfect/index.d.ts"
       ],
       "pointer": [
         "lib/pointer/index.d.ts"

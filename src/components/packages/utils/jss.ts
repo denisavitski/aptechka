@@ -38,11 +38,13 @@ export function styleToString(object: Style) {
   return text
 }
 
-export function createStylesheet(object: Style) {
+export function createStylesheet(value: Style | string) {
   if (isBrowser) {
     const styleSheet = new CSSStyleSheet()
 
-    styleSheet.replaceSync(styleToString(object))
+    styleSheet.replaceSync(
+      typeof value === 'string' ? value : styleToString(value)
+    )
 
     return styleSheet
   }

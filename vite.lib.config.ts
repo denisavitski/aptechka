@@ -59,6 +59,8 @@ export function libConfig() {
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
           'order/index': './src/components/packages/order/index.ts',
+          'pixel-perfect/index':
+            './src/components/packages/pixel-perfect/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
           'radio/index': './src/components/packages/radio/index.ts',
