@@ -86,6 +86,8 @@ export class PixelPerfectElement extends HTMLElement {
       const pictureImage = this.#imageElement.querySelector('img')
 
       if (pictureImage) {
+        this.#imageElement = pictureImage
+
         pictureImage.style.cssText = `
           display: block;
           width: 100%;
