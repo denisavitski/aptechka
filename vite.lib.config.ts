@@ -61,6 +61,7 @@ export function libConfig() {
           'order/index': './src/components/packages/order/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
           'popover/index': './src/components/packages/popover/index.ts',
+          'radio/index': './src/components/packages/radio/index.ts',
           'router/index': './src/components/packages/router/index.ts',
           'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
