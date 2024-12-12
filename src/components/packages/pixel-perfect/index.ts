@@ -15,11 +15,15 @@ const stylesheet = createStylesheet(/*css*/ `
     user-select: none;
   }
 
-  ::slotted(img),
-  ::slotted(picture) {
+  ::slotted(img) {
+    display: block;
     width: 100%;
     height: max-content;
     object-fit: cover;
+  }
+
+  ::slotted(picture) {
+    display: contents;
   }
 
   input {
@@ -78,6 +82,17 @@ export class PixelPerfectElement extends HTMLElement {
 
     if (imageElement instanceof HTMLElement) {
       this.#imageElement = imageElement
+
+      const pictureImage = this.#imageElement.querySelector('img')
+
+      if (pictureImage) {
+        pictureImage.style.cssText = `
+          display: block;
+          width: 100%;
+          height: max-content;
+          object-fit: cover;
+        `
+      }
     }
 
     this.#rangeInputListener()

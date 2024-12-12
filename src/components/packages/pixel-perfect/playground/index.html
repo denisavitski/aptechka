@@ -1,6 +1,12 @@
 <div class="scroll">
   <div class="block">123123</div>
   <e-pixel-perfect opacity="1">
-    <img src="/page.jpg" />
+    <picture>
+      <source
+        srcset="/building.png"
+        media="(max-width: 768px)"
+      />
+      <img src="/page.jpg" />
+    </picture>
   </e-pixel-perfect>
 </div>
