@@ -1,3 +1,4 @@
+import { ClassLinkedStatus } from '@packages/class-linked-status'
 import { CSSProperty } from '@packages/css-property'
 import { Store } from '@packages/store'
 import {
@@ -17,24 +18,156 @@ export interface PopoverEvents {
   popoverClosed: CustomEvent
 }
 
+class PopoverGroups {
+  #groups: Map<string, Array<PopoverElement>> = new Map()
+  #stack: Array<PopoverElement> = []
+
+  constructor() {
+    addEventListener('click', this.#clickOutsideListener)
+    addEventListener('keydown', this.#keydownListener)
+  }
+
+  public add(groupName: string, element: PopoverElement) {
+    if (element.closeRest.current) {
+      this.#groups.forEach((g) => {
+        g.forEach((e) => {
+          e.close()
+        })
+      })
+    } else if (element.closeRestInGroup.current) {
+      let group = this.#groups.get(groupName)
+
+      group?.forEach((e) => {
+        e.close()
+      })
+    }
+
+    let group = this.#groups.get(groupName)
+
+    if (!group?.length) {
+      group = []
+      this.#groups.set(groupName, group)
+    }
+
+    this.#stack.push(element)
+    group.push(element)
+  }
+
+  public remove(groupName: string, element: PopoverElement) {
+    this.#stack = this.#stack.filter((e) => e !== element)
+
+    if (element.closeRest.current) {
+      let elements: Array<PopoverElement> = []
+
+      this.#groups.forEach((group) => {
+        group.forEach((element) => elements.push(element))
+      })
+
+      this.#groups.clear()
+
+      elements.forEach((element) => element.close())
+    } else if (element.closeRestInGroup.current) {
+      const group = this.#groups.get(groupName)
+
+      this.#groups.delete(groupName)
+
+      group?.forEach((element) => {
+        element.close()
+      })
+    } else {
+      let group = this.#groups.get(groupName)
+
+      if (group) {
+        group = group.filter((el) => el !== element)
+
+        this.#groups.set(groupName, group)
+      }
+    }
+  }
+
+  #clickOutsideListener = (e: Event) => {
+    const lastPopover = [...this.#stack]
+      .reverse()
+      .find((el) => el.clickOutside.current)
+
+    if (lastPopover) {
+      const path = e.composedPath()
+
+      if (
+        path.find(
+          (el) =>
+            el instanceof HTMLElement && el.hasAttribute('data-popover-content')
+        )
+      ) {
+        return
+      }
+
+      const target = path[0]
+
+      const containsTarget =
+        target instanceof Node &&
+        (lastPopover.contains(target) ||
+          lastPopover.shadowRoot?.contains(target))
+
+      const outsideTarget =
+        target instanceof HTMLElement && target.hasAttribute('data-outside')
+
+      if (!containsTarget || outsideTarget) {
+        lastPopover.close()
+      }
+    }
+  }
+
+  #keydownListener = (e: KeyboardEvent) => {
+    if (e.code === 'Escape') {
+      const lastPopover = [...this.#stack]
+        .reverse()
+        .find((el) => el.escape.current)
+
+      if (lastPopover) {
+        lastPopover.close()
+      }
+    }
+  }
+}
+
 export class PopoverElement extends HTMLElement {
-  private static __openedElements: Array<PopoverElement> = []
-  private static __openedCounter = 0
+  private static stack = new PopoverGroups()
 
   public urlValue = ''
 
-  #openIndex = -1
   #opened = new Store(false)
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
-  #dominance = new CSSProperty<number>(this, '--dominance', 0)
+  #closeRest = new CSSProperty<boolean>(this, '--close-rest', false)
+  #closeRestInGroup = new CSSProperty<boolean>(
+    this,
+    '--close-rest-in-group',
+    false
+  )
   #group = new CSSProperty(this, '--group', '')
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #historyAllowed = false
   #lastTrigger: any
+  #status = new ClassLinkedStatus(this, {
+    opened: false,
+    closing: false,
+    closed: false,
+    triggered: false,
+  })
+
+  constructor() {
+    super()
+
+    this.#group.subscribe((e) => {
+      if (e.previous) {
+        PopoverElement.stack.remove(e.previous, this)
+      }
+    })
+  }
 
   public get history() {
     return this.#history
@@ -44,8 +177,12 @@ export class PopoverElement extends HTMLElement {
     return this.#restore
   }
 
-  public get dominance() {
-    return this.#dominance
+  public get closeRest() {
+    return this.#closeRest
+  }
+
+  public get closeRestInGroup() {
+    return this.#closeRestInGroup
   }
 
   public get group() {
@@ -80,36 +217,17 @@ export class PopoverElement extends HTMLElement {
     }
   }
 
-  public open = (options?: { skipTransition?: boolean; trigger?: any }) => {
+  public open(options?: { skipTransition?: boolean; trigger?: any }) {
     if (this.#opened.current) {
       return
     }
 
     this.#lastTrigger = options?.trigger
 
-    if (this.#dominance.current) {
-      PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
-        (e) => {
-          if (e !== this && this.#checkDomination(this, e)) {
-            e.close()
-            return false
-          }
-
-          return true
-        }
-      )
-    }
-
-    PopoverElement.__openedElements.push(this)
-    this.#openIndex = ++PopoverElement.__openedCounter
-
-    this.style.setProperty('--open-index', this.#openIndex.toString())
-
     clearTimeout(this.#closeTimeoutId)
 
-    this.classList.remove('closing')
-    this.classList.add('triggered')
-    this.style.display = 'block'
+    this.#status.set('closing', false)
+    this.#status.set('triggered', true)
 
     dispatchEvent(this, 'popoverTriggered', {
       custom: true,
@@ -125,13 +243,13 @@ export class PopoverElement extends HTMLElement {
     this.#opened.current = true
 
     const opened = () => {
-      addEventListener('click', this.#clickOutsideListener)
-      addEventListener('keydown', this.#keydownListener)
+      // if (this.#group.current) {
+      PopoverElement.stack.add(this.#group.current, this)
+      // }
 
       this.#resize()
 
-      this.style.opacity = '1'
-      this.classList.add('opened')
+      this.#status.set('opened', true)
 
       dispatchEvent(this, 'popoverOpened', {
         custom: true,
@@ -141,8 +259,6 @@ export class PopoverElement extends HTMLElement {
       })
 
       this.#openTimeoutId = undefined
-
-      this.setAttribute('aria-hidden', 'false')
     }
 
     if (options?.skipTransition) {
@@ -152,48 +268,29 @@ export class PopoverElement extends HTMLElement {
     }
   }
 
-  public close = () => {
+  public close() {
     if (!this.#opened.current) {
       return
     }
 
-    removeEventListener('click', this.#clickOutsideListener)
-    removeEventListener('keydown', this.#keydownListener)
+    clearTimeout(this.#openTimeoutId)
+
+    PopoverElement.stack.remove(this.#group.current, this)
 
     this.#opened.current = false
 
-    PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
-      (m) => {
-        if (m === this) {
-          return false
-        } else if (!m.#openTimeoutId && this.#checkDomination(this, m)) {
-          m.close()
-          return false
-        }
-
-        return true
-      }
-    )
-
     this.#deleteSearchParam()
 
-    this.classList.remove('opened')
-    this.classList.add('closing')
-    this.setAttribute('aria-hidden', 'true')
-    this.style.opacity = '0'
+    this.#status.set('opened', false)
+    this.#status.set('closing', true)
 
     dispatchEvent(this, 'popoverClosing', {
       custom: true,
     })
 
-    setTimeout(() => {
-      this.classList.remove('triggered')
-      this.classList.remove('closing')
-      this.style.display = 'none'
-      this.style.removeProperty('--open-index')
-
-      PopoverElement.__openedCounter--
-      this.#openIndex = -1
+    this.#closeTimeoutId = setTimeout(() => {
+      this.#status.set('triggered', false)
+      this.#status.set('closing', false)
 
       dispatchEvent(this, 'popoverClosed', {
         custom: true,
@@ -204,21 +301,13 @@ export class PopoverElement extends HTMLElement {
   protected connectedCallback() {
     this.#history.observe()
     this.#restore.observe()
-    this.#dominance.observe()
+    this.#closeRest.observe()
+    this.#closeRestInGroup.observe()
     this.#group.observe()
     this.#clickOutside.observe()
     this.#escape.observe()
 
-    this.style.opacity = '0'
-    this.style.display = 'none'
-
     this.setAttribute('role', 'dialog')
-    this.setAttribute('aria-hidden', 'true')
-
-    this.classList.remove('closing')
-    this.classList.remove('closed')
-    this.classList.remove('triggered')
-    this.classList.remove('opened')
 
     addEventListener('popstate', this.#popStateListener)
 
@@ -236,32 +325,26 @@ export class PopoverElement extends HTMLElement {
   }
 
   protected disconnectedCallback() {
+    PopoverElement.stack.remove(this.#group.current, this)
+
     windowResizer.unsubscribe(this.#resizeListener)
+
+    this.#status.close()
 
     this.#history.close()
     this.#restore.close()
-    this.#dominance.close()
+    this.#closeRest.close()
+    this.#closeRestInGroup.close()
     this.#group.close()
     this.#clickOutside.close()
     this.#escape.close()
 
-    this.style.opacity = ''
-    this.style.display = ''
-
     this.removeAttribute('role')
-    this.removeAttribute('aria-hidden')
-
-    PopoverElement.__openedElements = PopoverElement.__openedElements.filter(
-      (m) => m !== this
-    )
-    PopoverElement.__openedCounter--
 
     clearTimeout(this.#closeTimeoutId)
     clearTimeout(this.#openTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
-    removeEventListener('click', this.#clickOutsideListener)
-    removeEventListener('keydown', this.#keydownListener)
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
@@ -275,71 +358,11 @@ export class PopoverElement extends HTMLElement {
     }${this.idWithValue}`
   }
 
-  get #isLast() {
-    return this.#openIndex === PopoverElement.__openedCounter
-  }
-
-  #clickOutsideListener = (event: MouseEvent) => {
-    if (!this.#clickOutside.current || !this.#isLast) {
-      return
-    }
-
-    this.#withOrder(() => {
-      const path = event.composedPath()
-
-      if (
-        path.find(
-          (el) =>
-            el instanceof HTMLElement && el.hasAttribute('data-popover-content')
-        )
-      ) {
-        return
-      }
-
-      const target = path[0]
-
-      const containsTarget =
-        target instanceof Node &&
-        (this.contains(target) || this.shadowRoot?.contains(target))
-
-      const outsideTarget =
-        target instanceof HTMLElement && target.hasAttribute('data-outside')
-
-      if (!containsTarget || outsideTarget) {
-        this.close()
-      }
-    })
-  }
-
   #deleteSearchParam() {
     if (this.#history.current) {
       const url = new URL(location.href)
       url.searchParams.delete(this.id)
       history.replaceState(history.state, '', url.href)
-    }
-  }
-
-  #keydownListener = (event: KeyboardEvent) => {
-    if (!this.#escape.current || !this.#isLast) {
-      return
-    }
-
-    this.#withOrder(() => {
-      if (event.code === 'Escape') {
-        this.close()
-      }
-    })
-  }
-
-  #withOrder(okCallback: Function) {
-    if (
-      PopoverElement.__openedElements[this.#openIndex - 1] ||
-      PopoverElement.__openedElements.length === 1 ||
-      PopoverElement.__openedElements
-        .filter((e) => e !== this)
-        .every((e) => this.#dominance.current > e.dominance.current)
-    ) {
-      okCallback()
     }
   }
 
@@ -375,17 +398,6 @@ export class PopoverElement extends HTMLElement {
   #resize = () => {
     this.style.setProperty('--content-width', this.scrollWidth + 'px')
     this.style.setProperty('--content-height', this.scrollHeight + 'px')
-  }
-
-  #checkDomination(a: PopoverElement, b: PopoverElement) {
-    if (
-      a.#group.current === b.#group.current &&
-      a.dominance.current !== -1 &&
-      b.dominance.current !== -1 &&
-      a.dominance.current >= b.dominance.current
-    ) {
-      return true
-    }
   }
 }
 

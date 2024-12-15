@@ -1,37 +1,49 @@
-.content {
-  display: grid;
-  gap: 2vmin;
-  font-size: 5vmin;
+.flex {
+  display: flex;
+  gap: 2rem;
 }
 
-.parent {
-  font-size: 100px;
+.wrap {
+  position: relative;
+  user-select: none;
 }
 
 e-popover {
+  position: absolute;
+
   --duration: 0.5s;
   --history: true;
+  --restore: true;
+  /* --close-rest-in-group: true; */
+
   display: none;
   opacity: 0;
-  height: 0;
-  overflow: hidden;
 
-  transition: opacity var(--duration), height var(--duration);
+  transition: opacity var(--duration);
+}
+
+#x-1 {
+  /* --click-outside: true; */
+  --dominance: 10;
+}
+
+e-popover.x {
+  /* --group: x; */
+}
+
+e-popover.y {
+  /* --group: y; */
+}
+
+e-popover.triggered {
+  display: block;
 }
 
 e-popover.opened {
-  height: var(--content-height);
+  opacity: 1;
 }
 
 e-popover-button {
   --type: toggle;
-}
-
-.fixed {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 20vmin;
-  height: 100vh;
-  background-color: tomato;
+  cursor: pointer;
 }
