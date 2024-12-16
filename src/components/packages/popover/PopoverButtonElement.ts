@@ -18,12 +18,12 @@ export class PopoverButtonElement extends HTMLElement {
 
           if (
             type === 'open' ||
-            (type === 'toggle' && !this.#popoverElement.opened.current)
+            (type === 'toggle' && !this.#popoverElement.opened)
           ) {
             this.#popoverElement.open({ trigger: this })
           } else if (
             type === 'close' ||
-            (type === 'toggle' && this.#popoverElement.opened.current)
+            (type === 'toggle' && this.#popoverElement.opened)
           ) {
             this.#popoverElement.close()
           }
@@ -53,7 +53,7 @@ export class PopoverButtonElement extends HTMLElement {
           this.setAttribute('aria-haspopup', 'true')
           this.setAttribute(
             'aria-expanded',
-            this.#popoverElement.opened.current ? 'true' : 'false'
+            this.#popoverElement.opened ? 'true' : 'false'
           )
           this.setAttribute('aria-controls', this.#popoverElement.id || '')
         } else {

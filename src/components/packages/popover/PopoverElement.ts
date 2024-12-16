@@ -27,6 +27,14 @@ class PopoverGroups {
     addEventListener('keydown', this.#keydownListener)
   }
 
+  public get groups() {
+    return this.#groups
+  }
+
+  public get stack() {
+    return this.#stack
+  }
+
   public add(groupName: string, element: PopoverElement) {
     if (element.closeRest.current) {
       this.#groups.forEach((g) => {
@@ -136,7 +144,7 @@ export class PopoverElement extends HTMLElement {
 
   public urlValue = ''
 
-  #opened = new Store(false)
+  #opened = false
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
@@ -155,7 +163,6 @@ export class PopoverElement extends HTMLElement {
   #status = new ClassLinkedStatus(this, {
     opened: false,
     closing: false,
-    closed: false,
     triggered: false,
   })
 
@@ -165,6 +172,33 @@ export class PopoverElement extends HTMLElement {
     this.#group.subscribe((e) => {
       if (e.previous) {
         PopoverElement.stack.remove(e.previous, this)
+
+        if (!e.current) {
+          document.documentElement.classList.remove(
+            `${this.group.previous}-closing`
+          )
+
+          document.documentElement.classList.remove(
+            `${this.group.previous}-opened`
+          )
+        }
+      }
+    })
+
+    this.#status.subscribe((e) => {
+      if (this.group.current) {
+        document.documentElement.classList.toggle(
+          `${this.group.current}-closing`,
+          e.current.closing
+        )
+
+        const group = PopoverElement.stack.groups.get(this.group.current)
+        const element = group?.find((e) => e.opened)
+
+        document.documentElement.classList.toggle(
+          `${this.group.current}-opened`,
+          !!element
+        )
       }
     })
   }
@@ -212,13 +246,13 @@ export class PopoverElement extends HTMLElement {
   public updateUrlValue(value?: string | number) {
     this.urlValue = value?.toString() || ''
 
-    if (this.#opened.current) {
+    if (this.#opened) {
       updateSearchParameter(this.id, value)
     }
   }
 
   public open(options?: { skipTransition?: boolean; trigger?: any }) {
-    if (this.#opened.current) {
+    if (this.#opened) {
       return
     }
 
@@ -240,7 +274,7 @@ export class PopoverElement extends HTMLElement {
       history.pushState(history.state, '', this.#path)
     }
 
-    this.#opened.current = true
+    this.#opened = true
 
     const opened = () => {
       // if (this.#group.current) {
@@ -269,7 +303,7 @@ export class PopoverElement extends HTMLElement {
   }
 
   public close() {
-    if (!this.#opened.current) {
+    if (!this.#opened) {
       return
     }
 
@@ -277,7 +311,7 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.stack.remove(this.#group.current, this)
 
-    this.#opened.current = false
+    this.#opened = false
 
     this.#deleteSearchParam()
 
@@ -369,13 +403,13 @@ export class PopoverElement extends HTMLElement {
   #popStateListener = () => {
     this.#historyAllowed = false
     if (
-      this.#opened.current &&
+      this.#opened &&
       this.#history.current &&
       !location.search.includes(this.id)
     ) {
       this.close()
     } else if (
-      !this.#opened.current &&
+      !this.#opened &&
       this.#history.current &&
       location.search.includes(this.id)
     ) {
