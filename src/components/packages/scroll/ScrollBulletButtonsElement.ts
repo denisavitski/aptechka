@@ -60,12 +60,18 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
       this.#sectionsChangeListener
     )
 
-    this.#sectionsChangeListener()
+    this.scrollElement.sectionsInViewCSSProperty.subscribe(
+      this.#sectionsChangeListener
+    )
   }
 
   protected disconnectedCallback() {
     this.scrollElement.removeEventListener(
       'sectionsChange',
+      this.#sectionsChangeListener
+    )
+
+    this.scrollElement.sectionsInViewCSSProperty.unsubscribe(
       this.#sectionsChangeListener
     )
 
@@ -78,7 +84,11 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
 
     this.#buttons = []
 
-    for (let index = 0; index < this.scrollElement.sections.length; index++) {
+    const length =
+      this.scrollElement.sections.length -
+      Math.max(this.scrollElement.sectionsInViewCSSProperty.current - 1, 0)
+
+    for (let index = 0; index < length; index++) {
       const button = new BulletButton(
         this.scrollElement,
         index,
