@@ -21,6 +21,21 @@ export class RadioElement<T extends string = string> extends HTMLElement {
     return this.#currentButtonElement
   }
 
+  public addButton(element: HTMLElement) {
+    this.#buttonElements.push(element)
+
+    element.addEventListener('click', this.#buttonClickListener)
+  }
+
+  public removeButton(element: HTMLElement) {
+    const founded = this.#buttonElements.find((el) => el === element)
+
+    if (founded) {
+      founded.removeEventListener('click', this.#buttonClickListener)
+      this.#buttonElements = this.#buttonElements.filter((el) => el !== element)
+    }
+  }
+
   public setValue(value: T | undefined) {
     if (value && value !== this.#value) {
       this.#value = value
