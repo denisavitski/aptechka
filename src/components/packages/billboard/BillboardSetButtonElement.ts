@@ -3,7 +3,7 @@ import { BillboardElement } from './BillboardElement'
 import { CSSProperty } from '@packages/css-property'
 
 export class BillboardSetButtonElement extends HTMLElement {
-  #step = new CSSProperty(this, '--set', 0)
+  #index = new CSSProperty(this, '--index', 0)
   #billboardElement: BillboardElement | null = null
 
   constructor() {
@@ -11,7 +11,7 @@ export class BillboardSetButtonElement extends HTMLElement {
 
     this.addEventListener('click', () => {
       if (this.#billboardElement) {
-        this.#billboardElement.set(this.#step.current)
+        this.#billboardElement.set(this.#index.current)
       }
     })
   }
@@ -21,12 +21,37 @@ export class BillboardSetButtonElement extends HTMLElement {
 
     this.#billboardElement = findParentElement(this, BillboardElement)
 
-    this.#step.observe()
+    this.#billboardElement?.addEventListener(
+      'billboardChange',
+      this.#changeListener
+    )
+
+    customElements.whenDefined('e-billboard').then(() => {
+      if (this.isConnected) {
+        this.#changeListener()
+      }
+    })
+
+    this.#index.observe()
   }
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
-    this.#step.unobserve()
+
+    this.#index.unobserve()
+
+    this.#billboardElement?.removeEventListener(
+      'billboardChange',
+      this.#changeListener
+    )
+  }
+
+  #changeListener = () => {
+    if (this.#index.current === this.#billboardElement?.counter) {
+      this.classList.add('current')
+    } else {
+      this.classList.remove('current')
+    }
   }
 }
 
