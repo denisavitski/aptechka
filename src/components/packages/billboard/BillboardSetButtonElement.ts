@@ -32,11 +32,15 @@ export class BillboardSetButtonElement extends HTMLElement {
       }
     })
 
+    this.#index.subscribe(this.#changeListener)
+
     this.#index.observe()
   }
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
+
+    this.#index.unsubscribe(this.#changeListener)
 
     this.#index.unobserve()
 
