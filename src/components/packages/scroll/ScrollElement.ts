@@ -229,16 +229,7 @@ export class ScrollElement extends HTMLElement {
       shadow.appendChild(this.#contentWrapperElement)
 
       this.#mutationObserver = new MutationObserver((records) => {
-        if (
-          !this.#hibernated &&
-          (this.#loopCSSProperty.current ||
-            this.#splitCSSProperty.current ||
-            this.#loopCSSProperty.current ||
-            this.#autoSizeCSSProperty.current ||
-            this.#sectionalCSSProperty.current)
-        ) {
-          this.#split()
-        }
+        this.tryResplit()
       })
     }
   }
@@ -453,6 +444,19 @@ export class ScrollElement extends HTMLElement {
 
   public override get scrollHeight(): number {
     return this.#axisCSSProperty.current === 'x' ? 0 : this.#damped.distance
+  }
+
+  public tryResplit() {
+    if (
+      !this.#hibernated &&
+      (this.#loopCSSProperty.current ||
+        this.#splitCSSProperty.current ||
+        this.#loopCSSProperty.current ||
+        this.#autoSizeCSSProperty.current ||
+        this.#sectionalCSSProperty.current)
+    ) {
+      this.#split()
+    }
   }
 
   public onScroll(...parameters: Parameters<Damped['subscribe']>) {
@@ -791,8 +795,6 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.observe()
 
     windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
-
-    this.#mutationObserver.observe(this, { childList: true })
   }
 
   protected disconnectedCallback() {
@@ -975,15 +977,7 @@ export class ScrollElement extends HTMLElement {
 
       scrollEntries.register(this)
 
-      if (
-        this.#loopCSSProperty.current ||
-        this.#splitCSSProperty.current ||
-        this.#loopCSSProperty.current ||
-        this.#autoSizeCSSProperty.current ||
-        this.#sectionalCSSProperty.current
-      ) {
-        this.#split()
-      }
+      this.tryResplit()
 
       this.#enable()
 
