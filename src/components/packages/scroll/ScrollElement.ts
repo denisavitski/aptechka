@@ -203,6 +203,8 @@ export class ScrollElement extends HTMLElement {
 
   #isConnected = false
 
+  #mutationObserver: MutationObserver = null!
+
   constructor() {
     super()
 
@@ -225,6 +227,19 @@ export class ScrollElement extends HTMLElement {
       this.#contentElement.appendChild(this.#slotElement)
       this.#contentWrapperElement.appendChild(this.#contentElement)
       shadow.appendChild(this.#contentWrapperElement)
+
+      this.#mutationObserver = new MutationObserver((records) => {
+        if (
+          !this.#hibernated &&
+          (this.#loopCSSProperty.current ||
+            this.#splitCSSProperty.current ||
+            this.#loopCSSProperty.current ||
+            this.#autoSizeCSSProperty.current ||
+            this.#sectionalCSSProperty.current)
+        ) {
+          this.#split()
+        }
+      })
     }
   }
 
@@ -776,6 +791,8 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.observe()
 
     windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
+
+    this.#mutationObserver.observe(this, { childList: true })
   }
 
   protected disconnectedCallback() {
@@ -817,6 +834,8 @@ export class ScrollElement extends HTMLElement {
     windowResizer.unsubscribe(this.#connectListener)
 
     this.#hibernate()
+
+    this.#mutationObserver.disconnect()
   }
 
   #updateAxis() {
