@@ -46,29 +46,8 @@ export class PopoverButtonElement extends HTMLElement {
     return this.#popoverElement
   }
 
-  protected connectedCallback() {
-    this.#type.subscribe((e) => {
-      if (this.#popoverElement instanceof PopoverElement) {
-        if (e.current !== 'close') {
-          this.setAttribute('aria-haspopup', 'true')
-          this.setAttribute(
-            'aria-expanded',
-            this.#popoverElement.opened ? 'true' : 'false'
-          )
-          this.setAttribute('aria-controls', this.#popoverElement.id || '')
-        } else {
-          this.removeAttribute('aria-haspopup')
-          this.removeAttribute('aria-expanded')
-          this.removeAttribute('aria-controls')
-        }
-      }
-    })
-
-    if (!this.hasAttribute('tabindex')) {
-      this.tabIndex = 0
-    }
-
-    const targetId = this.getAttribute('target')
+  public changePopover(targetId: string) {
+    this.#unlistenPopover()
 
     if (targetId) {
       let popoverElement: Element | null | undefined = null
@@ -90,9 +69,13 @@ export class PopoverButtonElement extends HTMLElement {
       } else if (targetId === 'sibling') {
         popoverElement = this.parentElement?.querySelector('[popover-target]')
       } else {
+        if (!targetId.startsWith('.') && !targetId.startsWith('[')) {
+          targetId = `#${targetId}`
+        }
+
         popoverElement =
-          document.querySelector(`#${targetId}`) ||
-          (this.getRootNode() as ParentNode).querySelector(`#${targetId}`)
+          document.querySelector(targetId) ||
+          (this.getRootNode() as ParentNode).querySelector(targetId)
       }
 
       if (popoverElement instanceof HTMLElement) {
@@ -102,14 +85,17 @@ export class PopoverButtonElement extends HTMLElement {
           'popoverTriggered',
           this.#popoverTriggeredListener
         )
+
         this.#popoverElement.addEventListener(
           'popoverOpened',
           this.#popoverOpenedListener
         )
+
         this.#popoverElement.addEventListener(
           'popoverClosing',
           this.#popoverClosingListener
         )
+
         this.#popoverElement.addEventListener(
           'popoverClosed',
           this.#popoverClosedListener
@@ -117,6 +103,24 @@ export class PopoverButtonElement extends HTMLElement {
       } else {
         console.warn(this, `target ${targetId} not found`)
       }
+    }
+
+    this.#updateType(this.#type.current)
+  }
+
+  protected connectedCallback() {
+    this.#type.subscribe((e) => {
+      this.#updateType(e.current)
+    })
+
+    if (!this.hasAttribute('tabindex')) {
+      this.tabIndex = 0
+    }
+
+    const targetId = this.getAttribute('target')
+
+    if (targetId) {
+      this.changePopover(targetId)
     }
 
     if (this.isConnected) {
@@ -131,6 +135,10 @@ export class PopoverButtonElement extends HTMLElement {
     this.removeAttribute('aria-expanded')
     this.removeAttribute('aria-controls')
 
+    this.#unlistenPopover()
+  }
+
+  #unlistenPopover() {
     if (this.#popoverElement) {
       this.#popoverElement.removeEventListener(
         'popoverTriggered',
@@ -172,6 +180,23 @@ export class PopoverButtonElement extends HTMLElement {
     this.classList.remove('triggered')
 
     this.setAttribute('aria-expanded', 'false')
+  }
+
+  #updateType(value: PopoverButtonType) {
+    if (this.#popoverElement instanceof PopoverElement) {
+      if (value !== 'close') {
+        this.setAttribute('aria-haspopup', 'true')
+        this.setAttribute(
+          'aria-expanded',
+          this.#popoverElement.opened ? 'true' : 'false'
+        )
+        this.setAttribute('aria-controls', this.#popoverElement.id || '')
+      } else {
+        this.removeAttribute('aria-haspopup')
+        this.removeAttribute('aria-expanded')
+        this.removeAttribute('aria-controls')
+      }
+    }
   }
 }
 
