@@ -15,6 +15,10 @@ export function dispatchEvent<
       ? WindowEventMap[K] extends CustomEvent<any>
         ? WindowEventMap[K]['detail']
         : unknown
+      : K extends keyof DocumentEventMap
+      ? DocumentEventMap[K] extends CustomEvent<any>
+        ? DocumentEventMap[K]['detail']
+        : unknown
       : unknown
   > & { custom?: boolean }
 ) {

@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { intersector } from '@packages/intersector'
-import { dispatchEvent, loopNumber } from '@packages/utils'
+import { dispatchEvent, loopNumber, requestIdleCallback } from '@packages/utils'
 
 export interface BillboardEvents {
   billboardChange: CustomEvent<{
@@ -118,6 +118,10 @@ export class BillboardElement extends HTMLElement {
       detail: {
         counter: this.#counter,
       },
+    })
+
+    requestIdleCallback(() => {
+      window.dispatchEvent(new Event('resize'))
     })
   }
 

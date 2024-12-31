@@ -5,6 +5,7 @@ export interface LoadingEvents {
     total: number
     loaded: number
     progress: number
+    resourceName: string | undefined
   }>
   loadingStart: CustomEvent<{}>
   loadingComplete: CustomEvent<{
@@ -19,6 +20,22 @@ class Loading {
   #map = new Map<string, boolean>()
   #isStarted = false
 
+  #total = 0
+  #loaded = 0
+  #progress = 0
+
+  public get total() {
+    return this.#total
+  }
+
+  public get loaded() {
+    return this.#loaded
+  }
+
+  public get progress() {
+    return this.#progress
+  }
+
   public get map() {
     return this.#map
   }
@@ -30,7 +47,7 @@ class Loading {
 
   public complete(resourceName: string) {
     this.#map.set(resourceName, true)
-    this.#check()
+    this.#check(resourceName)
   }
 
   public error(resourceName: string) {
@@ -38,7 +55,7 @@ class Loading {
       console.error(`Failed to load ${resourceName}`)
       this.#map.delete(resourceName)
 
-      dispatchEvent(window, 'loadingError', {
+      dispatchEvent(document, 'loadingError', {
         detail: {
           name: resourceName,
         },
@@ -52,27 +69,31 @@ class Loading {
     if (!this.#isStarted) {
       this.#isStarted = true
 
-      dispatchEvent(window, 'loadingStart')
+      dispatchEvent(document, 'loadingStart')
 
       this.#check()
     }
   }, 0)
 
-  #check = () => {
+  #check = (resourceName?: string) => {
     if (!this.#isStarted) {
       return
     }
 
     const total = this.#map.size
     const loaded = Array.from(this.#map).filter((item) => item[1]).length
-
     const progress = loaded / total
 
-    dispatchEvent(window, 'loadingProgress', {
+    this.#total = total
+    this.#loaded = loaded
+    this.#progress = progress
+
+    dispatchEvent(document, 'loadingProgress', {
       detail: {
         total,
         loaded,
         progress,
+        resourceName,
       },
     })
 
@@ -84,11 +105,15 @@ class Loading {
   #complete = debounce(() => {
     this.#isStarted = false
 
-    dispatchEvent(window, 'loadingComplete', {
+    dispatchEvent(document, 'loadingComplete', {
       detail: {
         total: this.#map.size,
       },
     })
+
+    this.#total = 0
+    this.#loaded = 0
+    this.#progress = 0
 
     this.#map.clear()
   }, 0)
@@ -97,5 +122,5 @@ class Loading {
 export const loading = new Loading()
 
 declare global {
-  interface WindowEventMap extends LoadingEvents {}
+  interface DocumentEventMap extends LoadingEvents {}
 }

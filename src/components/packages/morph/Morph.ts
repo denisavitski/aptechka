@@ -52,11 +52,17 @@ export interface MorphNavigateOptions {
   revalidate?: boolean
 }
 
+export interface MorphScrollDetail {
+  left: number
+  top: number
+}
+
 export interface MorphEvents {
   morphStart: CustomEvent<MorphTransitionEntry>
   morphComplete: CustomEvent<MorphTransitionEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
+  morphScroll: CustomEvent<MorphScrollDetail>
 }
 
 interface ScrollToElementOptions
@@ -544,9 +550,18 @@ export class Morph {
   }
 
   #updateCurrentScrollElement(document: Document) {
+    this.#currentScrollElement?.removeEventListener(
+      'scroll',
+      this.#scrollListener
+    )
+
     this.#currentScrollElement =
       document.querySelector(this.#options.scrollSelector) ||
       document.documentElement
+
+    this.#currentScrollElement?.addEventListener('scroll', this.#scrollListener)
+
+    this.#scrollListener()
   }
 
   #tryScrollToElement(id: string | number, options?: ScrollToElementOptions) {
@@ -564,10 +579,27 @@ export class Morph {
 
   #popStateListener = async (event: PopStateEvent) => {
     if (event.state?.path) {
+      event.preventDefault()
+
       this.#isPopstateNavigation = true
       await this.navigate(event.state.path, { historyAction: 'none' })
       this.#isPopstateNavigation = false
     }
+  }
+
+  #scrollListener = () => {
+    const top = this.#currentScrollElement.scrollTop
+    const left = this.#currentScrollElement.scrollLeft
+
+    document.documentElement.classList.toggle('top-scrolled', top > 0)
+    document.documentElement.classList.toggle('left-scrolled', left > 0)
+
+    dispatchEvent(document, 'morphScroll', {
+      detail: {
+        left,
+        top,
+      },
+    })
   }
 }
 
