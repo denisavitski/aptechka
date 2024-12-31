@@ -120,9 +120,9 @@ export class BillboardElement extends HTMLElement {
       },
     })
 
-    requestIdleCallback(() => {
+    setTimeout(() => {
       window.dispatchEvent(new Event('resize'))
-    })
+    }, 0)
   }
 
   #tick = () => {
