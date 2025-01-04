@@ -2,18 +2,18 @@ import { Axes2D } from './ts-shape'
 
 export function setupDrag(
   onMove: (moveEvent: PointerEvent) => void,
-  onDrop?: () => void
+  onDrop?: (e: PointerEvent | TouchEvent) => void
 ) {
   const pointerMove = (moveEvent: PointerEvent) => {
     onMove?.(moveEvent)
   }
 
-  const drop = () => {
+  const drop = (e: PointerEvent | TouchEvent) => {
     removeEventListener('pointermove', pointerMove)
     removeEventListener('pointerup', drop)
     removeEventListener('touchend', drop)
 
-    onDrop?.()
+    onDrop?.(e)
   }
 
   addEventListener('pointermove', pointerMove)

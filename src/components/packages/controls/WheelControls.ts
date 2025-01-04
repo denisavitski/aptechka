@@ -99,13 +99,13 @@ export class WheelControls extends Controls {
         return
       }
 
-      this.changeEvent.notify('wheel', delta)
+      this.changeEvent.notify('wheel', delta, event)
 
       this.#timeoutId = setTimeout(() => {
         this.#timeoutId = undefined
       }, 80)
     } else {
-      this.changeEvent.notify('wheel', delta)
+      this.changeEvent.notify('wheel', delta, event)
     }
   }
 }

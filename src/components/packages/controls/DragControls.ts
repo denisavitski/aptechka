@@ -108,10 +108,10 @@ export class DragControls extends Controls {
 
           DragControls.#currentElement = this.#element
 
-          this.changeEvent.notify('drag', this.#delta)
+          this.changeEvent.notify('drag', this.#delta, moveEvent)
         }
       },
-      () => {
+      (e) => {
         DragControls.#currentElement = null
 
         if (okToNotify && !this.swipe && this.inertion) {
@@ -121,7 +121,7 @@ export class DragControls extends Controls {
             order: TICK_ORDER.CONTROLS - 1,
           })
         } else if (this.swipe) {
-          this.changeEvent.notify('drag-end', this.#delta)
+          this.changeEvent.notify('drag-end', this.#delta, e)
         }
 
         document.documentElement.classList.remove('grabbing')
@@ -138,6 +138,6 @@ export class DragControls extends Controls {
     this.#delta *= 0.95
     this.#delta = preciseNumber(this.#delta, 3)
 
-    this.changeEvent.notify('drag', this.#delta)
+    this.changeEvent.notify('drag', this.#delta, null)
   }
 }

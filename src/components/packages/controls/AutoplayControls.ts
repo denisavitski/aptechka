@@ -116,7 +116,8 @@ export class AutoplayControls extends Controls {
         e.timeBetweenFrames *
           this.#speed *
           this.direction *
-          (1 - this.#paused.current)
+          (1 - this.#paused.current),
+        e
       )
     }
   }
@@ -125,7 +126,8 @@ export class AutoplayControls extends Controls {
     if (this.#paused.current !== 1) {
       this.changeEvent.notify(
         'autoplay',
-        Math.sign(this.#speed) * this.direction * (1 - this.#paused.current)
+        Math.sign(this.#speed) * this.direction * (1 - this.#paused.current),
+        null
       )
     }
   }

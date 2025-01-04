@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { intersector } from '@packages/intersector'
-import { dispatchEvent, loopNumber, requestIdleCallback } from '@packages/utils'
+import { dispatchEvent, loopNumber } from '@packages/utils'
 
 export interface BillboardEvents {
   billboardChange: CustomEvent<{

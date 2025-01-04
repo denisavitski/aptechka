@@ -18,6 +18,7 @@ export interface AnimationOptions extends TickerAddOptions {
   max?: number
   equalize?: boolean
   restart?: boolean
+  current?: number
 }
 
 export type AnimationConstructorOptions<Options extends AnimationOptions> =
@@ -173,12 +174,16 @@ export abstract class Animation<
 
     if (options?.equalize) {
       this.unlistenAnimationFrame()
-      this.current = this.#target
+      this.current = this.#from = this.#target
     }
 
     if (options?.restart) {
       this.unlistenAnimationFrame()
-      this.current = this.initial
+      this.current = this.#from = this.initial
+    }
+
+    if (typeof options?.current === 'number') {
+      this.#from = this.current = options.current
     }
   }
 
@@ -190,7 +195,6 @@ export abstract class Animation<
 
   #setTarget(value: number) {
     this.#direction = Math.sign(value - this.#target)
-
     this.#target = clamp(value, this.#min, this.#max)
 
     this.#from = this.current

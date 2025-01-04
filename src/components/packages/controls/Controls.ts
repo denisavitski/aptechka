@@ -1,6 +1,6 @@
 import { Notifier } from '@packages/notifier'
 
-export type ControlsCallback = (type: string, value: number) => void
+export type ControlsCallback = (type: string, value: number, event: any) => void
 
 export abstract class Controls {
   #changeEvent = new Notifier<ControlsCallback>()

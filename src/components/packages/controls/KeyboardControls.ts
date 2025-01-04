@@ -82,7 +82,7 @@ export class KeyboardControls extends Controls {
 
     if (value) {
       e.stopPropagation()
-      this.changeEvent.notify('keyboard', value)
+      this.changeEvent.notify('keyboard', value, e)
     }
   }
 }
