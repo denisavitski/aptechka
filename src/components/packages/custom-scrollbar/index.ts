@@ -5,6 +5,7 @@
 import { elementResizer } from '@packages/element-resizer'
 import { windowResizer } from '@packages/window-resizer'
 import { findScrollParentElement, isBrowser, setupDrag } from '@packages/utils'
+import { ticker } from '@packages/ticker'
 
 export class CustomScrollbarElement extends HTMLElement {
   #scrollElement: HTMLElement = null!
@@ -27,6 +28,8 @@ export class CustomScrollbarElement extends HTMLElement {
 
       this.#scrollElement.addEventListener('scroll', this.#scrollListener)
       this.#thumbElement.addEventListener('pointerdown', this.#grabListener)
+
+      ticker.subscribe(this.#tickListener, { maxFPS: 5 })
     }
   }
 
@@ -38,6 +41,8 @@ export class CustomScrollbarElement extends HTMLElement {
     this.#thumbElement.removeEventListener('pointerdown', this.#grabListener)
 
     clearTimeout(this.#activeTimeoutId)
+
+    ticker.unsubscribe(this.#tickListener)
   }
 
   #scrollListener = () => {
@@ -97,6 +102,10 @@ export class CustomScrollbarElement extends HTMLElement {
 
     const startValue = this.#scrollElement.scrollTop
     const grabCursor = grabEvent.y
+  }
+
+  #tickListener = () => {
+    this.#resizeListener()
   }
 }
 
