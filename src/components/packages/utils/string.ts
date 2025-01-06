@@ -84,3 +84,13 @@ export function generateId(
 export function isUppercase(string: string) {
   return /^\p{Lu}/u.test(string)
 }
+
+let textarea: HTMLTextAreaElement | null
+export function decodeHtmlEntities(html: string) {
+  if (!textarea) {
+    textarea = document.createElement('textarea')
+  }
+
+  textarea.innerHTML = html
+  return textarea.value
+}
