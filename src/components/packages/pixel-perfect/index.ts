@@ -16,10 +16,10 @@ const stylesheet = createStylesheet(/*css*/ `
   }
 
   ::slotted(img) {
-    display: block;
-    width: 100%;
-    height: max-content;
-    object-fit: cover;
+    display: block !important;
+    width: 100% !important;
+    height: max-content !important;
+    object-fit: cover !important;
   }
 
   ::slotted(picture) {
