@@ -10,12 +10,11 @@ import {
   step,
   throttle,
 } from '@packages/utils'
-import { Store, StoreSubscribeCallback } from '@packages/store'
+import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'
 import { ScrollSegmentDefaultContainer } from './ScrollSegmentDefaultContainer'
-import { elementResizer } from '@packages/element-resizer'
 
 export interface ScrollSegmentEvents {
   scrollSegmentCapture: CustomEvent
@@ -281,7 +280,7 @@ export class ScrollSegmentElement extends HTMLElement {
     return this.#isDisabled
   }
 
-  public resize() {
+  public resize = () => {
     this.#directionSize = this.#scrollContainer.vertical
       ? this.offsetHeight
       : this.offsetWidth
@@ -325,6 +324,8 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#passed.max = this.#distance
 
     this.#isResized = true
+
+    this.#tickListener()
   }
 
   public tick() {
@@ -708,7 +709,6 @@ export class ScrollSegmentElement extends HTMLElement {
     })
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
-    elementResizer.subscribe(this, this.#resizeListener)
 
     this.scrollContainer.onScroll(this.#tickListener)
 
@@ -721,7 +721,6 @@ export class ScrollSegmentElement extends HTMLElement {
     }
 
     windowResizer.unsubscribe(this.#resizeListener)
-    elementResizer.unsubscribe(this.#resizeListener)
 
     this.scrollContainer.offScroll(this.#tickListener)
 
@@ -857,7 +856,6 @@ export class ScrollSegmentElement extends HTMLElement {
   #resizeListener = () => {
     if (!this.#isDisabled) {
       this.resize()
-      this.#tickListener()
     }
   }
 

@@ -32,6 +32,7 @@ export type ScrollLine = 'start' | 'end' | null
 export interface ScrollEvents {
   scrollSectionsChange: CustomEvent
   scrollLine: CustomEvent<{ line: ScrollLine }>
+  scrollResize: CustomEvent
 }
 
 export type ScrollBehaviour = 'smooth' | 'instant'
@@ -1108,6 +1109,8 @@ export class ScrollElement extends HTMLElement {
     } else if (!this.#disabledCSSProperty.current) {
       this.#enable()
     }
+
+    dispatchEvent(this, 'scrollResize', { custom: true })
 
     this.#animatedChangeListener()
   }

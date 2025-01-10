@@ -13,8 +13,24 @@ export class ScrollSegmentElement extends ScrollSeg {
         'scrollSectionsChange',
         this.findAnotherScrollEntries
       )
+
+      this.scrollContainer.addEventListener('scrollResize', this.resize)
+      this.resize()
     } else {
       console.error(this, 'e-scroll not found')
+    }
+  }
+
+  protected override disconnectedCallback() {
+    super.disconnectedCallback()
+
+    if (this.scrollContainer instanceof ScrollElement) {
+      this.scrollContainer.removeEventListener(
+        'scrollSectionsChange',
+        this.findAnotherScrollEntries
+      )
+
+      this.scrollContainer.removeEventListener('scrollResize', this.resize)
     }
   }
 }
