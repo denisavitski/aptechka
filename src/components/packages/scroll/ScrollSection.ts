@@ -183,26 +183,28 @@ export class ScrollSection {
   }
 
   public setIndex(value: number | null) {
-    this.#setVar('--index', value)
+    this.#setVar('index', value)
   }
 
   public setCurrentIndex(value: number | null) {
-    this.#setVar('--current-index', value)
+    this.#setVar('current-index', value)
   }
 
   public setCurrentIndexArc(value: number | null) {
-    this.#setVar('--current-index-arc', value)
+    this.#setVar('current-index-arc', value)
   }
 
   public setCurrentIndexArcAbs(value: number | null) {
-    this.#setVar('--current-index-arc-abs', value)
+    this.#setVar('current-index-arc-abs', value)
   }
 
   #setVar(name: string, value: string | number | null) {
     if (value !== null) {
-      this.#element.style.setProperty(name, value.toString())
+      this.#element.style.setProperty(`--${name}`, value.toString())
+      this.#element.setAttribute(`data-${name}`, value.toString())
     } else {
-      this.#element.style.removeProperty(name)
+      this.#element.style.removeProperty(`--${name}`)
+      this.#element.removeAttribute(`data-${name}`)
     }
   }
 }

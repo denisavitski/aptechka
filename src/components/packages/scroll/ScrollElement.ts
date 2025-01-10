@@ -1228,7 +1228,7 @@ export class ScrollElement extends HTMLElement {
         }
 
         if (this.#isGrabbing) {
-          this.scrollToSection(this.#counter.current, options)
+          this.scrollToSection(this.#getNearestSectionIndex(true), options)
         } else {
           this.shiftSections(direction, options)
         }
@@ -1302,6 +1302,7 @@ export class ScrollElement extends HTMLElement {
         this.#sections.forEach((section, index) => {
           section.setCurrentIndex(null)
           section.setCurrentIndexArc(null)
+          section.setCurrentIndexArcAbs(null)
 
           const overflow =
             counter -
@@ -1352,8 +1353,7 @@ export class ScrollElement extends HTMLElement {
     }
   }
 
-  // TODO: Учитывать loop
-  #getNearestSectionIndex() {
+  #getNearestSectionIndex(NAMEIT = false) {
     let scrollValue = this.targetScrollValue
 
     let minDiff = Infinity
@@ -1368,7 +1368,11 @@ export class ScrollElement extends HTMLElement {
 
       let position = section.position
 
-      const diff = Math.abs(position + offset - scrollValue)
+      if (this.overscroll && position === 0 && NAMEIT) {
+        position = this.#distance
+      }
+
+      let diff = Math.abs(position + offset - scrollValue)
 
       if (diff < minDiff) {
         minDiff = diff

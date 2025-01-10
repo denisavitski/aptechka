@@ -1,3 +1,9 @@
+.wrapper {
+  --padding-horisontal: 10rem;
+  width: 100%;
+  /* padding: 0 var(--padding-horisontal); */
+}
+
 e-scroll {
   --axis: x;
   --damping: 10;
@@ -10,12 +16,19 @@ e-scroll {
   --classes: true;
   --loop: true;
   --animation-var-type: target;
+  --section-distance-scale: 2;
   /* --split: true; */
 
   display: block;
   height: max-content;
 
   user-select: none;
+
+  border: 0.1rem solid red;
+
+  @media (max-width: 768px) {
+    --sections-in-view: 3;
+  }
 }
 
 section {
@@ -31,13 +44,13 @@ section {
 
 e-scroll-segment {
   --progress-arc-var: progress;
-  --start-offset: calc(-100vw);
-  --distance-offset: 100vw;
+  --start-offset: calc(-100vw + var(--padding-horisontal) / 2);
+  --distance-offset: calc(100vw + var(--padding-horisontal));
 
   display: block;
 
   width: 50%;
   height: 100%;
   background-color: blue;
-  transform: scale(calc(1 + (1 - var(--progress))));
+  /* transform: scale(calc(1 + (1 - var(--progress)))); */
 }
