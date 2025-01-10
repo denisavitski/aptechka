@@ -205,6 +205,8 @@ export class ScrollElement extends HTMLElement {
 
   #mutationObserver: MutationObserver = null!
 
+  #currentSections: Array<ScrollSection> = []
+
   constructor() {
     super()
 
@@ -1138,6 +1140,8 @@ export class ScrollElement extends HTMLElement {
       }
     }
 
+    this.#updateIndexes()
+
     scrollEntries.update(
       this,
       this.#axisCSSProperty.current,
@@ -1289,12 +1293,11 @@ export class ScrollElement extends HTMLElement {
           this.#sectionsInViewCSSProperty.current +
           this.#currentIndexEndOffsetCSSProperty.current
 
-        const currentSections: Array<ScrollSection> = []
+        this.#currentSections = []
 
         this.#sections.forEach((section, index) => {
           section.setCurrentIndex(null)
           section.setCurrentIndexArc(null)
-          section.setIndex(section.index)
 
           const overflow =
             counter -
@@ -1308,7 +1311,7 @@ export class ScrollElement extends HTMLElement {
 
           if ((index >= counter && index < currentRange) || index <= overflow) {
             section.setMark('current')
-            currentSections.push(section)
+            this.#currentSections.push(section)
           } else if (
             (index >= currentRange && index < currentRange + vv / 2) ||
             index <= overflow + sectionsInView
@@ -1318,25 +1321,26 @@ export class ScrollElement extends HTMLElement {
             section.setMark('previous')
           }
         })
-
-        const middle = Math.floor(currentSections.length / 2)
-
-        currentSections.sort((a, b) => {
-          return a.transformPosition - b.transformPosition
-        })
-
-        currentSections.forEach((section, i) => {
-          const arcIndex = Math.abs(i - middle)
-
-          section.setCurrentIndex(i)
-          section.setCurrentIndexArc(arcIndex)
-        })
       }
-    } else {
-      this.#sections.forEach((section, index) => {
-        section.element.style.removeProperty('--current-index')
-        section.element.style.removeProperty('--current-index-arc')
-        section.element.style.removeProperty('--index')
+    }
+  }
+
+  #updateIndexes() {
+    if (this.#classesCSSProperty.current) {
+      const middle = Math.floor(this.#currentSections.length / 2)
+
+      this.#currentSections.sort((a, b) => {
+        return (
+          a.element.getBoundingClientRect().left -
+          b.element.getBoundingClientRect().left
+        )
+      })
+
+      this.#currentSections.forEach((section, i) => {
+        const arcIndex = Math.abs(i - middle)
+
+        section.setCurrentIndex(i)
+        section.setCurrentIndexArc(arcIndex)
       })
     }
   }

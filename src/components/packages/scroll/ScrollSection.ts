@@ -42,6 +42,8 @@ export class ScrollSection {
     this.#scrollElement = scrollElement
 
     scrollEntries.register(this.#element)
+
+    this.setIndex(this.#index)
   }
 
   public get element() {
@@ -183,7 +185,7 @@ export class ScrollSection {
   }
 
   #setVar(name: string, value: string | number | null) {
-    if (value) {
+    if (value !== null) {
       this.#element.style.setProperty(name, value.toString())
     } else {
       this.#element.style.removeProperty(name)
