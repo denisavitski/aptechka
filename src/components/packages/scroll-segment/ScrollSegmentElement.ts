@@ -657,7 +657,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#progressArcVarCSSProperty.subscribe((v) => {
       if (this.#isDisabled) return
       this.removeVar(v.previous)
-      this.setVar(v.current, this.#progress)
+      this.setVar(v.current, this.#arcProgress())
     })
 
     this.#startVarCSSProperty.subscribe((v) => {
@@ -702,7 +702,7 @@ export class ScrollSegmentElement extends HTMLElement {
       if (this.#progressArcVarCSSProperty.current) {
         this.setVar(
           this.#progressArcVarCSSProperty.current,
-          Math.abs(Math.cos(this.#progress * Math.PI)).toFixed(6)
+          this.#arcProgress().toFixed(6)
         )
       }
     })
@@ -865,6 +865,10 @@ export class ScrollSegmentElement extends HTMLElement {
     if (!this.#isDisabled && this.#isResized) {
       this.tick()
     }
+  }
+
+  #arcProgress() {
+    return Math.abs(Math.cos(this.#progress * Math.PI))
   }
 
   #handleClassSetting(e: { current: string; previous?: string }) {
