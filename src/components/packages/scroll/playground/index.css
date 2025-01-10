@@ -7,7 +7,7 @@ e-scroll {
   --sectional: true;
   --overflow: unset;
   --mouse-drag: true;
-  --classes: false;
+  --classes: true;
   --loop: true;
   --animation-var-type: target;
   /* --split: true; */

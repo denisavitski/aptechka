@@ -652,6 +652,7 @@ export class ScrollElement extends HTMLElement {
     this.#autoSizeCSSProperty.subscribe((e) => {
       if (this.#isConnected) {
         this.#resizeListener()
+
         if (e.current && !e.previous && !this.#sections.length) {
           this.#split()
         } else if (!e.current && e.previous && this.#sections.length) {
@@ -1344,6 +1345,10 @@ export class ScrollElement extends HTMLElement {
 
         section.setCurrentIndex(i)
         section.setCurrentIndexArc(arcIndex)
+
+        console.log(i === middle)
+
+        section.setMiddle(i === middle)
       })
     }
   }

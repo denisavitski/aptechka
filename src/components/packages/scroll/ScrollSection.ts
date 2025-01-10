@@ -1,3 +1,7 @@
+/**
+ * TODO: как-то уёбищно выглядят методы для классов и атрибутов. Может быть как то это все переделать?
+ */
+
 import { scrollEntries } from '@packages/scroll-entries'
 
 import {
@@ -77,6 +81,7 @@ export class ScrollSection {
     this.setIndex(null)
     this.setCurrentIndex(null)
     this.setCurrentIndexArc(null)
+    this.setMiddle(false)
     this.setSize()
   }
 
@@ -170,6 +175,10 @@ export class ScrollSection {
         custom: true,
       })
     }
+  }
+
+  public setMiddle(bool: boolean) {
+    this.#element.classList.toggle('middle', bool)
   }
 
   public setIndex(value: number | null) {
