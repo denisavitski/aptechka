@@ -30,6 +30,7 @@ export class ScrollSection {
   #size = 0
   #position = 0
   #currentMark: ScrollSectionMark = null
+  #transformPosition = 0
 
   constructor(
     element: HTMLElement,
@@ -41,6 +42,10 @@ export class ScrollSection {
     this.#scrollElement = scrollElement
 
     scrollEntries.register(this.#element)
+  }
+
+  public get element() {
+    return this.#element
   }
 
   public get index() {
@@ -55,6 +60,10 @@ export class ScrollSection {
     return this.#position
   }
 
+  public get transformPosition() {
+    return this.#transformPosition
+  }
+
   public destroy() {
     scrollEntries.unregister(this.#element)
     this.unsetTransform()
@@ -62,7 +71,10 @@ export class ScrollSection {
 
   public unsetTransform() {
     this.#element.style.transform = ''
-    this.mark(null)
+    this.setMark(null)
+    this.setIndex(null)
+    this.setCurrentIndex(null)
+    this.setCurrentIndexArc(null)
     this.setSize()
   }
 
@@ -123,14 +135,20 @@ export class ScrollSection {
     const max = this.#position + this.#size + distanceAddition
     const value = clamp(valueToClamp, min, max)
 
+    this.#transformPosition = value * -1
+
     if (this.#scrollElement.vertical) {
-      this.#element.style.transform = `translate3d(0px, ${value * -1}px, 0px)`
+      this.#element.style.transform = `translate3d(0px, ${
+        this.#transformPosition
+      }px, 0px)`
     } else {
-      this.#element.style.transform = `translate3d(${value * -1}px, 0px, 0px)`
+      this.#element.style.transform = `translate3d(${
+        this.#transformPosition
+      }px, 0px, 0px)`
     }
   }
 
-  public mark(mark: ScrollSectionMark) {
+  public setMark(mark: ScrollSectionMark) {
     if (this.#currentMark !== mark) {
       if (this.#currentMark) {
         this.#element.classList.remove(this.#currentMark)
@@ -149,6 +167,26 @@ export class ScrollSection {
         },
         custom: true,
       })
+    }
+  }
+
+  public setIndex(value: number | null) {
+    this.#setVar('--index', value)
+  }
+
+  public setCurrentIndex(value: number | null) {
+    this.#setVar('--current-index', value)
+  }
+
+  public setCurrentIndexArc(value: number | null) {
+    this.#setVar('--current-index-arc', value)
+  }
+
+  #setVar(name: string, value: string | number | null) {
+    if (value) {
+      this.#element.style.setProperty(name, value.toString())
+    } else {
+      this.#element.style.removeProperty(name)
     }
   }
 }

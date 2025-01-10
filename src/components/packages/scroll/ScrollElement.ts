@@ -1289,7 +1289,13 @@ export class ScrollElement extends HTMLElement {
           this.#sectionsInViewCSSProperty.current +
           this.#currentIndexEndOffsetCSSProperty.current
 
+        const currentSections: Array<ScrollSection> = []
+
         this.#sections.forEach((section, index) => {
+          section.setCurrentIndex(null)
+          section.setCurrentIndexArc(null)
+          section.setIndex(section.index)
+
           const overflow =
             counter -
             this.limit -
@@ -1301,17 +1307,37 @@ export class ScrollElement extends HTMLElement {
           const vv = this.sections.length - currentRange
 
           if ((index >= counter && index < currentRange) || index <= overflow) {
-            section.mark('current')
+            section.setMark('current')
+            currentSections.push(section)
           } else if (
             (index >= currentRange && index < currentRange + vv / 2) ||
             index <= overflow + sectionsInView
           ) {
-            section.mark('next')
+            section.setMark('next')
           } else {
-            section.mark('previous')
+            section.setMark('previous')
           }
         })
+
+        const middle = Math.floor(currentSections.length / 2)
+
+        currentSections.sort((a, b) => {
+          return a.transformPosition - b.transformPosition
+        })
+
+        currentSections.forEach((section, i) => {
+          const arcIndex = Math.abs(i - middle)
+
+          section.setCurrentIndex(i)
+          section.setCurrentIndexArc(arcIndex)
+        })
       }
+    } else {
+      this.#sections.forEach((section, index) => {
+        section.element.style.removeProperty('--current-index')
+        section.element.style.removeProperty('--current-index-arc')
+        section.element.style.removeProperty('--index')
+      })
     }
   }
 

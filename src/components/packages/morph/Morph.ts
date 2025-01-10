@@ -45,6 +45,8 @@ export type MorphPreprocessor = (entry: MorphPreprocessorEntry) => void
 
 export type MorphNavigationCallback = (entry: MorphNavigationEntry) => void
 
+export type MorphPathnameModifier = (pathname: string) => string
+
 export interface MorphNavigateOptions {
   historyAction?: ChangeHistoryAction
   centerScroll?: boolean
@@ -72,6 +74,7 @@ interface ScrollToElementOptions
 
 export class Morph {
   public preprocessor?: MorphPreprocessor
+  public pathnameModifier?: MorphPathnameModifier
 
   #options: MorphOptions = null!
   #morphElements: Array<HTMLElement> = null!
@@ -178,7 +181,7 @@ export class Morph {
       return
     }
 
-    const parts = this.normalizePath(path)
+    const parts = this.normalizePath(this.pathnameModifier?.(path) || path)
 
     let { pathname, hash, parameters, leaf } = parts
 

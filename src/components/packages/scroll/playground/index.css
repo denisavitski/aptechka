@@ -3,14 +3,18 @@ e-scroll {
   --damping: 10;
   --auto-size: true;
   --gap: 3.2rem;
-  --sections-in-view: 5;
+  --sections-in-view: 3;
   --sectional: true;
   --overflow: hidden;
   --mouse-drag: true;
   --classes: true;
+  --loop: true;
+  --classes: true;
 
   display: block;
   height: max-content;
+
+  user-select: none;
 }
 
 section {

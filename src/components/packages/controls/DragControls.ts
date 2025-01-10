@@ -55,6 +55,10 @@ export class DragControls extends Controls {
   }
 
   #pointerdownListener = (grabEvent: PointerEvent) => {
+    if (grabEvent.button !== 0) {
+      return
+    }
+
     if (
       grabEvent
         .composedPath()
