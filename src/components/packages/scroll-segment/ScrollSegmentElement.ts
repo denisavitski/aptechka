@@ -8,12 +8,14 @@ import {
   getStickyOffset,
   isBrowser,
   step,
+  throttle,
 } from '@packages/utils'
-import { Store } from '@packages/store'
+import { Store, StoreSubscribeCallback } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'
 import { ScrollSegmentDefaultContainer } from './ScrollSegmentDefaultContainer'
+import { elementResizer } from '@packages/element-resizer'
 
 export interface ScrollSegmentEvents {
   scrollSegmentCapture: CustomEvent
@@ -82,10 +84,15 @@ export class ScrollSegmentElement extends HTMLElement {
   )
   #passedVarCSSProperty = new CSSProperty<string>(this, '--passed-var', '')
   #progressVarCSSProperty = new CSSProperty<string>(this, '--progress-var', '')
+  #progressArcVarCSSProperty = new CSSProperty<string>(
+    this,
+    '--progress-arc-var',
+    ''
+  )
   #animationVarTypeCSSProperty = new CSSProperty<'current' | 'target'>(
     this,
     '--animation-var-type',
-    'current'
+    'target'
   )
   #distanceVarCSSProperty = new CSSProperty<string>(this, '--distance-var', '')
   #startVarCSSProperty = new CSSProperty<string>(this, '--start-var', '')
@@ -115,6 +122,8 @@ export class ScrollSegmentElement extends HTMLElement {
   #isResized = false
   #isCapturedOnce = false
   #isDisabled = true
+
+  #skipPassNotification = false
 
   public get scrollContainer() {
     return this.#scrollContainer
@@ -170,6 +179,10 @@ export class ScrollSegmentElement extends HTMLElement {
 
   public get progressVarCSSProperty() {
     return this.#progressVarCSSProperty
+  }
+
+  public get progressArcVarCSSProperty() {
+    return this.#progressArcVarCSSProperty
   }
 
   public get animationVarTypeCSSProperty() {
@@ -321,7 +334,15 @@ export class ScrollSegmentElement extends HTMLElement {
       scrollValue += se.value
     })
 
-    this.#passed.set(scrollValue - this.#start)
+    const delta = scrollValue - this.#start
+
+    if (!this.#skipPassNotification) {
+      this.#skipPassNotification = this.#passed.previous
+        ? Math.abs(this.#passed.previous - delta) > 1000
+        : false
+    }
+
+    this.#passed.set(delta)
 
     const fscrollValue = Math.round(scrollValue)
 
@@ -524,6 +545,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#releasedFromFinishCSSProperty.observe()
     this.#passedVarCSSProperty.observe()
     this.#progressVarCSSProperty.observe()
+    this.#progressArcVarCSSProperty.observe()
     this.#animationVarTypeCSSProperty.observe()
     this.#distanceVarCSSProperty.observe()
     this.#startVarCSSProperty.observe()
@@ -632,6 +654,12 @@ export class ScrollSegmentElement extends HTMLElement {
       this.setVar(v.current, this.#progress)
     })
 
+    this.#progressArcVarCSSProperty.subscribe((v) => {
+      if (this.#isDisabled) return
+      this.removeVar(v.previous)
+      this.setVar(v.current, this.#progress)
+    })
+
     this.#startVarCSSProperty.subscribe((v) => {
       if (this.#isDisabled) return
 
@@ -654,6 +682,11 @@ export class ScrollSegmentElement extends HTMLElement {
     })
 
     this.#passed.subscribe((e) => {
+      if (this.#skipPassNotification) {
+        this.#skipPassNotification = false
+        return
+      }
+
       const passedValue =
         this.#passed[this.#animationVarTypeCSSProperty.current]
 
@@ -665,9 +698,17 @@ export class ScrollSegmentElement extends HTMLElement {
         this.#progressVarCSSProperty.current,
         this.#progress.toFixed(6)
       )
+
+      if (this.#progressArcVarCSSProperty.current) {
+        this.setVar(
+          this.#progressArcVarCSSProperty.current,
+          Math.abs(Math.cos(this.#progress * Math.PI)).toFixed(6)
+        )
+      }
     })
 
-    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
+    windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
+    elementResizer.subscribe(this, this.#resizeListener)
 
     this.scrollContainer.onScroll(this.#tickListener)
 
@@ -680,6 +721,7 @@ export class ScrollSegmentElement extends HTMLElement {
     }
 
     windowResizer.unsubscribe(this.#resizeListener)
+    elementResizer.unsubscribe(this.#resizeListener)
 
     this.scrollContainer.offScroll(this.#tickListener)
 
