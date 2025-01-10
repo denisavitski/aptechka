@@ -741,6 +741,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#releasedFromFinishCSSProperty.close()
     this.#passedVarCSSProperty.close()
     this.#progressVarCSSProperty.close()
+    this.#progressArcVarCSSProperty.close()
     this.#distanceVarCSSProperty.close()
     this.#startVarCSSProperty.close()
     this.#finishVarCSSProperty.close()
@@ -907,6 +908,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#removeVars(
       this.#passedVarCSSProperty.current,
       this.#progressVarCSSProperty.current,
+      this.#progressArcVarCSSProperty.current,
       this.#distanceVarCSSProperty.current,
       this.#startVarCSSProperty.current,
       this.#finishVarCSSProperty.current
