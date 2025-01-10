@@ -1341,12 +1341,11 @@ export class ScrollElement extends HTMLElement {
       })
 
       this.#currentSections.forEach((section, i) => {
-        const arcIndex = Math.abs(i - middle)
+        const arcIndex = i - middle
 
         section.setCurrentIndex(i)
         section.setCurrentIndexArc(arcIndex)
-
-        console.log(i === middle)
+        section.setCurrentIndexArcAbs(Math.abs(arcIndex))
 
         section.setMiddle(i === middle)
       })
