@@ -1324,6 +1324,7 @@ export class ScrollElement extends HTMLElement {
           section.setCurrentIndex(null)
           section.setCurrentIndexArc(null)
           section.setCurrentIndexArcAbs(null)
+          section.setMiddle(false)
 
           const overflow =
             counter -
@@ -1368,7 +1369,6 @@ export class ScrollElement extends HTMLElement {
         section.setCurrentIndex(i)
         section.setCurrentIndexArc(arcIndex)
         section.setCurrentIndexArcAbs(Math.abs(arcIndex))
-
         section.setMiddle(i === middle)
       })
     }
