@@ -19,6 +19,7 @@ import {
   createStylesheet,
   dispatchEvent,
   loopNumber,
+  debounce,
 } from '@packages/utils'
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
@@ -238,9 +239,11 @@ export class ScrollElement extends HTMLElement {
       this.#contentWrapperElement.appendChild(this.#contentElement)
       shadow.appendChild(this.#contentWrapperElement)
 
-      this.#mutationObserver = new MutationObserver((records) => {
-        this.tryResplit()
-      })
+      this.#mutationObserver = new MutationObserver(
+        debounce(() => {
+          this.tryResplit()
+        }, 10)
+      )
     }
   }
 
@@ -817,6 +820,8 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.observe()
 
     windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
+
+    this.#mutationObserver.observe(this, { childList: true })
   }
 
   protected disconnectedCallback() {
