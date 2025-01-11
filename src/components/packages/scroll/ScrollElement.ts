@@ -159,6 +159,13 @@ export class ScrollElement extends HTMLElement {
     '--current-index-end-offset',
     0
   )
+  #shiftSectionPositionCSSProperty = new CSSProperty<number>(
+    this,
+    '--shift-section-position',
+    0,
+    { rawValueCheck: false }
+  )
+
   #focusDelayCSSProperty = new CSSProperty<number>(this, '--focus-delay', 0)
   #focusDurationCSSProperty = new CSSProperty<number>(
     this,
@@ -339,6 +346,10 @@ export class ScrollElement extends HTMLElement {
 
   public get currentIndexEndOffsetCSSProperty() {
     return this.#currentIndexEndOffsetCSSProperty
+  }
+
+  public get shiftSectionPositionCSSProperty() {
+    return this.#shiftSectionPositionCSSProperty
   }
 
   public get focusDelayCSSProperty() {
@@ -793,6 +804,7 @@ export class ScrollElement extends HTMLElement {
     this.#classesCSSProperty.observe()
     this.#currentIndexStartOffsetCSSProperty.observe()
     this.#currentIndexEndOffsetCSSProperty.observe()
+    this.#shiftSectionPositionCSSProperty.observe()
     this.#focusDelayCSSProperty.observe()
     this.#focusDurationCSSProperty.observe()
     this.#disabledCSSProperty.observe()
@@ -832,6 +844,7 @@ export class ScrollElement extends HTMLElement {
     this.#classesCSSProperty.unobserve()
     this.#currentIndexStartOffsetCSSProperty.unobserve()
     this.#currentIndexEndOffsetCSSProperty.unobserve()
+    this.#shiftSectionPositionCSSProperty.unobserve()
     this.#focusDelayCSSProperty.unobserve()
     this.#focusDurationCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()

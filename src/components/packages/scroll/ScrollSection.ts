@@ -117,18 +117,26 @@ export class ScrollSection {
   }
 
   public transform() {
-    let offset = 0
+    const cssOffset =
+      this.#scrollElement.shiftSectionPositionCSSProperty.current
+
+    console.log(cssOffset)
+
+    let offset = cssOffset
 
     const distanceAddition =
       this.#scrollElement.viewportSize *
       this.#scrollElement.sectionDistanceScaleCSSProperty.current
 
-    if (
-      this.#scrollElement.loopCSSProperty.current &&
-      this.#scrollElement.overscroll &&
-      this.#position + this.#size < this.#scrollElement.currentScrollValue
-    ) {
-      offset = this.#scrollElement.distance * -1 - this.#scrollElement.gap
+    if (this.#scrollElement.loopCSSProperty.current) {
+      if (
+        this.#position + this.#size <
+        this.#scrollElement.currentScrollValue - cssOffset
+      ) {
+        offset =
+          (this.#scrollElement.distance - cssOffset) * -1 -
+          this.#scrollElement.gap
+      }
     }
 
     scrollEntries.update(

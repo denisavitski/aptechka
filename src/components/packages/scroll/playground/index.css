@@ -1,7 +1,7 @@
 .wrapper {
   --padding-horisontal: 10rem;
   width: 100%;
-  padding: 0 var(--padding-horisontal);
+  /* padding: 0 var(--padding-horisontal); */
 }
 
 e-scroll {
@@ -11,7 +11,7 @@ e-scroll {
   --gap: 3.2rem;
   --sections-in-view: 5;
   --sectional: true;
-  --overflow: hidden;
+  --overflow: none;
   --mouse-drag: true;
   --classes: true;
   --loop: true;
@@ -24,10 +24,10 @@ e-scroll {
 
   user-select: none;
 
-  /* border: 0.1rem solid red; */
+  border: 0.1rem solid red;
 
   @media (max-width: 768px) {
-    --sections-in-view: 1;
+    --sections-in-view: 2;
   }
 }
 
