@@ -128,8 +128,8 @@ export class ScrollSection {
 
     if (this.#scrollElement.loopCSSProperty.current) {
       if (
-        this.#position + this.#size <
-        this.#scrollElement.currentScrollValue - cssOffset
+        this.#position + this.#size <=
+        this.#scrollElement.currentScrollValue - cssOffset / 2
       ) {
         offset =
           (this.#scrollElement.distance - cssOffset) * -1 -
