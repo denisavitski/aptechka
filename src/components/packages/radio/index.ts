@@ -9,6 +9,8 @@ export class RadioElement<T extends string = string> extends HTMLElement {
   #value: T | undefined
   #currentButtonElement: HTMLElement | null = null
 
+  #disabled = false
+
   public get value() {
     return this.#value
   }
@@ -19,6 +21,18 @@ export class RadioElement<T extends string = string> extends HTMLElement {
 
   public get currentButtonElement() {
     return this.#currentButtonElement
+  }
+
+  public get disabled() {
+    return this.#disabled
+  }
+
+  public disable() {
+    this.#disabled = true
+  }
+
+  public enable() {
+    this.#disabled = false
   }
 
   public addButton(element: HTMLElement) {
@@ -99,12 +113,14 @@ export class RadioElement<T extends string = string> extends HTMLElement {
   }
 
   #buttonClickListener = (e: Event) => {
-    const ct = e.currentTarget as HTMLElement
+    if (!this.#disabled) {
+      const ct = e.currentTarget as HTMLElement
 
-    const value = ct.getAttribute('data-value')
+      const value = ct.getAttribute('data-value')
 
-    if (value) {
-      this.setValue(value as T)
+      if (value) {
+        this.setValue(value as T)
+      }
     }
   }
 
