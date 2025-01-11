@@ -742,6 +742,12 @@ export class ScrollElement extends HTMLElement {
       }
     })
 
+    this.#shiftSectionPositionCSSProperty.subscribe((e) => {
+      if (this.#isConnected) {
+        this.#damped.notify()
+      }
+    })
+
     this.#damped.isRunning.subscribe((e) => {
       this.classList.toggle('active', e.current)
     })
@@ -950,7 +956,8 @@ export class ScrollElement extends HTMLElement {
   #enable() {
     if (this.#disabled) {
       this.#disabled = false
-      this.#damped.subscribe(this.#animatedChangeListener)
+      this.#damped.subscribe(this.#animatedChangeListener, -10000)
+      this.#damped.notify()
 
       this.#wheelControls.connect()
       this.#keyboardControls.connect()
@@ -1126,7 +1133,7 @@ export class ScrollElement extends HTMLElement {
 
     dispatchEvent(this, 'scrollResize', { custom: true })
 
-    this.#animatedChangeListener()
+    this.#damped.notify()
   }
 
   #animatedChangeListener = () => {

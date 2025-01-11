@@ -120,8 +120,6 @@ export class ScrollSection {
     const cssOffset =
       this.#scrollElement.shiftSectionPositionCSSProperty.current
 
-    console.log(cssOffset)
-
     let offset = cssOffset
 
     const distanceAddition =

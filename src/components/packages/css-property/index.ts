@@ -50,18 +50,21 @@ export class CSSProperty<
     }
   }
 
-  public override subscribe(callback: StoreSubscribeCallback<StoreType>) {
-    if (!this.subscribers.size) {
+  public override subscribe(
+    callback: StoreSubscribeCallback<StoreType>,
+    order?: number
+  ) {
+    if (!this.subscribers.length) {
       this.observe()
     }
 
-    return super.subscribe(callback)
+    return super.subscribe(callback, order)
   }
 
   public override unsubscribe(callback: StoreSubscribeCallback<StoreType>) {
     super.unsubscribe(callback)
 
-    if (!this.subscribers.size) {
+    if (!this.subscribers.length) {
       this.unobserve()
     }
   }

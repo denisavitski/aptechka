@@ -48,18 +48,21 @@ export class Attribute<T extends string | number | boolean> extends Store<T> {
     }
   }
 
-  public override subscribe(callback: StoreSubscribeCallback<T>) {
-    if (!this.subscribers.size) {
+  public override subscribe(
+    callback: StoreSubscribeCallback<T>,
+    order?: number
+  ) {
+    if (!this.subscribers.length) {
       this.observe()
     }
 
-    return super.subscribe(callback)
+    return super.subscribe(callback, order)
   }
 
   public override unsubscribe(callback: StoreSubscribeCallback<T>) {
     super.unsubscribe(callback)
 
-    if (!this.subscribers.size) {
+    if (!this.subscribers.length) {
       this.unobserve()
     }
   }

@@ -8,7 +8,6 @@ import {
   getStickyOffset,
   isBrowser,
   step,
-  throttle,
 } from '@packages/utils'
 import { Store } from '@packages/store'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
@@ -469,6 +468,7 @@ export class ScrollSegmentElement extends HTMLElement {
     })
 
     this.#anotherScrollEntries = allScrollEntriesAbove.slice(scrollIndex + 1)
+    this.tick()
   }, 0)
 
   #connect() {

@@ -1,12 +1,20 @@
 export type NotifierCallback = (...args: any[]) => void
 
-interface NotifierSubscriber {
+export interface NotifierSubscriber {
   callback: NotifierCallback
   order: number
 }
 
 export class Notifier<Callback extends NotifierCallback = NotifierCallback> {
   #subscribers: Array<NotifierSubscriber> = []
+
+  public get subscribers() {
+    return this.#subscribers
+  }
+
+  public get size() {
+    return this.#subscribers.length
+  }
 
   public close() {
     this.#subscribers = []

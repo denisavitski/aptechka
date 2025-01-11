@@ -1,3 +1,4 @@
+import { Notifier } from '@packages/notifier'
 import { storeRegistry } from './StoreRegistry'
 
 export interface StoreState<StoreType> {
@@ -33,7 +34,7 @@ export class Store<StoreType = unknown> {
   __manager?: any
   #state: StoreState<StoreType>
   #equalityCheck: StoreEqualityCheckCallback<StoreType>
-  #callbacks = new Set<StoreSubscribeCallback<StoreType>>()
+  #notifier = new Notifier<StoreSubscribeCallback<StoreType>>()
   #skipSubscribeNotification: boolean
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
   #notifyAndClose: boolean
@@ -97,7 +98,7 @@ export class Store<StoreType = unknown> {
 
       this.#state.current = value
 
-      this.#notify()
+      this.notify()
 
       if (this.#notifyAndClose) {
         this.close()
@@ -106,7 +107,11 @@ export class Store<StoreType = unknown> {
   }
 
   public get subscribers() {
-    return this.#callbacks
+    return this.#notifier.subscribers
+  }
+
+  public notify() {
+    this.#notifier.notify(this.#state)
   }
 
   public addMiddleware(middleware: StoreMiddleware<StoreType>) {
@@ -125,12 +130,15 @@ export class Store<StoreType = unknown> {
     }
   }
 
-  public subscribe(callback: StoreSubscribeCallback<StoreType>) {
-    if (!this.#invisible && !this.#callbacks.size) {
+  public subscribe(
+    callback: StoreSubscribeCallback<StoreType>,
+    order?: number
+  ) {
+    if (!this.#invisible && !this.#notifier.size) {
       shareStore(this)
     }
 
-    this.#callbacks.add(callback)
+    this.#notifier.subscribe(callback, order)
 
     if (!this.#skipSubscribeNotification) {
       callback(this.#state)
@@ -142,9 +150,9 @@ export class Store<StoreType = unknown> {
   }
 
   public unsubscribe(callback: StoreSubscribeCallback<StoreType>) {
-    this.#callbacks.delete(callback)
+    this.#notifier.unsubscribe(callback)
 
-    if (!this.#callbacks.size) {
+    if (!this.#notifier.size) {
       unshareStore(this)
     }
   }
@@ -156,18 +164,12 @@ export class Store<StoreType = unknown> {
   }
 
   public close() {
-    this.#callbacks.clear()
+    this.#notifier.close()
 
     this.#state.previous = undefined
     this.#state.current = this.#state.initial
 
     unshareStore(this)
-  }
-
-  #notify() {
-    for (const callback of this.#callbacks) {
-      callback(this.#state)
-    }
   }
 }
 
