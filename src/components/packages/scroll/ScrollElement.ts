@@ -1258,7 +1258,8 @@ export class ScrollElement extends HTMLElement {
   #getScrollValue(type: 'target' | 'current' = 'current') {
     if (this.#loopCSSProperty.current && this.#sections.length) {
       const mod =
-        this.#damped[type] % (this.#scrollSize + this.#viewportSize + this.#gap)
+        this.#damped[type] %
+        Math.round(this.#scrollSize + this.#viewportSize + this.#gap)
 
       const value =
         mod < 0 ? this.#scrollSize + mod + this.#viewportSize + this.#gap : mod
@@ -1374,7 +1375,7 @@ export class ScrollElement extends HTMLElement {
 
       let diff = Math.abs(position + offset - scrollValue)
 
-      if (diff < minDiff) {
+      if (diff <= minDiff) {
         minDiff = diff
         nearestIndex = i
       }
