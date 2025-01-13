@@ -606,7 +606,10 @@ export class ScrollElement extends HTMLElement {
       this.#notAutoplayControlListener
     )
 
-    this.#dragControls = new DragControls({ element: this.#contentElement })
+    this.#dragControls = new DragControls({
+      element: this.#contentElement,
+      rootElement: this,
+    })
     this.#dragControls.changeEvent.subscribe(this.#notAutoplayControlListener)
 
     this.#autoplayControls = new AutoplayControls({

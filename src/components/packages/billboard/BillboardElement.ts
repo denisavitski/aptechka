@@ -10,7 +10,7 @@ export interface BillboardEvents {
 
 export class BillboardElement extends HTMLElement {
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
-  #swipe = new CSSProperty<Axes2D>(this, '--swipe', 'x')
+  #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
   #itemElements: Array<HTMLElement> = []
@@ -135,6 +135,10 @@ export class BillboardElement extends HTMLElement {
   }
 
   #pointerDownListener = (e: PointerEvent) => {
+    if (!this.#swipe.current) {
+      return
+    }
+
     let dir = 0
 
     setupDrag(

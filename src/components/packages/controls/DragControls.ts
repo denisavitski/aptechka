@@ -10,6 +10,7 @@ import { TICK_ORDER } from '@packages/order'
 import { Controls } from './Controls'
 
 export interface DragControlsOptions {
+  rootElement?: HTMLElement
   element?: HTMLElement
   axis?: Axes2D
   swipe?: boolean
@@ -22,8 +23,11 @@ export class DragControls extends Controls {
   public swipe: boolean
   public inertion = 1
 
+  #rootElement: HTMLElement = null!
   #element: HTMLElement = null!
   #delta = 0
+  #linkElements: Array<HTMLAnchorElement> = []
+  #dragDelta = 0
 
   constructor(options?: DragControlsOptions) {
     super()
@@ -35,26 +39,47 @@ export class DragControls extends Controls {
       this.#element = options?.element
         ? getElement(options.element) || document.documentElement
         : document.documentElement
+      this.#rootElement = options?.rootElement || this.#element
     }
   }
 
   public connect() {
     if (isBrowser) {
+      this.#linkElements = [...this.#rootElement.querySelectorAll('a')]
+
+      this.#linkElements.forEach((element) => {
+        element.addEventListener('click', this.#linkClickListener)
+      })
+
       this.#element.addEventListener('pointerdown', this.#pointerdownListener)
     }
   }
 
   public disconnect() {
     if (isBrowser) {
+      this.#linkElements.forEach((element) => {
+        element.removeEventListener('click', this.#linkClickListener)
+      })
+
       this.#element.removeEventListener(
         'pointerdown',
         this.#pointerdownListener
       )
+
       ticker.unsubscribe(this.#tickListener)
     }
   }
 
+  #linkClickListener = (e: Event) => {
+    if (Math.abs(this.#dragDelta) > 2) {
+      e.preventDefault()
+    }
+  }
+
   #pointerdownListener = (grabEvent: PointerEvent) => {
+    this.#dragDelta = 0
+    this.#delta = 0
+
     if (grabEvent.button !== 0) {
       return
     }
@@ -76,8 +101,6 @@ export class DragControls extends Controls {
     let prev = grabEvent
     let okToNotify = false
 
-    this.#delta = 0
-
     document.documentElement.classList.add('grabbing')
 
     let dx = 0
@@ -96,8 +119,10 @@ export class DragControls extends Controls {
         dy = prev.y - moveEvent.y
 
         if (this.axis === 'x') {
+          this.#dragDelta = moveEvent.x - grabEvent.x
           this.#delta = dx
         } else {
+          this.#dragDelta = moveEvent.y - grabEvent.y
           this.#delta = dy
         }
 
