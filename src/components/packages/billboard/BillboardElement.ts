@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
 import { intersector } from '@packages/intersector'
-import { dispatchEvent, loopNumber } from '@packages/utils'
+import { Axes2D, dispatchEvent, loopNumber, setupDrag } from '@packages/utils'
 
 export interface BillboardEvents {
   billboardChange: CustomEvent<{
@@ -10,6 +10,7 @@ export interface BillboardEvents {
 
 export class BillboardElement extends HTMLElement {
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
+  #swipe = new CSSProperty<Axes2D>(this, '--swipe', 'x')
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
   #itemElements: Array<HTMLElement> = []
@@ -59,10 +60,14 @@ export class BillboardElement extends HTMLElement {
     })
 
     this.#autoplay.observe()
+    this.#swipe.observe()
+
+    this.addEventListener('pointerdown', this.#pointerDownListener)
   }
 
   protected disconnectedCallback() {
     this.#autoplay.unobserve()
+    this.#swipe.unobserve()
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
@@ -127,6 +132,30 @@ export class BillboardElement extends HTMLElement {
 
   #tick = () => {
     this.#updateCounter(this.#counter + 1)
+  }
+
+  #pointerDownListener = (e: PointerEvent) => {
+    let dir = 0
+
+    setupDrag(
+      (moveEvent) => {
+        const dx = e.x - moveEvent.x
+        const dy = e.y - moveEvent.y
+
+        if (this.#swipe.current === 'x') {
+          if (Math.abs(dx) > Math.abs(dy)) {
+            dir = Math.sign(dx)
+          }
+        } else if (this.#swipe.current === 'y') {
+          if (Math.abs(dy) > Math.abs(dx)) {
+            dir = Math.sign(dy)
+          }
+        }
+      },
+      () => {
+        this.shift(dir)
+      }
+    )
   }
 }
 

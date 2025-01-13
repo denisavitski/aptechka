@@ -1,4 +1,5 @@
 e-billboard {
+  display: grid;
   --autoplay: 2s;
 
   @media (max-width: 768px) {
@@ -10,4 +11,12 @@ button {
   width: 100px;
   height: 100px;
   display: block;
+}
+
+[data-billboard-item] {
+  grid-column: 1/1;
+  grid-row: 1/1;
+  width: 100px;
+  height: 100px;
+  background-color: tomato;
 }
