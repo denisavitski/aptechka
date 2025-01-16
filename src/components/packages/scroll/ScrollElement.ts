@@ -762,6 +762,8 @@ export class ScrollElement extends HTMLElement {
       if (this.#sections.length) {
         this.#updateMarks()
       }
+
+      this.style.setProperty('--counter', e.current + '')
     })
 
     this.#setTween.subscribe((e) => {

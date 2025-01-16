@@ -16,7 +16,6 @@ e-scroll {
   --classes: true;
   --loop: true;
   --animation-var-type: target;
-  --section-distance-scale: 2;
   /* --split: true; */
 
   display: block;
@@ -53,4 +52,42 @@ e-scroll-segment {
   height: 100%;
   background-color: blue;
   /* transform: scale(calc(1 + (1 - var(--progress)))); */
+}
+
+e-scroll-bullet-buttons {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+
+  --size: 1rem;
+  --gap: 1rem;
+
+  width: calc(var(--size) * 5);
+  overflow: hidden;
+
+  border: 0.1rem solid red;
+
+  div {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    width: max-content;
+    transition-property: transform;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+    transform: translateX(
+      calc(var(--size) * 2 + var(--counter) * (var(--size) + var(--gap)) * -1)
+    );
+  }
+
+  button {
+    width: var(--size);
+    height: var(--size);
+    background-color: grey;
+
+    &.current {
+      background-color: red;
+    }
+  }
 }
