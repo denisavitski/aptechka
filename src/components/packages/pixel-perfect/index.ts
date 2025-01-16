@@ -73,7 +73,13 @@ export class PixelPerfectElement extends HTMLElement {
   }
 
   protected connectedCallback() {
-    this.#scrollParentElement = findScrollParentElement(this)
+    const scrollSelector = this.getAttribute('scroll-selector')
+
+    if (scrollSelector) {
+      this.#scrollParentElement = document.querySelector(scrollSelector)
+    } else {
+      this.#scrollParentElement = findScrollParentElement(this)
+    }
 
     this.#scrollParentElement?.addEventListener('scroll', this.#scrollListener)
 
