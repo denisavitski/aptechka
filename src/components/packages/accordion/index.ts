@@ -14,6 +14,7 @@ export interface AccordionToggleOptions {
 export interface AccordionEvents {
   accordionItemToggle: CustomEvent<{
     opened: boolean
+    element: HTMLElement
   }>
 }
 
@@ -107,6 +108,7 @@ class AccordionItem {
       composed: true,
       detail: {
         opened: this.#opened,
+        element: this.#element,
       },
     })
   }
@@ -134,6 +136,7 @@ class AccordionItem {
       composed: true,
       detail: {
         opened: this.#opened,
+        element: this.#element,
       },
     })
   }
