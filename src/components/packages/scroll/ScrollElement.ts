@@ -910,6 +910,8 @@ export class ScrollElement extends HTMLElement {
 
     this.#contentElement.style.transform = ''
 
+    this.style.setProperty('--sections', this.#sections.length.toString())
+
     dispatchEvent(this, 'scrollSectionsChange', {
       custom: true,
       composed: true,
