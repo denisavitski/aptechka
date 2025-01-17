@@ -106,6 +106,9 @@ export class DragControls extends Controls {
     let dx = 0
     let dy = 0
 
+    let ddx = 0
+    let ddy = 0
+
     setupDrag(
       (moveEvent) => {
         if (
@@ -118,19 +121,22 @@ export class DragControls extends Controls {
         dx = prev.x - moveEvent.x
         dy = prev.y - moveEvent.y
 
+        ddx = moveEvent.x - grabEvent.x
+        ddy = moveEvent.y - grabEvent.y
+
         if (this.axis === 'x') {
-          this.#dragDelta = moveEvent.x - grabEvent.x
+          this.#dragDelta = ddx
           this.#delta = dx
         } else {
-          this.#dragDelta = moveEvent.y - grabEvent.y
+          this.#dragDelta = ddy
           this.#delta = dy
         }
 
         prev = moveEvent
 
         okToNotify =
-          (this.axis === 'x' && Math.abs(dx) > Math.abs(dy)) ||
-          (this.axis === 'y' && Math.abs(dy) > Math.abs(dx))
+          (this.axis === 'x' && Math.abs(ddx) > Math.abs(ddy)) ||
+          (this.axis === 'y' && Math.abs(ddy) > Math.abs(ddx))
 
         if (okToNotify) {
           document.documentElement.classList.add('dragging')
@@ -143,14 +149,16 @@ export class DragControls extends Controls {
       (e) => {
         DragControls.#currentElement = null
 
-        if (okToNotify && !this.swipe && this.inertion) {
-          this.#delta = this.#delta * this.inertion
+        if (okToNotify) {
+          if (!this.swipe && this.inertion) {
+            this.#delta = this.#delta * this.inertion
 
-          ticker.subscribe(this.#tickListener, {
-            order: TICK_ORDER.CONTROLS - 1,
-          })
-        } else if (this.swipe) {
-          this.changeEvent.notify('drag-end', this.#delta, e)
+            ticker.subscribe(this.#tickListener, {
+              order: TICK_ORDER.CONTROLS - 1,
+            })
+          } else if (this.swipe) {
+            this.changeEvent.notify('drag-end', this.#delta, e)
+          }
         }
 
         document.documentElement.classList.remove('grabbing')
