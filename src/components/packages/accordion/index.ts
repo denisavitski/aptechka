@@ -155,8 +155,8 @@ class AccordionItem {
     }
   }
 
-  #windowResizeListener = () => {
-    if (this.#opened) {
+  #windowResizeListener = (event: Event) => {
+    if (this.#opened && !(event instanceof CustomEvent)) {
       this.#setScrollSize(0, true)
       this.#setScrollSize(this.#scrollSize)
     }
