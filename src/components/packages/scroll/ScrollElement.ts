@@ -584,6 +584,132 @@ export class ScrollElement extends HTMLElement {
     this.setPosition(this.#damped.target + value, options)
   }
 
+  public resize() {
+    if (this.#hibernatedCSSProperty.current) {
+      return
+    }
+
+    this.#damped.unlistenAnimationFrame()
+
+    const prevProgress = this.currentScrollValue / this.#scrollSize || 0
+    const prevCounter = this.#counter.current
+
+    this.#position = this.vertical
+      ? getCumulativeOffsetTop(this)
+      : getCumulativeOffsetLeft(this)
+
+    this.#contentPosition = this.vertical
+      ? getCumulativeOffsetTop(this.#contentElement)
+      : getCumulativeOffsetLeft(this.#contentElement)
+
+    this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
+
+    if (this.vertical) {
+      this.#gap = cssUnitParser.parse(
+        getComputedStyle(this.#contentElement).rowGap
+      )
+    } else {
+      this.#gap = cssUnitParser.parse(
+        getComputedStyle(this.#contentElement).columnGap
+      )
+    }
+
+    if (this.#autoSizeCSSProperty.current && this.#sections.length) {
+      const ivc = this.#sectionsInViewCSSProperty.current
+
+      const sectionSize = (this.#viewportSize - this.#gap * (ivc - 1)) / ivc
+
+      this.#sections.forEach((section) => {
+        section.setSize(sectionSize)
+      })
+    } else {
+      this.#sections.forEach((section) => {
+        section.setSize()
+      })
+    }
+
+    this.#sections.forEach((section) => {
+      section.resize()
+    })
+
+    if (this.#pagesCSSProperty.current) {
+      this.#scrollSize = this.#viewportSize * this.#pagesCSSProperty.current
+      const contentSize = this.#scrollSize + this.#viewportSize
+
+      if (this.vertical) {
+        this.#contentElement.style.width = contentSize + 'px'
+        this.#contentElement.style.height = '100%'
+      } else {
+        this.#contentElement.style.height = contentSize + 'px'
+        this.#contentElement.style.width = '100%'
+      }
+    } else {
+      if (this.vertical) {
+        this.#contentElement.style.width = '100%'
+        this.#contentElement.style.height = 'max-content'
+        this.#scrollSize =
+          this.#contentElement.offsetHeight - this.#viewportSize
+      } else {
+        this.#contentElement.style.width = 'max-content'
+        this.#contentElement.style.height = '100%'
+        this.#scrollSize = this.#contentElement.offsetWidth - this.#viewportSize
+      }
+    }
+
+    if (!this.#loopCSSProperty.current) {
+      const cs = getComputedStyle(this)
+
+      const padding = this.vertical
+        ? parseFloat(cs.paddingBlockStart) + parseFloat(cs.paddingBlockEnd)
+        : parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd)
+
+      this.#scrollSize += padding
+
+      this.#damped.max = this.#scrollSize
+    }
+
+    if (this.#loopCSSProperty.current && this.#sections.length) {
+      const lastSection = this.#sections[this.#sections.length - 1]
+      const lastSectionMax =
+        lastSection.position + lastSection.size - this.#viewportSize
+      const lastSectionMargin = this.#scrollSize - lastSectionMax
+
+      this.#distance =
+        lastSection.position + lastSection.size + lastSectionMargin
+    } else {
+      this.#distance = this.#scrollSize
+    }
+
+    if (this.#sectionalCSSProperty.current && this.#sections.length) {
+      const section = this.#sections[prevCounter]
+
+      this.#damped.set(section.position, {
+        equalize: true,
+      })
+    } else {
+      this.#damped.set(prevProgress * this.#scrollSize, {
+        equalize: true,
+      })
+    }
+
+    this.#hasOverflow =
+      (this.vertical
+        ? this.#contentElement.offsetHeight
+        : this.#contentElement.offsetWidth) > this.#viewportSize
+
+    this.classList.toggle('has-overflow', this.#hasOverflow)
+
+    if (!this.#hasOverflow) {
+      this.#disable()
+    } else if (!this.#disabledCSSProperty.current) {
+      this.#enable()
+    }
+
+    dispatchEvent(this, 'scrollResize', { custom: true })
+
+    this.#damped.notify()
+  }
+
   protected connectedCallback() {
     scrollEntries.register(this)
 
@@ -1023,129 +1149,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   #resizeListener = () => {
-    if (this.#hibernatedCSSProperty.current) {
-      return
-    }
-
-    this.#damped.unlistenAnimationFrame()
-
-    const prevProgress = this.currentScrollValue / this.#scrollSize || 0
-    const prevCounter = this.#counter.current
-
-    this.#position = this.vertical
-      ? getCumulativeOffsetTop(this)
-      : getCumulativeOffsetLeft(this)
-
-    this.#contentPosition = this.vertical
-      ? getCumulativeOffsetTop(this.#contentElement)
-      : getCumulativeOffsetLeft(this.#contentElement)
-
-    this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
-
-    if (this.vertical) {
-      this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).rowGap
-      )
-    } else {
-      this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).columnGap
-      )
-    }
-
-    if (this.#autoSizeCSSProperty.current && this.#sections.length) {
-      const ivc = this.#sectionsInViewCSSProperty.current
-
-      const sectionSize = (this.#viewportSize - this.#gap * (ivc - 1)) / ivc
-
-      this.#sections.forEach((section) => {
-        section.setSize(sectionSize)
-      })
-    } else {
-      this.#sections.forEach((section) => {
-        section.setSize()
-      })
-    }
-
-    this.#sections.forEach((section) => {
-      section.resize()
-    })
-
-    if (this.#pagesCSSProperty.current) {
-      this.#scrollSize = this.#viewportSize * this.#pagesCSSProperty.current
-      const contentSize = this.#scrollSize + this.#viewportSize
-
-      if (this.vertical) {
-        this.#contentElement.style.width = contentSize + 'px'
-        this.#contentElement.style.height = '100%'
-      } else {
-        this.#contentElement.style.height = contentSize + 'px'
-        this.#contentElement.style.width = '100%'
-      }
-    } else {
-      if (this.vertical) {
-        this.#contentElement.style.width = '100%'
-        this.#contentElement.style.height = 'max-content'
-        this.#scrollSize =
-          this.#contentElement.offsetHeight - this.#viewportSize
-      } else {
-        this.#contentElement.style.width = 'max-content'
-        this.#contentElement.style.height = '100%'
-        this.#scrollSize = this.#contentElement.offsetWidth - this.#viewportSize
-      }
-    }
-
-    if (!this.#loopCSSProperty.current) {
-      const cs = getComputedStyle(this)
-
-      const padding = this.vertical
-        ? parseFloat(cs.paddingBlockStart) + parseFloat(cs.paddingBlockEnd)
-        : parseFloat(cs.paddingInlineStart) + parseFloat(cs.paddingInlineEnd)
-
-      this.#scrollSize += padding
-
-      this.#damped.max = this.#scrollSize
-    }
-
-    if (this.#loopCSSProperty.current && this.#sections.length) {
-      const lastSection = this.#sections[this.#sections.length - 1]
-      const lastSectionMax =
-        lastSection.position + lastSection.size - this.#viewportSize
-      const lastSectionMargin = this.#scrollSize - lastSectionMax
-
-      this.#distance =
-        lastSection.position + lastSection.size + lastSectionMargin
-    } else {
-      this.#distance = this.#scrollSize
-    }
-
-    if (this.#sectionalCSSProperty.current && this.#sections.length) {
-      const section = this.#sections[prevCounter]
-
-      this.#damped.set(section.position, {
-        equalize: true,
-      })
-    } else {
-      this.#damped.set(prevProgress * this.#scrollSize, {
-        equalize: true,
-      })
-    }
-
-    this.#hasOverflow =
-      (this.vertical
-        ? this.#contentElement.offsetHeight
-        : this.#contentElement.offsetWidth) > this.#viewportSize
-
-    this.classList.toggle('has-overflow', this.#hasOverflow)
-
-    if (!this.#hasOverflow) {
-      this.#disable()
-    } else if (!this.#disabledCSSProperty.current) {
-      this.#enable()
-    }
-
-    dispatchEvent(this, 'scrollResize', { custom: true })
-
-    this.#damped.notify()
+    this.resize()
   }
 
   #animatedChangeListener = () => {
