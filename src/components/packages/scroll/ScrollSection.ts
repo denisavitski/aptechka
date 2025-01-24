@@ -9,6 +9,7 @@ import {
   getCumulativeOffsetLeft,
   clamp,
   dispatchEvent,
+  preciseNumber,
 } from '@packages/utils'
 
 import { ScrollElement } from './ScrollElement'
@@ -144,10 +145,13 @@ export class ScrollSection {
     )
 
     const valueToClamp = this.#scrollElement.currentScrollValue + offset
+
     const min =
       this.#position - this.#scrollElement.viewportSize - distanceAddition
+
     const max = this.#position + this.#size + distanceAddition
-    const value = clamp(valueToClamp, min, max)
+
+    const value = preciseNumber(clamp(valueToClamp, min, max), 3)
 
     this.#transformPosition = value * -1
 

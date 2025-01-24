@@ -87,6 +87,11 @@ export class ScrollSegmentElement extends HTMLElement {
     '--progress-arc-var',
     ''
   )
+  #progressArcMultCSSProperty = new CSSProperty<number>(
+    this,
+    '--progress-arc-mult',
+    1
+  )
   #animationVarTypeCSSProperty = new CSSProperty<'current' | 'target'>(
     this,
     '--animation-var-type',
@@ -183,6 +188,10 @@ export class ScrollSegmentElement extends HTMLElement {
     return this.#progressArcVarCSSProperty
   }
 
+  public get progressArcMultCSSProperty() {
+    return this.#progressArcMultCSSProperty
+  }
+
   public get animationVarTypeCSSProperty() {
     return this.#animationVarTypeCSSProperty
   }
@@ -257,6 +266,13 @@ export class ScrollSegmentElement extends HTMLElement {
 
   public get progress() {
     return this.#progress
+  }
+
+  public get progressArc() {
+    return (
+      Math.abs(Math.cos(this.#progress * Math.PI)) *
+      this.#progressArcMultCSSProperty.current
+    )
   }
 
   public get start() {
@@ -444,7 +460,8 @@ export class ScrollSegmentElement extends HTMLElement {
 
   protected setVar(name: string | undefined, value: string | number) {
     if (name) {
-      this.#targetElement.style.setProperty(`--${name}`, value.toString())
+      const v = typeof value === 'number' ? value.toFixed(6) : value
+      this.#targetElement.style.setProperty(`--${name}`, v)
     }
   }
 
@@ -547,6 +564,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#passedVarCSSProperty.observe()
     this.#progressVarCSSProperty.observe()
     this.#progressArcVarCSSProperty.observe()
+    this.#progressArcMultCSSProperty.observe()
     this.#animationVarTypeCSSProperty.observe()
     this.#distanceVarCSSProperty.observe()
     this.#startVarCSSProperty.observe()
@@ -658,7 +676,12 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#progressArcVarCSSProperty.subscribe((v) => {
       if (this.#isDisabled) return
       this.removeVar(v.previous)
-      this.setVar(v.current, this.#arcProgress())
+      this.setVar(v.current, this.progressArc)
+    })
+
+    this.#progressArcMultCSSProperty.subscribe((v) => {
+      if (this.#isDisabled) return
+      this.#updateProgress()
     })
 
     this.#startVarCSSProperty.subscribe((v) => {
@@ -688,24 +711,7 @@ export class ScrollSegmentElement extends HTMLElement {
         return
       }
 
-      const passedValue =
-        this.#passed[this.#animationVarTypeCSSProperty.current]
-
-      this.#progress = passedValue / this.#distance || 0
-
-      this.setVar(this.#passedVarCSSProperty.current, passedValue.toFixed(6))
-
-      this.setVar(
-        this.#progressVarCSSProperty.current,
-        this.#progress.toFixed(6)
-      )
-
-      if (this.#progressArcVarCSSProperty.current) {
-        this.setVar(
-          this.#progressArcVarCSSProperty.current,
-          this.#arcProgress().toFixed(6)
-        )
-      }
+      this.#updateProgress()
     })
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL + 1)
@@ -741,6 +747,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#passedVarCSSProperty.close()
     this.#progressVarCSSProperty.close()
     this.#progressArcVarCSSProperty.close()
+    this.#progressArcMultCSSProperty.close()
     this.#distanceVarCSSProperty.close()
     this.#startVarCSSProperty.close()
     this.#finishVarCSSProperty.close()
@@ -751,6 +758,7 @@ export class ScrollSegmentElement extends HTMLElement {
     this.#isCapturedFromFinish.close()
     this.#isReleasedFromFinish.close()
     this.disable()
+    this.#passed.close()
   }
 
   #captureListener() {
@@ -865,8 +873,18 @@ export class ScrollSegmentElement extends HTMLElement {
     }
   }
 
-  #arcProgress() {
-    return Math.abs(Math.cos(this.#progress * Math.PI))
+  #updateProgress() {
+    const passedValue = this.#passed[this.#animationVarTypeCSSProperty.current]
+
+    this.setVar(this.#passedVarCSSProperty.current, passedValue)
+
+    this.#progress = passedValue / this.#distance || 0
+
+    this.setVar(this.#progressVarCSSProperty.current, this.#progress)
+
+    if (this.#progressArcVarCSSProperty.current) {
+      this.setVar(this.#progressArcVarCSSProperty.current, this.progressArc)
+    }
   }
 
   #handleClassSetting(e: { current: string; previous?: string }) {
