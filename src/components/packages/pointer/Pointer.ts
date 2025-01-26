@@ -134,8 +134,13 @@ export class Pointer {
     if (this.#normalize) {
       const res = normalize(pointer, size)
 
-      pointer.x = clamp(res.x * 2, -1, 1)
-      pointer.y = clamp(res.y * 2, -1, 1)
+      if (this.#cartesian) {
+        pointer.x = clamp(res.x * 2, -1, 1)
+        pointer.y = clamp(res.y * 2, -1, 1)
+      } else {
+        pointer.x = res.x
+        pointer.y = res.y
+      }
     }
 
     this.#x.set(pointer.x)
