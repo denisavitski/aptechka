@@ -61,7 +61,7 @@ export interface ChangeHistoryParameters {
 }
 
 export function changeHistory(p: ChangeHistoryParameters) {
-  const por = p?.searchParameters || location.search
+  const por = p?.searchParameters
   const hash = p.hash ? (p.hash.startsWith('#') ? p.hash : '#' + p.hash) : ''
   const searhParameters = por ? (por.startsWith('?') ? por : '?' + por) : ''
   const pathPlus = `${p.pathname}${hash}${searhParameters}`

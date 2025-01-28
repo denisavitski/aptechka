@@ -52,6 +52,7 @@ export interface MorphNavigateOptions {
   centerScroll?: boolean
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   revalidate?: boolean
+  keepSearchParameters?: boolean
 }
 
 export interface MorphScrollDetail {
@@ -130,7 +131,7 @@ export class Morph {
       changeHistory({
         action: 'replace',
         pathname: this.#currentPathname,
-        searchParameters: normalizedPath.parameters,
+        searchParameters: normalizedPath.parameters || location.search,
         hash: normalizedPath.hash,
       })
 
@@ -175,6 +176,7 @@ export class Morph {
       centerScroll,
       offsetScroll,
       revalidate,
+      keepSearchParameters,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
@@ -350,7 +352,8 @@ export class Morph {
       changeHistory({
         action: historyAction,
         pathname,
-        searchParameters: parameters,
+        searchParameters:
+          parameters || (keepSearchParameters ? location.search : ''),
         hash,
       })
 

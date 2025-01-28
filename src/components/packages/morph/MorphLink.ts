@@ -68,11 +68,16 @@ export class MorphLink {
 
     const revalidate = this.#element.hasAttribute('data-revalidate')
 
+    const keepSearchParameters = this.#element.hasAttribute(
+      'data-keep-search-parameters'
+    )
+
     this.#morph.navigate(this.#pathname, {
       historyAction,
       centerScroll,
       offsetScroll,
       revalidate,
+      keepSearchParameters,
     })
   }
 
