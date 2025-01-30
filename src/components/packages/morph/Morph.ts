@@ -157,6 +157,10 @@ export class Morph {
     return this.#currentScrollElement
   }
 
+  public get isPopstateNavigation() {
+    return this.#isPopstateNavigation
+  }
+
   public normalizePath(path: string) {
     return splitPath(path, {
       base: this.#options.base,
