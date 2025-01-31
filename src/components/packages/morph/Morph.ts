@@ -8,6 +8,7 @@ import {
   requestIdleCallback,
   scrollToElement,
   splitPath,
+  wait,
 } from '@packages/utils'
 
 import './MorphAnnouncer'
@@ -329,6 +330,8 @@ export class Morph {
           }
         })
       }
+
+      await wait(10)
 
       const oldElementsWithLoadEvent: Array<Element> = []
 
