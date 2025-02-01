@@ -57,7 +57,7 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
     super.connectedCallback()
 
     this.scrollElement.addEventListener(
-      'sectionsChange',
+      'scrollSectionsChange',
       this.#sectionsChangeListener
     )
 
@@ -73,7 +73,7 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
 
   protected disconnectedCallback() {
     this.scrollElement.removeEventListener(
-      'sectionsChange',
+      'scrollSectionsChange',
       this.#sectionsChangeListener
     )
 
