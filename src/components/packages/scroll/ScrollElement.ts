@@ -24,9 +24,9 @@ import {
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
-import { elementResizer } from '@packages/element-resizer'
 import { ScrollSection } from './ScrollSection'
 import { TweenEasingName } from '@packages/animation/Tweened'
+import { elementResizer } from '@packages/element-resizer'
 
 export type ScrollLine = 'start' | 'end' | null
 
@@ -215,6 +215,8 @@ export class ScrollElement extends HTMLElement {
   #mutationObserver: MutationObserver = null!
 
   #currentSections: Array<ScrollSection> = []
+
+  #skipNextResize = false
 
   constructor() {
     super()
@@ -585,6 +587,11 @@ export class ScrollElement extends HTMLElement {
   }
 
   public resize() {
+    if (this.#skipNextResize) {
+      this.#skipNextResize = false
+      return
+    }
+
     if (this.#hibernatedCSSProperty.current) {
       return
     }
@@ -704,6 +711,8 @@ export class ScrollElement extends HTMLElement {
     } else if (!this.#disabledCSSProperty.current) {
       this.#enable()
     }
+
+    this.#updateMaxSectionsSize()
 
     dispatchEvent(this, 'scrollResize', { custom: true })
 
@@ -951,6 +960,7 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.observe()
 
     windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
+    elementResizer.subscribe(this, this.#resizeListener)
 
     this.#mutationObserver.observe(this, { childList: true })
   }
@@ -993,6 +1003,7 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.unobserve()
 
     windowResizer.unsubscribe(this.#connectListener)
+    elementResizer.unsubscribe(this.#resizeListener)
 
     this.#hibernate()
 
@@ -1058,6 +1069,8 @@ export class ScrollElement extends HTMLElement {
     this.#counter.reset()
     this.#damped.reset()
 
+    this.style.removeProperty('--max-section-size')
+
     dispatchEvent(this, 'scrollSectionsChange', {
       custom: true,
       composed: true,
@@ -1112,7 +1125,6 @@ export class ScrollElement extends HTMLElement {
       this.#hibernated = true
 
       windowResizer.unsubscribe(this.#resizeListener)
-      elementResizer.unsubscribe(this.#resizeListener)
 
       this.#disable()
 
@@ -1144,7 +1156,6 @@ export class ScrollElement extends HTMLElement {
       this.#enable()
 
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
-      elementResizer.subscribe(this, this.#resizeListener)
     }
   }
 
@@ -1364,6 +1375,8 @@ export class ScrollElement extends HTMLElement {
             section.setMark('previous')
           }
         })
+
+        this.#updateMaxSectionsSize()
       }
     }
   }
@@ -1388,6 +1401,26 @@ export class ScrollElement extends HTMLElement {
         section.setMiddle(i === middle)
       })
     }
+  }
+
+  #updateMaxSectionsSize() {
+    const maxSectionSize = this.#currentSections.reduce((p, c) => {
+      const s = this.vertical ? c.width : c.height
+
+      if (s > p) {
+        return s
+      }
+
+      return p
+    }, 0)
+
+    this.#skipNextResize = true
+    this.style.setProperty('--max-section-size', '')
+
+    setTimeout(() => {
+      this.#skipNextResize = true
+      this.style.setProperty('--max-section-size', maxSectionSize + 'px')
+    }, 10)
   }
 
   #getNearestSectionIndex(NAMEIT = false) {

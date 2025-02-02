@@ -32,6 +32,8 @@ export class ScrollSection {
   #index: number
   #scrollElement: ScrollElement
 
+  #width = 0
+  #height = 0
   #size = 0
   #position = 0
   #currentMark: ScrollSectionMark = null
@@ -61,6 +63,14 @@ export class ScrollSection {
 
   public get size() {
     return this.#size
+  }
+
+  public get width() {
+    return this.#width
+  }
+
+  public get height() {
+    return this.#height
   }
 
   public get position() {
@@ -106,6 +116,9 @@ export class ScrollSection {
   }
 
   public resize() {
+    this.#width = this.#element.offsetWidth
+    this.#height = this.#element.offsetHeight
+
     this.#size = this.#scrollElement.vertical
       ? this.#element.offsetHeight
       : this.#element.offsetWidth
