@@ -217,6 +217,7 @@ export class ScrollElement extends HTMLElement {
   #currentSections: Array<ScrollSection> = []
 
   #skipNextResize = false
+  #maxSectionSizeTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   constructor() {
     super()
@@ -587,11 +588,6 @@ export class ScrollElement extends HTMLElement {
   }
 
   public resize() {
-    if (this.#skipNextResize) {
-      this.#skipNextResize = false
-      return
-    }
-
     if (this.#hibernatedCSSProperty.current) {
       return
     }
@@ -1124,6 +1120,8 @@ export class ScrollElement extends HTMLElement {
     if (!this.#hibernated) {
       this.#hibernated = true
 
+      clearTimeout(this.#maxSectionSizeTimeoutId)
+
       windowResizer.unsubscribe(this.#resizeListener)
 
       this.#disable()
@@ -1159,7 +1157,12 @@ export class ScrollElement extends HTMLElement {
     }
   }
 
-  #resizeListener = () => {
+  #resizeListener = (e?: any) => {
+    if (e && this.#skipNextResize) {
+      this.#skipNextResize = false
+      return
+    }
+
     this.resize()
   }
 
@@ -1403,7 +1406,7 @@ export class ScrollElement extends HTMLElement {
     }
   }
 
-  #updateMaxSectionsSize() {
+  #updateMaxSectionsSize = debounce(() => {
     const maxSectionSize = this.#currentSections.reduce((p, c) => {
       const s = this.vertical ? c.width : c.height
 
@@ -1414,14 +1417,16 @@ export class ScrollElement extends HTMLElement {
       return p
     }, 0)
 
+    clearTimeout(this.#maxSectionSizeTimeoutId)
+
     this.#skipNextResize = true
     this.style.setProperty('--max-section-size', '')
 
-    setTimeout(() => {
+    this.#maxSectionSizeTimeoutId = setTimeout(() => {
       this.#skipNextResize = true
       this.style.setProperty('--max-section-size', maxSectionSize + 'px')
     }, 10)
-  }
+  }, 20)
 
   #getNearestSectionIndex(NAMEIT = false) {
     let scrollValue = this.targetScrollValue
