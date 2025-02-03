@@ -30,6 +30,8 @@ export class Pointer {
   #width = 0
   #height = 0
 
+  #equalize = false
+
   constructor(parameters: PointerParameters) {
     this.#element = getElement<HTMLElement>(parameters.element)!
 
@@ -104,6 +106,11 @@ export class Pointer {
   }
 
   #pointerEnterListener = (e: PointerEvent) => {
+    const pointer = this.#getPointerCoords(e)
+
+    this.#x.set(pointer.x, { equalize: true })
+    this.#y.set(pointer.y, { equalize: true })
+
     this.#z.set(1)
   }
 
@@ -112,36 +119,7 @@ export class Pointer {
   }
 
   #pointerMoveListener = (e: PointerEvent) => {
-    const pos = getPointerPosition(e, this.#element.getBoundingClientRect())
-
-    const size = {
-      width: this.#width,
-      height: this.#height,
-    }
-
-    const pointer = {
-      x: pos.x,
-      y: pos.y,
-    }
-
-    if (this.#cartesian) {
-      const res = screenToCartesian(pointer, size)
-
-      pointer.x = res.x
-      pointer.y = res.y
-    }
-
-    if (this.#normalize) {
-      const res = normalize(pointer, size)
-
-      if (this.#cartesian) {
-        pointer.x = clamp(res.x * 2, -1, 1)
-        pointer.y = clamp(res.y * 2, -1, 1)
-      } else {
-        pointer.x = res.x
-        pointer.y = res.y
-      }
-    }
+    const pointer = this.#getPointerCoords(e)
 
     this.#x.set(pointer.x)
     this.#y.set(pointer.y)
@@ -191,5 +169,40 @@ export class Pointer {
 
     this.#y.min = ymin
     this.#y.max = ymax
+  }
+
+  #getPointerCoords(event: PointerEvent) {
+    const pos = getPointerPosition(event, this.#element.getBoundingClientRect())
+
+    const size = {
+      width: this.#width,
+      height: this.#height,
+    }
+
+    const pointer = {
+      x: pos.x,
+      y: pos.y,
+    }
+
+    if (this.#cartesian) {
+      const res = screenToCartesian(pointer, size)
+
+      pointer.x = res.x
+      pointer.y = res.y
+    }
+
+    if (this.#normalize) {
+      const res = normalize(pointer, size)
+
+      if (this.#cartesian) {
+        pointer.x = clamp(res.x * 2, -1, 1)
+        pointer.y = clamp(res.y * 2, -1, 1)
+      } else {
+        pointer.x = res.x
+        pointer.y = res.y
+      }
+    }
+
+    return pointer
   }
 }
