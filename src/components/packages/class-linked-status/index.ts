@@ -10,6 +10,10 @@ export class ClassLinkedStatus<
     super(value)
 
     this.#elements = Array.isArray(element) ? element : [element]
+
+    for (const key in this.initial) {
+      this.set(key as Extract<keyof T, 'string'>, this.initial[key as keyof T]!)
+    }
   }
 
   public addElement(element: HTMLElement) {
