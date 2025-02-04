@@ -138,6 +138,7 @@ export class ScrollElement extends HTMLElement {
     '--section-distance-scale',
     0.5
   )
+  #startSectionCSSProperty = new CSSProperty<number>(this, '--start-section', 0)
   #autoplayCSSProperty = new CSSProperty<number>(this, '--autoplay', 0)
   #autoplayPauseDurationCSSProperty = new CSSProperty<number>(
     this,
@@ -328,6 +329,10 @@ export class ScrollElement extends HTMLElement {
 
   public get sectionDistanceScaleCSSProperty() {
     return this.#sectionDistanceScaleCSSProperty
+  }
+
+  public get startSectionCSSProperty() {
+    return this.#startSectionCSSProperty
   }
 
   public get autoplayCSSProperty() {
@@ -942,6 +947,7 @@ export class ScrollElement extends HTMLElement {
     this.#stiffnessCSSProperty.observe()
     this.#mouseDragCSSProperty.observe()
     this.#sectionDistanceScaleCSSProperty.observe()
+    this.#startSectionCSSProperty.observe()
     this.#autoplayCSSProperty.observe()
     this.#autoplayCSSProperty.observe()
     this.#autoplayPauseDurationCSSProperty.observe()
@@ -986,6 +992,7 @@ export class ScrollElement extends HTMLElement {
     this.#stiffnessCSSProperty.unobserve()
     this.#mouseDragCSSProperty.unobserve()
     this.#sectionDistanceScaleCSSProperty.unobserve()
+    this.#startSectionCSSProperty.unobserve()
     this.#autoplayCSSProperty.unobserve()
     this.#autoplayPauseDurationCSSProperty.unobserve()
     this.#autoplayUserDirectionCSSProperty.unobserve()
@@ -1152,6 +1159,10 @@ export class ScrollElement extends HTMLElement {
       this.tryResplit()
 
       this.#enable()
+
+      this.scrollToSection(this.#startSectionCSSProperty.current, {
+        behaviour: 'instant',
+      })
 
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.SCROLL)
     }
