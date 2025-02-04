@@ -1,8 +1,10 @@
 import { Store } from '@packages/store'
 import { camelToKebab } from '@packages/utils'
 
-export class ClassLinkedStatus<
-  T extends { [key in string]: boolean }
+export type ElementLinkedStoreValueType = boolean | string | number
+
+export class ElementLinkedStore<
+  T extends { [key in string]: ElementLinkedStoreValueType }
 > extends Store<T> {
   #elements: Array<HTMLElement>
 
@@ -12,7 +14,7 @@ export class ClassLinkedStatus<
     this.#elements = Array.isArray(element) ? element : [element]
 
     for (const key in this.initial) {
-      this.set(key as Extract<keyof T, 'string'>, this.initial[key as keyof T]!)
+      this.set(key as Extract<keyof T, 'string'>, this.initial[key]!)
     }
   }
 
@@ -40,17 +42,25 @@ export class ClassLinkedStatus<
     }
   }
 
-  public set(key: keyof T, value = true) {
+  public set(key: keyof T, value: ElementLinkedStoreValueType) {
+    const k = key as string
+
     this.current = { ...this.current, [key]: value }
 
-    if (value) {
-      this.#elements.forEach((el) =>
-        el.classList.add(camelToKebab(key as string))
-      )
+    if (k.startsWith('--')) {
+      if (value) {
+        this.#elements.forEach((el) =>
+          el.style.setProperty(k, value.toString())
+        )
+      } else {
+        this.#elements.forEach((el) => el.style.removeProperty(k))
+      }
     } else {
-      this.#elements.forEach((el) =>
-        el.classList.remove(camelToKebab(key as string))
-      )
+      if (value) {
+        this.#elements.forEach((el) => el.classList.add(camelToKebab(k)))
+      } else {
+        this.#elements.forEach((el) => el.classList.remove(camelToKebab(k)))
+      }
     }
   }
 }

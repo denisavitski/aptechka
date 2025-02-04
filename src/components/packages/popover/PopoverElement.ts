@@ -1,6 +1,5 @@
-import { ClassLinkedStatus } from '@packages/class-linked-status'
+import { ElementLinkedStore } from '@packages/element-linked-store'
 import { CSSProperty } from '@packages/css-property'
-import { Store } from '@packages/store'
 import {
   debounce,
   dispatchEvent,
@@ -160,7 +159,7 @@ export class PopoverElement extends HTMLElement {
   #escape = new CSSProperty(this, '--escape', false)
   #historyAllowed = false
   #lastTrigger: any
-  #status = new ClassLinkedStatus(this, {
+  #status = new ElementLinkedStore(this, {
     opened: false,
     closing: false,
     triggered: false,

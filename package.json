@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.53.3",
+  "version": "0.54.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -43,10 +43,10 @@
       "require": "./lib/canvas/index.cjs",
       "default": "./lib/canvas/index.js"
     },
-    "./class-linked-status": {
-      "types": "./lib/class-linked-status/index.d.ts",
-      "require": "./lib/class-linked-status/index.cjs",
-      "default": "./lib/class-linked-status/index.js"
+    "./element-linked-store": {
+      "types": "./lib/element-linked-store/index.d.ts",
+      "require": "./lib/element-linked-store/index.cjs",
+      "default": "./lib/element-linked-store/index.js"
     },
     "./connector": {
       "types": "./lib/connector/index.d.ts",
@@ -266,8 +266,8 @@
       "canvas": [
         "lib/canvas/index.d.ts"
       ],
-      "class-linked-status": [
-        "lib/class-linked-status/index.d.ts"
+      "element-linked-store": [
+        "lib/element-linked-store/index.d.ts"
       ],
       "component": [
         "lib/component/index.d.ts"

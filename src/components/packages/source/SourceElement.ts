@@ -1,5 +1,5 @@
 import { SourceManager, type Source } from '@packages/source'
-import { ClassLinkedStatus } from '@packages/class-linked-status'
+import { ElementLinkedStore } from '@packages/element-linked-store'
 import { isBrowser, kebabToCamel } from '@packages/utils'
 import { dispatchEvent } from '@packages/utils'
 import { loading } from '@packages/loading'
@@ -27,7 +27,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #id: string = ''
   #idWithUrl = ''
 
-  #status = new ClassLinkedStatus(this, {
+  #status = new ElementLinkedStore(this, {
     loading: false,
     loaded: false,
     error: false,
