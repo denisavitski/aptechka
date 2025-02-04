@@ -51,34 +51,40 @@ export class MorphLink {
   #clickListener = (e: MouseEvent) => {
     e.preventDefault()
 
-    const historyAction =
-      (this.#element.getAttribute(
-        'data-history-action'
-      ) as ChangeHistoryAction) || 'push'
+    const back = this.#element.hasAttribute('data-back')
 
-    const centerScroll = this.#element.hasAttribute('data-center-scroll')
+    if (back && this.#morph.previousPathname) {
+      history.back()
+    } else {
+      const historyAction =
+        (this.#element.getAttribute(
+          'data-history-action'
+        ) as ChangeHistoryAction) || 'push'
 
-    const offsetScrollRawValue = getComputedStyle(this.#element)
-      .getPropertyValue('--offset-scroll')
-      .trim()
+      const centerScroll = this.#element.hasAttribute('data-center-scroll')
 
-    const offsetScroll = offsetScrollRawValue
-      ? cssValueParser.parse(offsetScrollRawValue)
-      : undefined
+      const offsetScrollRawValue = getComputedStyle(this.#element)
+        .getPropertyValue('--offset-scroll')
+        .trim()
 
-    const revalidate = this.#element.hasAttribute('data-revalidate')
+      const offsetScroll = offsetScrollRawValue
+        ? cssValueParser.parse(offsetScrollRawValue)
+        : undefined
 
-    const keepSearchParameters = this.#element.hasAttribute(
-      'data-keep-search-parameters'
-    )
+      const revalidate = this.#element.hasAttribute('data-revalidate')
 
-    this.#morph.navigate(this.#pathname, {
-      historyAction,
-      centerScroll,
-      offsetScroll,
-      revalidate,
-      keepSearchParameters,
-    })
+      const keepSearchParameters = this.#element.hasAttribute(
+        'data-keep-search-parameters'
+      )
+
+      this.#morph.navigate(this.#pathname, {
+        historyAction,
+        centerScroll,
+        offsetScroll,
+        revalidate,
+        keepSearchParameters,
+      })
+    }
   }
 
   #pointerListener = () => {
