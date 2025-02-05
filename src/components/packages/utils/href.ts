@@ -17,5 +17,5 @@ export function tryCreateHrefFromContact(contact: string) {
     type = 'phone'
   }
 
-  return { href, type }
+  return { href, type, contact }
 }
