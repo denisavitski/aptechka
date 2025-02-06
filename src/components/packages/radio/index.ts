@@ -5,6 +5,7 @@ export interface RadioEvents {
 }
 
 export class RadioElement<T extends string = string> extends HTMLElement {
+  #listenerElements: Array<HTMLElement> = []
   #buttonElements: Array<HTMLElement> = []
   #value: T | undefined
   #currentButtonElement: HTMLElement | null = null
@@ -63,6 +64,13 @@ export class RadioElement<T extends string = string> extends HTMLElement {
         }
       })
 
+      if (this.#currentButtonElement) {
+        this.#listenerElements.forEach((element) => {
+          element.innerHTML =
+            this.#currentButtonElement!.getAttribute('data-name') || value
+        })
+      }
+
       dispatchEvent(this, 'radioChange', {
         detail: this.#value,
         bubbles: true,
@@ -71,6 +79,10 @@ export class RadioElement<T extends string = string> extends HTMLElement {
   }
 
   protected connectedCallback() {
+    this.#listenerElements = [
+      ...this.querySelectorAll<HTMLElement>('[data-radio-listener]'),
+    ]
+
     this.#buttonElements = [
       ...this.querySelectorAll<HTMLElement>('[data-radio-button]'),
     ]

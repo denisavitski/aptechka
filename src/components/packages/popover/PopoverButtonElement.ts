@@ -163,23 +163,29 @@ export class PopoverButtonElement extends HTMLElement {
   }
 
   #popoverTriggeredListener = () => {
-    this.classList.add('triggered')
+    if (this.#type.current !== 'close') {
+      this.classList.add('triggered')
+    }
   }
 
   #popoverOpenedListener = () => {
-    this.classList.add('opened')
-
-    this.setAttribute('aria-expanded', 'true')
+    if (this.#type.current !== 'close') {
+      this.classList.add('opened')
+      this.setAttribute('aria-expanded', 'true')
+    }
   }
 
   #popoverClosingListener = () => {
-    this.classList.remove('opened')
+    if (this.#type.current !== 'close') {
+      this.classList.remove('opened')
+    }
   }
 
   #popoverClosedListener = () => {
-    this.classList.remove('triggered')
-
-    this.setAttribute('aria-expanded', 'false')
+    if (this.#type.current !== 'close') {
+      this.classList.remove('triggered')
+      this.setAttribute('aria-expanded', 'false')
+    }
   }
 
   #updateType(value: PopoverButtonType) {
