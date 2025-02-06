@@ -20,12 +20,11 @@ class Loading {
   #map = new Map<string, boolean>()
   #isStarted = false
 
-  #total = 0
   #loaded = 0
   #progress = 0
 
   public get total() {
-    return this.#total
+    return this.#map.size
   }
 
   public get loaded() {
@@ -84,7 +83,6 @@ class Loading {
     const loaded = Array.from(this.#map).filter((item) => item[1]).length
     const progress = loaded / total
 
-    this.#total = total
     this.#loaded = loaded
     this.#progress = progress
 
@@ -111,7 +109,6 @@ class Loading {
       },
     })
 
-    this.#total = 0
     this.#loaded = 0
     this.#progress = 0
 
