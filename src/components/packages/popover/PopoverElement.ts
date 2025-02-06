@@ -144,8 +144,10 @@ export class PopoverElement extends HTMLElement {
   public urlValue = ''
 
   #opened = false
+  #startClosingTimeoutId: ReturnType<typeof setTimeout> | undefined
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
+  #openTransitionTimeoutId: ReturnType<typeof setTimeout> | undefined
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
   #closeRest = new CSSProperty<boolean>(this, '--close-rest', false)
@@ -163,6 +165,7 @@ export class PopoverElement extends HTMLElement {
     opened: false,
     closing: false,
     triggered: false,
+    transitionend: false,
   })
 
   constructor() {
@@ -257,6 +260,7 @@ export class PopoverElement extends HTMLElement {
 
     this.#lastTrigger = options?.trigger
 
+    clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
 
     this.#status.set('closing', false)
@@ -292,6 +296,10 @@ export class PopoverElement extends HTMLElement {
       })
 
       this.#openTimeoutId = undefined
+
+      this.#openTransitionTimeoutId = setTimeout(() => {
+        this.#status.set('transitionend', true)
+      }, getElementTransitionDurationMS(this) + 10)
     }
 
     if (options?.skipTransition) {
@@ -307,6 +315,7 @@ export class PopoverElement extends HTMLElement {
     }
 
     clearTimeout(this.#openTimeoutId)
+    clearTimeout(this.#openTransitionTimeoutId)
 
     PopoverElement.stack.remove(this.#group.current, this)
 
@@ -314,21 +323,25 @@ export class PopoverElement extends HTMLElement {
 
     this.#deleteSearchParam()
 
-    this.#status.set('opened', false)
-    this.#status.set('closing', true)
+    this.#status.set('transitionend', false)
 
-    dispatchEvent(this, 'popoverClosing', {
-      custom: true,
-    })
+    this.#startClosingTimeoutId = setTimeout(() => {
+      this.#status.set('opened', false)
+      this.#status.set('closing', true)
 
-    this.#closeTimeoutId = setTimeout(() => {
-      this.#status.set('triggered', false)
-      this.#status.set('closing', false)
-
-      dispatchEvent(this, 'popoverClosed', {
+      dispatchEvent(this, 'popoverClosing', {
         custom: true,
       })
-    }, getElementTransitionDurationMS(this) + 10)
+
+      this.#closeTimeoutId = setTimeout(() => {
+        this.#status.set('triggered', false)
+        this.#status.set('closing', false)
+
+        dispatchEvent(this, 'popoverClosed', {
+          custom: true,
+        })
+      }, getElementTransitionDurationMS(this) + 10)
+    }, 10)
   }
 
   protected connectedCallback() {
@@ -374,8 +387,10 @@ export class PopoverElement extends HTMLElement {
 
     this.removeAttribute('role')
 
+    clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
     clearTimeout(this.#openTimeoutId)
+    clearTimeout(this.#openTransitionTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
 
