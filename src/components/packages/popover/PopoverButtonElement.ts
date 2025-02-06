@@ -53,7 +53,7 @@ export class PopoverButtonElement extends HTMLElement {
       let popoverElement: Element | null | undefined = null
 
       if (targetId === 'parent') {
-        const closestTarget = this.closest('[popover-target]')
+        const closestTarget = this.closest('[popover]')
 
         if (closestTarget) {
           popoverElement = closestTarget
@@ -61,13 +61,13 @@ export class PopoverButtonElement extends HTMLElement {
           const rootNode = this.getRootNode()
 
           if (rootNode instanceof ShadowRoot) {
-            popoverElement = rootNode.host.closest('[popover-target]')
+            popoverElement = rootNode.host.closest('[popover]')
           } else if (rootNode instanceof HTMLElement) {
-            popoverElement = rootNode.closest('[popover-target]')
+            popoverElement = rootNode.closest('[popover]')
           }
         }
       } else if (targetId === 'sibling') {
-        popoverElement = this.parentElement?.querySelector('[popover-target]')
+        popoverElement = this.parentElement?.querySelector('[popover]')
       } else {
         if (!targetId.startsWith('.') && !targetId.startsWith('[')) {
           targetId = `#${targetId}`
