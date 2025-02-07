@@ -172,7 +172,7 @@ export abstract class Animation<
       typeof this.#tmpSetValue === 'number' ? this.#tmpSetValue : this.#target
     )
 
-    if (options?.equalize) {
+    if (options?.equalize && !options?.restart) {
       this.unlistenAnimationFrame()
       this.current = this.#from = this.#target
     }
@@ -180,6 +180,10 @@ export abstract class Animation<
     if (options?.restart) {
       this.unlistenAnimationFrame()
       this.current = this.#from = this.initial
+
+      if (options?.equalize) {
+        this.current = this.#from = this.#target
+      }
     }
 
     if (typeof options?.current === 'number') {
