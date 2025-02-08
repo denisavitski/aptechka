@@ -1,4 +1,4 @@
-export function iElementVisible(buttonElement: HTMLElement) {
+export function isElementVisible(buttonElement: HTMLElement) {
   const style = window.getComputedStyle(buttonElement)
 
   return (
