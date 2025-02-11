@@ -40,7 +40,9 @@ export class BillboardElement extends HTMLElement {
 
   protected connectedCallback() {
     this.#itemElements = [
-      ...this.querySelectorAll<HTMLElement>('[data-billboard-item]'),
+      ...this.querySelectorAll<HTMLElement>(
+        `[data-billboard-item="${this.id || ''}"]`
+      ),
     ]
 
     this.#itemElements[0]?.classList.add('current')
