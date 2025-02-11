@@ -13,10 +13,7 @@ export class BillboardSetButtonElement extends HTMLElement {
 
     this.addEventListener('click', (event) => {
       if (this.#billboardElement) {
-        if (
-          !this.handleClick ||
-          (this.handleClick && this.handleClick(event))
-        ) {
+        if (!this.handleClick || this.handleClick(event)) {
           this.#billboardElement.set(this.#index.current)
         }
       }

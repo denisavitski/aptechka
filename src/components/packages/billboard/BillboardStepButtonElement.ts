@@ -12,10 +12,7 @@ export class BillboardStepButtonElement extends HTMLElement {
 
     this.addEventListener('click', (event) => {
       if (this.#billboardElement) {
-        if (
-          !this.handleClick ||
-          (this.handleClick && this.handleClick(event))
-        ) {
+        if (!this.handleClick || this.handleClick(event)) {
           this.#billboardElement.shift(this.#step.current)
         }
       }

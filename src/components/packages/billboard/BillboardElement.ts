@@ -9,6 +9,8 @@ export interface BillboardEvents {
 }
 
 export class BillboardElement extends HTMLElement {
+  public handleSet: ((number: number) => boolean) | undefined
+
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
   #intervalId: ReturnType<typeof setInterval> | undefined
@@ -30,8 +32,10 @@ export class BillboardElement extends HTMLElement {
   }
 
   public set(value: number) {
-    this.#updateCounter(value)
-    this.#tryAutoplay()
+    if (!this.handleSet || this.handleSet(value)) {
+      this.#updateCounter(value)
+      this.#tryAutoplay()
+    }
   }
 
   public shift(value: number) {
