@@ -3,15 +3,22 @@ import { BillboardElement } from './BillboardElement'
 import { CSSProperty } from '@packages/css-property'
 
 export class BillboardSetButtonElement extends HTMLElement {
+  public handleClick: ((event: Event) => boolean) | undefined
+
   #index = new CSSProperty(this, '--index', 0)
   #billboardElement: BillboardElement | null = null
 
   constructor() {
     super()
 
-    this.addEventListener('click', () => {
+    this.addEventListener('click', (event) => {
       if (this.#billboardElement) {
-        this.#billboardElement.set(this.#index.current)
+        if (
+          !this.handleClick ||
+          (this.handleClick && this.handleClick(event))
+        ) {
+          this.#billboardElement.set(this.#index.current)
+        }
       }
     })
   }

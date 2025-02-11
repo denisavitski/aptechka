@@ -3,15 +3,21 @@ import { BillboardElement } from './BillboardElement'
 import { CSSProperty } from '@packages/css-property'
 
 export class BillboardStepButtonElement extends HTMLElement {
+  public handleClick: ((event: Event) => boolean) | undefined
   #step = new CSSProperty(this, '--step', 1)
   #billboardElement: BillboardElement | null = null
 
   constructor() {
     super()
 
-    this.addEventListener('click', () => {
+    this.addEventListener('click', (event) => {
       if (this.#billboardElement) {
-        this.#billboardElement.shift(this.#step.current)
+        if (
+          !this.handleClick ||
+          (this.handleClick && this.handleClick(event))
+        ) {
+          this.#billboardElement.shift(this.#step.current)
+        }
       }
     })
   }
