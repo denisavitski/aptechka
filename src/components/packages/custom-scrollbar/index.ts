@@ -16,7 +16,17 @@ export class CustomScrollbarElement extends HTMLElement {
   #activeTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   protected connectedCallback() {
-    const scrollElement = findScrollParentElement(this)
+    const scrollSelector = this.getAttribute('data-scroll')
+    let scrollElement: HTMLElement | null = null
+
+    if (scrollSelector) {
+      scrollElement = document.querySelector(scrollSelector)
+    }
+
+    if (!scrollElement) {
+      scrollElement = findScrollParentElement(this)
+    }
+
     const thumbElement = this.querySelector<HTMLElement>('[data-thumb]')
 
     if (scrollElement && thumbElement) {
