@@ -99,7 +99,7 @@ class AccordionItem {
       this.#element.classList.add('opened')
       this.#element.setAttribute('data-opened', '')
       this.#activeTimeoutId = setTimeout(() => {
-        window.dispatchEvent(new Event('resize'))
+        window.dispatchEvent(new CustomEvent('resize'))
       }, getElementTransitionDurationMS(this.#bodyElement))
     }, 0)
 
@@ -128,7 +128,7 @@ class AccordionItem {
 
     this.#activeTimeoutId = setTimeout(() => {
       this.#element.classList.remove('triggered')
-      window.dispatchEvent(new Event('resize'))
+      window.dispatchEvent(new CustomEvent('resize'))
     }, getElementTransitionDurationMS(this.#bodyElement))
 
     dispatchEvent(this.element, 'accordionItemToggle', {
