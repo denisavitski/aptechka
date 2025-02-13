@@ -74,6 +74,7 @@ export class BillboardElement extends HTMLElement {
 
     this.#autoplay.observe()
     this.#swipe.observe()
+    this.#loop.observe()
 
     this.addEventListener('pointerdown', this.#pointerDownListener)
   }
@@ -81,6 +82,7 @@ export class BillboardElement extends HTMLElement {
   protected disconnectedCallback() {
     this.#autoplay.unobserve()
     this.#swipe.unobserve()
+    this.#loop.unobserve()
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
