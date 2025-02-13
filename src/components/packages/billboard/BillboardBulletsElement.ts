@@ -1,36 +1,41 @@
 import { findParentElement, isBrowser } from '@packages/utils'
-import { BillboardElement, BillboardEvents } from './BillboardElement'
+import { BillboardElement } from './BillboardElement'
 
 export class BillboardBulletsElement extends HTMLElement {
   #billboardElement: BillboardElement | null = null
+  #contentElement: HTMLElement = null!
   #buttonElements: Array<HTMLElement> = []
 
-  protected connectedCallback() {
+  protected async connectedCallback() {
     this.#billboardElement = findParentElement(this, BillboardElement)
 
     if (this.#billboardElement) {
-      customElements.whenDefined('e-billboard').then(() => {
-        if (this.isConnected) {
-          const length = this.#billboardElement!.itemElements.length
+      await customElements.whenDefined('e-billboard')
 
-          for (let index = 0; index < length; index++) {
-            const button = document.createElement('button')
-            this.#buttonElements.push(button)
-            this.appendChild(button)
-          }
+      if (this.isConnected) {
+        const length = this.#billboardElement!.itemElements.length
 
-          this.#buttonElements.forEach((element) => {
-            element.addEventListener('click', this.#clickListener)
-          })
+        this.#contentElement = document.createElement('div')
 
-          this.#billboardElement?.addEventListener(
-            'billboardChange',
-            this.#billboardChangeListener
-          )
-
-          this.#billboardChangeListener()
+        for (let index = 0; index < length; index++) {
+          const button = document.createElement('button')
+          this.#buttonElements.push(button)
+          this.#contentElement.appendChild(button)
         }
-      })
+
+        this.appendChild(this.#contentElement)
+
+        this.#buttonElements.forEach((element) => {
+          element.addEventListener('click', this.#clickListener)
+        })
+
+        this.#billboardElement?.addEventListener(
+          'billboardChange',
+          this.#billboardChangeListener
+        )
+
+        this.#billboardChangeListener()
+      }
     }
   }
 
