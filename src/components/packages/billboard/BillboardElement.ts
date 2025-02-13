@@ -1,6 +1,12 @@
 import { CSSProperty } from '@packages/css-property'
 import { intersector } from '@packages/intersector'
-import { Axes2D, dispatchEvent, loopNumber, setupDrag } from '@packages/utils'
+import {
+  Axes2D,
+  clamp,
+  dispatchEvent,
+  loopNumber,
+  setupDrag,
+} from '@packages/utils'
 
 export interface BillboardEvents {
   billboardChange: CustomEvent<{
@@ -11,6 +17,7 @@ export interface BillboardEvents {
 export class BillboardElement extends HTMLElement {
   public handleSet: ((number: number) => boolean) | undefined
 
+  #loop = new CSSProperty<boolean>(this, '--loop', true)
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
   #intervalId: ReturnType<typeof setInterval> | undefined
@@ -115,13 +122,21 @@ export class BillboardElement extends HTMLElement {
   }
 
   #updateCounter(value: number) {
-    this.#counter = loopNumber(value, this.#itemElements.length)
+    if (this.#loop.current) {
+      this.#counter = loopNumber(value, this.#itemElements.length)
+    } else {
+      this.#counter = clamp(value, 0, this.#itemElements.length - 1)
+    }
 
     this.#itemElements.forEach((itemElement, i) => {
+      itemElement.classList.remove('current', 'previous', 'next')
+
       if (i === this.#counter) {
         itemElement.classList.add('current')
-      } else {
-        itemElement.classList.remove('current')
+      } else if (i < this.#counter) {
+        itemElement.classList.add('previous')
+      } else if (i > this.#counter) {
+        itemElement.classList.add('next')
       }
     })
 
