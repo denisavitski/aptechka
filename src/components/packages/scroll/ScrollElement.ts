@@ -70,6 +70,7 @@ const stylesheet = createStylesheet({
     width: '100%',
     height: '100%',
     overflow: 'var(--overflow, initial)',
+    borderRadius: 'var(--border-radius, unset)',
   },
 
   '.content': {
