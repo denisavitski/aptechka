@@ -67,8 +67,8 @@ const stylesheet = createStylesheet({
   },
 
   '.content-wrapper': {
-    width: '100%',
-    height: '100%',
+    width: 'var(--content-wrapper-width, 100%)',
+    height: 'var(--content-wrapper-height, 100%)',
     overflow: 'var(--overflow, initial)',
     borderRadius: 'var(--border-radius, unset)',
   },
