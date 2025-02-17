@@ -68,6 +68,22 @@ export class PopoverButtonElement extends HTMLElement {
         }
       } else if (targetId === 'sibling') {
         popoverElement = this.parentElement?.querySelector('[data-popover]')
+      } else if (targetId === 'ancestor-child') {
+        const find = (el: HTMLElement | null): HTMLElement | null => {
+          if (!el) {
+            return null
+          }
+
+          let founded = el.querySelector<HTMLElement>('[data-popover]')
+
+          if (!founded && el?.parentElement) {
+            founded = find(el.parentElement)
+          }
+
+          return founded
+        }
+
+        popoverElement = find(this.parentElement) || null
       } else {
         if (!targetId.startsWith('.') && !targetId.startsWith('[')) {
           targetId = `#${targetId}`
