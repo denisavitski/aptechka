@@ -170,17 +170,19 @@ export class BillboardElement extends HTMLElement {
         const dy = e.y - moveEvent.y
 
         if (this.#swipe.current === 'x') {
-          if (Math.abs(dx) > Math.abs(dy)) {
+          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
             dir = Math.sign(dx)
           }
         } else if (this.#swipe.current === 'y') {
-          if (Math.abs(dy) > Math.abs(dx)) {
+          if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
             dir = Math.sign(dy)
           }
         }
       },
       () => {
-        this.shift(dir)
+        if (dir) {
+          this.shift(dir)
+        }
       }
     )
   }
