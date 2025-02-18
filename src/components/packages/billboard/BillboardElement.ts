@@ -52,7 +52,7 @@ export class BillboardElement extends HTMLElement {
   protected connectedCallback() {
     this.#itemElements = [
       ...this.querySelectorAll<HTMLElement>(
-        `[data-billboard-item="${this.id || ''}"]`
+        `[data-billboard-item${this.id ? `="${this.id}"` : ''}]`
       ),
     ]
 
