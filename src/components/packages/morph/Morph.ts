@@ -391,12 +391,14 @@ export class Morph {
 
           currentMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
+              this.destroyOldLinks(element)
               element.classList.add('old')
             }
           })
 
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
+              this.findNewLinks(element)
               element.classList.add('new')
             }
           })
@@ -440,8 +442,10 @@ export class Morph {
 
           this.#promises.push(promise)
         } else {
+          this.destroyOldLinks(morphElement)
           morphElement.innerHTML = ''
           morphElement.append(...newMorphElementChildNodes)
+          this.findNewLinks(morphElement)
         }
       })
 
@@ -470,8 +474,6 @@ export class Morph {
           element.replaceWith(newScriptTag)
         })
       })
-
-      this.findLinks()
 
       dispatchEvent(document, 'morphComplete', {
         detail: transitionDetail,
@@ -506,21 +508,45 @@ export class Morph {
     })
   }
 
+  public destroyOldLinks(morphElement: HTMLElement) {
+    this.#links = this.#links.filter((link) => {
+      if (morphElement.contains(link.element)) {
+        link.destroy()
+        return false
+      }
+
+      return true
+    })
+  }
+
+  public findNewLinks(morphElement: HTMLElement) {
+    const linkElements = [...morphElement.querySelectorAll('a')].filter(
+      this.#checkLink
+    )
+
+    this.#links.push(
+      ...linkElements.map((element) => new MorphLink(element, this))
+    )
+  }
+
   public findLinks() {
     const linkElements = [
       ...document.documentElement.querySelectorAll('a'),
-    ].filter(
-      (a) =>
-        a.getAttribute('href')?.startsWith('/') &&
-        !a.hasAttribute('download') &&
-        !a.hasAttribute('data-morph-skip') &&
-        !a.closest('[data-morph-skip]') &&
-        a.getAttribute('target') !== '_blank'
-    )
+    ].filter(this.#checkLink)
 
     this.#links.forEach((link) => link.destroy())
 
     this.#links = linkElements.map((element) => new MorphLink(element, this))
+  }
+
+  #checkLink = (element: HTMLElement) => {
+    return (
+      element.getAttribute('href')?.startsWith('/') &&
+      !element.hasAttribute('download') &&
+      !element.hasAttribute('data-morph-skip') &&
+      !element.closest('[data-morph-skip]') &&
+      element.getAttribute('target') !== '_blank'
+    )
   }
 
   async #getRoute(pathname: string, revalidate = false) {
