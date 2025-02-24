@@ -76,6 +76,8 @@ interface ScrollToElementOptions
 }
 
 export class Morph {
+  public static instance: Morph = null!
+
   public preprocessor?: MorphPreprocessor
   public pathnameModifier?: MorphPathnameModifier
 
@@ -93,7 +95,9 @@ export class Morph {
   #announcer: MorphAnnouncer = null!
 
   constructor(parameters?: Partial<MorphOptions>) {
-    if (isBrowser) {
+    if (isBrowser && !Morph.instance) {
+      Morph.instance = this
+
       this.#options = {
         base: normalizeBase(parameters?.base),
         waitForHeadToLoad:
