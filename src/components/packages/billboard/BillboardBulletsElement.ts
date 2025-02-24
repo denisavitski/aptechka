@@ -13,6 +13,8 @@ export class BillboardBulletsElement extends HTMLElement {
       await customElements.whenDefined('e-billboard')
 
       if (this.isConnected) {
+        this.innerHTML = ''
+
         const length = this.#billboardElement!.itemElements.length
 
         this.#contentElement = document.createElement('div')

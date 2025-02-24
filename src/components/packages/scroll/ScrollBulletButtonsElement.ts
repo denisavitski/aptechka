@@ -56,6 +56,8 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
+    this.innerHTML = ''
+
     this.scrollElement.addEventListener(
       'scrollSectionsChange',
       this.#sectionsChangeListener

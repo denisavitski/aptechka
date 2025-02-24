@@ -96,4 +96,12 @@ export class MorphRoute {
       left: this.#scrollState.x,
     })
   }
+
+  public renewScrollPosition() {
+    this.#morph.scrollElement.scroll({
+      top: 0,
+      left: 0,
+      behavior: 'instant',
+    })
+  }
 }

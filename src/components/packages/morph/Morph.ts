@@ -24,6 +24,7 @@ export interface MorphOptions {
   cachePages: boolean
   trailingSlash: boolean
   scrollSelector: string
+  morphInsideScrollContainer: boolean
 }
 
 export interface MorphNavigationEntry {
@@ -100,6 +101,8 @@ export class Morph {
         cachePages: parameters?.cachePages === false ? false : true,
         trailingSlash: parameters?.trailingSlash || false,
         scrollSelector: parameters?.scrollSelector || 'body',
+        morphInsideScrollContainer:
+          parameters?.morphInsideScrollContainer || false,
       }
 
       this.#morphElements = this.#getMorphElements(document.body)
@@ -351,7 +354,9 @@ export class Morph {
         fetchedRoute.document.body as HTMLElement
       )
 
-      this.#updateCurrentScrollElement(fetchedRoute.document)
+      if (!this.#options.morphInsideScrollContainer) {
+        this.#updateCurrentScrollElement(fetchedRoute.document)
+      }
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
       document.documentElement.setAttribute('data-current-leaf', leaf)
@@ -438,10 +443,11 @@ export class Morph {
 
       if (hash) {
         fetchedRoute.clearScrollState()
-
         this.#tryScrollToElement(hash, { centerScroll, offsetScroll })
       } else if (this.#isPopstateNavigation) {
         fetchedRoute.restoreScrollPosition()
+      } else {
+        fetchedRoute.renewScrollPosition()
       }
 
       await Promise.all(this.#promises)
@@ -449,6 +455,17 @@ export class Morph {
       oldElementsWithLoadEvent.forEach((child) => child.remove())
 
       this.#promises = []
+
+      this.#morphElements.forEach((el) => {
+        const scriptElements = el.querySelectorAll('script')
+
+        scriptElements.forEach((element) => {
+          const newScriptTag = document.createElement('script')
+          newScriptTag.type = 'module'
+          newScriptTag.src = element.getAttribute('src')!
+          element.replaceWith(newScriptTag)
+        })
+      })
 
       this.findLinks()
 
