@@ -176,9 +176,9 @@ export class Morph {
     })
   }
 
-  public async prefetch(path: string) {
+  public async prefetch(path: string, revalidate?: boolean) {
     const parts = this.normalizePath(path)
-    this.#createRoute(parts.pathname)
+    this.#getRoute(parts.pathname, revalidate)
   }
 
   public async navigate(

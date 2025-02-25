@@ -88,7 +88,8 @@ export class MorphLink {
   }
 
   #pointerListener = () => {
-    this.#morph.prefetch(this.#pathname)
+    const revalidate = this.#element.hasAttribute('data-revalidate')
+    this.#morph.prefetch(this.#pathname, revalidate)
     this.#element.removeEventListener('pointerenter', this.#pointerListener)
   }
 }
