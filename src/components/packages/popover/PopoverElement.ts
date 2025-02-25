@@ -9,6 +9,7 @@ import {
   updateSearchParameter,
 } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
+import { viewport } from '@packages/device'
 
 export interface PopoverEvents {
   popoverTriggered: CustomEvent<{ trigger: any }>
@@ -148,6 +149,7 @@ export class PopoverElement extends HTMLElement {
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTimeoutId: ReturnType<typeof setTimeout> | undefined
   #openTransitionTimeoutId: ReturnType<typeof setTimeout> | undefined
+
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
   #closeRest = new CSSProperty<boolean>(this, '--close-rest', false)
@@ -159,6 +161,7 @@ export class PopoverElement extends HTMLElement {
   #group = new CSSProperty(this, '--group', '')
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
+  #checkViewportBounds = new CSSProperty(this, '--check-viewport-bounds', false)
   #historyAllowed = false
   #lastTrigger: any
   #status = new ElementLinkedStore(this, {
@@ -284,7 +287,7 @@ export class PopoverElement extends HTMLElement {
       PopoverElement.stack.add(this.#group.current, this)
       // }
 
-      this.#resize()
+      this.#resizeListener()
 
       this.#status.set('opened', true)
 
@@ -352,6 +355,7 @@ export class PopoverElement extends HTMLElement {
     this.#group.observe()
     this.#clickOutside.observe()
     this.#escape.observe()
+    this.#checkViewportBounds.observe()
 
     this.setAttribute('role', 'dialog')
 
@@ -366,6 +370,10 @@ export class PopoverElement extends HTMLElement {
         this.#historyAllowed = true
       }
     }, 0)
+
+    this.#checkViewportBounds.subscribe(() => {
+      this.#resizeListener()
+    })
 
     windowResizer.subscribe(this.#resizeListener)
   }
@@ -384,6 +392,7 @@ export class PopoverElement extends HTMLElement {
     this.#group.close()
     this.#clickOutside.close()
     this.#escape.close()
+    this.#checkViewportBounds.close()
 
     this.removeAttribute('role')
 
@@ -396,6 +405,9 @@ export class PopoverElement extends HTMLElement {
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
+
+    this.style.removeProperty('--viewport-offset-x')
+    this.style.removeProperty('--viewport-offset-y')
 
     this.#deleteSearchParam()
   }
@@ -436,6 +448,9 @@ export class PopoverElement extends HTMLElement {
     this.style.setProperty('--content-width', 'initial')
     this.style.setProperty('--content-height', 'initial')
 
+    this.style.setProperty('--viewport-offset-x', '0px')
+    this.style.setProperty('--viewport-offset-y', '0px')
+
     this.#debouncedResize()
   }
 
@@ -446,6 +461,28 @@ export class PopoverElement extends HTMLElement {
   #resize = () => {
     this.style.setProperty('--content-width', this.scrollWidth + 'px')
     this.style.setProperty('--content-height', this.scrollHeight + 'px')
+
+    if (this.#checkViewportBounds.current) {
+      const rect = this.getBoundingClientRect()
+
+      let viewportOffsetX = 0
+      let viewportOffsetY = 0
+
+      if (rect.right > viewport.width) {
+        viewportOffsetX = viewport.width - rect.right
+      } else if (rect.left < 0) {
+        viewportOffsetX = rect.left * -1
+      }
+
+      if (rect.bottom > viewport.height) {
+        viewportOffsetY = viewport.height - rect.bottom
+      } else if (rect.top < 0) {
+        viewportOffsetY = rect.top * -1
+      }
+
+      this.style.setProperty('--viewport-offset-x', viewportOffsetX + 'px')
+      this.style.setProperty('--viewport-offset-y', viewportOffsetY + 'px')
+    }
   }
 }
 
