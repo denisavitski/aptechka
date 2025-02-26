@@ -70,6 +70,11 @@ export interface MorphEvents {
   morphScroll: CustomEvent<MorphScrollDetail>
 }
 
+export interface MorphGetRouteOptions {
+  searchParameters?: string
+  revalidate?: boolean
+}
+
 interface ScrollToElementOptions
   extends Pick<MorphNavigateOptions, 'centerScroll' | 'offsetScroll'> {
   behavior?: ScrollBehavior
@@ -178,7 +183,11 @@ export class Morph {
 
   public async prefetch(path: string, revalidate?: boolean) {
     const parts = this.normalizePath(path)
-    this.#getRoute(parts.pathname, revalidate)
+
+    this.#getRoute(parts.pathname, {
+      searchParameters: parts.parameters,
+      revalidate,
+    })
   }
 
   public async navigate(
@@ -251,7 +260,10 @@ export class Morph {
       }
 
       const currentRoute = await this.#getRoute(this.#currentPathname)
-      const fetchedRoute = await this.#getRoute(pathname, revalidate)
+      const fetchedRoute = await this.#getRoute(pathname, {
+        searchParameters: parameters,
+        revalidate,
+      })
 
       if (this.#candidatePathname !== pathname) {
         this.#links.forEach((link) => {
@@ -549,24 +561,27 @@ export class Morph {
     )
   }
 
-  async #getRoute(pathname: string, revalidate = false) {
-    let route = this.#routes.get(pathname)
+  async #getRoute(path: string, options?: MorphGetRouteOptions) {
+    let route = this.#routes.get(path)
 
-    if (!route || revalidate) {
-      route = await this.#createRoute(pathname)
+    if (!route || options?.revalidate) {
+      route = await this.#createRoute(path, options?.searchParameters)
     }
 
     return route
   }
 
-  async #createRoute(pathname: string) {
-    const fetchResult = await fetch(pathname)
+  async #createRoute(path: string, searchParameters?: string) {
+    const fetchResult = await fetch(
+      `${path}${searchParameters ? '?' + searchParameters : ''}`
+    )
+
     const text = await fetchResult.text()
     const document = this.#domParser.parseFromString(text, 'text/html')
 
-    const route = new MorphRoute(this, pathname, document)
+    const route = new MorphRoute(this, path, document)
 
-    this.#routes.set(pathname, route)
+    this.#routes.set(path, route)
 
     return route
   }
