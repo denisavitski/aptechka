@@ -29,9 +29,6 @@ export interface MorphOptions {
 
 export interface MorphNavigationEntry {
   pathname: string
-}
-
-export interface MorphTransitionEntry extends MorphNavigationEntry {
   submorph?: Array<string>
 }
 
@@ -46,9 +43,6 @@ export interface MorphPreprocessorEntry extends MorphNavigationEntry {
 }
 
 export type MorphPreprocessor = (entry: MorphPreprocessorEntry) => void
-
-export type MorphNavigationCallback = (entry: MorphNavigationEntry) => void
-
 export type MorphPathnameModifier = (pathname: string) => string
 
 export interface MorphNavigateOptions {
@@ -66,9 +60,9 @@ export interface MorphScrollDetail {
 }
 
 export interface MorphEvents {
-  morphNavigation: CustomEvent<MorphTransitionEntry>
-  morphStart: CustomEvent<MorphTransitionEntry>
-  morphComplete: CustomEvent<MorphTransitionEntry>
+  morphNavigation: CustomEvent<MorphNavigationEntry>
+  morphStart: CustomEvent<MorphNavigationEntry>
+  morphComplete: CustomEvent<MorphNavigationEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
   morphScroll: CustomEvent<MorphScrollDetail>
@@ -244,6 +238,7 @@ export class Morph {
               pathname,
               resolve,
               reject,
+              submorph,
             })
           })
         } catch (e: any) {
@@ -264,7 +259,7 @@ export class Morph {
         return
       }
 
-      const transitionDetail: MorphTransitionEntry = {
+      const transitionDetail: MorphNavigationEntry = {
         pathname,
         submorph,
       }
