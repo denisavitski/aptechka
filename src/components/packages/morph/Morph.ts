@@ -63,6 +63,7 @@ export interface MorphScrollDetail {
 }
 
 export interface MorphEvents {
+  morphNavigation: CustomEvent<MorphTransitionEntry>
   morphStart: CustomEvent<MorphTransitionEntry>
   morphComplete: CustomEvent<MorphTransitionEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
@@ -259,6 +260,14 @@ export class Morph {
         return
       }
 
+      const transitionDetail: MorphTransitionEntry = {
+        pathname,
+      }
+
+      dispatchEvent(document, 'morphNavigation', {
+        detail: transitionDetail,
+      })
+
       const currentRoute = await this.#getRoute(this.#currentPathname)
       const fetchedRoute = await this.#getRoute(pathname, {
         searchParameters: parameters,
@@ -286,10 +295,6 @@ export class Morph {
       this.#announcer.textContent = fetchedRoute.title
 
       document.body.appendChild(this.#announcer)
-
-      const transitionDetail: MorphTransitionEntry = {
-        pathname,
-      }
 
       dispatchEvent(document, 'morphStart', {
         detail: transitionDetail,
