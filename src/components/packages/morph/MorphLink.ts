@@ -77,12 +77,18 @@ export class MorphLink {
         'data-keep-search-parameters'
       )
 
+      const submorph = this.#element
+        .getAttribute('data-submorph')
+        ?.split(',')
+        .map((v) => v.trim())
+
       this.#morph.navigate(this.#pathname, {
         historyAction,
         centerScroll,
         offsetScroll,
         revalidate,
         keepSearchParameters,
+        submorph,
       })
     }
   }

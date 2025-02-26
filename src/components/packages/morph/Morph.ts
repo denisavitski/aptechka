@@ -55,6 +55,7 @@ export interface MorphNavigateOptions {
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   revalidate?: boolean
   keepSearchParameters?: boolean
+  submorph?: Array<string>
 }
 
 export interface MorphScrollDetail {
@@ -199,6 +200,7 @@ export class Morph {
       offsetScroll,
       revalidate,
       keepSearchParameters,
+      submorph,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
@@ -401,69 +403,92 @@ export class Morph {
         const duration =
           getComputedStyle(morphElement).getPropertyValue('--morph-duration')
 
-        const newMorphElementChildNodes = [...newMorphElement.childNodes]
+        let newMorphElementChildNodes: Array<ChildNode> = []
+        let currentMorphElementChildNodes: Array<ChildNode> = []
 
-        if (duration) {
-          const currentMorphElementChildNodes = [...morphElement.childNodes]
+        if (submorph) {
+          submorph.forEach((selector) => {
+            const curSubMorphElement = morphElement.querySelector(selector)
+            const newSubMorphElement = newMorphElement.querySelector(selector)
 
-          currentMorphElementChildNodes.forEach((element) => {
-            if (element instanceof HTMLElement) {
-              this.destroyOldLinks(element)
-              element.classList.add('old')
+            if (curSubMorphElement && newSubMorphElement) {
+              currentMorphElementChildNodes.push(curSubMorphElement)
+              newMorphElementChildNodes.push(newSubMorphElement)
             }
           })
+        } else {
+          newMorphElementChildNodes.push(...newMorphElement.childNodes)
+          currentMorphElementChildNodes.push(...morphElement.childNodes)
+        }
 
+        currentMorphElementChildNodes.forEach((element) => {
+          if (element instanceof HTMLElement) {
+            this.destroyOldLinks(element)
+            element.classList.add('old')
+          }
+        })
+
+        newMorphElementChildNodes.forEach((element) => {
+          if (element instanceof HTMLElement) {
+            this.findNewLinks(element)
+            element.classList.add('new')
+          }
+        })
+
+        if (!submorph) {
+          morphElement.prepend(...newMorphElementChildNodes)
+        } else {
+          newMorphElementChildNodes.forEach((el, i) => {
+            currentMorphElementChildNodes[i].parentElement?.insertBefore(
+              el,
+              currentMorphElementChildNodes[i]
+            )
+          })
+        }
+
+        requestIdleCallback(() => {
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
-              this.findNewLinks(element)
-              element.classList.add('new')
+              element.parentElement?.style.setProperty(
+                '--new-content-height',
+                element.offsetHeight + 'px'
+              )
+              element.classList.add('in')
             }
           })
+        })
 
-          morphElement.prepend(...newMorphElementChildNodes)
+        const detail: MorphChildrenActionEntry = {
+          morphElement,
+          pathname,
+        }
 
-          requestIdleCallback(() => {
+        dispatchEvent(document, 'morphNewChildrenAdded', {
+          detail,
+        })
+
+        const promise = new Promise<void>((res) => {
+          setTimeout(() => {
+            currentMorphElementChildNodes.forEach((el) => el.remove())
+
             newMorphElementChildNodes.forEach((element) => {
               if (element instanceof HTMLElement) {
-                element.classList.add('in')
+                element.parentElement?.style.removeProperty(
+                  '--new-content-height'
+                )
+                element.classList.remove('in', 'new')
               }
             })
-          })
 
-          const detail: MorphChildrenActionEntry = {
-            morphElement,
-            pathname,
-          }
+            dispatchEvent(document, 'morphOldChildrenRemoved', {
+              detail,
+            })
 
-          dispatchEvent(document, 'morphNewChildrenAdded', {
-            detail,
-          })
+            res()
+          }, (parseFloat(duration) || 0) * 1000 + 10)
+        })
 
-          const promise = new Promise<void>((res) => {
-            setTimeout(() => {
-              currentMorphElementChildNodes.forEach((el) => el.remove())
-
-              newMorphElementChildNodes.forEach((element) => {
-                if (element instanceof HTMLElement) {
-                  element.classList.remove('in', 'new')
-                }
-              })
-
-              dispatchEvent(document, 'morphOldChildrenRemoved', {
-                detail,
-              })
-
-              res()
-            }, (parseFloat(duration) || 0) * 1000 + 10)
-          })
-
-          this.#promises.push(promise)
-        } else {
-          this.destroyOldLinks(morphElement)
-          morphElement.innerHTML = ''
-          morphElement.append(...newMorphElementChildNodes)
-          this.findNewLinks(morphElement)
-        }
+        this.#promises.push(promise)
       })
 
       if (hash) {
