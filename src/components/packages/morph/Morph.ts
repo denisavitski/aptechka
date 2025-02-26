@@ -31,7 +31,9 @@ export interface MorphNavigationEntry {
   pathname: string
 }
 
-export interface MorphTransitionEntry extends MorphNavigationEntry {}
+export interface MorphTransitionEntry extends MorphNavigationEntry {
+  submorph?: Array<string>
+}
 
 export interface MorphChildrenActionEntry {
   morphElement: HTMLElement
@@ -264,6 +266,7 @@ export class Morph {
 
       const transitionDetail: MorphTransitionEntry = {
         pathname,
+        submorph,
       }
 
       dispatchEvent(document, 'morphNavigation', {
