@@ -35,7 +35,7 @@ export class BillboardElement extends HTMLElement {
 
   public addItem(element: HTMLElement) {
     this.#itemElements.push(element)
-    this.#checkLength()
+    this.#updateClasses()
   }
 
   public set(value: number) {
@@ -58,7 +58,7 @@ export class BillboardElement extends HTMLElement {
 
     this.#itemElements[0]?.classList.add('current')
 
-    this.#checkLength()
+    this.#updateClasses()
 
     this.#autoplay.subscribe((e) => {
       if (e.current) {
@@ -88,14 +88,6 @@ export class BillboardElement extends HTMLElement {
     clearInterval(this.#intervalId)
   }
 
-  #checkLength() {
-    if (this.#itemElements.length > 1) {
-      this.classList.add('has-length')
-    } else {
-      this.classList.remove('has-length')
-    }
-  }
-
   #tryAutoplay() {
     if (this.#autoplay.current !== false) {
       this.#clearAndSpawnInterval()
@@ -123,6 +115,17 @@ export class BillboardElement extends HTMLElement {
     }
   }
 
+  #updateClasses() {
+    this.classList.toggle('has-length', this.#itemElements.length > 1)
+
+    this.classList.toggle('start', this.#counter === 0)
+
+    this.classList.toggle(
+      'end',
+      this.#counter === this.#itemElements.length - 1
+    )
+  }
+
   #updateCounter(value: number) {
     if (this.#loop.current) {
       this.#counter = loopNumber(value, this.#itemElements.length)
@@ -141,6 +144,8 @@ export class BillboardElement extends HTMLElement {
         itemElement.classList.add('next')
       }
     })
+
+    this.#updateClasses()
 
     dispatchEvent(this, 'billboardChange', {
       detail: {
