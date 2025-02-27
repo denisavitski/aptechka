@@ -19,7 +19,11 @@ export class BillboardStepButtonElement extends HTMLElement {
     })
   }
 
-  protected connectedCallback() {
+  protected async connectedCallback() {
+    await customElements.whenDefined('e-billboard')
+
+    this.#step.observe()
+
     this.tabIndex = 0
 
     this.#billboardElement = findParentElement(this, BillboardElement)
@@ -29,7 +33,7 @@ export class BillboardStepButtonElement extends HTMLElement {
       this.#changeListener
     )
 
-    this.#step.observe()
+    this.#changeListener()
   }
 
   protected disconnectedCallback() {
