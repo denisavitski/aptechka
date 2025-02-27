@@ -29,6 +29,18 @@ export class BillboardElement extends HTMLElement {
     return this.#counter
   }
 
+  public get loop() {
+    return this.#loop
+  }
+
+  public get autoplay() {
+    return this.#autoplay
+  }
+
+  public get swipe() {
+    return this.#swipe
+  }
+
   public get itemElements() {
     return this.#itemElements
   }

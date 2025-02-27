@@ -24,12 +24,40 @@ export class BillboardStepButtonElement extends HTMLElement {
 
     this.#billboardElement = findParentElement(this, BillboardElement)
 
+    this.#billboardElement?.addEventListener(
+      'billboardChange',
+      this.#changeListener
+    )
+
     this.#step.observe()
   }
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
     this.#step.unobserve()
+
+    this.#billboardElement?.removeEventListener(
+      'billboardChange',
+      this.#changeListener
+    )
+  }
+
+  #changeListener = () => {
+    if (!this.#billboardElement) {
+      return
+    }
+
+    if (
+      !this.#billboardElement.loop.current &&
+      ((this.#billboardElement.counter === 0 && this.#step.current <= 0) ||
+        (this.#billboardElement.counter ===
+          this.#billboardElement.itemElements.length - 1 &&
+          this.#step.current >= 0))
+    ) {
+      this.setAttribute('disabled', '')
+    } else {
+      this.removeAttribute('disabled')
+    }
   }
 }
 
