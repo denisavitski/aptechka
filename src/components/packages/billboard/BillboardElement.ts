@@ -139,10 +139,20 @@ export class BillboardElement extends HTMLElement {
   }
 
   #updateCounter(value: number) {
+    const prev = this.#counter
+
     if (this.#loop.current) {
       this.#counter = loopNumber(value, this.#itemElements.length)
     } else {
       this.#counter = clamp(value, 0, this.#itemElements.length - 1)
+    }
+
+    this.classList.remove('forward', 'backward')
+
+    if (this.#counter - prev >= 0) {
+      this.classList.add('forward')
+    } else if (this.#counter - prev < 0) {
+      this.classList.add('backward')
     }
 
     this.#itemElements.forEach((itemElement, i) => {
