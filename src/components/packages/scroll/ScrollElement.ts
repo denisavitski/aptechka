@@ -546,7 +546,10 @@ export class ScrollElement extends HTMLElement {
             this.#viewportSize -
             previousSection.position +
             this.#gap
-          scrolledFromNearestSection = 0
+
+          if (!this.#isGrabbing) {
+            scrolledFromNearestSection = 0
+          }
         } else if (
           newCounterValue === this.#sections.length - 1 &&
           previousCounter === 0
