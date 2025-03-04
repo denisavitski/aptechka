@@ -94,6 +94,7 @@ export class MorphRoute {
     this.#morph.scrollElement.scroll({
       top: this.#scrollState.y,
       left: this.#scrollState.x,
+      behavior: 'instant',
     })
   }
 

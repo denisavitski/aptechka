@@ -132,6 +132,8 @@ class PopoverGroups {
         .reverse()
         .find((el) => el.escape.current)
 
+      console.log(this.#stack)
+
       if (lastPopover) {
         lastPopover.close()
       }
