@@ -23,7 +23,10 @@ class PopoverGroups {
   #stack: Array<PopoverElement> = []
 
   constructor() {
-    addEventListener('click', this.#clickOutsideListener)
+    document.documentElement.addEventListener(
+      'click',
+      this.#clickOutsideListener
+    )
     addEventListener('keydown', this.#keydownListener)
   }
 
@@ -131,8 +134,6 @@ class PopoverGroups {
       const lastPopover = [...this.#stack]
         .reverse()
         .find((el) => el.escape.current)
-
-      console.log(this.#stack)
 
       if (lastPopover) {
         lastPopover.close()
