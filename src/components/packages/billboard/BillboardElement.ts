@@ -17,6 +17,7 @@ export interface BillboardEvents {
 export class BillboardElement extends HTMLElement {
   public handleSet: ((number: number) => boolean) | undefined
 
+  #resize = new CSSProperty<boolean>(this, '--resize', true)
   #loop = new CSSProperty<boolean>(this, '--loop', true)
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
@@ -47,7 +48,7 @@ export class BillboardElement extends HTMLElement {
 
   public addItem(element: HTMLElement) {
     this.#itemElements.push(element)
-    this.#updateClasses()
+    this.#updateCounter()
   }
 
   public set(value: number) {
@@ -70,8 +71,6 @@ export class BillboardElement extends HTMLElement {
 
     this.#itemElements[0]?.classList.add('current')
 
-    this.#updateClasses()
-
     this.#autoplay.subscribe((e) => {
       if (e.current) {
         intersector.subscribe(this, this.#intersectionListener)
@@ -87,6 +86,9 @@ export class BillboardElement extends HTMLElement {
     this.#autoplay.observe()
     this.#swipe.observe()
     this.#loop.observe()
+    this.#resize.observe()
+
+    this.#updateCounter(0)
 
     this.addEventListener('pointerdown', this.#pointerDownListener)
   }
@@ -95,6 +97,7 @@ export class BillboardElement extends HTMLElement {
     this.#autoplay.unobserve()
     this.#swipe.unobserve()
     this.#loop.unobserve()
+    this.#resize.unobserve()
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
@@ -127,18 +130,7 @@ export class BillboardElement extends HTMLElement {
     }
   }
 
-  #updateClasses() {
-    this.classList.toggle('has-length', this.#itemElements.length > 1)
-
-    this.classList.toggle('start', this.#counter === 0)
-
-    this.classList.toggle(
-      'end',
-      this.#counter === this.#itemElements.length - 1
-    )
-  }
-
-  #updateCounter(value: number) {
+  #updateCounter(value = this.#counter) {
     const prev = this.#counter
 
     if (this.#loop.current) {
@@ -167,17 +159,31 @@ export class BillboardElement extends HTMLElement {
       }
     })
 
-    this.#updateClasses()
+    this.classList.toggle('has-length', this.#itemElements.length > 1)
 
-    dispatchEvent(this, 'billboardChange', {
-      detail: {
-        counter: this.#counter,
-      },
-    })
+    this.classList.toggle('start', this.#counter === 0)
 
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'))
-    }, 0)
+    this.classList.toggle(
+      'end',
+      this.#counter === this.#itemElements.length - 1
+    )
+
+    this.style.setProperty('--counter', this.#counter.toString())
+    this.style.setProperty('--sections', this.#itemElements.length.toString())
+
+    if (this.#counter !== prev) {
+      dispatchEvent(this, 'billboardChange', {
+        detail: {
+          counter: this.#counter,
+        },
+      })
+
+      if (this.#resize.current) {
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'))
+        }, 0)
+      }
+    }
   }
 
   #tick = () => {
