@@ -33,7 +33,9 @@ export class BillboardStepButtonElement extends HTMLElement {
       this.#changeListener
     )
 
-    this.#changeListener()
+    setTimeout(() => {
+      this.#changeListener()
+    }, 0)
   }
 
   protected disconnectedCallback() {
