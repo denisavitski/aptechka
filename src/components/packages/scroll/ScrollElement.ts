@@ -1048,7 +1048,7 @@ export class ScrollElement extends HTMLElement {
     this.#unsplit()
 
     this.#slotElement.assignedElements().forEach((element, i) => {
-      if (element instanceof HTMLElement) {
+      if (element instanceof HTMLElement && element.tagName !== 'SCRIPT') {
         this.#sections.push(new ScrollSection(element, i, this))
       }
     })
