@@ -14,7 +14,7 @@ export class CustomScrollbarElement extends HTMLElement {
   protected connectedCallback() {
     const scrollSelector = this.getAttribute('data-scroll')
 
-    this.#isHorizontal = this.getAttribute('orientation') === 'horizontal'
+    this.#isHorizontal = this.hasAttribute('horisontal')
 
     let scrollElement: HTMLElement | null = null
 
