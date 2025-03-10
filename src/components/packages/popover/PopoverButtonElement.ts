@@ -32,6 +32,7 @@ export class PopoverButtonElement extends HTMLElement {
 
       this.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
+          e.preventDefault()
           ;(e.currentTarget as HTMLElement).click()
         }
       })
