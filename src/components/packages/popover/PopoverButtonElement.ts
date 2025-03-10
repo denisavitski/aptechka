@@ -31,9 +31,9 @@ export class PopoverButtonElement extends HTMLElement {
       })
 
       this.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
+        if (e.code === 'Space' && !this.hasAttribute('keydown-disabled')) {
           e.preventDefault()
-          ;(e.currentTarget as HTMLElement).click()
+          this.click()
         }
       })
     }
