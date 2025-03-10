@@ -149,6 +149,7 @@ export class CustomScrollbarElement extends HTMLElement {
   #intersectionListener = (e: IntersectionObserverEntry) => {
     if (e.isIntersecting) {
       ticker.subscribe(this.#tickListener, { maxFPS: 5 })
+      this.#tickListener()
     } else {
       ticker.unsubscribe(this.#tickListener)
     }

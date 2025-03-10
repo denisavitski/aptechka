@@ -21,6 +21,7 @@ export class BillboardBulletsElement extends HTMLElement {
 
         for (let index = 0; index < length; index++) {
           const button = document.createElement('button')
+          button.setAttribute('aria-label', `Go to item ${index + 1}`)
           this.#buttonElements.push(button)
           this.#contentElement.appendChild(button)
         }

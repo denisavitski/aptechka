@@ -15,6 +15,7 @@ class BulletButton {
   ) {
     if (isBrowser) {
       this.#element = document.createElement('button')
+      this.#element.setAttribute('aria-label', `Go to section ${index + 1}`)
       this.#scrollElement = scrollElement
       this.#behaviour = behaviour
       this.#index = index
