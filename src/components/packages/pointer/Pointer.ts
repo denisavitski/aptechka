@@ -30,7 +30,7 @@ export class Pointer {
   #width = 0
   #height = 0
 
-  #equalize = false
+  #entered = false
 
   constructor(parameters: PointerParameters) {
     this.#element = getElement<HTMLElement>(parameters.element)!
@@ -106,6 +106,8 @@ export class Pointer {
   }
 
   #pointerEnterListener = (e: PointerEvent) => {
+    this.#entered = true
+
     const pointer = this.#getPointerCoords(e)
 
     this.#x.set(pointer.x, { equalize: true })
@@ -115,10 +117,16 @@ export class Pointer {
   }
 
   #pointerLeaveListener = (e: PointerEvent) => {
+    this.#entered = false
+
     this.#z.set(0)
   }
 
   #pointerMoveListener = (e: PointerEvent) => {
+    if (!this.#entered) {
+      this.#pointerEnterListener(e)
+    }
+
     const pointer = this.#getPointerCoords(e)
 
     this.#x.set(pointer.x)
