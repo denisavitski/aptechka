@@ -172,6 +172,19 @@ export class Morph {
     return this.#isPopstateNavigation
   }
 
+  public saveState(state: any) {
+    const route = this.#routes.get(this.#currentPathname)
+
+    if (route) {
+      route.saveState(state)
+    }
+  }
+
+  public getState() {
+    const route = this.#routes.get(this.#currentPathname)
+    return route?.clearState()
+  }
+
   public normalizePath(path: string) {
     return splitPath(path, {
       base: this.#options.base,
@@ -269,6 +282,7 @@ export class Morph {
       })
 
       const currentRoute = await this.#getRoute(this.#currentPathname)
+
       const fetchedRoute = await this.#getRoute(pathname, {
         searchParameters: parameters,
         revalidate,
@@ -282,6 +296,7 @@ export class Morph {
         return
       }
 
+      currentRoute.clearState()
       currentRoute.saveScrollState()
       currentRoute.saveDocumentState()
 

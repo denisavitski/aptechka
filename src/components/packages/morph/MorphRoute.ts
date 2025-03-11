@@ -10,6 +10,8 @@ export interface MorphRouteSaveState {
   document?: Document | undefined
 }
 
+export type MorpRouteSaveParametersArg = string | object | URLSearchParams
+
 export class MorphRoute {
   #morph: Morph
   #pathname: string
@@ -17,6 +19,7 @@ export class MorphRoute {
   #initialDocument: Document
   #modifiedDocument: Document | null = null
   #currentDocument: Document = null!
+  #savedState: any = null
 
   constructor(morph: Morph, pathname: string, initialDocument: Document) {
     this.#morph = morph
@@ -78,6 +81,14 @@ export class MorphRoute {
     }
   }
 
+  public restoreScrollPosition() {
+    this.#morph.scrollElement.scroll({
+      top: this.#scrollState.y,
+      left: this.#scrollState.x,
+      behavior: 'instant',
+    })
+  }
+
   public saveDocumentState() {
     if (
       !this.#initialDocument.documentElement.hasAttribute(
@@ -90,19 +101,23 @@ export class MorphRoute {
     }
   }
 
-  public restoreScrollPosition() {
-    this.#morph.scrollElement.scroll({
-      top: this.#scrollState.y,
-      left: this.#scrollState.x,
-      behavior: 'instant',
-    })
-  }
-
   public renewScrollPosition() {
     this.#morph.scrollElement.scroll({
       top: 0,
       left: 0,
       behavior: 'instant',
     })
+  }
+
+  public saveState(state: any) {
+    this.#savedState = state
+  }
+
+  public clearState() {
+    const state = this.#savedState
+
+    this.#savedState = null
+
+    return state
   }
 }
