@@ -52,6 +52,7 @@ export interface MorphNavigateOptions {
   revalidate?: boolean
   keepSearchParameters?: boolean
   submorph?: Array<string>
+  clearState?: boolean
 }
 
 export interface MorphScrollDetail {
@@ -210,6 +211,7 @@ export class Morph {
       revalidate,
       keepSearchParameters,
       submorph,
+      clearState,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
@@ -303,6 +305,10 @@ export class Morph {
       if (!this.#isPopstateNavigation) {
         fetchedRoute.clearScrollState()
         fetchedRoute.clearDocumentState()
+      }
+
+      if (clearState) {
+        fetchedRoute.clearState()
       }
 
       fetchedRoute.cloneDocument()

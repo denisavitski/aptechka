@@ -61,6 +61,10 @@ export interface ChangeHistoryParameters {
 }
 
 export function changeHistory(p: ChangeHistoryParameters) {
+  if (p.action === 'none') {
+    return
+  }
+
   const por = p?.searchParameters
   const hash = p.hash ? (p.hash.startsWith('#') ? p.hash : '#' + p.hash) : ''
   const searhParameters = por ? (por.startsWith('?') ? por : '?' + por) : ''

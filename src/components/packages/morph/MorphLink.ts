@@ -82,6 +82,8 @@ export class MorphLink {
         ?.split(',')
         .map((v) => v.trim())
 
+      const clearState = this.#element.hasAttribute('data-clear-state')
+
       this.#morph.navigate(this.#pathname, {
         historyAction,
         centerScroll,
@@ -89,6 +91,7 @@ export class MorphLink {
         revalidate,
         keepSearchParameters,
         submorph,
+        clearState,
       })
     }
   }
