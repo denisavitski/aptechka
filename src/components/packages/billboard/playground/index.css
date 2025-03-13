@@ -14,9 +14,11 @@ button {
 }
 
 [data-billboard-item] {
-  grid-column: 1/1;
-  grid-row: 1/1;
   width: 100px;
   height: 100px;
   background-color: tomato;
+
+  &.current {
+    background-color: lightblue;
+  }
 }

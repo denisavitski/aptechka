@@ -18,6 +18,13 @@ export class BillboardSetButtonElement extends HTMLElement {
         }
       }
     })
+
+    this.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !this.hasAttribute('keydown-disabled')) {
+        e.preventDefault()
+        this.click()
+      }
+    })
   }
 
   protected connectedCallback() {
