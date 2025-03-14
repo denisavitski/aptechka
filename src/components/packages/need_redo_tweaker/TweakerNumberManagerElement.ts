@@ -118,7 +118,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
 
     this.#min = nullishCoalescing(this.firstStore.__manager?.min, -Infinity)
     this.#max = nullishCoalescing(this.firstStore.__manager?.max, Infinity)

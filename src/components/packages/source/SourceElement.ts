@@ -1,9 +1,10 @@
-import { SourceManager, type Source } from '@packages/source'
 import { ElementLinkedStore } from '@packages/element-linked-store'
 import { isBrowser, kebabToCamel } from '@packages/utils'
 import { dispatchEvent } from '@packages/utils'
 import { loading } from '@packages/loading'
-import { SourceSetOptions } from '@packages/source/SourceSet'
+import { type Source } from './SourceClass'
+import { type SourceSetOptions } from './SourceSet'
+import { SourceManager } from './SourceManager'
 
 let id = 0
 

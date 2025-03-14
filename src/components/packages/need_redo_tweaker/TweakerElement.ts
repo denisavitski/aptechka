@@ -155,7 +155,10 @@ export class TweakerElement extends TweakerFolderElement {
 
     tweakerStorage.load()
 
-    this.shadowRoot!.adoptedStyleSheets.push(stylesheet)
+    this.shadowRoot!.adoptedStyleSheets = [
+      ...this.shadowRoot!.adoptedStyleSheets,
+      stylesheet,
+    ]
 
     this.head.current = [
       div({

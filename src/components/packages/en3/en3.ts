@@ -1,11 +1,13 @@
+import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
+import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
+
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { windowResizer } from '@packages/window-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
-import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
+
 import { En3View, En3ViewOptions } from './En3View'
 import { En3Raycaster } from './En3Raycaster'
-import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
@@ -13,6 +15,7 @@ export interface En3Options {
   containerElement?: ElementOrSelector<HTMLElement>
   view?: En3ViewOptions
   zIndex?: number
+  position?: 'fixed' | 'absolute' | 'relative'
   composer?: typeof EffectComposer
 }
 
@@ -99,7 +102,7 @@ class En3 {
     this.#webglRenderer = new WebGLRenderer(options?.webGLRendererParameters)
 
     this.#webglRenderer.domElement.style.cssText = `
-      position: fixed;
+      position: ${options?.position || 'fixed'};
       left: 0;
       top: 0;
       width: 100%;

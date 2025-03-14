@@ -56,7 +56,7 @@ export class TweakerSelectManagerElement extends TweakerStoreManagerElement<
     super(...stores)
 
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
 
     const variants = this.firstStore.__manager?.variants || []
 

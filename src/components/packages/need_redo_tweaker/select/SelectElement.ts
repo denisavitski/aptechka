@@ -73,7 +73,7 @@ export class SelectElement extends HTMLElement {
 
     if (isBrowser) {
       const shadow = this.attachShadow({ mode: 'open' })
-      shadow.adoptedStyleSheets.push(stylesheet)
+      shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
 
       this.#internals = this.attachInternals()
 

@@ -69,7 +69,7 @@ export class CheckboxElement extends HTMLElement {
     super()
 
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
     this.#internals = this.attachInternals()
 
     element(this, {

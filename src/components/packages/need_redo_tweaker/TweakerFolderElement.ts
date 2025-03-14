@@ -99,7 +99,7 @@ export class TweakerFolderElement extends HTMLElement {
     super()
 
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
 
     this.#key = parameters.key
     this.#mutationObserver = new MutationObserver(this.#mutationListener)

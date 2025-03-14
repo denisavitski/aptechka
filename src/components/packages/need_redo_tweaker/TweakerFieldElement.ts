@@ -91,7 +91,7 @@ export class TweakerFieldElement extends HTMLElement {
     )
 
     const shadow = this.attachShadow({ mode: 'open' })
-    shadow.adoptedStyleSheets.push(stylesheet)
+    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, stylesheet]
 
     element(this, {
       class: {
