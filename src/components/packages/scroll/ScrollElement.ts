@@ -20,6 +20,7 @@ import {
   dispatchEvent,
   loopNumber,
   debounce,
+  isElementVisible,
 } from '@packages/utils'
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { CSSProperty } from '@packages/css-property'
@@ -183,6 +184,7 @@ export class ScrollElement extends HTMLElement {
   #contentElement: HTMLElement = null!
   #slotElement: HTMLSlotElement = null!
   #sections: Array<ScrollSection> = []
+  #visibleSections: Array<ScrollSection> = []
 
   #position = 0
   #contentPosition = 0
@@ -400,6 +402,10 @@ export class ScrollElement extends HTMLElement {
     return this.#sections
   }
 
+  public get visibleSections() {
+    return this.#visibleSections
+  }
+
   public get position() {
     return this.#position
   }
@@ -426,7 +432,7 @@ export class ScrollElement extends HTMLElement {
 
   public get limit() {
     return Math.ceil(
-      this.#sections.length - this.#sectionsInViewCSSProperty.current
+      this.#visibleSections.length - this.#sectionsInViewCSSProperty.current
     )
   }
 
@@ -515,7 +521,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   public scrollToSection(sectionIndex: number, options?: ScrollSetOptions) {
-    if (!this.#sections.length) {
+    if (!this.#visibleSections.length) {
       return
     }
 
@@ -523,14 +529,14 @@ export class ScrollElement extends HTMLElement {
 
     const newCounterValue = this.#clampCounter(sectionIndex)
 
-    const previousSection = this.#sections[previousCounter]
-    const currentSection = this.#sections[newCounterValue]
+    const previousSection = this.#visibleSections[previousCounter]
+    const currentSection = this.#visibleSections[newCounterValue]
 
     if (previousSection && currentSection) {
       let shiftValue = 0
 
       const nearestSectionIndex = this.#getNearestSectionIndex()
-      const nearestSection = this.#sections[nearestSectionIndex]
+      const nearestSection = this.#visibleSections[nearestSectionIndex]
 
       let scrolledFromNearestSection = nearestSection
         ? this.targetScrollValue - nearestSection.position
@@ -539,7 +545,7 @@ export class ScrollElement extends HTMLElement {
       if (this.#loopCSSProperty.current) {
         if (
           newCounterValue === 0 &&
-          previousCounter === this.#sections.length - 1
+          previousCounter === this.#visibleSections.length - 1
         ) {
           shiftValue =
             this.#scrollSize +
@@ -551,7 +557,7 @@ export class ScrollElement extends HTMLElement {
             scrolledFromNearestSection = 0
           }
         } else if (
-          newCounterValue === this.#sections.length - 1 &&
+          newCounterValue === this.#visibleSections.length - 1 &&
           previousCounter === 0
         ) {
           shiftValue =
@@ -569,7 +575,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   public shiftSections(step: number, options?: ScrollSetOptions) {
-    if (!this.#sections.length) {
+    if (!this.#visibleSections.length) {
       return
     }
 
@@ -602,6 +608,15 @@ export class ScrollElement extends HTMLElement {
       return
     }
 
+    this.#visibleSections = this.#sections.filter((s) =>
+      isElementVisible(s.element)
+    )
+
+    this.style.setProperty(
+      '--sections',
+      this.#visibleSections.length.toString()
+    )
+
     this.#damped.unlistenAnimationFrame()
 
     const prevProgress = this.currentScrollValue / this.#scrollSize || 0
@@ -627,21 +642,21 @@ export class ScrollElement extends HTMLElement {
       )
     }
 
-    if (this.#autoSizeCSSProperty.current && this.#sections.length) {
+    if (this.#autoSizeCSSProperty.current && this.#visibleSections.length) {
       const ivc = this.#sectionsInViewCSSProperty.current
 
       const sectionSize = (this.#viewportSize - this.#gap * (ivc - 1)) / ivc
 
-      this.#sections.forEach((section) => {
+      this.#visibleSections.forEach((section) => {
         section.setSize(sectionSize)
       })
     } else {
-      this.#sections.forEach((section) => {
+      this.#visibleSections.forEach((section) => {
         section.setSize()
       })
     }
 
-    this.#sections.forEach((section) => {
+    this.#visibleSections.forEach((section) => {
       section.resize()
     })
 
@@ -681,8 +696,9 @@ export class ScrollElement extends HTMLElement {
       this.#damped.max = this.#scrollSize
     }
 
-    if (this.#loopCSSProperty.current && this.#sections.length) {
-      const lastSection = this.#sections[this.#sections.length - 1]
+    if (this.#loopCSSProperty.current && this.#visibleSections.length) {
+      const lastSection =
+        this.#visibleSections[this.#visibleSections.length - 1]
       const lastSectionMax =
         lastSection.position + lastSection.size - this.#viewportSize
       const lastSectionMargin = this.#scrollSize - lastSectionMax
@@ -693,8 +709,8 @@ export class ScrollElement extends HTMLElement {
       this.#distance = this.#scrollSize
     }
 
-    if (this.#sectionalCSSProperty.current && this.#sections.length) {
-      const section = this.#sections[prevCounter]
+    if (this.#sectionalCSSProperty.current && this.#visibleSections.length) {
+      const section = this.#visibleSections[prevCounter]
 
       this.#damped.set(section.position, {
         equalize: true,
@@ -799,9 +815,9 @@ export class ScrollElement extends HTMLElement {
       this.#autoplayControls.interval = e.current
 
       if (this.#isConnected) {
-        if (e.current && !e.previous && !this.#sections.length) {
+        if (e.current && !e.previous && !this.#visibleSections.length) {
           this.#split()
-        } else if (!e.current && e.previous && this.#sections.length) {
+        } else if (!e.current && e.previous && this.#visibleSections.length) {
           this.#unsplit()
         }
       }
@@ -811,9 +827,9 @@ export class ScrollElement extends HTMLElement {
       if (this.#isConnected) {
         this.#resizeListener()
 
-        if (e.current && !e.previous && !this.#sections.length) {
+        if (e.current && !e.previous && !this.#visibleSections.length) {
           this.#split()
-        } else if (!e.current && e.previous && this.#sections.length) {
+        } else if (!e.current && e.previous && this.#visibleSections.length) {
           this.#unsplit()
         }
       }
@@ -833,7 +849,7 @@ export class ScrollElement extends HTMLElement {
         this.#damped.min = 0
       } else {
         if (this.#isConnected) {
-          if (!this.#sections.length) {
+          if (!this.#visibleSections.length) {
             this.#splitCSSProperty.current = true
           }
         }
@@ -900,7 +916,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#counter.subscribe((e) => {
-      if (this.#sections.length) {
+      if (this.#visibleSections.length) {
         this.#updateMarks()
       }
 
@@ -1053,9 +1069,9 @@ export class ScrollElement extends HTMLElement {
       }
     })
 
-    this.#contentElement.style.transform = ''
+    this.#visibleSections = [...this.#sections]
 
-    this.style.setProperty('--sections', this.#sections.length.toString())
+    this.#contentElement.style.transform = ''
 
     dispatchEvent(this, 'scrollSectionsChange', {
       custom: true,
@@ -1073,6 +1089,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#sections = []
+    this.#visibleSections = []
 
     this.#counter.reset()
     this.#damped.reset()
@@ -1191,7 +1208,7 @@ export class ScrollElement extends HTMLElement {
 
     this.#overscroll = Math.max(0, currentScrollValue - this.#scrollSize)
 
-    if (this.#sections.length) {
+    if (this.#visibleSections.length) {
       for (let i = 0; i < this.#sections.length; i++) {
         const section = this.#sections[i]
         section.transform()
@@ -1223,7 +1240,7 @@ export class ScrollElement extends HTMLElement {
     let counter = this.#counter.current
 
     if (this.#loopCSSProperty.current) {
-      counter = loopNumber(value, this.#sections.length)
+      counter = loopNumber(value, this.#visibleSections.length)
     } else {
       counter = clamp(value, 0, this.limit)
     }
@@ -1258,7 +1275,7 @@ export class ScrollElement extends HTMLElement {
       clearInterval(this.#focusTimeoutId)
 
       this.#focusTimeoutId = setTimeout(() => {
-        const section = this.#sections[this.#getNearestSectionIndex()]
+        const section = this.#visibleSections[this.#getNearestSectionIndex()]
 
         if (section) {
           this.scrollToSection(section.index, {
@@ -1282,7 +1299,7 @@ export class ScrollElement extends HTMLElement {
     if (this.#sectionalCSSProperty.current && type !== 'drag') {
       const direction = Math.sign(value)
 
-      if (this.#sections.length) {
+      if (this.#visibleSections.length) {
         const options: ScrollSetOptions = {
           tween:
             this.#easingCSSProperty.current || this.#durationCSSProperty.current
@@ -1322,7 +1339,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   #getScrollValue(type: 'target' | 'current' = 'current') {
-    if (this.#loopCSSProperty.current && this.#sections.length) {
+    if (this.#loopCSSProperty.current && this.#visibleSections.length) {
       const mod =
         this.#damped[type] %
         Math.round(this.#scrollSize + this.#viewportSize + this.#gap)
@@ -1337,7 +1354,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   #updateMarks() {
-    if (this.#sections.length) {
+    if (this.#visibleSections.length) {
       const counter =
         this.#counter.current + this.#currentIndexStartOffsetCSSProperty.current
 
@@ -1366,7 +1383,7 @@ export class ScrollElement extends HTMLElement {
 
         this.#currentSections = []
 
-        this.#sections.forEach((section, index) => {
+        this.#visibleSections.forEach((section, index) => {
           section.setCurrentIndex(null)
           section.setCurrentIndexArc(null)
           section.setCurrentIndexArcAbs(null)
@@ -1452,8 +1469,8 @@ export class ScrollElement extends HTMLElement {
 
     const dir = this.#damped.direction
 
-    for (let i = 0; i < this.#sections.length; i++) {
-      const section = this.#sections[i]
+    for (let i = 0; i < this.#visibleSections.length; i++) {
+      const section = this.#visibleSections[i]
 
       let offset = this.#isGrabbing ? section.size * dir * -1 * 0.4 : 0
 

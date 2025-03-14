@@ -99,10 +99,10 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
     let length = 0
 
     if (this.scrollElement.loopCSSProperty.current) {
-      length = this.scrollElement.sections.length
+      length = this.scrollElement.visibleSections.length
     } else {
       length =
-        this.scrollElement.sections.length -
+        this.scrollElement.visibleSections.length -
         Math.max(this.scrollElement.sectionsInViewCSSProperty.current - 1, 0)
     }
 
