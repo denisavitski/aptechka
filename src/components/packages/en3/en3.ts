@@ -156,6 +156,8 @@ class En3 {
       view.destroy()
     })
 
+    this.#views.clear()
+
     this.#webglRenderer.dispose()
     this.#webglRenderer.domElement.remove()
     this.#webglRenderer = null!
