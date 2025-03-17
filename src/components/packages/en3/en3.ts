@@ -136,7 +136,11 @@ class En3 {
     this.#isCreated = true
 
     windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.CANVAS)
-    ticker.subscribe(this.#tickListener, { order: TICK_ORDER.CANVAS })
+
+    ticker.subscribe(this.#tickListener, {
+      order: TICK_ORDER.CANVAS,
+      culling: this.#containerElement,
+    })
   }
 
   public destroy() {
