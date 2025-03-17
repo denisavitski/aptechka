@@ -159,7 +159,8 @@ class En3 {
     this.#webglRenderer.dispose()
     this.#webglRenderer.domElement.remove()
     this.#webglRenderer = null!
-    this.#composer.dispose()
+
+    this.#composer?.dispose()
     this.#composer = null!
 
     this.#isCreated = false
