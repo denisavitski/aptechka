@@ -98,9 +98,8 @@ class AccordionItem {
     setTimeout(() => {
       this.#element.classList.add('opened')
       this.#element.setAttribute('data-opened', '')
-      this.#activeTimeoutId = setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('resize'))
-      }, getElementTransitionDurationMS(this.#bodyElement))
+
+      this.#tryDispatchResizeEvent()
     }, 0)
 
     dispatchEvent(this.element, 'accordionItemToggle', {
@@ -126,10 +125,9 @@ class AccordionItem {
 
     this.#setScrollSize(0)
 
-    this.#activeTimeoutId = setTimeout(() => {
+    this.#tryDispatchResizeEvent(() => {
       this.#element.classList.remove('triggered')
-      window.dispatchEvent(new CustomEvent('resize'))
-    }, getElementTransitionDurationMS(this.#bodyElement))
+    })
 
     dispatchEvent(this.element, 'accordionItemToggle', {
       bubbles: true,
@@ -187,6 +185,15 @@ class AccordionItem {
     setTimeout(() => {
       this.#bodyElement.style.transition = ''
     }, 50)
+  }
+
+  #tryDispatchResizeEvent(callback?: Function) {
+    if (!this.#accordionElement.hasAttribute('no-window-resize')) {
+      this.#activeTimeoutId = setTimeout(() => {
+        callback?.()
+        window.dispatchEvent(new CustomEvent('resize'))
+      }, getElementTransitionDurationMS(this.#bodyElement))
+    }
   }
 }
 
