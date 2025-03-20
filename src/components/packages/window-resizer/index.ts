@@ -1,7 +1,7 @@
 import { Notifier } from '@packages/notifier'
 import { debounce, isBrowser } from '@packages/utils'
 
-export type WindowResizerCallback = () => void
+export type WindowResizerCallback = (event?: Event) => void
 
 export class WindowResizer extends Notifier<WindowResizerCallback> {
   #isResizeScheduled = false
@@ -25,15 +25,15 @@ export class WindowResizer extends Notifier<WindowResizerCallback> {
     return unsub
   }
 
-  #resizeListener = () => {
+  #resizeListener = (event?: Event) => {
     if (!this.#isResizeScheduled) {
       this.#isResizeScheduled = true
-      this.#resize()
+      this.#resize(event)
     }
   }
 
-  #resize = debounce(() => {
-    this.notify()
+  #resize = debounce((event?: Event) => {
+    this.notify(event)
     this.#isResizeScheduled = false
   }, 0)
 }
