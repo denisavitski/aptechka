@@ -231,17 +231,19 @@ class En3 {
     this.#webglRenderer.render(view.scene, view.camera)
   }
 
-  #resizeListener = () => {
-    this.#width = this.#containerElement.clientWidth
-    this.#height = this.#containerElement.clientHeight
+  #resizeListener = (e?: Event) => {
+    if (!(e instanceof CustomEvent)) {
+      this.#width = this.#containerElement.clientWidth
+      this.#height = this.#containerElement.clientHeight
 
-    this.#pixelRatio = Math.min(this.#maxPixelRatio, devicePixelRatio || 1)
-    this.#webglRenderer.setPixelRatio(this.#pixelRatio)
-    this.#webglRenderer.setSize(this.#width, this.#height)
+      this.#pixelRatio = Math.min(this.#maxPixelRatio, devicePixelRatio || 1)
+      this.#webglRenderer.setPixelRatio(this.#pixelRatio)
+      this.#webglRenderer.setSize(this.#width, this.#height)
 
-    if (this.#composer) {
-      this.#composer.setPixelRatio(this.#pixelRatio)
-      this.#composer.setSize(this.#width, this.#height)
+      if (this.#composer) {
+        this.#composer.setPixelRatio(this.#pixelRatio)
+        this.#composer.setSize(this.#width, this.#height)
+      }
     }
   }
 
