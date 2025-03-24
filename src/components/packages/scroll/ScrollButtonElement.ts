@@ -35,12 +35,23 @@ export abstract class ScrollButtonElement extends ScrollUserElement {
   protected override connectedCallback() {
     super.connectedCallback()
 
+    if (!this.hasAttribute('tabindex')) {
+      this.setAttribute('tabindex', '0')
+    }
+
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'button')
+    }
+
     this.#behaviour.observe()
     this.#easing.observe()
     this.#duration.observe()
   }
 
   protected disconnectedCallback() {
+    this.removeAttribute('tabindex')
+    this.removeAttribute('role')
+
     this.#behaviour.close()
     this.#easing.close()
     this.#duration.close()

@@ -29,6 +29,14 @@ export class BillboardStepButtonElement extends HTMLElement {
   protected async connectedCallback() {
     await customElements.whenDefined('e-billboard')
 
+    if (!this.hasAttribute('tabindex')) {
+      this.setAttribute('tabindex', '0')
+    }
+
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'button')
+    }
+
     this.#step.observe()
 
     this.tabIndex = 0
@@ -47,6 +55,8 @@ export class BillboardStepButtonElement extends HTMLElement {
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
+    this.removeAttribute('role')
+
     this.#step.unobserve()
 
     this.#billboardElement?.removeEventListener(

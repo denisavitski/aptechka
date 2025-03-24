@@ -28,7 +28,13 @@ export class BillboardSetButtonElement extends HTMLElement {
   }
 
   protected connectedCallback() {
-    this.tabIndex = 0
+    if (!this.hasAttribute('tabindex')) {
+      this.setAttribute('tabindex', '0')
+    }
+
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'button')
+    }
 
     this.#billboardElement = findParentElement(this, BillboardElement)
 
@@ -50,6 +56,7 @@ export class BillboardSetButtonElement extends HTMLElement {
 
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
+    this.removeAttribute('role')
 
     this.#index.unsubscribe(this.#changeListener)
 

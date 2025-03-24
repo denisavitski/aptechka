@@ -134,6 +134,10 @@ export class PopoverButtonElement extends HTMLElement {
       this.tabIndex = 0
     }
 
+    if (!this.hasAttribute('role')) {
+      this.setAttribute('role', 'button')
+    }
+
     const targetId = this.getAttribute('target')
 
     if (targetId) {
@@ -151,6 +155,8 @@ export class PopoverButtonElement extends HTMLElement {
     this.removeAttribute('aria-haspopup')
     this.removeAttribute('aria-expanded')
     this.removeAttribute('aria-controls')
+    this.removeAttribute('role')
+    this.removeAttribute('tabindex')
 
     this.#unlistenPopover()
   }
