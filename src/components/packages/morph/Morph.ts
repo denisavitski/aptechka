@@ -16,14 +16,14 @@ import { MorphLink } from './MorphLink'
 
 import { MorphAnnouncer } from './MorphAnnouncer'
 
-import { MorphRoute } from './MorphRoute'
+import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 
 export interface MorphOptions {
   base: string
   waitForHeadToLoad: boolean
   cachePages: boolean
   trailingSlash: boolean
-  scrollSelector: string
+  scrollSelector: string | undefined
   morphInsideScrollContainer: boolean
 }
 
@@ -67,6 +67,7 @@ export interface MorphEvents {
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
   morphScroll: CustomEvent<MorphScrollDetail>
+  morphNavigationScroll: CustomEvent<MorphRouteScrollState>
 }
 
 export interface MorphGetRouteOptions {
@@ -94,9 +95,12 @@ export class Morph {
   #previousPathname: string | undefined = undefined
   #promises: Array<Promise<void>> = []
   #isPopstateNavigation = false
-  #currentScrollElement: HTMLElement = null!
+  #currentScrollElement: HTMLElement | Window = null!
+  #isWindowScroll = false
   #routes = new Map<string, MorphRoute>()
   #announcer: MorphAnnouncer = null!
+  #currentScrollX = 0
+  #currentScrollY = 0
 
   constructor(parameters?: Partial<MorphOptions>) {
     if (isBrowser && !Morph.instance) {
@@ -108,7 +112,7 @@ export class Morph {
           parameters?.waitForHeadToLoad === false ? false : true,
         cachePages: parameters?.cachePages === false ? false : true,
         trailingSlash: parameters?.trailingSlash || false,
-        scrollSelector: parameters?.scrollSelector || 'body',
+        scrollSelector: parameters?.scrollSelector,
         morphInsideScrollContainer:
           parameters?.morphInsideScrollContainer || false,
       }
@@ -137,6 +141,8 @@ export class Morph {
       )
 
       this.findLinks()
+
+      history.scrollRestoration = 'manual'
 
       addEventListener('popstate', this.#popStateListener)
 
@@ -171,6 +177,21 @@ export class Morph {
 
   public get isPopstateNavigation() {
     return this.#isPopstateNavigation
+  }
+
+  public get scrollValue() {
+    let top = 0
+    let left = 0
+
+    if (this.#isWindowScroll) {
+      top = window.scrollY
+      left = window.scrollX
+    } else {
+      top = (this.#currentScrollElement as HTMLElement).scrollTop
+      left = (this.#currentScrollElement as HTMLElement).scrollLeft
+    }
+
+    return { top, left }
   }
 
   public saveState(state: any) {
@@ -519,6 +540,10 @@ export class Morph {
         fetchedRoute.renewScrollPosition()
       }
 
+      dispatchEvent(document, 'morphNavigationScroll', {
+        detail: fetchedRoute.scrollState,
+      })
+
       await Promise.all(this.#promises)
 
       oldElementsWithLoadEvent.forEach((child) => child.remove())
@@ -680,9 +705,15 @@ export class Morph {
       this.#scrollListener
     )
 
-    this.#currentScrollElement =
-      document.querySelector(this.#options.scrollSelector) ||
-      document.documentElement
+    this.#currentScrollY = 0
+    this.#currentScrollX = 0
+
+    this.#currentScrollElement = this.#options.scrollSelector
+      ? document.querySelector<HTMLElement>(this.#options.scrollSelector) ||
+        window
+      : window
+
+    this.#isWindowScroll = this.#currentScrollElement === window
 
     this.#currentScrollElement?.addEventListener('scroll', this.#scrollListener)
 
@@ -713,11 +744,34 @@ export class Morph {
   }
 
   #scrollListener = () => {
-    const top = this.#currentScrollElement.scrollTop
-    const left = this.#currentScrollElement.scrollLeft
+    const { left, top } = this.scrollValue
 
-    document.documentElement.classList.toggle('top-scrolled', top > 0)
-    document.documentElement.classList.toggle('left-scrolled', left > 0)
+    const directionY = top - this.#currentScrollY
+    const directionX = left - this.#currentScrollX
+
+    this.#currentScrollY = top
+    this.#currentScrollX = left
+
+    document.documentElement.classList.toggle('scroll-y', top > 0)
+    document.documentElement.classList.toggle('scroll-x', left > 0)
+
+    document.documentElement.classList.toggle(
+      'scroll-y-forward',
+      directionY > 0
+    )
+    document.documentElement.classList.toggle(
+      'scroll-y-backward',
+      directionY < 0
+    )
+
+    document.documentElement.classList.toggle(
+      'scroll-x-forward',
+      directionX > 0
+    )
+    document.documentElement.classList.toggle(
+      'scroll-x-backward',
+      directionX < 0
+    )
 
     dispatchEvent(document, 'morphScroll', {
       detail: {

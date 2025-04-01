@@ -3,7 +3,7 @@ import { ticker } from '@packages/ticker'
 import { intersector } from '@packages/intersector'
 
 export class CustomScrollbarElement extends HTMLElement {
-  #scrollElement: HTMLElement = null!
+  #scrollElement: HTMLElement | Window = null!
   #thumbElement: HTMLElement = null!
   #thumbScrollSize = 0
   #limit = 0
@@ -16,18 +16,22 @@ export class CustomScrollbarElement extends HTMLElement {
 
     this.#isHorizontal = this.hasAttribute('horisontal')
 
-    let scrollElement: HTMLElement | null = null
+    let scrollElement: HTMLElement | Window | null = null
 
     if (scrollSelector) {
       if (scrollSelector === 'parent') {
         scrollElement = this.parentElement
       } else {
-        scrollElement = document.querySelector(scrollSelector)
+        scrollElement = document.querySelector<HTMLElement>(scrollSelector)
       }
     }
 
     if (!scrollElement) {
       scrollElement = findScrollParentElement(this)
+
+      if (scrollElement === document.body) {
+        scrollElement = window
+      }
     }
 
     const thumbElement = this.querySelector<HTMLElement>('[data-thumb]')
@@ -39,7 +43,10 @@ export class CustomScrollbarElement extends HTMLElement {
       this.#scrollElement.addEventListener('scroll', this.#scrollListener)
       this.#thumbElement.addEventListener('pointerdown', this.#grabListener)
 
-      intersector.subscribe(this.parentElement!, this.#intersectionListener)
+      intersector.subscribe(
+        this.parentElement === document.body ? this : this.parentElement!,
+        this.#intersectionListener
+      )
     }
   }
 
@@ -53,15 +60,60 @@ export class CustomScrollbarElement extends HTMLElement {
     ticker.unsubscribe(this.#tickListener)
   }
 
+  get #scrollPosition() {
+    if (this.#scrollElement instanceof HTMLElement) {
+      return this.#isHorizontal
+        ? this.#scrollElement.scrollLeft
+        : this.#scrollElement.scrollTop
+    } else {
+      return this.#isHorizontal
+        ? this.#scrollElement.scrollX
+        : this.#scrollElement.scrollY
+    }
+  }
+
+  get #scrollSize() {
+    if (this.#scrollElement instanceof HTMLElement) {
+      return this.#isHorizontal
+        ? this.#scrollElement.scrollWidth
+        : this.#scrollElement.scrollHeight
+    } else {
+      return this.#isHorizontal
+        ? Math.max(
+            document.body.scrollWidth,
+            document.documentElement.scrollWidth,
+            document.body.offsetWidth,
+            document.documentElement.offsetWidth,
+            document.body.clientWidth,
+            document.documentElement.clientWidth
+          )
+        : Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.offsetHeight,
+            document.body.clientHeight,
+            document.documentElement.clientHeight
+          )
+    }
+  }
+
+  get #scrollViewportSize() {
+    if (this.#scrollElement instanceof HTMLElement) {
+      return this.#isHorizontal
+        ? this.#scrollElement.offsetWidth
+        : this.#scrollElement.offsetHeight
+    } else {
+      return this.#isHorizontal ? innerWidth : innerHeight
+    }
+  }
+
   #scrollListener = () => {
     this.classList.add('active')
 
     clearTimeout(this.#activeTimeoutId)
 
-    const scrollPosition = this.#isHorizontal
-      ? this.#scrollElement.scrollLeft
-      : this.#scrollElement.scrollTop
-
+    const scrollPosition = this.#scrollPosition
     const position = (scrollPosition / this.#limit) * this.#thumbScrollSize
 
     if (this.#isHorizontal) {
@@ -78,9 +130,10 @@ export class CustomScrollbarElement extends HTMLElement {
   #resizeListener = () => {
     const barSize = this.#isHorizontal ? this.offsetWidth : this.offsetHeight
 
-    this.#limit = this.#isHorizontal
-      ? this.#scrollElement.scrollWidth - this.#scrollElement.offsetWidth
-      : this.#scrollElement.scrollHeight - this.#scrollElement.offsetHeight
+    const scrollSize = this.#scrollSize
+    const viewportSize = this.#scrollViewportSize
+
+    this.#limit = scrollSize - viewportSize
 
     let thumbSize = (barSize * barSize) / (this.#limit + barSize)
 
@@ -96,12 +149,7 @@ export class CustomScrollbarElement extends HTMLElement {
 
     this.#thumbScrollSize = barSize - thumbSize
 
-    if (
-      (this.#isHorizontal &&
-        !(this.#scrollElement.scrollWidth > this.#scrollElement.offsetWidth)) ||
-      (!this.#isHorizontal &&
-        !(this.#scrollElement.scrollHeight > this.#scrollElement.offsetHeight))
-    ) {
+    if (scrollSize <= viewportSize) {
       this.style.display = 'none'
     } else {
       this.style.display = 'block'
@@ -111,9 +159,8 @@ export class CustomScrollbarElement extends HTMLElement {
   #grabListener = (grabEvent: PointerEvent) => {
     document.documentElement.classList.add('grabbing')
 
-    const startValue = this.#isHorizontal
-      ? this.#scrollElement.scrollLeft
-      : this.#scrollElement.scrollTop
+    const startValue = this.#scrollPosition
+
     const grabCursor = this.#isHorizontal ? grabEvent.x : grabEvent.y
 
     setupDrag(

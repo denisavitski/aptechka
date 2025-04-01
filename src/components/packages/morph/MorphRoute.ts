@@ -73,8 +73,8 @@ export class MorphRoute {
         'data-no-scroll-restoration'
       )
     ) {
-      this.#scrollState.x = this.#morph.scrollElement.scrollLeft
-      this.#scrollState.y = this.#morph.scrollElement.scrollTop
+      this.#scrollState.x = this.#morph.scrollValue.left
+      this.#scrollState.y = this.#morph.scrollValue.top
     } else {
       this.#scrollState.x = 0
       this.#scrollState.y = 0

@@ -16,7 +16,7 @@ export function scrollToElement(
     behavior?: ScrollBehavior
     offset?: number | ElementOrSelector<HTMLElement>
     center?: boolean
-    scrollElement?: HTMLElement
+    scrollElement?: HTMLElement | Window
   } = {}
 ) {
   let start
@@ -41,9 +41,12 @@ export function scrollToElement(
         ? offset
         : getElement(offset)?.offsetHeight || 0) * -1
 
-    const centerValue = center
-      ? (innerHeight / 2) * -1 + centerElement.offsetHeight / 2
-      : 0
+    const height =
+      centerElement instanceof HTMLElement
+        ? centerElement.offsetHeight
+        : innerHeight
+
+    const centerValue = center ? (innerHeight / 2) * -1 + height / 2 : 0
 
     scrollContainerElement.scroll({
       top: start + offsetValue + centerValue,

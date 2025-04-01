@@ -269,6 +269,11 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
 
+    if (this.hasAttribute('data-document-class')) {
+      const className = this.getAttribute('data-document-class')!
+      document.documentElement.classList.add(className)
+    }
+
     this.#status.set('closing', false)
     this.#status.set('triggered', true)
 
@@ -328,6 +333,11 @@ export class PopoverElement extends HTMLElement {
     this.#opened = false
 
     this.#deleteSearchParam()
+
+    if (this.hasAttribute('data-document-class')) {
+      const className = this.getAttribute('data-document-class')!
+      document.documentElement.classList.remove(className)
+    }
 
     this.#status.set('transitionend', false)
 
