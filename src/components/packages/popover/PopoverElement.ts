@@ -271,7 +271,9 @@ export class PopoverElement extends HTMLElement {
 
     if (this.hasAttribute('data-document-class')) {
       const className = this.getAttribute('data-document-class')!
-      document.documentElement.classList.add(className)
+      className.split(' ').map((v) => {
+        document.documentElement.classList.add(v.trim())
+      })
     }
 
     this.#status.set('closing', false)
@@ -336,7 +338,9 @@ export class PopoverElement extends HTMLElement {
 
     if (this.hasAttribute('data-document-class')) {
       const className = this.getAttribute('data-document-class')!
-      document.documentElement.classList.remove(className)
+      className.split(' ').map((v) => {
+        document.documentElement.classList.remove(v.trim())
+      })
     }
 
     this.#status.set('transitionend', false)

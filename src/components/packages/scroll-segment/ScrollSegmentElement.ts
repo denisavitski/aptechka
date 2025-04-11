@@ -925,6 +925,7 @@ export class ScrollSegmentElement extends HTMLElement {
       this.#releasedFromStartCSSProperty.current,
       this.#releasedFromFinishCSSProperty.current
     )
+
     this.#removeVars(
       this.#passedVarCSSProperty.current,
       this.#progressVarCSSProperty.current,

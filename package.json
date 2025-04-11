@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.65.0",
+  "version": "0.65.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -401,12 +401,12 @@
     "dev": "vite --host --mode site"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
+    "@types/node": "^22.13.17",
     "@types/three": "^0.175.0",
-    "tsx": "^4.19.2",
-    "vite": "^6.0.1",
-    "vite-plugin-dts": "^4.3.0",
-    "vite-plugin-htmc": "0.1.15"
+    "tsx": "^4.19.3",
+    "vite": "^6.2.4",
+    "vite-plugin-dts": "^4.5.3",
+    "vite-plugin-htmc": "0.1.16"
   },
   "dependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
