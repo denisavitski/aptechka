@@ -73,8 +73,7 @@ export class BillboardStepButtonElement extends HTMLElement {
     if (
       !this.#billboardElement.loop.current &&
       ((this.#billboardElement.counter === 0 && this.#step.current <= 0) ||
-        (this.#billboardElement.counter ===
-          this.#billboardElement.itemElements.length - 1 &&
+        (this.#billboardElement.counter === this.#billboardElement.length - 1 &&
           this.#step.current >= 0))
     ) {
       this.setAttribute('disabled', '')

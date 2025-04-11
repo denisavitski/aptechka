@@ -15,7 +15,7 @@ export class BillboardBulletsElement extends HTMLElement {
       if (this.isConnected) {
         this.innerHTML = ''
 
-        const length = this.#billboardElement!.itemElements.length
+        const length = this.#billboardElement!.length
 
         this.#contentElement = document.createElement('div')
 

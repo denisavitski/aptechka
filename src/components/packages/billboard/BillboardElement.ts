@@ -24,7 +24,9 @@ export class BillboardElement extends HTMLElement {
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
   #itemElements: Array<HTMLElement> = []
+  #groups: Map<string, Array<HTMLElement>> = new Map()
   #counter = 0
+  #length = 0
 
   public get counter() {
     return this.#counter
@@ -46,8 +48,16 @@ export class BillboardElement extends HTMLElement {
     return this.#itemElements
   }
 
+  public get groups() {
+    return this.#groups
+  }
+
+  public get length() {
+    return this.#length
+  }
+
   public addItem(element: HTMLElement) {
-    this.#itemElements.push(element)
+    this.#addElement(element)
     this.#updateCounter()
   }
 
@@ -63,13 +73,19 @@ export class BillboardElement extends HTMLElement {
   }
 
   protected connectedCallback() {
-    this.#itemElements = [
+    const itemElements = [
       ...this.querySelectorAll<HTMLElement>(
         `[data-billboard-item${this.id ? `="${this.id}"` : ''}]`
       ),
     ]
 
-    this.#itemElements[0]?.classList.add('current')
+    itemElements.forEach((el) => {
+      this.#addElement(el)
+    })
+
+    this.#groups.forEach((g) => {
+      g[0]?.classList.add('current')
+    })
 
     this.#autoplay.subscribe((e) => {
       if (e.current) {
@@ -99,8 +115,33 @@ export class BillboardElement extends HTMLElement {
     this.#loop.unobserve()
     this.#resize.unobserve()
 
+    this.#groups.clear()
+
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
+  }
+
+  #addElement(element: HTMLElement) {
+    this.#itemElements.push(element)
+    const groupName =
+      element.getAttribute('data-billboard-item-group') || 'default'
+
+    let group = this.#groups.get(groupName)
+
+    if (!group) {
+      group = []
+      this.#groups.set(groupName, group)
+    }
+
+    group.push(element)
+
+    this.#length = 0
+
+    this.#groups.forEach((g) => {
+      if (g.length > this.#length) {
+        this.#length = g.length
+      }
+    })
   }
 
   #tryAutoplay() {
@@ -134,9 +175,9 @@ export class BillboardElement extends HTMLElement {
     const prev = this.#counter
 
     if (this.#loop.current) {
-      this.#counter = loopNumber(value, this.#itemElements.length)
+      this.#counter = loopNumber(value, this.#length)
     } else {
-      this.#counter = clamp(value, 0, this.#itemElements.length - 1)
+      this.#counter = clamp(value, 0, this.#length - 1)
     }
 
     this.classList.remove('forward', 'backward')
@@ -147,29 +188,40 @@ export class BillboardElement extends HTMLElement {
       this.classList.add('backward')
     }
 
-    this.#itemElements.forEach((itemElement, i) => {
-      itemElement.classList.remove('current', 'previous', 'next')
+    this.#groups.forEach((group) => {
+      group.forEach((itemElement, i) => {
+        itemElement.classList.remove(
+          'current',
+          'previous',
+          'next',
+          'previous-sibling',
+          'next-sibling'
+        )
 
-      if (i === this.#counter) {
-        itemElement.classList.add('current')
-      } else if (i < this.#counter) {
-        itemElement.classList.add('previous')
-      } else if (i > this.#counter) {
-        itemElement.classList.add('next')
-      }
+        if (i === this.#counter) {
+          itemElement.classList.add('current')
+        } else if (i < this.#counter) {
+          itemElement.classList.add('previous')
+        } else if (i > this.#counter) {
+          itemElement.classList.add('next')
+        }
+
+        if (i === loopNumber(this.#counter - 1, this.length)) {
+          itemElement.classList.add('previous-sibling')
+        } else if (i === (this.#counter + 1) % this.length) {
+          itemElement.classList.add('next-sibling')
+        }
+      })
     })
 
-    this.classList.toggle('has-length', this.#itemElements.length > 1)
+    this.classList.toggle('has-length', this.#length > 1)
 
     this.classList.toggle('start', this.#counter === 0)
 
-    this.classList.toggle(
-      'end',
-      this.#counter === this.#itemElements.length - 1
-    )
+    this.classList.toggle('end', this.#counter === this.#length - 1)
 
     this.style.setProperty('--counter', this.#counter.toString())
-    this.style.setProperty('--sections', this.#itemElements.length.toString())
+    this.style.setProperty('--sections', this.#length.toString())
 
     if (this.#counter !== prev) {
       dispatchEvent(this, 'billboardChange', {
