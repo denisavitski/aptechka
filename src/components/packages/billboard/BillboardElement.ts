@@ -226,7 +226,7 @@ export class BillboardElement extends HTMLElement {
               setTimeout(() => {
                 this.#updateItem(itemElement, i)
                 res()
-              }, 0)
+              }, 10)
             })
           )
         } else {
