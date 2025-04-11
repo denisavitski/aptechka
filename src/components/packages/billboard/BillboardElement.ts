@@ -171,7 +171,31 @@ export class BillboardElement extends HTMLElement {
     }
   }
 
-  #updateCounter(value = this.#counter) {
+  #updateItem(itemElement: HTMLElement, index: number) {
+    itemElement.classList.remove(
+      'current',
+      'previous',
+      'next',
+      'previous-sibling',
+      'next-sibling'
+    )
+
+    if (index === this.#counter) {
+      itemElement.classList.add('current')
+    } else if (index < this.#counter) {
+      itemElement.classList.add('previous')
+    } else if (index > this.#counter) {
+      itemElement.classList.add('next')
+    }
+
+    if (index === loopNumber(this.#counter - 1, this.length)) {
+      itemElement.classList.add('previous-sibling')
+    } else if (index === (this.#counter + 1) % this.length) {
+      itemElement.classList.add('next-sibling')
+    }
+  }
+
+  async #updateCounter(value = this.#counter) {
     const prev = this.#counter
 
     if (this.#loop.current) {
@@ -188,31 +212,32 @@ export class BillboardElement extends HTMLElement {
       this.classList.add('backward')
     }
 
+    let waits: Array<Promise<void>> = []
+
     this.#groups.forEach((group) => {
       group.forEach((itemElement, i) => {
-        itemElement.classList.remove(
-          'current',
-          'previous',
-          'next',
-          'previous-sibling',
-          'next-sibling'
-        )
+        const visited = itemElement.classList.contains('visited')
 
-        if (i === this.#counter) {
-          itemElement.classList.add('current')
-        } else if (i < this.#counter) {
-          itemElement.classList.add('previous')
-        } else if (i > this.#counter) {
-          itemElement.classList.add('next')
-        }
+        if (i === this.#counter && !visited) {
+          itemElement.classList.add('visited')
 
-        if (i === loopNumber(this.#counter - 1, this.length)) {
-          itemElement.classList.add('previous-sibling')
-        } else if (i === (this.#counter + 1) % this.length) {
-          itemElement.classList.add('next-sibling')
+          waits.push(
+            new Promise((res) => {
+              setTimeout(() => {
+                this.#updateItem(itemElement, i)
+                res()
+              }, 0)
+            })
+          )
+        } else {
+          this.#updateItem(itemElement, i)
         }
       })
     })
+
+    if (waits.length) {
+      await Promise.all(waits)
+    }
 
     this.classList.toggle('has-length', this.#length > 1)
 
