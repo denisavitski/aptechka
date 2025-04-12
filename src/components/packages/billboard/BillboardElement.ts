@@ -205,7 +205,7 @@ export class BillboardElement extends HTMLElement {
       this.#counter = clamp(value, 0, this.#length - 1)
     }
 
-    this.classList.remove('forward', 'backward')
+    this.classList.remove('forward', 'backward', 'next-round', 'prev-round')
 
     if (this.#counter - prev >= 0) {
       this.classList.add('forward')
@@ -262,6 +262,10 @@ export class BillboardElement extends HTMLElement {
         }, 0)
       }
     }
+
+    setTimeout(() => {
+      this.classList.remove('next-round', 'prev-round')
+    }, 10)
   }
 
   #tick = () => {

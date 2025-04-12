@@ -5,6 +5,7 @@ export interface TickerCallbackEntry {
   subscribeTimestamp: number
   timeBetweenFrames: number
   timeElapsedSinceSubscription: number
+  timeElapsedSinceIntersection: number
 }
 
 export type TickerCallback = (entry: TickerCallbackEntry) => void
@@ -19,8 +20,10 @@ class TickerSubscriber {
   #callback: TickerCallback
   #maxFPS: number | undefined
   #order: number
+  #timestamp = 0
   #lastTimestamp = 0
   #subscribeTimestamp = 0
+  #intersectionTimestamp = 0
   #timeBetweenFrames = 0
   #isVisible = false
   #intersectionObserver: IntersectionObserver | null = null
@@ -37,6 +40,7 @@ class TickerSubscriber {
         this.#intersectionObserver = new IntersectionObserver(
           this.#intersectionListener
         )
+
         this.#intersectionObserver.observe(element)
       }
     } else {
@@ -57,6 +61,8 @@ class TickerSubscriber {
   }
 
   public tick(timestamp: number) {
+    this.#timestamp = timestamp
+
     this.#timeBetweenFrames = Math.max(0, timestamp - this.#lastTimestamp)
 
     if (!this.#subscribeTimestamp) {
@@ -80,6 +86,7 @@ class TickerSubscriber {
         timestamp: timestamp,
         subscribeTimestamp: this.#subscribeTimestamp,
         timeElapsedSinceSubscription: timestamp - this.#subscribeTimestamp,
+        timeElapsedSinceIntersection: timestamp - this.#intersectionTimestamp,
       })
     }
   }
@@ -90,7 +97,12 @@ class TickerSubscriber {
 
   #intersectionListener = (entries: Array<IntersectionObserverEntry>) => {
     const entry = entries[0]
+
     this.#isVisible = entry.isIntersecting
+
+    if (this.#isVisible) {
+      this.#intersectionTimestamp = this.#timestamp
+    }
   }
 }
 
