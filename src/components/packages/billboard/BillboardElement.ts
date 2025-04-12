@@ -40,6 +40,10 @@ export class BillboardElement extends HTMLElement {
     return this.#autoplay
   }
 
+  public get autoplayDuration() {
+    return parseFloat(this.#autoplay.current || '0') * 1000
+  }
+
   public get swipe() {
     return this.#swipe
   }
@@ -164,10 +168,7 @@ export class BillboardElement extends HTMLElement {
     clearInterval(this.#intervalId)
 
     if (this.#isIntersecting) {
-      this.#intervalId = setInterval(
-        this.#tick,
-        parseFloat(this.#autoplay.current || '0') * 1000
-      )
+      this.#intervalId = setInterval(this.#tick, this.autoplayDuration)
     }
   }
 

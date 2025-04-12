@@ -1,4 +1,4 @@
-import { findParentElement, isBrowser } from '@packages/utils'
+import { findParentElement, isBrowser, whenDefined } from '@packages/utils'
 import { BillboardElement } from './BillboardElement'
 
 export class BillboardBulletsElement extends HTMLElement {
@@ -6,12 +6,16 @@ export class BillboardBulletsElement extends HTMLElement {
   #contentElement: HTMLElement = null!
   #buttonElements: Array<HTMLElement> = []
 
+  public get buttonElements() {
+    return this.#buttonElements
+  }
+
   protected async connectedCallback() {
+    await whenDefined('e-billboard')
+
     this.#billboardElement = findParentElement(this, BillboardElement)
 
     if (this.#billboardElement) {
-      await customElements.whenDefined('e-billboard')
-
       if (this.isConnected) {
         this.innerHTML = ''
 
