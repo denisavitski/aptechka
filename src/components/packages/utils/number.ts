@@ -29,10 +29,13 @@ export function loopNumber(value: number, max: number) {
 }
 
 export function beautifyNumber(number: string | number) {
-  const rounded = Math.ceil(+number)
-  const stringNumber = rounded.toString()
+  number = number.toString().replace(/\s/g, '')
 
-  const trimmed = stringNumber.trim()
+  number = Math.ceil(+number)
+
+  number = number.toString()
+
+  const trimmed = number.trim()
 
   let result = ''
 

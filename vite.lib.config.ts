@@ -68,8 +68,6 @@ export function libConfig() {
           'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
-          'scroll-segment/index':
-            './src/components/packages/scroll-segment/index.ts',
           'sequence/index': './src/components/packages/sequence/index.ts',
           'size-element/index':
             './src/components/packages/size-element/index.ts',

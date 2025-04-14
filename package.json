@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.65.6",
+  "version": "0.65.7",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -188,11 +188,6 @@
       "require": "./lib/scroll-entries/index.cjs",
       "default": "./lib/scroll-entries/index.js"
     },
-    "./scroll-segment": {
-      "types": "./lib/scroll-segment/index.d.ts",
-      "require": "./lib/scroll-segment/index.cjs",
-      "default": "./lib/scroll-segment/index.js"
-    },
     "./sequence": {
       "types": "./lib/sequence/index.d.ts",
       "require": "./lib/sequence/index.cjs",
@@ -355,9 +350,6 @@
       ],
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"
-      ],
-      "scroll-segment": [
-        "lib/scroll-segment/index.d.ts"
       ],
       "sequence": [
         "lib/sequence/index.d.ts"

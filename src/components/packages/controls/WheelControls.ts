@@ -75,7 +75,7 @@ export class WheelControls extends Controls {
 
     if (
       (this.debounce && this.axis === 'x' && absX < 5) ||
-      (this.axis === 'y' && absY < 5)
+      (this.debounce && this.axis === 'y' && absY < 5)
     ) {
       return
     }
