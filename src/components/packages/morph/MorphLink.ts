@@ -56,6 +56,8 @@ export class MorphLink {
     if (back && this.#morph.previousPathname) {
       history.back()
     } else {
+      this.#pathname = this.#element.getAttribute('href') || '/'
+
       const historyAction =
         (this.#element.getAttribute(
           'data-history-action'
