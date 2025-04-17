@@ -211,6 +211,10 @@ export class PopoverElement extends HTMLElement {
     })
   }
 
+  public get openClass() {
+    return this.getAttribute('data-open-global-class')
+  }
+
   public get history() {
     return this.#history
   }
@@ -269,9 +273,8 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
 
-    if (this.hasAttribute('data-document-class')) {
-      const className = this.getAttribute('data-document-class')!
-      className.split(' ').map((v) => {
+    if (this.openClass) {
+      this.openClass.split(' ').map((v) => {
         document.documentElement.classList.add(v.trim())
       })
     }
@@ -306,6 +309,7 @@ export class PopoverElement extends HTMLElement {
         detail: {
           trigger: this.#lastTrigger,
         },
+        bubbles: true,
       })
 
       this.#openTimeoutId = undefined
@@ -336,9 +340,8 @@ export class PopoverElement extends HTMLElement {
 
     this.#deleteSearchParam()
 
-    if (this.hasAttribute('data-document-class')) {
-      const className = this.getAttribute('data-document-class')!
-      className.split(' ').map((v) => {
+    if (this.openClass) {
+      this.openClass.split(' ').map((v) => {
         document.documentElement.classList.remove(v.trim())
       })
     }
@@ -351,6 +354,7 @@ export class PopoverElement extends HTMLElement {
 
       dispatchEvent(this, 'popoverClosing', {
         custom: true,
+        bubbles: true,
       })
 
       this.#closeTimeoutId = setTimeout(() => {
@@ -359,6 +363,7 @@ export class PopoverElement extends HTMLElement {
 
         dispatchEvent(this, 'popoverClosed', {
           custom: true,
+          bubbles: true,
         })
       }, getElementTransitionDurationMS(this) + 10)
     }, 10)
