@@ -39,6 +39,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         }
       }
 
+      if (this.hasAttribute('release-pause')) {
+        this.consumerElement.pause()
+      }
+
       if (this.hasAttribute('reload-source')) {
         this.classList.remove(
           'state-0',
