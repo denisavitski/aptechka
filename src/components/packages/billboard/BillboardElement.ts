@@ -217,19 +217,23 @@ export class BillboardElement extends HTMLElement {
 
     this.#groups.forEach((group) => {
       group.forEach((itemElement, i) => {
-        const visited = itemElement.classList.contains('visited')
+        if (this.hasAttribute('visited-class')) {
+          const visited = itemElement.classList.contains('visited')
 
-        if (i === this.#counter && !visited) {
-          itemElement.classList.add('visited')
+          if (i === this.#counter && !visited) {
+            itemElement.classList.add('visited')
 
-          waits.push(
-            new Promise((res) => {
-              setTimeout(() => {
-                this.#updateItem(itemElement, i)
-                res()
-              }, 10)
-            })
-          )
+            waits.push(
+              new Promise((res) => {
+                setTimeout(() => {
+                  this.#updateItem(itemElement, i)
+                  res()
+                }, 10)
+              })
+            )
+          } else {
+            this.#updateItem(itemElement, i)
+          }
         } else {
           this.#updateItem(itemElement, i)
         }
