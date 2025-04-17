@@ -53,6 +53,16 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         )
       }
     })
+
+    this.addEventListener('click', () => {
+      if (this.hasAttribute('click-controls')) {
+        if (this.consumerElement.paused) {
+          this.consumerElement.play()
+        } else {
+          this.consumerElement.pause()
+        }
+      }
+    })
   }
 
   protected override disconnectedCallback() {
