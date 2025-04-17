@@ -1,6 +1,7 @@
 import { Damped, DampedOptions } from '@packages/animation'
 
 import {
+  Dot2D,
   ElementOrSelector,
   clamp,
   getElement,
@@ -16,6 +17,7 @@ export interface PointerParameters {
   damped?: DampedOptions
   cartesian?: boolean
   normalize?: boolean
+  fullScreen?: boolean
 }
 
 export class Pointer {
@@ -26,6 +28,8 @@ export class Pointer {
 
   #cartesian: boolean
   #normalize: boolean
+
+  #fullScreen = false
 
   #width = 0
   #height = 0
@@ -41,6 +45,7 @@ export class Pointer {
 
     this.#cartesian = parameters.cartesian || false
     this.#normalize = parameters.normalize || false
+    this.#fullScreen = parameters.fullScreen || false
   }
 
   public get element() {
@@ -134,8 +139,13 @@ export class Pointer {
   }
 
   #resizeListener = () => {
-    this.#width = this.element.clientWidth
-    this.#height = this.element.clientHeight
+    if (!this.#fullScreen) {
+      this.#width = this.element.clientWidth
+      this.#height = this.element.clientHeight
+    } else {
+      this.#width = document.documentElement.clientWidth
+      this.#height = innerHeight
+    }
 
     let xmin = 0
     let xmax = 0
@@ -180,7 +190,13 @@ export class Pointer {
   }
 
   #getPointerCoords(event: PointerEvent) {
-    const pos = getPointerPosition(event, this.#element.getBoundingClientRect())
+    let pos: Dot2D = null!
+
+    if (this.#fullScreen) {
+      pos = { x: event.clientX, y: event.clientY }
+    } else {
+      pos = getPointerPosition(event, this.#element.getBoundingClientRect())
+    }
 
     const size = {
       width: this.#width,
