@@ -67,7 +67,7 @@ export interface MorphEvents {
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
   morphScroll: CustomEvent<MorphScrollDetail>
-  morphNavigationScroll: CustomEvent<MorphRouteScrollState>
+  morphBeforeNavigationScroll: CustomEvent<MorphRouteScrollState>
 }
 
 export interface MorphGetRouteOptions {
@@ -531,6 +531,22 @@ export class Morph {
         this.#promises.push(promise)
       })
 
+      if (this.isPopstateNavigation) {
+        document.documentElement.style.setProperty(
+          '--new-document-scroll-position',
+          (this.scrollValue.top - fetchedRoute.scrollState.y) * 1 + 'px'
+        )
+      } else {
+        document.documentElement.style.setProperty(
+          '--new-document-scroll-position',
+          this.scrollValue.top + 'px'
+        )
+      }
+
+      dispatchEvent(document, 'morphBeforeNavigationScroll', {
+        detail: fetchedRoute.scrollState,
+      })
+
       if (hash) {
         fetchedRoute.clearScrollState()
         this.#tryScrollToElement(hash, { centerScroll, offsetScroll })
@@ -539,10 +555,6 @@ export class Morph {
       } else {
         fetchedRoute.renewScrollPosition()
       }
-
-      dispatchEvent(document, 'morphNavigationScroll', {
-        detail: fetchedRoute.scrollState,
-      })
 
       await Promise.all(this.#promises)
 
@@ -564,6 +576,10 @@ export class Morph {
       dispatchEvent(document, 'morphComplete', {
         detail: transitionDetail,
       })
+
+      document.documentElement.style.removeProperty(
+        '--new-document-scroll-position'
+      )
 
       window.dispatchEvent(new Event('resize'))
     } catch (e) {
