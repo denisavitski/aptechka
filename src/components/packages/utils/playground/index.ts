@@ -1,7 +1,3 @@
-import { setIntervalOnIntersection } from '../timeouts'
+import { beautifyNumber } from '../number'
 
-const boxEl = document.querySelector('.box') as HTMLElement
-
-setIntervalOnIntersection(boxEl, 1000, (e) => {
-  console.log(e)
-})
+console.log(beautifyNumber('900 000'))

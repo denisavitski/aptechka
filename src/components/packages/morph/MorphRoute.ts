@@ -12,23 +12,32 @@ export interface MorphRouteSaveState {
 
 export type MorpRouteSaveParametersArg = string | object | URLSearchParams
 
+const domParser = new DOMParser()
+
 export class MorphRoute {
   #morph: Morph
   #pathname: string
+  #searchParameters?: string
   #scrollState: MorphRouteScrollState = { x: 0, y: 0 }
-  #initialDocument: Document
+  #initialDocument: Document = null!
   #modifiedDocument: Document | null = null
   #currentDocument: Document = null!
   #savedState: any = null
+  #abortController: AbortController | null = null
+  #fetching: Promise<void> | null = null
 
-  constructor(morph: Morph, pathname: string, initialDocument: Document) {
+  constructor(morph: Morph, pathname: string, searchParameters?: string) {
     this.#morph = morph
     this.#pathname = pathname
-    this.#initialDocument = initialDocument.cloneNode(true) as Document
+    this.#searchParameters = searchParameters
   }
 
   public get pathname() {
     return this.#pathname
+  }
+
+  public get searchParameters() {
+    return this.#searchParameters
   }
 
   public get scrollState() {
@@ -37,6 +46,53 @@ export class MorphRoute {
 
   public get document() {
     return this.#currentDocument
+  }
+
+  public setInitialDocument(document: Document) {
+    this.#initialDocument = document.cloneNode(true) as Document
+  }
+
+  public abort() {
+    return this.#abortController?.abort(
+      `[${this.pathname}] page loading cancelled`
+    )
+  }
+
+  public async fetch(revalidate?: boolean) {
+    if (this.#initialDocument && !revalidate) {
+      return
+    }
+
+    if (this.#fetching) {
+      return this.#fetching
+    }
+
+    this.#fetching = new Promise<void>(async (res) => {
+      try {
+        this.#abortController = new AbortController()
+
+        const fetchResult = await fetch(
+          `${this.pathname}${
+            this.searchParameters ? '?' + this.searchParameters : ''
+          }`,
+          {
+            signal: this.#abortController.signal,
+          }
+        )
+
+        const text = await fetchResult.text()
+
+        const document = domParser.parseFromString(text, 'text/html')
+
+        this.setInitialDocument(document)
+      } catch (e) {
+        console.warn(e)
+      } finally {
+        this.#abortController = null
+        this.#fetching = null
+        res()
+      }
+    })
   }
 
   public cloneDocument() {

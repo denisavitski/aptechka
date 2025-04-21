@@ -90,7 +90,6 @@ class En3 {
 
   public setup(options?: En3Options) {
     if (this.#isCreated) {
-      console.warn('[en3.setup]: You are trying to setup en3 again.')
       return
     }
 
@@ -145,9 +144,6 @@ class En3 {
 
   public destroy() {
     if (!this.#isCreated) {
-      console.warn(
-        '[en3.setup]: You are trying to destory en3 but it has not been initialized.'
-      )
       return
     }
 

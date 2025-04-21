@@ -89,7 +89,6 @@ export class Morph {
   #options: MorphOptions = null!
   #morphElements: Array<HTMLElement> = null!
   #links: Array<MorphLink> = []
-  #domParser: DOMParser = new DOMParser()
   #candidatePathname: string | undefined
   #currentPathname: string = null!
   #previousPathname: string | undefined = undefined
@@ -125,10 +124,10 @@ export class Morph {
 
       this.#currentPathname = normalizedPath.pathname
 
-      this.#routes.set(
-        this.#currentPathname,
-        new MorphRoute(this, this.#currentPathname, document)
-      )
+      const initialRoute = new MorphRoute(this, this.#currentPathname)
+      initialRoute.setInitialDocument(document)
+
+      this.#routes.set(this.#currentPathname, initialRoute)
 
       document.documentElement.setAttribute(
         'data-current-pathname',
@@ -217,10 +216,8 @@ export class Morph {
   public async prefetch(path: string, revalidate?: boolean) {
     const parts = this.normalizePath(path)
 
-    this.#getRoute(parts.pathname, {
-      searchParameters: parts.parameters,
-      revalidate,
-    })
+    const route = this.#getRoute(parts.pathname, parts.parameters)
+    route?.fetch(revalidate)
   }
 
   public async navigate(
@@ -304,12 +301,16 @@ export class Morph {
         detail: transitionDetail,
       })
 
-      const currentRoute = await this.#getRoute(this.#currentPathname)
+      const currentRoute = this.#getRoute(this.#currentPathname)
+      const nextRoute = this.#getRoute(pathname, parameters)
 
-      const fetchedRoute = await this.#getRoute(pathname, {
-        searchParameters: parameters,
-        revalidate,
+      this.#routes.forEach((el) => {
+        if (el.pathname !== pathname) {
+          el.abort()
+        }
       })
+
+      await nextRoute?.fetch(revalidate)
 
       if (this.#candidatePathname !== pathname) {
         this.#links.forEach((link) => {
@@ -324,17 +325,17 @@ export class Morph {
       currentRoute.saveDocumentState()
 
       if (!this.#isPopstateNavigation) {
-        fetchedRoute.clearScrollState()
-        fetchedRoute.clearDocumentState()
+        nextRoute.clearScrollState()
+        nextRoute.clearDocumentState()
       }
 
       if (clearState) {
-        fetchedRoute.clearState()
+        nextRoute.clearState()
       }
 
-      fetchedRoute.cloneDocument()
+      nextRoute.cloneDocument()
 
-      this.#announcer.textContent = fetchedRoute.title
+      this.#announcer.textContent = nextRoute.title
 
       document.body.appendChild(this.#announcer)
 
@@ -343,7 +344,7 @@ export class Morph {
       })
 
       const currentHeadChildren = Array.from(document.head.children)
-      const newHeadChildren = Array.from(fetchedRoute.document.head.children)
+      const newHeadChildren = Array.from(nextRoute.document.head.children)
 
       const identicalHeadChildren = this.#intersectElements(
         currentHeadChildren,
@@ -414,11 +415,11 @@ export class Morph {
       })
 
       const newMorphElements = this.#getMorphElements(
-        fetchedRoute.document.body as HTMLElement
+        nextRoute.document.body as HTMLElement
       )
 
       if (!this.#options.morphInsideScrollContainer) {
-        this.#updateCurrentScrollElement(fetchedRoute.document)
+        this.#updateCurrentScrollElement(nextRoute.document)
       }
 
       document.documentElement.setAttribute('data-current-pathname', pathname)
@@ -534,7 +535,7 @@ export class Morph {
       if (this.isPopstateNavigation) {
         document.documentElement.style.setProperty(
           '--new-document-scroll-position',
-          (this.scrollValue.top - fetchedRoute.scrollState.y) * 1 + 'px'
+          (this.scrollValue.top - nextRoute.scrollState.y) * 1 + 'px'
         )
       } else {
         document.documentElement.style.setProperty(
@@ -544,16 +545,16 @@ export class Morph {
       }
 
       dispatchEvent(document, 'morphBeforeNavigationScroll', {
-        detail: fetchedRoute.scrollState,
+        detail: nextRoute.scrollState,
       })
 
       if (hash) {
-        fetchedRoute.clearScrollState()
+        nextRoute.clearScrollState()
         this.#tryScrollToElement(hash, { centerScroll, offsetScroll })
       } else if (this.#isPopstateNavigation) {
-        fetchedRoute.restoreScrollPosition()
+        nextRoute.restoreScrollPosition()
       } else {
-        fetchedRoute.renewScrollPosition()
+        nextRoute.renewScrollPosition()
       }
 
       await Promise.all(this.#promises)
@@ -651,27 +652,13 @@ export class Morph {
     )
   }
 
-  async #getRoute(path: string, options?: MorphGetRouteOptions) {
+  #getRoute(path: string, searchParameters?: string) {
     let route = this.#routes.get(path)
 
-    if (!route || options?.revalidate) {
-      route = await this.#createRoute(path, options?.searchParameters)
+    if (!route) {
+      route = new MorphRoute(this, path, searchParameters)
+      this.#routes.set(path, route)
     }
-
-    return route
-  }
-
-  async #createRoute(path: string, searchParameters?: string) {
-    const fetchResult = await fetch(
-      `${path}${searchParameters ? '?' + searchParameters : ''}`
-    )
-
-    const text = await fetchResult.text()
-    const document = this.#domParser.parseFromString(text, 'text/html')
-
-    const route = new MorphRoute(this, path, document)
-
-    this.#routes.set(path, route)
 
     return route
   }
