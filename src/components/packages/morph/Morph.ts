@@ -214,6 +214,10 @@ export class Morph {
   }
 
   public async prefetch(path: string, revalidate?: boolean) {
+    if (this.#promises.length) {
+      return
+    }
+
     const parts = this.normalizePath(path)
 
     const route = this.#getRoute(parts.pathname, parts.parameters)
