@@ -16,8 +16,7 @@ const domParser = new DOMParser()
 
 export class MorphRoute {
   #morph: Morph
-  #pathname: string
-  #searchParameters?: string
+  #path: string
   #scrollState: MorphRouteScrollState = { x: 0, y: 0 }
   #initialDocument: Document = null!
   #modifiedDocument: Document | null = null
@@ -26,18 +25,13 @@ export class MorphRoute {
   #abortController: AbortController | null = null
   #fetching: Promise<void> | null = null
 
-  constructor(morph: Morph, pathname: string, searchParameters?: string) {
+  constructor(morph: Morph, path: string) {
     this.#morph = morph
-    this.#pathname = pathname
-    this.#searchParameters = searchParameters
+    this.#path = path
   }
 
-  public get pathname() {
-    return this.#pathname
-  }
-
-  public get searchParameters() {
-    return this.#searchParameters
+  public get path() {
+    return this.#path
   }
 
   public get scrollState() {
@@ -54,22 +48,17 @@ export class MorphRoute {
 
   public abort() {
     return this.#abortController?.abort(
-      `[${this.pathname}] page loading cancelled`
+      `[${this.#path}] page loading cancelled`
     )
   }
 
   public async fetch(revalidate?: boolean) {
     if (
-      this.#initialDocument &&
-      !revalidate &&
-      !this.#initialDocument.documentElement.hasAttribute(
-        'data-always-revalidate'
-      )
+      this.#fetching ||
+      (this.#initialDocument &&
+        this.#initialDocument.documentElement.hasAttribute('data-cache') &&
+        !revalidate)
     ) {
-      return
-    }
-
-    if (this.#fetching) {
       return this.#fetching
     }
 
@@ -77,14 +66,9 @@ export class MorphRoute {
       try {
         this.#abortController = new AbortController()
 
-        const fetchResult = await fetch(
-          `${this.pathname}${
-            this.searchParameters ? '?' + this.searchParameters : ''
-          }`,
-          {
-            signal: this.#abortController.signal,
-          }
-        )
+        const fetchResult = await fetch(this.#path, {
+          signal: this.#abortController.signal,
+        })
 
         const text = await fetchResult.text()
 
@@ -116,7 +100,7 @@ export class MorphRoute {
       title = this.#currentDocument.title
     } else {
       const h1 = this.#currentDocument.querySelector('h1')
-      title = h1?.innerText || h1?.textContent || this.#pathname
+      title = h1?.innerText || h1?.textContent || this.#path
     }
 
     return title

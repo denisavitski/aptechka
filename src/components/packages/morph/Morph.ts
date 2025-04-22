@@ -21,20 +21,19 @@ import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 export interface MorphOptions {
   base: string
   waitForHeadToLoad: boolean
-  cachePages: boolean
   trailingSlash: boolean
   scrollSelector: string | undefined
   morphInsideScrollContainer: boolean
 }
 
 export interface MorphNavigationEntry {
-  pathname: string
+  path: string
   submorph?: Array<string>
 }
 
 export interface MorphChildrenActionEntry {
   morphElement: HTMLElement
-  pathname: string
+  path: string
 }
 
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
@@ -89,8 +88,8 @@ export class Morph {
   #options: MorphOptions = null!
   #morphElements: Array<HTMLElement> = null!
   #links: Array<MorphLink> = []
-  #candidatePathname: string | undefined
-  #currentPathname: string = null!
+  #candidatePath: string | undefined
+  #currentPath: string = null!
   #previousPathname: string | undefined = undefined
   #promises: Array<Promise<void>> = []
   #isPopstateNavigation = false
@@ -109,7 +108,6 @@ export class Morph {
         base: normalizeBase(parameters?.base),
         waitForHeadToLoad:
           parameters?.waitForHeadToLoad === false ? false : true,
-        cachePages: parameters?.cachePages === false ? false : true,
         trailingSlash: parameters?.trailingSlash || false,
         scrollSelector: parameters?.scrollSelector,
         morphInsideScrollContainer:
@@ -122,16 +120,16 @@ export class Morph {
         location.pathname + location.hash
       )
 
-      this.#currentPathname = normalizedPath.pathname
+      this.#currentPath = normalizedPath.pathname
 
-      const initialRoute = new MorphRoute(this, this.#currentPathname)
+      const initialRoute = new MorphRoute(this, this.#currentPath)
       initialRoute.setInitialDocument(document)
 
-      this.#routes.set(this.#currentPathname, initialRoute)
+      this.#routes.set(this.#currentPath, initialRoute)
 
       document.documentElement.setAttribute(
         'data-current-pathname',
-        this.#currentPathname
+        this.#currentPath
       )
 
       document.documentElement.setAttribute(
@@ -147,7 +145,7 @@ export class Morph {
 
       changeHistory({
         action: 'replace',
-        pathname: this.#currentPathname,
+        pathname: this.#currentPath,
         searchParameters: normalizedPath.parameters || location.search,
         hash: normalizedPath.hash,
       })
@@ -158,8 +156,8 @@ export class Morph {
     }
   }
 
-  public get currentPathname() {
-    return this.#currentPathname
+  public get currentPath() {
+    return this.#currentPath
   }
 
   public get previousPathname() {
@@ -194,7 +192,7 @@ export class Morph {
   }
 
   public saveState(state: any) {
-    const route = this.#routes.get(this.#currentPathname)
+    const route = this.#routes.get(this.#currentPath)
 
     if (route) {
       route.saveState(state)
@@ -202,7 +200,7 @@ export class Morph {
   }
 
   public getState() {
-    const route = this.#routes.get(this.#currentPathname)
+    const route = this.#routes.get(this.#currentPath)
     return route?.clearState()
   }
 
@@ -218,9 +216,7 @@ export class Morph {
       return
     }
 
-    const parts = this.normalizePath(path)
-
-    const route = this.#getRoute(parts.pathname, parts.parameters)
+    const route = this.#getRoute(path)
     route?.fetch(revalidate)
   }
 
@@ -240,16 +236,16 @@ export class Morph {
       return
     }
 
-    const parts = this.normalizePath(this.pathnameModifier?.(path) || path)
-
-    let { pathname, hash, parameters, leaf } = parts
+    const normalizedPath = this.normalizePath(
+      this.pathnameModifier?.(path) || path
+    )
 
     if (
-      this.#candidatePathname === pathname ||
-      this.#currentPathname === pathname
+      this.#candidatePath === normalizedPath.path ||
+      this.#currentPath === normalizedPath.path
     ) {
       if (!this.#isPopstateNavigation) {
-        this.#tryScrollToElement(hash || 0, {
+        this.#tryScrollToElement(normalizedPath.hash || 0, {
           centerScroll,
           offsetScroll,
           behavior: 'smooth',
@@ -259,10 +255,10 @@ export class Morph {
       return
     }
 
-    this.#candidatePathname = pathname
+    this.#candidatePath = normalizedPath.path
 
     this.#links.forEach((link) => {
-      link.checkCurrent(pathname)
+      link.checkCurrent(normalizedPath.path)
     })
 
     try {
@@ -272,7 +268,7 @@ export class Morph {
         try {
           await new Promise<void>((resolve, reject) => {
             this.preprocessor?.({
-              pathname,
+              path,
               resolve,
               reject,
               submorph,
@@ -288,16 +284,19 @@ export class Morph {
         }
       }
 
-      if (!preprocessedSuccesfully || this.#candidatePathname !== pathname) {
+      if (
+        !preprocessedSuccesfully ||
+        this.#candidatePath !== normalizedPath.path
+      ) {
         this.#links.forEach((link) => {
-          link.checkCurrent(this.#currentPathname)
+          link.checkCurrent(this.#currentPath)
         })
 
         return
       }
 
       const transitionDetail: MorphNavigationEntry = {
-        pathname,
+        path: normalizedPath.path,
         submorph,
       }
 
@@ -305,20 +304,20 @@ export class Morph {
         detail: transitionDetail,
       })
 
-      const currentRoute = this.#getRoute(this.#currentPathname)
-      const nextRoute = this.#getRoute(pathname, parameters)
+      const currentRoute = this.#getRoute(this.#currentPath)
+      const nextRoute = this.#getRoute(path)
 
       this.#routes.forEach((el) => {
-        if (el.pathname !== pathname) {
+        if (el.path !== normalizedPath.path) {
           el.abort()
         }
       })
 
       await nextRoute?.fetch(revalidate)
 
-      if (this.#candidatePathname !== pathname) {
+      if (this.#candidatePath !== normalizedPath.path) {
         this.#links.forEach((link) => {
-          link.checkCurrent(this.#currentPathname)
+          link.checkCurrent(this.#currentPath)
         })
 
         return
@@ -426,21 +425,28 @@ export class Morph {
         this.#updateCurrentScrollElement(nextRoute.document)
       }
 
-      document.documentElement.setAttribute('data-current-pathname', pathname)
-      document.documentElement.setAttribute('data-current-leaf', leaf)
+      document.documentElement.setAttribute(
+        'data-current-pathname',
+        normalizedPath.pathname
+      )
+      document.documentElement.setAttribute(
+        'data-current-leaf',
+        normalizedPath.leaf
+      )
 
       changeHistory({
         action: historyAction,
-        pathname,
+        pathname: normalizedPath.pathname,
         searchParameters:
-          parameters || (keepSearchParameters ? location.search : ''),
-        hash,
+          normalizedPath.parameters ||
+          (keepSearchParameters ? location.search : ''),
+        hash: normalizedPath.hash,
       })
 
       this.#announcer.remove()
 
-      this.#previousPathname = this.#currentPathname
-      this.#currentPathname = pathname
+      this.#previousPathname = this.#currentPath
+      this.#currentPath = normalizedPath.path
 
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
@@ -505,7 +511,7 @@ export class Morph {
 
         const detail: MorphChildrenActionEntry = {
           morphElement,
-          pathname,
+          path: normalizedPath.path,
         }
 
         dispatchEvent(document, 'morphNewChildrenAdded', {
@@ -552,9 +558,12 @@ export class Morph {
         detail: nextRoute.scrollState,
       })
 
-      if (hash) {
+      if (normalizedPath.hash) {
         nextRoute.clearScrollState()
-        this.#tryScrollToElement(hash, { centerScroll, offsetScroll })
+        this.#tryScrollToElement(normalizedPath.hash, {
+          centerScroll,
+          offsetScroll,
+        })
       } else if (this.#isPopstateNavigation) {
         nextRoute.restoreScrollPosition()
       } else {
@@ -591,7 +600,7 @@ export class Morph {
       console.error(e)
     }
 
-    this.#candidatePathname = undefined
+    this.#candidatePath = undefined
   }
 
   public addLink(element: HTMLAnchorElement) {
@@ -656,11 +665,11 @@ export class Morph {
     )
   }
 
-  #getRoute(path: string, searchParameters?: string) {
+  #getRoute(path: string) {
     let route = this.#routes.get(path)
 
     if (!route) {
-      route = new MorphRoute(this, path, searchParameters)
+      route = new MorphRoute(this, path)
       this.#routes.set(path, route)
     }
 

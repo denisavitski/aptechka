@@ -5,13 +5,13 @@ import { cssValueParser } from '@packages/css-value-parser'
 export class MorphLink {
   #morph: Morph
   #element: HTMLAnchorElement
-  #pathname: string
+  #path: string
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
     this.#morph = morph
     this.#element = element
 
-    this.#pathname = this.#element.getAttribute('href') || '/'
+    this.#path = this.#element.getAttribute('href') || '/'
 
     this.#element.addEventListener('click', this.#clickListener)
 
@@ -26,9 +26,9 @@ export class MorphLink {
     return this.#element
   }
 
-  public checkCurrent(pathname: string) {
-    const locationUrl = this.#morph.normalizePath(pathname)
-    const linkUrl = this.#morph.normalizePath(this.#pathname)
+  public checkCurrent(path: string) {
+    const locationUrl = this.#morph.normalizePath(path)
+    const linkUrl = this.#morph.normalizePath(this.#path)
 
     if (
       this.#element.hasAttribute('data-include') &&
@@ -56,7 +56,7 @@ export class MorphLink {
     if (back && this.#morph.previousPathname) {
       history.back()
     } else {
-      this.#pathname = this.#element.getAttribute('href') || '/'
+      this.#path = this.#element.getAttribute('href') || '/'
 
       const historyAction =
         (this.#element.getAttribute(
@@ -86,7 +86,7 @@ export class MorphLink {
 
       const clearState = this.#element.hasAttribute('data-clear-state')
 
-      this.#morph.navigate(this.#pathname, {
+      this.#morph.navigate(this.#path, {
         historyAction,
         centerScroll,
         offsetScroll,
@@ -100,7 +100,7 @@ export class MorphLink {
 
   #pointerListener = () => {
     const revalidate = this.#element.hasAttribute('data-revalidate')
-    this.#morph.prefetch(this.#pathname, revalidate)
+    this.#morph.prefetch(this.#path, revalidate)
     this.#element.removeEventListener('pointerenter', this.#pointerListener)
   }
 }
