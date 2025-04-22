@@ -93,6 +93,8 @@ export class MorphRoute {
         res()
       }
     })
+
+    return this.#fetching
   }
 
   public cloneDocument() {
