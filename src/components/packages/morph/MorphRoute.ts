@@ -59,7 +59,13 @@ export class MorphRoute {
   }
 
   public async fetch(revalidate?: boolean) {
-    if (this.#initialDocument && !revalidate) {
+    if (
+      this.#initialDocument &&
+      !revalidate &&
+      !this.#initialDocument.documentElement.hasAttribute(
+        'data-always-revalidate'
+      )
+    ) {
       return
     }
 
