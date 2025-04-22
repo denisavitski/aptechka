@@ -57,7 +57,8 @@ export class MorphRoute {
       this.#fetching ||
       (this.#initialDocument &&
         this.#initialDocument.documentElement.hasAttribute('data-cache') &&
-        !revalidate)
+        !revalidate) ||
+      (this.#initialDocument && this.#morph.isPopstateNavigation)
     ) {
       return this.#fetching
     }

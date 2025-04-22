@@ -117,10 +117,10 @@ export class Morph {
       this.#morphElements = this.#getMorphElements(document.body)
 
       const normalizedPath = this.normalizePath(
-        location.pathname + location.hash
+        location.pathname + location.hash + location.search
       )
 
-      this.#currentPath = normalizedPath.pathname
+      this.#currentPath = normalizedPath.path
 
       const initialRoute = new MorphRoute(this, this.#currentPath)
       initialRoute.setInitialDocument(document)
@@ -145,8 +145,8 @@ export class Morph {
 
       changeHistory({
         action: 'replace',
-        pathname: this.#currentPath,
-        searchParameters: normalizedPath.parameters || location.search,
+        pathname: normalizedPath.pathname,
+        searchParameters: normalizedPath.parameters,
         hash: normalizedPath.hash,
       })
 
