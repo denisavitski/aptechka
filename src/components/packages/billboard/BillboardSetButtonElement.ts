@@ -69,11 +69,7 @@ export class BillboardSetButtonElement extends HTMLElement {
   }
 
   #changeListener = () => {
-    if (this.#index.current === this.#billboardElement?.counter) {
-      this.classList.add('current')
-    } else {
-      this.classList.remove('current')
-    }
+    this.#billboardElement?.updateItemClasses(this, this.#index.current)
   }
 }
 

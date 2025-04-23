@@ -76,6 +76,30 @@ export class BillboardElement extends HTMLElement {
     this.set(this.#counter + value)
   }
 
+  public updateItemClasses(itemElement: HTMLElement, index: number) {
+    itemElement.classList.remove(
+      'current',
+      'previous',
+      'next',
+      'previous-sibling',
+      'next-sibling'
+    )
+
+    if (index === this.#counter) {
+      itemElement.classList.add('current')
+    } else if (index < this.#counter) {
+      itemElement.classList.add('previous')
+    } else if (index > this.#counter) {
+      itemElement.classList.add('next')
+    }
+
+    if (index === loopNumber(this.#counter - 1, this.length)) {
+      itemElement.classList.add('previous-sibling')
+    } else if (index === (this.#counter + 1) % this.length) {
+      itemElement.classList.add('next-sibling')
+    }
+  }
+
   protected connectedCallback() {
     const itemElements = [
       ...this.querySelectorAll<HTMLElement>(
@@ -172,30 +196,6 @@ export class BillboardElement extends HTMLElement {
     }
   }
 
-  #updateItem(itemElement: HTMLElement, index: number) {
-    itemElement.classList.remove(
-      'current',
-      'previous',
-      'next',
-      'previous-sibling',
-      'next-sibling'
-    )
-
-    if (index === this.#counter) {
-      itemElement.classList.add('current')
-    } else if (index < this.#counter) {
-      itemElement.classList.add('previous')
-    } else if (index > this.#counter) {
-      itemElement.classList.add('next')
-    }
-
-    if (index === loopNumber(this.#counter - 1, this.length)) {
-      itemElement.classList.add('previous-sibling')
-    } else if (index === (this.#counter + 1) % this.length) {
-      itemElement.classList.add('next-sibling')
-    }
-  }
-
   async #updateCounter(value = this.#counter) {
     const prev = this.#counter
 
@@ -226,16 +226,16 @@ export class BillboardElement extends HTMLElement {
             waits.push(
               new Promise((res) => {
                 setTimeout(() => {
-                  this.#updateItem(itemElement, i)
+                  this.updateItemClasses(itemElement, i)
                   res()
                 }, 10)
               })
             )
           } else {
-            this.#updateItem(itemElement, i)
+            this.updateItemClasses(itemElement, i)
           }
         } else {
-          this.#updateItem(itemElement, i)
+          this.updateItemClasses(itemElement, i)
         }
       })
     })
