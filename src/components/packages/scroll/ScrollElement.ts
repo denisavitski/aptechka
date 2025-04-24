@@ -591,7 +591,7 @@ export class ScrollElement extends HTMLElement {
       })
     } else if (!this.#tweenTimeoutId) {
       this.#setTween.set(this.#damped.current, { equalize: true })
-      this.#setTween.set(value, { ...options.tween })
+      this.#setTween.set(Math.min(value, this.distance), { ...options.tween })
 
       this.#tweenTimeoutId = setTimeout(() => {
         this.#tweenTimeoutId = undefined
