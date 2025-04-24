@@ -521,7 +521,7 @@ export class ScrollElement extends HTMLElement {
   }
 
   public scrollToSection(sectionIndex: number, options?: ScrollSetOptions) {
-    if (!this.#visibleSections.length) {
+    if (!this.#visibleSections.length || this.#hibernated) {
       return
     }
 
@@ -583,6 +583,10 @@ export class ScrollElement extends HTMLElement {
   }
 
   public setPosition(value: number, options?: ScrollSetOptions) {
+    if (this.#hibernated) {
+      return
+    }
+
     this.#processAutoplay(Math.sign(value) || 1)
 
     if (!options?.tween) {
@@ -916,11 +920,13 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#counter.subscribe((e) => {
-      if (this.#visibleSections.length) {
-        this.#updateMarks()
-      }
+      if (!this.#hibernated) {
+        if (this.#visibleSections.length) {
+          this.#updateMarks()
+        }
 
-      this.style.setProperty('--counter', e.current + '')
+        this.style.setProperty('--counter', e.current + '')
+      }
     })
 
     this.#setTween.subscribe((e) => {
@@ -1160,6 +1166,7 @@ export class ScrollElement extends HTMLElement {
       this.#contentElement.style.width = ''
 
       this.classList.remove('has-overflow', 'start', 'end')
+      this.style.removeProperty('--counter')
 
       if (this.#sections.length) {
         this.#unsplit()
