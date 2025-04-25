@@ -174,6 +174,7 @@ export class PopoverElement extends HTMLElement {
     transitionend: false,
   })
   #innerCloseElements: Array<HTMLElement> = []
+  #resetScrollElements: Array<HTMLElement> = []
 
   constructor() {
     super()
@@ -362,6 +363,14 @@ export class PopoverElement extends HTMLElement {
         this.#status.set('triggered', false)
         this.#status.set('closing', false)
 
+        this.#resetScrollElements.forEach((el) => {
+          el.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'instant',
+          })
+        })
+
         dispatchEvent(this, 'popoverClosed', {
           custom: true,
           bubbles: true,
@@ -376,10 +385,15 @@ export class PopoverElement extends HTMLElement {
         `[data-popover-close${this.id ? `="${this.id}"` : ''}]`
       ),
     ]
-
     this.#innerCloseElements.forEach((el) => {
       el.addEventListener('click', this.#closeElementClickListener)
     })
+
+    this.#resetScrollElements = [
+      ...this.querySelectorAll<HTMLElement>(
+        `[data-popover-reset-scroll${this.id ? `="${this.id}"` : ''}]`
+      ),
+    ]
 
     this.#history.observe()
     this.#restore.observe()
