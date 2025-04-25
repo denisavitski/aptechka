@@ -1,4 +1,5 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
+import { viewport } from '@packages/device'
 
 class CSSValueParser {
   public static CSS_UNITS = new Set([
@@ -39,10 +40,14 @@ class CSSValueParser {
     } else if (unit) {
       if (unit === 'px') {
         return num
-      } else if (unit === 'hp') {
+      } else if (unit === 'oh') {
         return (element?.offsetHeight || 0) * (num / 100)
-      } else if (unit === 'wp') {
+      } else if (unit === 'ow') {
         return (element?.offsetWidth || 0) * (num / 100)
+      } else if (unit === 'ohmh') {
+        return ((element?.offsetHeight || 0) - viewport.height) * (num / 100)
+      } else if (unit === 'owmw') {
+        return ((element?.offsetWidth || 0) - viewport.width) * (num / 100)
       } else if (unit && CSSValueParser.CSS_UNITS.has(unit as any)) {
         return cssUnitParser.parse(value)
       } else {
