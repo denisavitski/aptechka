@@ -86,7 +86,7 @@ export class CSSProperty<
     this.#currentRawValue = rawValue
 
     if (rawValue) {
-      const result = cssValueParser.parse(this.#currentRawValue)
+      const result = cssValueParser.parse(this.#currentRawValue, this.#element)
 
       this.current = result
     } else {
