@@ -173,6 +173,7 @@ export class PopoverElement extends HTMLElement {
     triggered: false,
     transitionend: false,
   })
+  #innerCloseElements: Array<HTMLElement> = []
 
   constructor() {
     super()
@@ -370,6 +371,16 @@ export class PopoverElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    this.#innerCloseElements = [
+      ...this.querySelectorAll<HTMLElement>(
+        `[data-popover-close${this.id ? `="${this.id}"` : ''}]`
+      ),
+    ]
+
+    this.#innerCloseElements.forEach((el) => {
+      el.addEventListener('click', this.#closeElementClickListener)
+    })
+
     this.#history.observe()
     this.#restore.observe()
     this.#closeRest.observe()
@@ -401,6 +412,10 @@ export class PopoverElement extends HTMLElement {
   }
 
   protected disconnectedCallback() {
+    this.#innerCloseElements.forEach((el) => {
+      el.removeEventListener('click', this.#closeElementClickListener)
+    })
+
     PopoverElement.stack.remove(this.#group.current, this)
 
     windowResizer.unsubscribe(this.#resizeListener)
@@ -505,6 +520,10 @@ export class PopoverElement extends HTMLElement {
       this.style.setProperty('--viewport-offset-x', viewportOffsetX + 'px')
       this.style.setProperty('--viewport-offset-y', viewportOffsetY + 'px')
     }
+  }
+
+  #closeElementClickListener = () => {
+    this.close()
   }
 }
 
