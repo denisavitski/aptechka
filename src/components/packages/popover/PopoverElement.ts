@@ -302,6 +302,14 @@ export class PopoverElement extends HTMLElement {
       PopoverElement.stack.add(this.#group.current, this)
       // }
 
+      this.#resetScrollElements.forEach((el) => {
+        el.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'instant',
+        })
+      })
+
       this.#resizeListener()
 
       this.#status.set('opened', true)
@@ -333,12 +341,12 @@ export class PopoverElement extends HTMLElement {
       return
     }
 
+    this.#opened = false
+
     clearTimeout(this.#openTimeoutId)
     clearTimeout(this.#openTransitionTimeoutId)
 
     PopoverElement.stack.remove(this.#group.current, this)
-
-    this.#opened = false
 
     this.#deleteSearchParam()
 
@@ -362,14 +370,6 @@ export class PopoverElement extends HTMLElement {
       this.#closeTimeoutId = setTimeout(() => {
         this.#status.set('triggered', false)
         this.#status.set('closing', false)
-
-        this.#resetScrollElements.forEach((el) => {
-          el.scroll({
-            top: 0,
-            left: 0,
-            behavior: 'instant',
-          })
-        })
 
         dispatchEvent(this, 'popoverClosed', {
           custom: true,
