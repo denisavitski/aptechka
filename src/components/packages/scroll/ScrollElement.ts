@@ -593,7 +593,9 @@ export class ScrollElement extends HTMLElement {
       this.#damped.set(value, {
         equalize: options?.behaviour === 'instant',
       })
-    } else if (!this.#tweenTimeoutId) {
+    } else {
+      clearTimeout(this.#tweenTimeoutId)
+
       this.#setTween.set(this.#damped.current, { equalize: true })
       this.#setTween.set(Math.min(value, this.distance), { ...options.tween })
 
@@ -1263,16 +1265,16 @@ export class ScrollElement extends HTMLElement {
   }
 
   #controlsListener = (type: string, value: number) => {
+    if (this.#tweenTimeoutId) {
+      return
+    }
+
     if (this.#directionCSSProperty.current) {
       if (this.#directionCSSProperty.current < 0 && value > 0) {
         return
       } else if (this.#directionCSSProperty.current > 0 && value < 0) {
         return
       }
-    }
-
-    if (!this.#tweenTimeoutId) {
-      this.#setTween.unlistenAnimationFrame()
     }
 
     if (
