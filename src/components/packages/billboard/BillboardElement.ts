@@ -14,6 +14,81 @@ export interface BillboardEvents {
   }>
 }
 
+export class BillboardItem {
+  public element: HTMLElement
+  #parent: BillboardElement
+  #raf: number | null = null
+  #wasCurrent = false
+
+  constructor(element: HTMLElement, parent: BillboardElement) {
+    this.element = element
+    this.#parent = parent
+  }
+
+  public destroy() {
+    this.#clearTimeout()
+  }
+
+  public updateClasses(index: number) {
+    const isCurrent = index === this.#parent.counter
+
+    if (this.#wasCurrent && !isCurrent) {
+      this.element.classList.add('was-current')
+    } else {
+      this.element.classList.remove('was-current')
+    }
+
+    this.#clearClasses()
+    this.#clearTimeout()
+
+    if (index === this.#parent.counter) {
+      this.#setCurrent()
+    } else if (index < this.#parent.counter) {
+      this.element.classList.add('previous')
+    } else {
+      this.element.classList.add('next')
+    }
+
+    this.#setSiblingClasses(index)
+  }
+
+  #setCurrent() {
+    this.#wasCurrent = true
+
+    this.element.classList.add('current')
+
+    this.#raf = requestAnimationFrame(() => {
+      this.element.classList.add('current-active')
+    })
+  }
+
+  #setSiblingClasses(index: number) {
+    if (index === loopNumber(this.#parent.counter - 1, this.#parent.length)) {
+      this.element.classList.add('previous-sibling')
+    } else if (index === (this.#parent.counter + 1) % this.#parent.length) {
+      this.element.classList.add('next-sibling')
+    }
+  }
+
+  #clearClasses() {
+    this.element.classList.remove(
+      'current',
+      'previous',
+      'next',
+      'previous-sibling',
+      'next-sibling',
+      'current-active'
+    )
+  }
+
+  #clearTimeout() {
+    if (this.#raf) {
+      cancelAnimationFrame(this.#raf)
+      this.#raf = null
+    }
+  }
+}
+
 export class BillboardElement extends HTMLElement {
   public handleSet: ((number: number) => boolean) | undefined
 
@@ -23,10 +98,11 @@ export class BillboardElement extends HTMLElement {
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
-  #itemElements: Array<HTMLElement> = []
-  #groups: Map<string, Array<HTMLElement>> = new Map()
-  #counter = 0
+  #items: Array<BillboardItem> = []
+  #groups: Map<string, Array<BillboardItem>> = new Map()
+  #counter = -1
   #length = 0
+  #timeouts: Array<ReturnType<typeof setTimeout>> = []
 
   public get counter() {
     return this.#counter
@@ -48,8 +124,8 @@ export class BillboardElement extends HTMLElement {
     return this.#swipe
   }
 
-  public get itemElements() {
-    return this.#itemElements
+  public get items() {
+    return this.#items
   }
 
   public get groups() {
@@ -61,8 +137,21 @@ export class BillboardElement extends HTMLElement {
   }
 
   public addItem(element: HTMLElement) {
-    this.#addElement(element)
-    this.#updateCounter()
+    const item = new BillboardItem(element, this)
+    this.#items.push(item)
+
+    const groupName =
+      element.getAttribute('data-billboard-item-group') || 'default'
+    let group = this.#groups.get(groupName)
+
+    if (!group) {
+      group = []
+      this.#groups.set(groupName, group)
+    }
+
+    group.push(item)
+
+    this.#updateLength()
   }
 
   public set(value: number) {
@@ -76,30 +165,6 @@ export class BillboardElement extends HTMLElement {
     this.set(this.#counter + value)
   }
 
-  public updateItemClasses(itemElement: HTMLElement, index: number) {
-    itemElement.classList.remove(
-      'current',
-      'previous',
-      'next',
-      'previous-sibling',
-      'next-sibling'
-    )
-
-    if (index === this.#counter) {
-      itemElement.classList.add('current')
-    } else if (index < this.#counter) {
-      itemElement.classList.add('previous')
-    } else if (index > this.#counter) {
-      itemElement.classList.add('next')
-    }
-
-    if (index === loopNumber(this.#counter - 1, this.length)) {
-      itemElement.classList.add('previous-sibling')
-    } else if (index === (this.#counter + 1) % this.length) {
-      itemElement.classList.add('next-sibling')
-    }
-  }
-
   protected connectedCallback() {
     const itemElements = [
       ...this.querySelectorAll<HTMLElement>(
@@ -108,11 +173,11 @@ export class BillboardElement extends HTMLElement {
     ]
 
     itemElements.forEach((el) => {
-      this.#addElement(el)
+      this.addItem(el)
     })
 
     this.#groups.forEach((g) => {
-      g[0]?.classList.add('current')
+      g[0]?.element.classList.add('current')
     })
 
     this.#autoplay.subscribe((e) => {
@@ -143,28 +208,20 @@ export class BillboardElement extends HTMLElement {
     this.#loop.unobserve()
     this.#resize.unobserve()
 
+    this.#items.forEach((item) => item.destroy())
+    this.#items = []
     this.#groups.clear()
 
     intersector.unsubscribe(this.#intersectionListener)
     clearInterval(this.#intervalId)
+
+    this.#timeouts.forEach((timeout) => {
+      clearTimeout(timeout)
+    })
   }
 
-  #addElement(element: HTMLElement) {
-    this.#itemElements.push(element)
-    const groupName =
-      element.getAttribute('data-billboard-item-group') || 'default'
-
-    let group = this.#groups.get(groupName)
-
-    if (!group) {
-      group = []
-      this.#groups.set(groupName, group)
-    }
-
-    group.push(element)
-
+  #updateLength() {
     this.#length = 0
-
     this.#groups.forEach((g) => {
       if (g.length > this.#length) {
         this.#length = g.length
@@ -205,6 +262,14 @@ export class BillboardElement extends HTMLElement {
       this.#counter = clamp(value, 0, this.#length - 1)
     }
 
+    if (prev === this.#counter) {
+      return
+    }
+
+    this.#timeouts.forEach((timeout) => {
+      clearTimeout(timeout)
+    })
+
     this.classList.remove('forward', 'backward', 'next-round', 'prev-round')
 
     if (this.#counter - prev >= 0) {
@@ -213,63 +278,38 @@ export class BillboardElement extends HTMLElement {
       this.classList.add('backward')
     }
 
-    let waits: Array<Promise<void>> = []
-
     this.#groups.forEach((group) => {
-      group.forEach((itemElement, i) => {
-        if (this.hasAttribute('visited-class')) {
-          const visited = itemElement.classList.contains('visited')
-
-          if (i === this.#counter && !visited) {
-            itemElement.classList.add('visited')
-
-            waits.push(
-              new Promise((res) => {
-                setTimeout(() => {
-                  this.updateItemClasses(itemElement, i)
-                  res()
-                }, 10)
-              })
-            )
-          } else {
-            this.updateItemClasses(itemElement, i)
-          }
-        } else {
-          this.updateItemClasses(itemElement, i)
-        }
+      group.forEach((item, i) => {
+        item.updateClasses(i)
       })
     })
 
-    if (waits.length) {
-      await Promise.all(waits)
-    }
-
     this.classList.toggle('has-length', this.#length > 1)
-
     this.classList.toggle('start', this.#counter === 0)
-
     this.classList.toggle('end', this.#counter === this.#length - 1)
 
     this.style.setProperty('--counter', this.#counter.toString())
     this.style.setProperty('--sections', this.#length.toString())
 
-    if (this.#counter !== prev) {
-      dispatchEvent(this, 'billboardChange', {
-        detail: {
-          counter: this.#counter,
-        },
-      })
+    dispatchEvent(this, 'billboardChange', {
+      detail: {
+        counter: this.#counter,
+      },
+    })
 
-      if (this.#resize.current) {
+    if (this.#resize.current) {
+      this.#timeouts.push(
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'))
         }, 0)
-      }
+      )
     }
 
-    setTimeout(() => {
-      this.classList.remove('next-round', 'prev-round')
-    }, 10)
+    this.#timeouts.push(
+      setTimeout(() => {
+        this.classList.remove('next-round', 'prev-round')
+      }, 10)
+    )
   }
 
   #tick = () => {

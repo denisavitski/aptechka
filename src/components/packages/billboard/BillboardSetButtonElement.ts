@@ -1,10 +1,11 @@
-import { findParentElement, isBrowser } from '@packages/utils'
-import { BillboardElement } from './BillboardElement'
+import { findParentElement, isBrowser, whenDefined } from '@packages/utils'
+import { BillboardElement, BillboardItem } from './BillboardElement'
 import { CSSProperty } from '@packages/css-property'
 
 export class BillboardSetButtonElement extends HTMLElement {
   public handleClick: ((event: Event) => boolean) | undefined
 
+  #item: BillboardItem = null!
   #index = new CSSProperty(this, '--index', 0)
   #billboardElement: BillboardElement | null = null
 
@@ -27,7 +28,9 @@ export class BillboardSetButtonElement extends HTMLElement {
     })
   }
 
-  protected connectedCallback() {
+  protected async connectedCallback() {
+    await whenDefined('e-billboard')
+
     if (!this.hasAttribute('tabindex')) {
       this.setAttribute('tabindex', '0')
     }
@@ -38,20 +41,20 @@ export class BillboardSetButtonElement extends HTMLElement {
 
     this.#billboardElement = findParentElement(this, BillboardElement)
 
-    this.#billboardElement?.addEventListener(
-      'billboardChange',
-      this.#changeListener
-    )
+    if (this.#billboardElement) {
+      this.#item = new BillboardItem(this, this.#billboardElement)
 
-    customElements.whenDefined('e-billboard').then(() => {
-      if (this.isConnected) {
-        this.#changeListener()
-      }
-    })
+      this.#billboardElement.addEventListener(
+        'billboardChange',
+        this.#changeListener
+      )
 
-    this.#index.subscribe(this.#changeListener)
+      this.#changeListener()
 
-    this.#index.observe()
+      this.#index.subscribe(this.#changeListener)
+
+      this.#index.observe()
+    }
   }
 
   protected disconnectedCallback() {
@@ -66,10 +69,12 @@ export class BillboardSetButtonElement extends HTMLElement {
       'billboardChange',
       this.#changeListener
     )
+
+    this.#item.destroy()
   }
 
   #changeListener = () => {
-    this.#billboardElement?.updateItemClasses(this, this.#index.current)
+    this.#item.updateClasses(this.#index.current)
   }
 }
 
