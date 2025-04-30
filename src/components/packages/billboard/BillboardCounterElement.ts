@@ -5,7 +5,7 @@ export class BillboardCounterElement extends HTMLElement {
   #billboardElement: BillboardElement | null = null
 
   protected async connectedCallback() {
-    whenDefined('e-billboard')
+    await whenDefined('e-billboard')
 
     this.#billboardElement = findParentElement(this, BillboardElement)
 

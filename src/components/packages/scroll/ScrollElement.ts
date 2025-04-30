@@ -614,6 +614,8 @@ export class ScrollElement extends HTMLElement {
       return
     }
 
+    console.log('resize', this.#hibernatedCSSProperty.current)
+
     this.#visibleSections = this.#sections.filter((s) =>
       isElementVisible(s.element)
     )
@@ -948,6 +950,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#hibernatedCSSProperty.subscribe((e) => {
+      console.log('hibernatedCSSProperty', e.current)
       if (e.current && !e.previous) {
         this.classList.add('hibernated')
         this.#hibernate()
@@ -991,7 +994,6 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.observe()
 
     windowResizer.subscribe(this.#connectListener, RESIZE_ORDER.LAST)
-    elementResizer.subscribe(this, this.#resizeListener)
 
     this.#mutationObserver.observe(this, { childList: true })
   }
@@ -1035,6 +1037,7 @@ export class ScrollElement extends HTMLElement {
     this.#hibernatedCSSProperty.unobserve()
 
     windowResizer.unsubscribe(this.#connectListener)
+    windowResizer.unsubscribe(this.#resizeListener)
     elementResizer.unsubscribe(this.#resizeListener)
 
     this.#hibernate()
@@ -1506,6 +1509,9 @@ export class ScrollElement extends HTMLElement {
     if (!this.hibernatedCSSProperty.current) {
       this.#awake()
     }
+
+    elementResizer.subscribe(this, this.#resizeListener)
+    windowResizer.unsubscribe(this.#connectListener)
   }
 }
 
