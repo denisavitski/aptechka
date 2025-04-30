@@ -614,8 +614,6 @@ export class ScrollElement extends HTMLElement {
       return
     }
 
-    console.log('resize', this.#hibernatedCSSProperty.current)
-
     this.#visibleSections = this.#sections.filter((s) =>
       isElementVisible(s.element)
     )
@@ -950,7 +948,6 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#hibernatedCSSProperty.subscribe((e) => {
-      console.log('hibernatedCSSProperty', e.current)
       if (e.current && !e.previous) {
         this.classList.add('hibernated')
         this.#hibernate()
