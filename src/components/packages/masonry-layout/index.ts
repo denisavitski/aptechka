@@ -1,5 +1,9 @@
 import { CSSProperty } from '@packages/css-property'
-import { createStylesheet, isBrowser } from '@packages/utils'
+import { createStylesheet, dispatchEvent, isBrowser } from '@packages/utils'
+
+export interface MasonryLayoutElementEvents {
+  masonryLayoutDistributed: CustomEvent
+}
 
 export class MasonryLayoutElement extends HTMLElement {
   #columns = new CSSProperty<number>(this, '--columns', 2)
@@ -27,6 +31,10 @@ export class MasonryLayoutElement extends HTMLElement {
         },
       }),
     ]
+  }
+
+  public get columnElements() {
+    return this.#columnElements
   }
 
   protected connectedCallback() {
@@ -76,6 +84,7 @@ export class MasonryLayoutElement extends HTMLElement {
     })
 
     this.classList.add('distributed')
+    dispatchEvent(this, 'masonryLayoutDistributed', { custom: true })
   }
 }
 
@@ -87,4 +96,6 @@ declare global {
   interface HTMLElementTagNameMap {
     'e-masonry-layout': MasonryLayoutElement
   }
+
+  interface HTMLElementEventMap extends MasonryLayoutElementEvents {}
 }
