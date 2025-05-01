@@ -33,6 +33,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     loaded: false,
     error: false,
     clear: false,
+    playing: false,
   })
 
   #intersectionObserver: IntersectionObserver = null!
@@ -116,6 +117,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     this.#consumerElement.classList.add('source-consumer')
 
+    this.#consumerElement.addEventListener('play', this.#playListener)
+    this.#consumerElement.addEventListener('pause', this.#pauseListener)
+
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
         const value = attr.nodeValue || ''
@@ -155,6 +159,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#sourceManager?.close()
 
     if (this.#consumerElement) {
+      this.#consumerElement.removeEventListener('play', this.#playListener)
+      this.#consumerElement.removeEventListener('pause', this.#pauseListener)
+
       this.#consumerElement.onloadeddata = null
       this.#consumerElement.onload = null
       this.#consumerElement.onerror = null
@@ -273,6 +280,14 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     dispatchEvent(this, 'sourceError', { custom: true })
 
     this.#isFirstLoadHappened = true
+  }
+
+  #playListener = () => {
+    this.#status.set('playing', true)
+  }
+
+  #pauseListener = () => {
+    this.#status.set('playing', false)
   }
 }
 
