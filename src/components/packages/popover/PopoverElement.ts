@@ -217,6 +217,10 @@ export class PopoverElement extends HTMLElement {
     return this.getAttribute('data-open-global-class')
   }
 
+  public get closingClass() {
+    return this.getAttribute('data-closing-global-class')
+  }
+
   public get history() {
     return this.#history
   }
@@ -275,13 +279,11 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
 
-    if (this.openClass) {
-      this.openClass.split(' ').map((v) => {
-        document.documentElement.classList.add(v.trim())
-      })
-    }
+    this.#toggleGlobalClass(true, this.openClass)
 
+    this.#toggleGlobalClass(false, this.closingClass)
     this.#status.set('closing', false)
+
     this.#status.set('triggered', true)
 
     dispatchEvent(this, 'popoverTriggered', {
@@ -350,17 +352,14 @@ export class PopoverElement extends HTMLElement {
 
     this.#deleteSearchParam()
 
-    if (this.openClass) {
-      this.openClass.split(' ').map((v) => {
-        document.documentElement.classList.remove(v.trim())
-      })
-    }
+    this.#toggleGlobalClass(false, this.openClass)
 
     this.#status.set('transitionend', false)
 
     this.#startClosingTimeoutId = setTimeout(() => {
       this.#status.set('opened', false)
       this.#status.set('closing', true)
+      this.#toggleGlobalClass(true, this.closingClass)
 
       dispatchEvent(this, 'popoverClosing', {
         custom: true,
@@ -370,6 +369,7 @@ export class PopoverElement extends HTMLElement {
       this.#closeTimeoutId = setTimeout(() => {
         this.#status.set('triggered', false)
         this.#status.set('closing', false)
+        this.#toggleGlobalClass(false, this.closingClass)
 
         dispatchEvent(this, 'popoverClosed', {
           custom: true,
@@ -467,6 +467,14 @@ export class PopoverElement extends HTMLElement {
     return `${location.pathname}${
       location.search ? location.search + '&' : '?'
     }${this.idWithValue}`
+  }
+
+  #toggleGlobalClass(on: boolean, className?: string | null) {
+    if (className) {
+      className.split(' ').map((v) => {
+        document.documentElement.classList.toggle(v.trim(), on)
+      })
+    }
   }
 
   #deleteSearchParam() {
