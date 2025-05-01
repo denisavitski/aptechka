@@ -33,14 +33,19 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     this.addEventListener('sourceRelease', () => {
       if (this.hasAttribute('capture-autoplay')) {
         this.consumerElement.pause()
-
-        if (this.hasAttribute('replay')) {
-          this.consumerElement.currentTime = 0
-        }
       }
 
       if (this.hasAttribute('release-pause')) {
         this.consumerElement.pause()
+      }
+
+      if (this.hasAttribute('release-stop')) {
+        this.consumerElement.pause()
+        this.consumerElement.currentTime = 0
+      }
+
+      if (this.hasAttribute('replay')) {
+        this.consumerElement.currentTime = 0
       }
 
       if (this.hasAttribute('reload-source')) {
