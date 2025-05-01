@@ -185,6 +185,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('error', false)
     this.#status.set('loading', false)
     this.#status.set('clear', false)
+    this.#status.set('playing', false)
 
     if (source) {
       this.#idWithUrl = `${this.#id}-${source.url}`
