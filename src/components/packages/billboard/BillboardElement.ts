@@ -101,11 +101,16 @@ export class BillboardElement extends HTMLElement {
   #items: Array<BillboardItem> = []
   #groups: Map<string, Array<BillboardItem>> = new Map()
   #counter = -1
+  #rawCounter = -1
   #length = 0
   #timeouts: Array<ReturnType<typeof setTimeout>> = []
 
   public get counter() {
     return this.#counter
+  }
+
+  public get rawCounter() {
+    return this.#rawCounter
   }
 
   public get loop() {
@@ -261,6 +266,8 @@ export class BillboardElement extends HTMLElement {
     } else {
       this.#counter = clamp(value, 0, this.#length - 1)
     }
+
+    this.#rawCounter = value
 
     if (prev === this.#counter) {
       return
