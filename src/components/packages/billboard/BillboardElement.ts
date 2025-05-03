@@ -96,21 +96,17 @@ export class BillboardElement extends HTMLElement {
   #loop = new CSSProperty<boolean>(this, '--loop', true)
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
+  #lengthOffset = new CSSProperty<number>(this, '--length-offset', 0)
   #intervalId: ReturnType<typeof setInterval> | undefined
   #isIntersecting = false
   #items: Array<BillboardItem> = []
   #groups: Map<string, Array<BillboardItem>> = new Map()
   #counter = -1
-  #rawCounter = -1
   #length = 0
   #timeouts: Array<ReturnType<typeof setTimeout>> = []
 
   public get counter() {
     return this.#counter
-  }
-
-  public get rawCounter() {
-    return this.#rawCounter
   }
 
   public get loop() {
@@ -127,6 +123,10 @@ export class BillboardElement extends HTMLElement {
 
   public get swipe() {
     return this.#swipe
+  }
+
+  public get lengthOffset() {
+    return this.#lengthOffset
   }
 
   public get items() {
@@ -197,8 +197,13 @@ export class BillboardElement extends HTMLElement {
       }
     })
 
+    this.#lengthOffset.subscribe(() => {
+      this.#updateLength()
+    })
+
     this.#autoplay.observe()
     this.#swipe.observe()
+    this.#lengthOffset.observe()
     this.#loop.observe()
     this.#resize.observe()
 
@@ -210,6 +215,7 @@ export class BillboardElement extends HTMLElement {
   protected disconnectedCallback() {
     this.#autoplay.unobserve()
     this.#swipe.unobserve()
+    this.#lengthOffset.unobserve()
     this.#loop.unobserve()
     this.#resize.unobserve()
 
@@ -227,11 +233,14 @@ export class BillboardElement extends HTMLElement {
 
   #updateLength() {
     this.#length = 0
+
     this.#groups.forEach((g) => {
       if (g.length > this.#length) {
         this.#length = g.length
       }
     })
+
+    this.#length += this.#lengthOffset.current
   }
 
   #tryAutoplay() {
@@ -266,8 +275,6 @@ export class BillboardElement extends HTMLElement {
     } else {
       this.#counter = clamp(value, 0, this.#length - 1)
     }
-
-    this.#rawCounter = value
 
     if (prev === this.#counter) {
       return
