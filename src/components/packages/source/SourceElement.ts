@@ -107,6 +107,8 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.#status.addElement(notifyElement)
     }
 
+    this.querySelector('.source-consumer')?.remove()
+
     this.#consumerElement = this.createConsumer()
 
     this.#consumerElement.style.cssText = `
