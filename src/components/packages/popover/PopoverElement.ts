@@ -411,7 +411,10 @@ export class PopoverElement extends HTMLElement {
     setTimeout(() => {
       if (this.#restore.current) {
         this.urlValue = parseSearchParameters(location.search)[this.id]
-        this.#popStateListener()
+
+        if (location.search.includes(this.id)) {
+          this.open({ trigger: this.idWithValue })
+        }
       } else {
         this.#deleteSearchParam()
         this.#historyAllowed = true
