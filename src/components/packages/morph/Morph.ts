@@ -31,13 +31,14 @@ export interface MorphNavigationEntry {
   submorph?: Array<string>
 }
 
-export interface MorphCompleteEntry extends MorphNavigationEntry {
+export interface MorphNavigationDocumentFetchedEntry
+  extends MorphNavigationEntry {
   document: Document
 }
 
-export interface MorphChildrenActionEntry {
+export interface MorphChildrenActionEntry
+  extends MorphNavigationDocumentFetchedEntry {
   morphElement: HTMLElement
-  path: string
 }
 
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
@@ -65,8 +66,8 @@ export interface MorphScrollDetail {
 
 export interface MorphEvents {
   morphNavigation: CustomEvent<MorphNavigationEntry>
-  morphStart: CustomEvent<MorphNavigationEntry>
-  morphComplete: CustomEvent<MorphCompleteEntry>
+  morphStart: CustomEvent<MorphNavigationDocumentFetchedEntry>
+  morphComplete: CustomEvent<MorphNavigationDocumentFetchedEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
   morphScroll: CustomEvent<MorphScrollDetail>
@@ -299,13 +300,13 @@ export class Morph {
         return
       }
 
-      const transitionDetail: MorphNavigationEntry = {
+      const navigationEntry: MorphNavigationEntry = {
         path: normalizedPath.path,
         submorph,
       }
 
       dispatchEvent(document, 'morphNavigation', {
-        detail: transitionDetail,
+        detail: navigationEntry,
       })
 
       const currentRoute = this.#getRoute(this.#currentPath)
@@ -325,6 +326,11 @@ export class Morph {
         })
 
         return
+      }
+
+      const documentFetchedEntry: MorphNavigationDocumentFetchedEntry = {
+        ...navigationEntry,
+        document: nextRoute.document,
       }
 
       currentRoute.clearState()
@@ -347,7 +353,7 @@ export class Morph {
       document.body.appendChild(this.#announcer)
 
       dispatchEvent(document, 'morphStart', {
-        detail: transitionDetail,
+        detail: documentFetchedEntry,
       })
 
       const currentHeadChildren = Array.from(document.head.children)
@@ -514,8 +520,8 @@ export class Morph {
         })
 
         const detail: MorphChildrenActionEntry = {
+          ...documentFetchedEntry,
           morphElement,
-          path: normalizedPath.path,
         }
 
         dispatchEvent(document, 'morphNewChildrenAdded', {
@@ -592,10 +598,7 @@ export class Morph {
       })
 
       dispatchEvent(document, 'morphComplete', {
-        detail: {
-          ...transitionDetail,
-          document: nextRoute.document,
-        },
+        detail: documentFetchedEntry,
       })
 
       document.documentElement.style.removeProperty(
