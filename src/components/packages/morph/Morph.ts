@@ -31,6 +31,10 @@ export interface MorphNavigationEntry {
   submorph?: Array<string>
 }
 
+export interface MorphCompleteEntry extends MorphNavigationEntry {
+  document: Document
+}
+
 export interface MorphChildrenActionEntry {
   morphElement: HTMLElement
   path: string
@@ -62,7 +66,7 @@ export interface MorphScrollDetail {
 export interface MorphEvents {
   morphNavigation: CustomEvent<MorphNavigationEntry>
   morphStart: CustomEvent<MorphNavigationEntry>
-  morphComplete: CustomEvent<MorphNavigationEntry>
+  morphComplete: CustomEvent<MorphCompleteEntry>
   morphNewChildrenAdded: CustomEvent<MorphChildrenActionEntry>
   morphOldChildrenRemoved: CustomEvent<MorphChildrenActionEntry>
   morphScroll: CustomEvent<MorphScrollDetail>
@@ -588,7 +592,10 @@ export class Morph {
       })
 
       dispatchEvent(document, 'morphComplete', {
-        detail: transitionDetail,
+        detail: {
+          ...transitionDetail,
+          document: nextRoute.document,
+        },
       })
 
       document.documentElement.style.removeProperty(
