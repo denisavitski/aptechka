@@ -508,13 +508,19 @@ export class Morph {
         }
 
         requestIdleCallback(() => {
+          currentMorphElementChildNodes.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              element.classList.add('old-idle')
+            }
+          })
+
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
               element.parentElement?.style.setProperty(
                 '--new-content-height',
                 element.offsetHeight + 'px'
               )
-              element.classList.add('in')
+              element.classList.add('new-idle')
             }
           })
         })
@@ -537,7 +543,7 @@ export class Morph {
                 element.parentElement?.style.removeProperty(
                   '--new-content-height'
                 )
-                element.classList.remove('in', 'new')
+                element.classList.remove('new-idle', 'new')
               }
             })
 
