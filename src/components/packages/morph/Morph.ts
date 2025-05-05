@@ -328,11 +328,6 @@ export class Morph {
         return
       }
 
-      const documentFetchedEntry: MorphNavigationDocumentFetchedEntry = {
-        ...navigationEntry,
-        document: nextRoute.document,
-      }
-
       currentRoute.clearState()
       currentRoute.saveScrollState()
       currentRoute.saveDocumentState()
@@ -351,6 +346,11 @@ export class Morph {
       this.#announcer.textContent = nextRoute.title
 
       document.body.appendChild(this.#announcer)
+
+      const documentFetchedEntry: MorphNavigationDocumentFetchedEntry = {
+        ...navigationEntry,
+        document: nextRoute.document,
+      }
 
       dispatchEvent(document, 'morphStart', {
         detail: documentFetchedEntry,
