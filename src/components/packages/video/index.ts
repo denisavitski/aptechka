@@ -85,10 +85,12 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   protected override consumeSource(url: string | null) {
     this.consumerElement.src = url || ''
 
-    if (this.hasAttribute('volume')) {
-      this.consumerElement.volume = parseFloat(
-        this.getAttribute('volume') || '1'
-      )
+    if (url) {
+      if (this.hasAttribute('volume')) {
+        this.consumerElement.volume = parseFloat(
+          this.getAttribute('volume') || '1'
+        )
+      }
     }
   }
 

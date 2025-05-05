@@ -161,11 +161,14 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#sourceManager?.close()
 
     if (this.#consumerElement) {
+      this.consumeSource(null)
+
       this.#consumerElement.removeEventListener('play', this.#playListener)
       this.#consumerElement.removeEventListener('pause', this.#pauseListener)
 
       this.#consumerElement.onloadeddata = null
       this.#consumerElement.onload = null
+      this.#consumerElement.onerror = null
       this.#consumerElement.onerror = null
       this.#consumerElement.remove()
     }
