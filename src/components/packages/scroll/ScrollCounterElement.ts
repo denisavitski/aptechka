@@ -13,7 +13,9 @@ export class ScrollCounterElement extends ScrollUserElement {
   }
 
   #counterChangeListener = () => {
-    this.textContent = `${this.scrollElement.counter.current + 1}`
+    const value = this.scrollElement.counter.current + 1
+    const pad = parseInt(this.getAttribute('pad') || '0')
+    this.textContent = value.toString().padStart(pad, '0')
   }
 }
 
