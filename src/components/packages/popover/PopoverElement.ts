@@ -150,7 +150,7 @@ export class PopoverElement extends HTMLElement {
   #opened = false
   #startClosingTimeoutId: ReturnType<typeof setTimeout> | undefined
   #closeTimeoutId: ReturnType<typeof setTimeout> | undefined
-  #openTimeoutId: ReturnType<typeof setTimeout> | undefined
+  #openFrameId: number | undefined
   #openTransitionTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   #history = new CSSProperty(this, '--history', false)
@@ -168,9 +168,10 @@ export class PopoverElement extends HTMLElement {
   #historyAllowed = false
   #lastTrigger: any
   #status = new ElementLinkedStore(this, {
+    triggered: false,
+    beforeopen: false,
     opened: false,
     closing: false,
-    triggered: false,
     transitionend: false,
   })
   #innerCloseElements: Array<HTMLElement> = []
@@ -279,11 +280,9 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
 
-    this.#toggleGlobalClass(true, this.openClass)
-
     this.#toggleGlobalClass(false, this.closingClass)
-    this.#status.set('closing', false)
 
+    this.#status.set('closing', false)
     this.#status.set('triggered', true)
 
     dispatchEvent(this, 'popoverTriggered', {
@@ -296,6 +295,8 @@ export class PopoverElement extends HTMLElement {
     if (this.#history.current && this.#historyAllowed) {
       history.pushState(history.state, '', this.#path)
     }
+
+    this.#status.set('beforeopen', true)
 
     this.#opened = true
 
@@ -312,9 +313,10 @@ export class PopoverElement extends HTMLElement {
         })
       })
 
-      this.#resizeListener()
-
+      this.#toggleGlobalClass(true, this.openClass)
       this.#status.set('opened', true)
+
+      this.#resizeListener()
 
       dispatchEvent(this, 'popoverOpened', {
         custom: true,
@@ -324,7 +326,7 @@ export class PopoverElement extends HTMLElement {
         bubbles: true,
       })
 
-      this.#openTimeoutId = undefined
+      this.#openFrameId = undefined
 
       this.#openTransitionTimeoutId = setTimeout(() => {
         this.#status.set('transitionend', true)
@@ -334,7 +336,7 @@ export class PopoverElement extends HTMLElement {
     if (options?.skipTransition) {
       opened()
     } else {
-      this.#openTimeoutId = setTimeout(opened, 10)
+      this.#openFrameId = requestAnimationFrame(opened)
     }
   }
 
@@ -345,7 +347,8 @@ export class PopoverElement extends HTMLElement {
 
     this.#opened = false
 
-    clearTimeout(this.#openTimeoutId)
+    cancelAnimationFrame(this.#openFrameId!)
+
     clearTimeout(this.#openTransitionTimeoutId)
 
     PopoverElement.stack.remove(this.#group.current, this)
@@ -368,6 +371,7 @@ export class PopoverElement extends HTMLElement {
 
       this.#closeTimeoutId = setTimeout(() => {
         this.#status.set('triggered', false)
+        this.#status.set('beforeopen', false)
         this.#status.set('closing', false)
         this.#toggleGlobalClass(false, this.closingClass)
 
@@ -452,7 +456,7 @@ export class PopoverElement extends HTMLElement {
 
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
-    clearTimeout(this.#openTimeoutId)
+    clearTimeout(this.#openFrameId)
     clearTimeout(this.#openTransitionTimeoutId)
 
     removeEventListener('popstate', this.#popStateListener)
