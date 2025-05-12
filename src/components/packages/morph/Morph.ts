@@ -682,11 +682,13 @@ export class Morph {
   }
 
   #getRoute(path: string) {
-    let route = this.#routes.get(path)
+    let pathWithoutHash = path.split('#')[0]
+
+    let route = this.#routes.get(pathWithoutHash)
 
     if (!route) {
-      route = new MorphRoute(this, path)
-      this.#routes.set(path, route)
+      route = new MorphRoute(this, pathWithoutHash)
+      this.#routes.set(pathWithoutHash, route)
     }
 
     return route
