@@ -445,8 +445,6 @@ export class PopoverElement extends HTMLElement {
 
     windowResizer.unsubscribe(this.#resizeListener)
 
-    this.#status.close()
-
     this.#history.close()
     this.#restore.close()
     this.#closeRest.close()
