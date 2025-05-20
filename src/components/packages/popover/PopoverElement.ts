@@ -458,6 +458,9 @@ export class PopoverElement extends HTMLElement {
 
     this.removeAttribute('role')
 
+    this.#toggleGlobalClass(false, this.openClass)
+    this.#toggleGlobalClass(false, this.closingClass)
+
     clearTimeout(this.#startClosingTimeoutId)
     clearTimeout(this.#closeTimeoutId)
     clearTimeout(this.#openFrameId)
