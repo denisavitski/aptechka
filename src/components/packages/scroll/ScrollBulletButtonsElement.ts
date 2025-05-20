@@ -59,6 +59,9 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
 
     this.innerHTML = ''
 
+    this.#contentElement = document.createElement('div')
+    this.appendChild(this.#contentElement)
+
     this.scrollElement.addEventListener(
       'scrollSectionsChange',
       this.#sectionsChangeListener
@@ -70,8 +73,7 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
 
     this.scrollElement.loopCSSProperty.subscribe(this.#sectionsChangeListener)
 
-    this.#contentElement = document.createElement('div')
-    this.appendChild(this.#contentElement)
+    this.#sectionsChangeListener()
   }
 
   protected disconnectedCallback() {
@@ -92,6 +94,7 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
   }
 
   #sectionsChangeListener = debounce(() => {
+    console.log(this, this.scrollElement.visibleSections.length)
     this.#buttons.forEach((b) => b.destroy())
 
     this.#buttons = []
