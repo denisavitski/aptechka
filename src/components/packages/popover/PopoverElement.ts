@@ -316,7 +316,7 @@ export class PopoverElement extends HTMLElement {
       this.#toggleGlobalClass(true, this.openClass)
       this.#status.set('opened', true)
 
-      this.#resizeListener()
+      dispatchEvent(window, 'resize')
 
       dispatchEvent(this, 'popoverOpened', {
         custom: true,
