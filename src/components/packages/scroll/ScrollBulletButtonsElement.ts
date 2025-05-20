@@ -94,7 +94,6 @@ export class ScrollBulletButtonsElement extends ScrollUserElement {
   }
 
   #sectionsChangeListener = debounce(() => {
-    console.log(this, this.scrollElement.visibleSections.length)
     this.#buttons.forEach((b) => b.destroy())
 
     this.#buttons = []
