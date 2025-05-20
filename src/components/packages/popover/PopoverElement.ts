@@ -165,7 +165,7 @@ export class PopoverElement extends HTMLElement {
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #checkViewportBounds = new CSSProperty(this, '--check-viewport-bounds', false)
-  #historyAllowed = false
+  #historyAllowed = true
   #lastTrigger: any
   #status = new ElementLinkedStore(this, {
     triggered: false,
@@ -414,11 +414,15 @@ export class PopoverElement extends HTMLElement {
 
     setTimeout(() => {
       if (this.#restore.current) {
+        this.#historyAllowed = false
+
         this.urlValue = parseSearchParameters(location.search)[this.id]
 
         if (location.search.includes(this.id)) {
           this.open({ trigger: this.idWithValue })
         }
+
+        this.#historyAllowed = true
       } else {
         this.#deleteSearchParam()
         this.#historyAllowed = true
