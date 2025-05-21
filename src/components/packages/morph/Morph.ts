@@ -377,8 +377,13 @@ export class Morph {
       addHeadChildren.forEach((child, index) => {
         if (child.tagName === 'SCRIPT' && child.getAttribute('src')) {
           const newScriptTag = document.createElement('script')
-          newScriptTag.type = 'module'
-          newScriptTag.src = child.getAttribute('src')!
+          const src = child.getAttribute('src')!
+
+          if (!src.includes('http')) {
+            newScriptTag.type = 'module'
+          }
+
+          newScriptTag.src = src
           addHeadChildren[index] = newScriptTag
         }
       })
