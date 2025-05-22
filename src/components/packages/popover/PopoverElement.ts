@@ -359,9 +359,8 @@ export class PopoverElement extends HTMLElement {
 
     this.#toggleGlobalClass(false, this.openClass)
 
-    this.#status.set('transitionend', false)
-
     this.#startClosingTimeoutId = setTimeout(() => {
+      this.#status.set('transitionend', false)
       this.#status.set('opened', false)
       this.#status.set('closing', true)
       this.#toggleGlobalClass(true, this.closingClass)
