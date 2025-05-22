@@ -20,21 +20,30 @@ export class SizeElement extends HTMLElement {
 
   protected disconnectedCallback() {
     elementResizer.unsubscribe(this.#resizeListener)
+  }
 
-    this.#targetElement.style.removeProperty('--width')
-    this.#targetElement.style.removeProperty('--height')
+  #setVar(varName: string, value?: string) {
+    const prefix = this.dataset.prefix || ''
+
+    if (value) {
+      this.#targetElement.style.setProperty(`--${prefix}${varName}`, value)
+    } else {
+      this.#targetElement.style.removeProperty(`--${prefix}${varName}`)
+    }
   }
 
   #resizeListener = () => {
     this.#targetElement.style.removeProperty('--width')
     this.#targetElement.style.removeProperty('--height')
+    this.#setVar('width')
+    this.#setVar('height')
 
     setTimeout(() => {
       const width = this.offsetWidth
       const height = this.offsetHeight
 
-      this.#targetElement.style.setProperty('--width', width + 'px')
-      this.#targetElement.style.setProperty('--height', height + 'px')
+      this.#setVar('width', width + 'px')
+      this.#setVar('height', height + 'px')
     }, 0)
   }
 }
