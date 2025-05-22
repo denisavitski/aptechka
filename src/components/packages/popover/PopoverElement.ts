@@ -16,6 +16,7 @@ export interface PopoverEvents {
   popoverOpened: CustomEvent<{ trigger: any }>
   popoverClosing: CustomEvent
   popoverClosed: CustomEvent
+  popoverTransitionend: CustomEvent
 }
 
 class PopoverGroups {
@@ -330,6 +331,7 @@ export class PopoverElement extends HTMLElement {
 
       this.#openTransitionTimeoutId = setTimeout(() => {
         this.#status.set('transitionend', true)
+        dispatchEvent(this, 'popoverTransitionend')
       }, getElementTransitionDurationMS(this) + 10)
     }
 
