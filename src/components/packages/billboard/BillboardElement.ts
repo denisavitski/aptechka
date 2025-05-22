@@ -38,8 +38,14 @@ export class BillboardItem {
       this.element.classList.remove('was-current')
     }
 
+    const isActive = this.element.classList.contains('current-active')
+
     this.#clearClasses()
     this.#clearTimeout()
+
+    if (isActive) {
+      this.element.classList.add('previous-active')
+    }
 
     if (index === this.#parent.counter) {
       this.#setCurrent()
@@ -77,7 +83,8 @@ export class BillboardItem {
       'next',
       'previous-sibling',
       'next-sibling',
-      'current-active'
+      'current-active',
+      'previous-active'
     )
   }
 
