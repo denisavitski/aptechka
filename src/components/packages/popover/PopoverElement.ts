@@ -357,12 +357,12 @@ export class PopoverElement extends HTMLElement {
 
     this.#deleteSearchParam()
 
-    this.#toggleGlobalClass(false, this.openClass)
-
     this.#startClosingTimeoutId = setTimeout(() => {
       this.#status.set('transitionend', false)
       this.#status.set('opened', false)
       this.#status.set('closing', true)
+
+      this.#toggleGlobalClass(false, this.openClass)
       this.#toggleGlobalClass(true, this.closingClass)
 
       dispatchEvent(this, 'popoverClosing', {
