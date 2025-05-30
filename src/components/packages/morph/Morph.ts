@@ -602,8 +602,16 @@ export class Morph {
 
         scriptElements.forEach((element) => {
           const newScriptTag = document.createElement('script')
-          newScriptTag.type = 'module'
-          newScriptTag.src = element.getAttribute('src')!
+
+          for (let i = 0; i < element.attributes.length; i++) {
+            const attr = element.attributes[i]
+            newScriptTag.setAttribute(attr.name, attr.value)
+          }
+
+          if (!element.hasAttribute('src')) {
+            newScriptTag.innerHTML = element.innerHTML
+          }
+
           element.replaceWith(newScriptTag)
         })
       })
