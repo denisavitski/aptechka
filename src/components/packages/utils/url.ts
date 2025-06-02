@@ -27,7 +27,7 @@ export function splitPath(
   }
 
   const pathname = base + leaf
-  const parameters = split2?.[1]
+  const parameters = split2?.[1] || ''
   const hash = split1?.[1]
   const path = `${pathname}${parameters ? '?' + parameters : ''}`
 
