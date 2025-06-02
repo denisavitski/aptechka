@@ -53,7 +53,7 @@ export class MorphLink {
 
     const back = this.#element.hasAttribute('data-back')
 
-    if (back && this.#morph.previousPathname) {
+    if (back && this.#morph.previousURL) {
       history.back()
     } else {
       this.#path = this.#element.getAttribute('href') || '/'
