@@ -27,7 +27,7 @@ export interface MorphOptions {
 }
 
 export interface MorphNavigationEntry {
-  path: string
+  url: ReturnType<typeof splitPath>
   submorph?: Array<string>
 }
 
@@ -127,13 +127,13 @@ export class Morph {
 
       this.#morphElements = this.#getMorphElements(document.body)
 
-      const normalizedPath = this.normalizePath(
+      const normalizedURL = this.normalizePath(
         location.pathname + location.hash + location.search
       )
 
-      this.#currentURL = normalizedPath
+      this.#currentURL = normalizedURL
 
-      const initialRoute = new MorphRoute(this, this.#currentURL.path)
+      const initialRoute = new MorphRoute(this, this.#currentURL.pathname)
       initialRoute.setInitialDocument(document)
 
       this.#routes.set(this.#currentURL.path, initialRoute)
@@ -145,7 +145,7 @@ export class Morph {
 
       document.documentElement.setAttribute(
         'data-current-leaf',
-        normalizedPath.leaf
+        normalizedURL.leaf
       )
 
       this.findLinks()
@@ -156,9 +156,9 @@ export class Morph {
 
       changeHistory({
         action: 'replace',
-        pathname: normalizedPath.pathname,
-        searchParameters: normalizedPath.parameters,
-        hash: normalizedPath.hash,
+        pathname: normalizedURL.pathname,
+        searchParameters: normalizedURL.parameters,
+        hash: normalizedURL.hash,
       })
 
       this.#announcer = new MorphAnnouncer()
@@ -228,7 +228,7 @@ export class Morph {
     }
 
     const route = this.#getRoute(path)
-    route?.fetch(revalidate)
+    route?.fetch(path, revalidate)
   }
 
   public async navigate(
@@ -247,33 +247,31 @@ export class Morph {
       return
     }
 
-    const normalizedPath = this.normalizePath(
+    const normalizedURL = this.normalizePath(
       this.pathnameModifier?.(path) || path
     )
 
     if (
-      this.#candidateURL?.pathname === normalizedPath.pathname ||
-      this.#currentURL.pathname === normalizedPath.pathname
+      this.#candidateURL?.pathname === normalizedURL.pathname ||
+      this.#currentURL.pathname === normalizedURL.pathname
     ) {
       if (!this.#isPopstateNavigation) {
-        this.#tryScrollToElement(normalizedPath.hash || 0, {
+        this.#tryScrollToElement(normalizedURL.hash || 0, {
           centerScroll,
           offsetScroll,
           behavior: 'smooth',
         })
       }
 
-      if (this.#currentURL?.path !== normalizedPath.path) {
+      if (this.#currentURL?.parameters !== normalizedURL.parameters) {
         this.#previousURL = this.#currentURL
-        this.#currentURL = normalizedPath
+        this.#currentURL = normalizedURL
 
         changeHistory({
           action: historyAction,
-          pathname: normalizedPath.pathname,
-          searchParameters:
-            normalizedPath.parameters ||
-            (keepSearchParameters ? location.search : ''),
-          hash: normalizedPath.hash,
+          pathname: normalizedURL.pathname,
+          searchParameters: normalizedURL.parameters,
+          hash: normalizedURL.hash,
         })
 
         dispatchEvent(document, 'morphURLParametersChange', {
@@ -282,20 +280,15 @@ export class Morph {
             previousURL: this.#previousURL,
           },
         })
-
-        const route = new MorphRoute(this, this.#currentURL.path)
-        route.setInitialDocument(document)
-
-        this.#routes.set(this.#currentURL.path, route)
       }
 
       return
     }
 
-    this.#candidateURL = normalizedPath
+    this.#candidateURL = normalizedURL
 
     this.#links.forEach((link) => {
-      link.checkCurrent(normalizedPath.path)
+      link.checkCurrent(normalizedURL.pathname)
     })
 
     try {
@@ -305,7 +298,7 @@ export class Morph {
         try {
           await new Promise<void>((resolve, reject) => {
             this.preprocessor?.({
-              path,
+              url: normalizedURL,
               resolve,
               reject,
               submorph,
@@ -323,17 +316,17 @@ export class Morph {
 
       if (
         !preprocessedSuccesfully ||
-        this.#candidateURL.path !== normalizedPath.path
+        this.#candidateURL.pathname !== normalizedURL.pathname
       ) {
         this.#links.forEach((link) => {
-          link.checkCurrent(this.#currentURL.path)
+          link.checkCurrent(this.#currentURL.pathname)
         })
 
         return
       }
 
       const navigationEntry: MorphNavigationEntry = {
-        path: normalizedPath.path,
+        url: normalizedURL,
         submorph,
       }
 
@@ -341,18 +334,18 @@ export class Morph {
         detail: navigationEntry,
       })
 
-      const currentRoute = this.#getRoute(this.#currentURL.path)
+      const currentRoute = this.#getRoute(this.#currentURL.pathname)
       const nextRoute = this.#getRoute(path)
 
       this.#routes.forEach((el) => {
-        if (el.path !== normalizedPath.path) {
+        if (el.pathname !== normalizedURL.pathname) {
           el.abort()
         }
       })
 
-      await nextRoute?.fetch(revalidate)
+      await nextRoute?.fetch(path, revalidate)
 
-      if (this.#candidateURL.path !== normalizedPath.path) {
+      if (this.#candidateURL.pathname !== normalizedURL.pathname) {
         this.#links.forEach((link) => {
           link.checkCurrent(this.#currentURL.path)
         })
@@ -474,26 +467,26 @@ export class Morph {
 
       document.documentElement.setAttribute(
         'data-current-pathname',
-        normalizedPath.pathname
+        normalizedURL.pathname
       )
       document.documentElement.setAttribute(
         'data-current-leaf',
-        normalizedPath.leaf
+        normalizedURL.leaf
       )
 
       changeHistory({
         action: historyAction,
-        pathname: normalizedPath.pathname,
+        pathname: normalizedURL.pathname,
         searchParameters:
-          normalizedPath.parameters ||
+          normalizedURL.parameters ||
           (keepSearchParameters ? location.search : ''),
-        hash: normalizedPath.hash,
+        hash: normalizedURL.hash,
       })
 
       this.#announcer.remove()
 
       this.#previousURL = this.#currentURL
-      this.#currentURL = normalizedPath
+      this.#currentURL = normalizedURL
 
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
@@ -611,9 +604,9 @@ export class Morph {
         detail: nextRoute.scrollState,
       })
 
-      if (normalizedPath.hash) {
+      if (normalizedURL.hash) {
         nextRoute.clearScrollState()
-        this.#tryScrollToElement(normalizedPath.hash, {
+        this.#tryScrollToElement(normalizedURL.hash, {
           centerScroll,
           offsetScroll,
         })
@@ -727,13 +720,13 @@ export class Morph {
   }
 
   #getRoute(path: string) {
-    let pathWithoutHash = path.split('#')[0]
+    const normalizedURL = this.normalizePath(path)
 
-    let route = this.#routes.get(pathWithoutHash)
+    let route = this.#routes.get(normalizedURL.pathname)
 
     if (!route) {
-      route = new MorphRoute(this, pathWithoutHash)
-      this.#routes.set(pathWithoutHash, route)
+      route = new MorphRoute(this, normalizedURL.pathname)
+      this.#routes.set(normalizedURL.pathname, route)
     }
 
     return route

@@ -16,7 +16,7 @@ const domParser = new DOMParser()
 
 export class MorphRoute {
   #morph: Morph
-  #path: string
+  #pathname: string
   #scrollState: MorphRouteScrollState = { x: 0, y: 0 }
   #initialDocument: Document = null!
   #modifiedDocument: Document | null = null
@@ -24,14 +24,16 @@ export class MorphRoute {
   #savedState: any = null
   #abortController: AbortController | null = null
   #fetching: Promise<void> | null = null
+  #previouslyFetchedPath: string
 
-  constructor(morph: Morph, path: string) {
+  constructor(morph: Morph, pathname: string) {
     this.#morph = morph
-    this.#path = path
+    this.#pathname = pathname
+    this.#previouslyFetchedPath = pathname
   }
 
-  public get path() {
-    return this.#path
+  public get pathname() {
+    return this.#pathname
   }
 
   public get scrollState() {
@@ -48,16 +50,17 @@ export class MorphRoute {
 
   public abort() {
     return this.#abortController?.abort(
-      `[${this.#path}] page loading cancelled`
+      `[${this.#pathname}] page loading cancelled`
     )
   }
 
-  public async fetch(revalidate?: boolean) {
+  public async fetch(path: string, revalidate?: boolean) {
     if (
       this.#fetching ||
       (this.#initialDocument &&
         this.#initialDocument.documentElement.hasAttribute('data-cache') &&
-        !revalidate) ||
+        !revalidate &&
+        this.#previouslyFetchedPath !== path) ||
       (this.#initialDocument && this.#morph.isPopstateNavigation)
     ) {
       return this.#fetching
@@ -67,7 +70,7 @@ export class MorphRoute {
       try {
         this.#abortController = new AbortController()
 
-        const fetchResult = await fetch(this.#path, {
+        const fetchResult = await fetch(path, {
           signal: this.#abortController.signal,
         })
 
@@ -79,6 +82,7 @@ export class MorphRoute {
       } catch (e) {
         console.warn(e)
       } finally {
+        this.#previouslyFetchedPath = path
         this.#abortController = null
         this.#fetching = null
         res()
@@ -101,7 +105,7 @@ export class MorphRoute {
       title = this.#currentDocument.title
     } else {
       const h1 = this.#currentDocument.querySelector('h1')
-      title = h1?.innerText || h1?.textContent || this.#path
+      title = h1?.innerText || h1?.textContent || this.#pathname
     }
 
     return title
