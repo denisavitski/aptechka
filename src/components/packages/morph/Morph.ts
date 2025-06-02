@@ -255,20 +255,21 @@ export class Morph {
       this.#candidateURL?.pathname === normalizedURL.pathname ||
       this.#currentURL.pathname === normalizedURL.pathname
     ) {
-      if (!this.#isPopstateNavigation) {
-        this.#tryScrollToElement(normalizedURL.hash || 0, {
-          centerScroll,
-          offsetScroll,
-          behavior: 'smooth',
-        })
-      }
+      this.#tryScrollToElement(normalizedURL.hash || 0, {
+        centerScroll,
+        offsetScroll,
+        behavior: 'smooth',
+      })
 
       if (this.#currentURL?.parameters !== normalizedURL.parameters) {
         this.#previousURL = this.#currentURL
         this.#currentURL = normalizedURL
 
         changeHistory({
-          action: historyAction,
+          action:
+            this.#currentURL?.hash !== normalizedURL.hash
+              ? 'replace'
+              : historyAction,
           pathname: normalizedURL.pathname,
           searchParameters: normalizedURL.parameters,
           hash: normalizedURL.hash,
@@ -806,13 +807,15 @@ export class Morph {
   }
 
   #popStateListener = async (event: PopStateEvent) => {
-    if (event.state?.path) {
-      event.preventDefault()
+    event.preventDefault()
 
-      this.#isPopstateNavigation = true
-      await this.navigate(event.state.path, { historyAction: 'none' })
-      this.#isPopstateNavigation = false
-    }
+    this.#isPopstateNavigation = true
+
+    await this.navigate(location.href.replace(location.origin, ''), {
+      historyAction: 'none',
+    })
+
+    this.#isPopstateNavigation = false
   }
 
   #scrollListener = () => {
