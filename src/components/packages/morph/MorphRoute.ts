@@ -59,12 +59,13 @@ export class MorphRoute {
       this.#fetching ||
       (this.#initialDocument &&
         this.#initialDocument.documentElement.hasAttribute('data-cache') &&
-        !revalidate &&
-        this.#previouslyFetchedPath !== path) ||
+        (!revalidate || this.#previouslyFetchedPath !== path)) ||
       (this.#initialDocument && this.#morph.isPopstateNavigation)
     ) {
       return this.#fetching
     }
+
+    this.#previouslyFetchedPath = path
 
     this.#fetching = new Promise<void>(async (res) => {
       try {
@@ -82,7 +83,6 @@ export class MorphRoute {
       } catch (e) {
         console.warn(e)
       } finally {
-        this.#previouslyFetchedPath = path
         this.#abortController = null
         this.#fetching = null
         res()
