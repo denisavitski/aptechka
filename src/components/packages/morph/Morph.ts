@@ -136,7 +136,7 @@ export class Morph {
       const initialRoute = new MorphRoute(this, this.#currentURL.pathname)
       initialRoute.setInitialDocument(document)
 
-      this.#routes.set(this.#currentURL.path, initialRoute)
+      this.#routes.set(this.#currentURL.pathname, initialRoute)
 
       document.documentElement.setAttribute(
         'data-current-pathname',
@@ -335,7 +335,7 @@ export class Morph {
       })
 
       const currentRoute = this.#getRoute(this.#currentURL.pathname)
-      const nextRoute = this.#getRoute(path)
+      const nextRoute = this.#getRoute(normalizedURL.pathname)
 
       this.#routes.forEach((el) => {
         if (el.pathname !== normalizedURL.pathname) {

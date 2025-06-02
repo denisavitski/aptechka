@@ -121,6 +121,7 @@ export class MorphRoute {
   }
 
   public saveScrollState() {
+    console.log(this.#pathname)
     if (
       !this.#initialDocument.documentElement.hasAttribute(
         'data-no-scroll-restoration'
