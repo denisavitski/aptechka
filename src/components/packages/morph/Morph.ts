@@ -231,6 +231,10 @@ export class Morph {
     route?.fetch(path, revalidate)
   }
 
+  public excludeHeadChild(child: Node) {
+    return false
+  }
+
   public async navigate(
     path: string,
     {
@@ -398,19 +402,13 @@ export class Morph {
       const addHeadChildren = this.#excludeElements(
         newHeadChildren,
         identicalHeadChildren
-      )
+      ).filter((child) => !this.excludeHeadChild(child))
 
       addHeadChildren.forEach((child, index) => {
-        if (child.tagName === 'SCRIPT' && child.getAttribute('src')) {
-          const newScriptTag = document.createElement('script')
-          const src = child.getAttribute('src')!
-
-          if (!src.includes('http')) {
-            newScriptTag.type = 'module'
-          }
-
-          newScriptTag.src = src
-          addHeadChildren[index] = newScriptTag
+        if (child.tagName === 'SCRIPT') {
+          addHeadChildren[index] = this.#createScript(
+            child as HTMLScriptElement
+          )
         }
       })
 
@@ -627,18 +625,7 @@ export class Morph {
         const scriptElements = el.querySelectorAll('script')
 
         scriptElements.forEach((element) => {
-          const newScriptTag = document.createElement('script')
-
-          for (let i = 0; i < element.attributes.length; i++) {
-            const attr = element.attributes[i]
-            newScriptTag.setAttribute(attr.name, attr.value)
-          }
-
-          if (!element.hasAttribute('src')) {
-            newScriptTag.innerHTML = element.innerHTML
-          }
-
-          element.replaceWith(newScriptTag)
+          element.replaceWith(this.#createScript(element))
         })
       })
 
@@ -708,6 +695,21 @@ export class Morph {
     this.#links.forEach((link) => link.destroy())
 
     this.#links = linkElements.map((element) => new MorphLink(element, this))
+  }
+
+  #createScript(element: HTMLScriptElement) {
+    const newScriptTag = document.createElement('script')
+
+    for (let i = 0; i < element.attributes.length; i++) {
+      const attr = element.attributes[i]
+      newScriptTag.setAttribute(attr.name, attr.value)
+    }
+
+    if (!element.hasAttribute('src')) {
+      newScriptTag.innerHTML = element.innerHTML
+    }
+
+    return newScriptTag
   }
 
   #checkLink = (element: HTMLElement) => {
