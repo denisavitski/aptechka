@@ -59,6 +59,24 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
         this.#intersectionListener
       )
     }
+
+    this.#status.subscribe((e) => {
+      const globalClasses = this.getAttribute('data-global-play-class')?.split(
+        ','
+      )
+
+      if (globalClasses?.length) {
+        if (e.current.playing) {
+          globalClasses.forEach((className) => {
+            document.documentElement.classList.add(className.trim())
+          })
+        } else {
+          globalClasses.forEach((className) => {
+            document.documentElement.classList.remove(className.trim())
+          })
+        }
+      }
+    })
   }
 
   public get consumerElement() {
@@ -306,25 +324,11 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #playListener = () => {
     this.#status.set('playing', true)
 
-    const globalClass = this.getAttribute('data-global-play-class')
-    if (globalClass) {
-      globalClass.split(',').forEach((className) => {
-        document.documentElement.classList.add(className.trim())
-      })
-    }
-
     dispatchEvent(this, 'sourcePlay', { custom: true })
   }
 
   #pauseListener = () => {
     this.#status.set('playing', false)
-
-    const globalClass = this.getAttribute('data-global-play-class')
-    if (globalClass) {
-      globalClass.split(',').forEach((className) => {
-        document.documentElement.classList.remove(className.trim())
-      })
-    }
 
     dispatchEvent(this, 'sourcePause', { custom: true })
   }
