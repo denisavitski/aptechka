@@ -99,16 +99,18 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
     const newProgress = this.consumerElement.readyState / 4
 
+    if (newProgress !== this.#progress) {
+      dispatchEvent(this, 'videoReadyStateChange', {
+        detail: {
+          readyState: this.consumerElement.readyState,
+          progress: this.#progress,
+        },
+      })
+    }
+
     if (newProgress > this.#progress) {
       this.#progress = newProgress
     }
-
-    dispatchEvent(this, 'videoReadyStateChange', {
-      detail: {
-        readyState: this.consumerElement.readyState,
-        progress: this.#progress,
-      },
-    })
 
     if (this.consumerElement.readyState === 4) {
       ticker.unsubscribe(this.#checkReady)

@@ -5,6 +5,7 @@ import { loading } from '@packages/loading'
 import { type Source } from './SourceClass'
 import { type SourceSetOptions } from './SourceSet'
 import { SourceManager } from './SourceManager'
+import { formatMediaDuration } from '@packages/utils/metadata'
 
 let id = 0
 
@@ -13,6 +14,9 @@ export interface SourceEvents {
   sourceRelease: CustomEvent
   sourceLoaded: CustomEvent
   sourceError: CustomEvent
+  sourcePlay: CustomEvent
+  sourcePause: CustomEvent
+  sourceMetadataLoaded: CustomEvent
 }
 
 export interface SourceElementOptions {
@@ -34,6 +38,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     error: false,
     clear: false,
     playing: false,
+    metadata: false,
   })
 
   #intersectionObserver: IntersectionObserver = null!
@@ -121,6 +126,11 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     this.#consumerElement.addEventListener('play', this.#playListener)
     this.#consumerElement.addEventListener('pause', this.#pauseListener)
+    this.#consumerElement.addEventListener(
+      'loadedmetadata',
+      this.#loadedmetadataListener
+    )
+    this.#loadedmetadataListener()
 
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
@@ -165,6 +175,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
       this.#consumerElement.removeEventListener('play', this.#playListener)
       this.#consumerElement.removeEventListener('pause', this.#pauseListener)
+      this.#consumerElement.removeEventListener(
+        'loadedmetadata',
+        this.#loadedmetadataListener
+      )
 
       this.#consumerElement.onloadeddata = null
       this.#consumerElement.onload = null
@@ -191,6 +205,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#status.set('loading', false)
     this.#status.set('clear', false)
     this.#status.set('playing', false)
+    this.#status.set('metadata', false)
 
     if (source) {
       this.#idWithUrl = `${this.#id}-${source.url}`
@@ -290,10 +305,48 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   #playListener = () => {
     this.#status.set('playing', true)
+
+    const globalClass = this.getAttribute('data-global-play-class')
+    if (globalClass) {
+      globalClass.split(',').forEach((className) => {
+        document.documentElement.classList.add(className.trim())
+      })
+    }
+
+    dispatchEvent(this, 'sourcePlay', { custom: true })
   }
 
   #pauseListener = () => {
     this.#status.set('playing', false)
+
+    const globalClass = this.getAttribute('data-global-play-class')
+    if (globalClass) {
+      globalClass.split(',').forEach((className) => {
+        document.documentElement.classList.remove(className.trim())
+      })
+    }
+
+    dispatchEvent(this, 'sourcePause', { custom: true })
+  }
+
+  #loadedmetadataListener = () => {
+    const consumerElement = this.#consumerElement as any as
+      | HTMLVideoElement
+      | HTMLAudioElement
+
+    if (
+      (consumerElement.tagName === 'VIDEO' ||
+        consumerElement.tagName === 'AUDIO') &&
+      consumerElement.readyState >= 1
+    ) {
+      this.#status.set('metadata', true)
+
+      dispatchEvent(this, 'sourceMetadataLoaded', { custom: true })
+
+      this.querySelectorAll('[data-source-duration]').forEach((el) => {
+        el.textContent = formatMediaDuration(consumerElement.duration)
+      })
+    }
   }
 }
 
