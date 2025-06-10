@@ -78,6 +78,7 @@ export interface MorphEvents {
   morphScroll: CustomEvent<MorphScrollDetail>
   morphBeforeNavigationScroll: CustomEvent<MorphRouteScrollState>
   morphURLParametersChange: CustomEvent<MorphURLParametersChangeEntry>
+  morphSamePath: CustomEvent
 }
 
 export interface MorphGetRouteOptions {
@@ -263,6 +264,10 @@ export class Morph {
         centerScroll,
         offsetScroll,
         behavior: 'smooth',
+      })
+
+      dispatchEvent(document, 'morphSamePath', {
+        custom: true,
       })
 
       if (this.#currentURL?.parameters !== normalizedURL.parameters) {
