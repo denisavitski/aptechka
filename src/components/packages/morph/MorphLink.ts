@@ -37,6 +37,13 @@ export class MorphLink {
       this.#element.classList.add('current')
     } else if (linkUrl.pathname === locationUrl.pathname) {
       this.#element.classList.add('current')
+    } else if (
+      this.#element
+        .getAttribute('data-associated-paths')
+        ?.split(',')
+        .find((path) => path.includes(locationUrl.pathname))
+    ) {
+      this.#element.classList.add('current')
     } else {
       this.#element.classList.remove('current')
     }
