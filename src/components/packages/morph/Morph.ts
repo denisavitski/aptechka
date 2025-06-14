@@ -229,12 +229,14 @@ export class Morph {
     }
 
     const route = this.#getRoute(path)
-    route?.fetch(path, revalidate)
+    route?.fetch(path, this.#currentURL.path, revalidate)
   }
 
   public excludeHeadChild(child: Node) {
     return false
   }
+
+  public setHeaders(path: string) {}
 
   public async navigate(
     path: string,
@@ -353,7 +355,7 @@ export class Morph {
         }
       })
 
-      await nextRoute?.fetch(path, revalidate)
+      await nextRoute?.fetch(path, this.#currentURL.path, revalidate)
 
       if (this.#candidateURL.pathname !== normalizedURL.pathname) {
         this.#links.forEach((link) => {

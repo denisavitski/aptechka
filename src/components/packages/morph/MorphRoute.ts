@@ -25,6 +25,7 @@ export class MorphRoute {
   #abortController: AbortController | null = null
   #fetching: Promise<void> | null = null
   #previouslyFetchedPath: string
+  #headers: HeadersInit | undefined
 
   constructor(morph: Morph, pathname: string) {
     this.#morph = morph
@@ -44,6 +45,10 @@ export class MorphRoute {
     return this.#currentDocument
   }
 
+  public setHeaders(headers: HeadersInit) {
+    this.#headers = headers
+  }
+
   public setInitialDocument(document: Document) {
     this.#initialDocument = document.cloneNode(true) as Document
   }
@@ -54,7 +59,7 @@ export class MorphRoute {
     )
   }
 
-  public async fetch(path: string, revalidate?: boolean) {
+  public async fetch(path: string, currentPath: string, revalidate?: boolean) {
     if (
       this.#fetching ||
       (this.#initialDocument &&
@@ -73,6 +78,12 @@ export class MorphRoute {
 
         const fetchResult = await fetch(path, {
           signal: this.#abortController.signal,
+          headers: {
+            'X-MORPH': 'true',
+            'X-MORPH-CURRENT-PATH': currentPath,
+            'X-MORPH-NEW-PATH': path,
+            ...this.#headers,
+          },
         })
 
         const text = await fetchResult.text()
