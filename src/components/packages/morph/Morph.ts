@@ -228,6 +228,8 @@ export class Morph {
       return
     }
 
+    path = this.pathnameModifier?.(path) || path
+
     const route = this.#getRoute(path)
     route?.fetch(path, this.#currentURL.path, revalidate)
   }
