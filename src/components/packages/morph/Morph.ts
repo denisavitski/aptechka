@@ -636,6 +636,10 @@ export class Morph {
         })
       })
 
+      this.#links.forEach((link) => {
+        link.checkCurrent(this.#currentURL.path)
+      })
+
       dispatchEvent(document, 'morphComplete', {
         detail: documentFetchedEntry,
       })
