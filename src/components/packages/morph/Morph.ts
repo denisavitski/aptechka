@@ -256,9 +256,9 @@ export class Morph {
       return
     }
 
-    const normalizedURL = this.normalizePath(
-      this.pathnameModifier?.(path) || path
-    )
+    const modifiedPath = this.pathnameModifier?.(path) || path
+
+    const normalizedURL = this.normalizePath(modifiedPath)
 
     if (
       this.#candidateURL?.pathname === normalizedURL.pathname ||
@@ -357,7 +357,7 @@ export class Morph {
         }
       })
 
-      await nextRoute?.fetch(path, this.#currentURL.path, revalidate)
+      await nextRoute?.fetch(modifiedPath, this.#currentURL.path, revalidate)
 
       if (this.#candidateURL.pathname !== normalizedURL.pathname) {
         this.#links.forEach((link) => {
