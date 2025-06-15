@@ -41,7 +41,7 @@ export class MorphLink {
       this.#element
         .getAttribute('data-associated-paths')
         ?.split(',')
-        .find((path) => path.includes(locationUrl.pathname))
+        .find((path) => locationUrl.pathname.includes(path))
     ) {
       this.#element.classList.add('current')
     } else {
