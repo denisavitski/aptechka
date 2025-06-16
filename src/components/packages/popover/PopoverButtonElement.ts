@@ -185,26 +185,42 @@ export class PopoverButtonElement extends HTMLElement {
     }
   }
 
-  #popoverTriggeredListener = () => {
+  #popoverTriggeredListener = (e: Event) => {
+    if (e.target !== this.#popoverElement) {
+      return
+    }
+
     if (this.#type.current !== 'close') {
       this.classList.add('triggered')
     }
   }
 
-  #popoverOpenedListener = () => {
+  #popoverOpenedListener = (e: Event) => {
+    if (e.target !== this.#popoverElement) {
+      return
+    }
+
     if (this.#type.current !== 'close') {
       this.classList.add('opened')
       this.setAttribute('aria-expanded', 'true')
     }
   }
 
-  #popoverClosingListener = () => {
+  #popoverClosingListener = (e: Event) => {
+    if (e.target !== this.#popoverElement) {
+      return
+    }
+
     if (this.#type.current !== 'close') {
       this.classList.remove('opened')
     }
   }
 
-  #popoverClosedListener = () => {
+  #popoverClosedListener = (e: Event) => {
+    if (e.target !== this.#popoverElement) {
+      return
+    }
+
     if (this.#type.current !== 'close') {
       this.classList.remove('triggered')
       this.setAttribute('aria-expanded', 'false')
