@@ -66,7 +66,9 @@ class PopoverGroups {
   }
 
   public remove(groupName: string, element: PopoverElement) {
-    this.#stack = this.#stack.filter((e) => e !== element)
+    setTimeout(() => {
+      this.#stack = this.#stack.filter((e) => e !== element)
+    })
 
     if (element.closeRest.current) {
       let elements: Array<PopoverElement> = []
@@ -500,6 +502,7 @@ export class PopoverElement extends HTMLElement {
 
   #popStateListener = () => {
     this.#historyAllowed = false
+
     if (
       this.#opened &&
       this.#history.current &&
