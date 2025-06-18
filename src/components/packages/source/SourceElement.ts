@@ -26,6 +26,7 @@ export interface SourceElementOptions {
 export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
+  #consumerHolderElement: HTMLElement = this
   #isFirstLoadHappened = false
   #lazyLoaded = false
   #isLazy = false
@@ -83,6 +84,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     return this.#consumerElement
   }
 
+  public get consumerHolderElement() {
+    return this.#consumerHolderElement
+  }
+
   public get sourceManager() {
     return this.#sourceManager
   }
@@ -130,6 +135,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.#status.addElement(notifyElement)
     }
 
+    this.#consumerHolderElement =
+      this.querySelector('[data-consumer-holder]') || this
+
     this.querySelector('.source-consumer')?.remove()
 
     this.#consumerElement = this.createConsumer()
@@ -161,7 +169,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       }
     })
 
-    this.appendChild(this.#consumerElement)
+    this.#consumerHolderElement.appendChild(this.#consumerElement)
 
     this.#sourceManager = new SourceManager({
       srcset: srcset,
