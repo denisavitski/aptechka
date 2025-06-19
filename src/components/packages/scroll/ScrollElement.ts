@@ -954,6 +954,8 @@ export class ScrollElement extends HTMLElement {
       } else if (!e.current && e.previous) {
         this.classList.remove('hibernated')
         this.#awake()
+      } else {
+        this.#hibernated = false
       }
     })
 
