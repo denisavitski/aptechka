@@ -1,7 +1,7 @@
 import { isBrowser } from '@packages/utils'
 import { ScrollUserElement } from './ScrollUserElement'
 
-export class ScrollCounterElement extends ScrollUserElement {
+export class ScrollTotalElement extends ScrollUserElement {
   protected override async connectedCallback() {
     super.connectedCallback()
 
@@ -20,11 +20,11 @@ export class ScrollCounterElement extends ScrollUserElement {
 }
 
 if (isBrowser && !customElements.get('e-scroll-total')) {
-  customElements.define('e-scroll-total', ScrollCounterElement)
+  customElements.define('e-scroll-total', ScrollTotalElement)
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'e-scroll-total': ScrollCounterElement
+    'e-scroll-total': ScrollTotalElement
   }
 }
