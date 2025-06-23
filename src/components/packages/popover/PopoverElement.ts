@@ -402,11 +402,6 @@ export class PopoverElement extends HTMLElement {
       ),
     ]
 
-    console.log(
-      this.id,
-      `[data-popover-reset-scroll${this.id ? `="${this.id}"` : ''}]`
-    )
-
     this.#history.observe()
     this.#restore.observe()
     this.#closeRest.observe()
