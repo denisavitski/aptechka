@@ -529,6 +529,8 @@ export class ScrollElement extends HTMLElement {
 
     const newCounterValue = this.#clampCounter(sectionIndex)
 
+    this.#counter.current = newCounterValue
+
     const previousSection = this.#visibleSections[previousCounter]
     const currentSection = this.#visibleSections[newCounterValue]
 
@@ -1223,7 +1225,9 @@ export class ScrollElement extends HTMLElement {
         section.transform()
       }
 
-      this.#counter.current = this.#getNearestSectionIndex()
+      if (!this.#sectionalCSSProperty.current) {
+        this.#counter.current = this.#getNearestSectionIndex()
+      }
     } else {
       if (this.vertical) {
         this.#contentElement.style.transform = `translate3d(0px, ${
@@ -1444,6 +1448,12 @@ export class ScrollElement extends HTMLElement {
         section.setCurrentIndexArc(arcIndex)
         section.setCurrentIndexArcAbs(Math.abs(arcIndex))
         section.setMiddle(i === middle)
+      })
+
+      this.#visibleSections.forEach((section, i) => {
+        section.setOffsetIndex(
+          i - (this.#counter.current + this.#sectionsInViewCSSProperty.current)
+        )
       })
     }
   }

@@ -93,6 +93,7 @@ export class ScrollSection {
     this.setCurrentIndex(null)
     this.setCurrentIndexArc(null)
     this.setCurrentIndexArcAbs(null)
+    this.setOffsetIndex(null)
     this.setMiddle(false)
     this.setSize()
   }
@@ -215,6 +216,10 @@ export class ScrollSection {
 
   public setCurrentIndexArc(value: number | null) {
     this.#setVar('current-index-arc', value)
+  }
+
+  public setOffsetIndex(value: number | null) {
+    this.#setVar('offset-index', value)
   }
 
   public setCurrentIndexArcAbs(value: number | null) {
