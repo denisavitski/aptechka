@@ -177,6 +177,8 @@ export class ScrollElement extends HTMLElement {
     3000
   )
 
+  #shiftLimitCSSProperty = new CSSProperty<number>(this, '--shift-limit', 0)
+
   #disabledCSSProperty = new CSSProperty<boolean>(this, '--disabled', false)
   #hibernatedCSSProperty = new CSSProperty<boolean>(this, '--hibernate', false)
 
@@ -374,6 +376,10 @@ export class ScrollElement extends HTMLElement {
     return this.#focusDurationCSSProperty
   }
 
+  public get shiftLimitCSSProperty() {
+    return this.#shiftLimitCSSProperty
+  }
+
   public get disabledCSSProperty() {
     return this.#disabledCSSProperty
   }
@@ -432,7 +438,9 @@ export class ScrollElement extends HTMLElement {
 
   public get limit() {
     return Math.ceil(
-      this.#visibleSections.length - this.#sectionsInViewCSSProperty.current
+      this.#visibleSections.length -
+        this.#sectionsInViewCSSProperty.current +
+        this.#shiftLimitCSSProperty.current
     )
   }
 
@@ -989,6 +997,7 @@ export class ScrollElement extends HTMLElement {
     this.#shiftSectionPositionCSSProperty.observe()
     this.#focusDelayCSSProperty.observe()
     this.#focusDurationCSSProperty.observe()
+    this.#shiftLimitCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#hibernatedCSSProperty.observe()
 
@@ -1032,6 +1041,7 @@ export class ScrollElement extends HTMLElement {
     this.#shiftSectionPositionCSSProperty.unobserve()
     this.#focusDelayCSSProperty.unobserve()
     this.#focusDurationCSSProperty.unobserve()
+    this.#shiftLimitCSSProperty.unobserve()
     this.#disabledCSSProperty.unobserve()
     this.#hibernatedCSSProperty.unobserve()
 
