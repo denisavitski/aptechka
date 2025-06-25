@@ -607,7 +607,8 @@ export class ScrollElement extends HTMLElement {
       clearTimeout(this.#tweenTimeoutId)
 
       this.#setTween.set(this.#damped.current, { equalize: true })
-      this.#setTween.set(Math.min(value, this.distance), { ...options.tween })
+      // this.#setTween.set(Math.min(value, this.distance), { ...options.tween })
+      this.#setTween.set(value, { ...options.tween })
 
       this.#tweenTimeoutId = setTimeout(() => {
         this.#tweenTimeoutId = undefined
@@ -873,6 +874,8 @@ export class ScrollElement extends HTMLElement {
         this.#damped.max = Infinity
         this.#damped.min = -Infinity
       }
+
+      this.classList.toggle('loop', !!e.current)
     })
 
     this.#dampingCSSProperty.subscribe((e) => {
@@ -1381,7 +1384,7 @@ export class ScrollElement extends HTMLElement {
       const counter =
         this.#counter.current + this.#currentIndexStartOffsetCSSProperty.current
 
-      if (counter === 0) {
+      if (counter === this.#currentIndexStartOffsetCSSProperty.current) {
         this.#scrollLine = 'start'
       } else if (counter === this.limit) {
         this.#scrollLine = 'end'
