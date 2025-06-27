@@ -529,7 +529,11 @@ export class ScrollElement extends HTMLElement {
   }
 
   public scrollToSection(sectionIndex: number, options?: ScrollSetOptions) {
-    if (!this.#visibleSections.length || this.#hibernated) {
+    if (
+      !this.#visibleSections.length ||
+      this.#hibernated ||
+      this.#tweenTimeoutId
+    ) {
       return
     }
 
@@ -1367,8 +1371,8 @@ export class ScrollElement extends HTMLElement {
   #getScrollValue(type: 'target' | 'current' = 'current') {
     if (this.#loopCSSProperty.current && this.#visibleSections.length) {
       const mod =
-        this.#damped[type] %
-        Math.round(this.#scrollSize + this.#viewportSize + this.#gap)
+        Math.floor(this.#damped[type]) %
+        Math.floor(this.#scrollSize + this.#viewportSize + this.#gap)
 
       const value =
         mod < 0 ? this.#scrollSize + mod + this.#viewportSize + this.#gap : mod
