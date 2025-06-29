@@ -139,7 +139,7 @@ export class DragControls extends Controls {
           (this.axis === 'y' && Math.abs(ddy) > Math.abs(ddx))
 
         if (okToNotify) {
-          document.documentElement.classList.add('dragging')
+          document.documentElement.classList.add('click-disabled')
 
           DragControls.#currentElement = this.#element
 
@@ -162,7 +162,10 @@ export class DragControls extends Controls {
         }
 
         document.documentElement.classList.remove('grabbing')
-        document.documentElement.classList.remove('dragging')
+
+        setTimeout(() => {
+          document.documentElement.classList.remove('click-disabled')
+        })
       }
     )
   }

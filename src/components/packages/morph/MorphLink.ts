@@ -58,6 +58,10 @@ export class MorphLink {
   #clickListener = (e: MouseEvent) => {
     e.preventDefault()
 
+    if (document.documentElement.classList.contains('click-disabled')) {
+      return
+    }
+
     const back = this.#element.hasAttribute('data-back')
 
     if (back && this.#morph.previousURL) {
