@@ -156,7 +156,6 @@ export abstract class Animation<
   public unlistenAnimationFrame() {
     if (this.#isRunning.current) {
       this.#isRunning.current = false
-
       ticker.unsubscribe(this.#animationFrameListener)
     }
   }

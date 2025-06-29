@@ -541,7 +541,9 @@ export class ScrollElement extends HTMLElement {
 
     const newCounterValue = this.#clampCounter(sectionIndex)
 
-    this.#counter.current = newCounterValue
+    if (!this.#isGrabbing) {
+      this.#counter.current = newCounterValue
+    }
 
     const previousSection = this.#visibleSections[previousCounter]
     const currentSection = this.#visibleSections[newCounterValue]
@@ -1242,7 +1244,7 @@ export class ScrollElement extends HTMLElement {
         section.transform()
       }
 
-      if (!this.#sectionalCSSProperty.current) {
+      if (this.#isGrabbing || !this.#sectionalCSSProperty.current) {
         this.#counter.current = this.#getNearestSectionIndex()
       }
     } else {
@@ -1330,20 +1332,19 @@ export class ScrollElement extends HTMLElement {
       const direction = Math.sign(value)
 
       if (this.#visibleSections.length) {
-        const options: ScrollSetOptions = {
-          tween:
-            this.#easingCSSProperty.current || this.#durationCSSProperty.current
-              ? {
-                  easing: this.#easingCSSProperty.current || 'easeInOutCubic',
-                  duration: this.#durationCSSProperty.current || 500,
-                }
-              : undefined,
-        }
-
         if (this.#isGrabbing) {
-          this.scrollToSection(this.#getNearestSectionIndex(true), options)
+          this.scrollToSection(this.#getNearestSectionIndex(true))
         } else {
-          this.shiftSections(direction, options)
+          this.shiftSections(direction, {
+            tween:
+              this.#easingCSSProperty.current ||
+              this.#durationCSSProperty.current
+                ? {
+                    easing: this.#easingCSSProperty.current || 'easeInOutCubic',
+                    duration: this.#durationCSSProperty.current || 500,
+                  }
+                : undefined,
+          })
         }
       } else {
         this.#damped.shift(direction * this.#viewportSize)
