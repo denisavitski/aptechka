@@ -62,6 +62,7 @@ export interface MorphNavigateOptions {
   revalidate?: boolean
   keepSearchParameters?: boolean
   submorph?: Array<string>
+  submorphAppend?: boolean
   clearState?: boolean
   keepScrollPosition?: boolean
 }
@@ -113,7 +114,8 @@ export class Morph {
   #announcer: MorphAnnouncer = null!
   #currentScrollX = 0
   #currentScrollY = 0
-  #lastSubmorph: Array<string> | null = null
+  #lastSubmorph: Array<string> | undefined
+  #lastRevalidate: boolean | undefined
 
   constructor(parameters?: Partial<MorphOptions>) {
     if (isBrowser && !Morph.instance) {
@@ -253,6 +255,7 @@ export class Morph {
       revalidate,
       keepSearchParameters,
       submorph,
+      submorphAppend,
       clearState,
       keepScrollPosition,
     }: MorphNavigateOptions = {}
@@ -261,7 +264,8 @@ export class Morph {
       return
     }
 
-    this.#lastSubmorph = submorph || null
+    this.#lastSubmorph = submorph
+    this.#lastRevalidate = revalidate
 
     const modifiedPath = this.pathnameModifier?.(path) || path
 
@@ -358,12 +362,14 @@ export class Morph {
           el.firstElementChild?.setAttribute('data-morph-out', '')
         })
       } else {
-        submorph.forEach((sel) => {
-          document.querySelectorAll(sel).forEach((el) => {
-            el.classList.add('out')
-            el.setAttribute('data-morph-out', '')
+        if (!submorphAppend) {
+          submorph.forEach((sel) => {
+            document.querySelectorAll(sel).forEach((el) => {
+              el.classList.add('out')
+              el.setAttribute('data-morph-out', '')
+            })
           })
-        })
+        }
       }
 
       dispatchEvent(document, 'morphNavigation', {
@@ -393,7 +399,7 @@ export class Morph {
       currentRoute.saveScrollState()
       currentRoute.saveDocumentState()
 
-      if (!this.#isPopstateNavigation) {
+      if (!this.#isPopstateNavigation || revalidate) {
         nextRoute.clearScrollState()
         nextRoute.clearDocumentState()
       }
@@ -413,11 +419,13 @@ export class Morph {
         document: nextRoute.document,
       }
 
-      documentFetchedEntry.document
-        .querySelectorAll('[data-morph-out]')
-        .forEach((el) => {
-          el.classList.remove('out')
-        })
+      if (!submorphAppend) {
+        documentFetchedEntry.document
+          .querySelectorAll('[data-morph-out]')
+          .forEach((el) => {
+            el.classList.remove('out')
+          })
+      }
 
       dispatchEvent(document, 'morphStart', {
         detail: documentFetchedEntry,
@@ -481,17 +489,19 @@ export class Morph {
 
       const oldElementsWithLoadEvent: Array<Element> = []
 
-      removeHeadChildren.forEach((child) => {
-        if (child.hasAttribute('data-permanent')) {
-          return
-        }
+      if (!submorphAppend) {
+        removeHeadChildren.forEach((child) => {
+          if (child.hasAttribute('data-permanent')) {
+            return
+          }
 
-        if (this.#isElementEmitsLoadEvent(child)) {
-          oldElementsWithLoadEvent.push(child)
-        } else {
-          child.remove()
-        }
-      })
+          if (this.#isElementEmitsLoadEvent(child)) {
+            oldElementsWithLoadEvent.push(child)
+          } else {
+            child.remove()
+          }
+        })
+      }
 
       const newMorphElements = this.#getMorphElements(
         nextRoute.document.body as HTMLElement
@@ -557,12 +567,14 @@ export class Morph {
           morphedElements.push(morphElement)
         }
 
-        currentMorphElementChildNodes.forEach((element) => {
-          if (element instanceof HTMLElement) {
-            this.destroyOldLinks(element)
-            element.classList.add('old')
-          }
-        })
+        if (!submorphAppend) {
+          currentMorphElementChildNodes.forEach((element) => {
+            if (element instanceof HTMLElement) {
+              this.destroyOldLinks(element)
+              element.classList.add('old')
+            }
+          })
+        }
 
         newMorphElementChildNodes.forEach((element) => {
           if (element instanceof HTMLElement) {
@@ -574,20 +586,30 @@ export class Morph {
         if (!submorph) {
           morphElement.prepend(...newMorphElementChildNodes)
         } else {
-          newMorphElementChildNodes.forEach((el, i) => {
-            currentMorphElementChildNodes[i].parentElement?.insertBefore(
-              el,
-              currentMorphElementChildNodes[i]
-            )
-          })
+          if (!submorphAppend) {
+            newMorphElementChildNodes.forEach((el, i) => {
+              currentMorphElementChildNodes[i].parentElement?.insertBefore(
+                el,
+                currentMorphElementChildNodes[i]
+              )
+            })
+          } else {
+            newMorphElementChildNodes.forEach((el, i) => {
+              if (currentMorphElementChildNodes[i] instanceof HTMLElement) {
+                currentMorphElementChildNodes[i].append(...el.childNodes)
+              }
+            })
+          }
         }
 
         requestIdleCallback(() => {
-          currentMorphElementChildNodes.forEach((element) => {
-            if (element instanceof HTMLElement) {
-              element.classList.add('old-idle')
-            }
-          })
+          if (!submorphAppend) {
+            currentMorphElementChildNodes.forEach((element) => {
+              if (element instanceof HTMLElement) {
+                element.classList.add('old-idle')
+              }
+            })
+          }
 
           newMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
@@ -611,7 +633,9 @@ export class Morph {
 
         const promise = new Promise<void>((res) => {
           setTimeout(() => {
-            currentMorphElementChildNodes.forEach((el) => el.remove())
+            if (!submorphAppend) {
+              currentMorphElementChildNodes.forEach((el) => el.remove())
+            }
 
             newMorphElementChildNodes.forEach((element) => {
               if (element instanceof HTMLElement) {
@@ -622,9 +646,11 @@ export class Morph {
               }
             })
 
-            dispatchEvent(document, 'morphOldChildrenRemoved', {
-              detail,
-            })
+            if (!submorphAppend) {
+              dispatchEvent(document, 'morphOldChildrenRemoved', {
+                detail,
+              })
+            }
 
             res()
           }, (parseFloat(duration) || 0) * 1000 + 10)
@@ -665,7 +691,9 @@ export class Morph {
 
       await Promise.all(this.#promises)
 
-      oldElementsWithLoadEvent.forEach((child) => child.remove())
+      if (!submorphAppend) {
+        oldElementsWithLoadEvent.forEach((child) => child.remove())
+      }
 
       this.#promises = []
 
@@ -867,7 +895,8 @@ export class Morph {
 
     await this.navigate(location.href.replace(location.origin, ''), {
       historyAction: 'none',
-      submorph: this.#lastSubmorph || undefined,
+      submorph: !this.#lastRevalidate ? this.#lastSubmorph : undefined,
+      revalidate: this.#lastRevalidate,
     })
 
     this.#isPopstateNavigation = false
