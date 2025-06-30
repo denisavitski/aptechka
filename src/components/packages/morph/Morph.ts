@@ -132,7 +132,7 @@ export class Morph {
       this.#morphElements = this.#getMorphElements(document.body)
 
       const normalizedURL = this.normalizePath(
-        location.pathname + location.hash + location.search
+        location.pathname + location.search + location.hash
       )
 
       this.#currentURL = normalizedURL

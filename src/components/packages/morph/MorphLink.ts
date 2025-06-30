@@ -58,7 +58,7 @@ export class MorphLink {
   public destroy() {
     this.#element.removeEventListener('click', this.#clickListener)
     this.#element.removeEventListener('pointerenter', this.#pointerListener)
-    this.#element.classList.remove('current')
+    this.#element.classList.remove('current', 'exact')
   }
 
   #clickListener = (e: MouseEvent) => {
