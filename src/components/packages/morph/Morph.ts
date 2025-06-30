@@ -286,6 +286,9 @@ export class Morph {
           pathname: normalizedURL.pathname,
           searchParameters: normalizedURL.parameters,
           hash: normalizedURL.hash,
+          state: {
+            submorph: submorph,
+          },
         })
 
         dispatchEvent(document, 'morphURLParametersChange', {
@@ -469,7 +472,7 @@ export class Morph {
         nextRoute.document.body as HTMLElement
       )
 
-      if (!this.#options.morphInsideScrollContainer) {
+      if (!this.#options.morphInsideScrollContainer && !submorph) {
         this.#updateCurrentScrollElement(nextRoute.document)
       }
 
@@ -489,12 +492,17 @@ export class Morph {
           normalizedURL.parameters ||
           (keepSearchParameters ? location.search : ''),
         hash: normalizedURL.hash,
+        state: {
+          submorph: submorph,
+        },
       })
 
       this.#announcer.remove()
 
       this.#previousURL = this.#currentURL
       this.#currentURL = normalizedURL
+
+      const morphedElements: Array<Element> = []
 
       this.#morphElements.forEach((morphElement, i) => {
         const newMorphElement = newMorphElements[i]!
@@ -515,9 +523,16 @@ export class Morph {
               newMorphElementChildNodes.push(newSubMorphElement)
             }
           })
+
+          currentMorphElementChildNodes.forEach((el) => {
+            if (el.parentElement) {
+              morphedElements.push(el.parentElement)
+            }
+          })
         } else {
           newMorphElementChildNodes.push(...newMorphElement.childNodes)
           currentMorphElementChildNodes.push(...morphElement.childNodes)
+          morphedElements.push(morphElement)
         }
 
         currentMorphElementChildNodes.forEach((element) => {
@@ -630,7 +645,7 @@ export class Morph {
 
       this.#promises = []
 
-      this.#morphElements.forEach((el) => {
+      morphedElements.forEach((el) => {
         const scriptElements = el.querySelectorAll('script')
 
         scriptElements.forEach((element) => {
@@ -828,6 +843,7 @@ export class Morph {
 
     await this.navigate(location.href.replace(location.origin, ''), {
       historyAction: 'none',
+      submorph: event.state.submorph,
     })
 
     this.#isPopstateNavigation = false
