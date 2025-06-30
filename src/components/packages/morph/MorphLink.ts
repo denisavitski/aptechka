@@ -90,6 +90,10 @@ export class MorphLink {
         'data-keep-search-parameters'
       )
 
+      const keepScrollPosition = this.#element.hasAttribute(
+        'data-keep-scroll-position'
+      )
+
       const submorph = this.#element
         .getAttribute('data-submorph')
         ?.split(',')
@@ -105,6 +109,7 @@ export class MorphLink {
         keepSearchParameters,
         submorph,
         clearState,
+        keepScrollPosition,
       })
     }
   }

@@ -62,6 +62,7 @@ export interface MorphNavigateOptions {
   keepSearchParameters?: boolean
   submorph?: Array<string>
   clearState?: boolean
+  keepScrollPosition?: boolean
 }
 
 export interface MorphScrollDetail {
@@ -251,6 +252,7 @@ export class Morph {
       keepSearchParameters,
       submorph,
       clearState,
+      keepScrollPosition,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
@@ -652,7 +654,7 @@ export class Morph {
         })
       } else if (this.#isPopstateNavigation) {
         nextRoute.restoreScrollPosition()
-      } else {
+      } else if (!keepScrollPosition) {
         nextRoute.renewScrollPosition()
       }
 
