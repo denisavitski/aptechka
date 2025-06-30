@@ -111,6 +111,7 @@ export class Morph {
   #announcer: MorphAnnouncer = null!
   #currentScrollX = 0
   #currentScrollY = 0
+  #lastSubmorph: Array<string> | null = null
 
   constructor(parameters?: Partial<MorphOptions>) {
     if (isBrowser && !Morph.instance) {
@@ -256,6 +257,8 @@ export class Morph {
       return
     }
 
+    this.#lastSubmorph = submorph || null
+
     const modifiedPath = this.pathnameModifier?.(path) || path
 
     const normalizedURL = this.normalizePath(modifiedPath)
@@ -286,9 +289,6 @@ export class Morph {
           pathname: normalizedURL.pathname,
           searchParameters: normalizedURL.parameters,
           hash: normalizedURL.hash,
-          state: {
-            submorph: submorph,
-          },
         })
 
         dispatchEvent(document, 'morphURLParametersChange', {
@@ -347,6 +347,20 @@ export class Morph {
         submorph,
       }
 
+      if (!submorph) {
+        this.#morphElements.forEach((el) => {
+          el.firstElementChild?.classList.add('out')
+          el.firstElementChild?.setAttribute('data-morph-out', '')
+        })
+      } else {
+        submorph.forEach((sel) => {
+          document.querySelectorAll(sel).forEach((el) => {
+            el.classList.add('out')
+            el.setAttribute('data-morph-out', '')
+          })
+        })
+      }
+
       dispatchEvent(document, 'morphNavigation', {
         detail: navigationEntry,
       })
@@ -393,6 +407,12 @@ export class Morph {
         ...navigationEntry,
         document: nextRoute.document,
       }
+
+      documentFetchedEntry.document
+        .querySelectorAll('[data-morph-out]')
+        .forEach((el) => {
+          el.classList.remove('out')
+        })
 
       dispatchEvent(document, 'morphStart', {
         detail: documentFetchedEntry,
@@ -492,9 +512,6 @@ export class Morph {
           normalizedURL.parameters ||
           (keepSearchParameters ? location.search : ''),
         hash: normalizedURL.hash,
-        state: {
-          submorph: submorph,
-        },
       })
 
       this.#announcer.remove()
@@ -843,7 +860,7 @@ export class Morph {
 
     await this.navigate(location.href.replace(location.origin, ''), {
       historyAction: 'none',
-      submorph: event.state.submorph,
+      submorph: this.#lastSubmorph || undefined,
     })
 
     this.#isPopstateNavigation = false
