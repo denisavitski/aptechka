@@ -70,7 +70,7 @@ export function changeHistory(p: ChangeHistoryParameters) {
   const por = p?.searchParameters
   const hash = p.hash ? (p.hash.startsWith('#') ? p.hash : '#' + p.hash) : ''
   const searhParameters = por ? (por.startsWith('?') ? por : '?' + por) : ''
-  const pathPlus = `${p.pathname}${hash}${searhParameters}`
+  const pathPlus = `${p.pathname}${searhParameters}${hash}`
   const hstate = { ...p.state, path: pathPlus }
 
   if (p.action === 'push') {
