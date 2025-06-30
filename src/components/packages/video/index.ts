@@ -63,7 +63,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       if (this.hasAttribute('click-controls')) {
         if (this.consumerElement.paused) {
           this.consumerElement.play()
-        } else {
+        } else if (!this.hasAttribute('controls')) {
           this.consumerElement.pause()
         }
       }
