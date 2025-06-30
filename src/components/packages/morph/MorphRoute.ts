@@ -80,8 +80,8 @@ export class MorphRoute {
           signal: this.#abortController.signal,
           headers: {
             'X-MORPH': 'true',
-            'X-MORPH-CURRENT-PATH': currentPath,
-            'X-MORPH-NEW-PATH': path,
+            'X-MORPH-CURRENT-PATH': encodeURIComponent(currentPath),
+            'X-MORPH-NEW-PATH': encodeURIComponent(path),
             ...this.#headers,
           },
         })
