@@ -265,6 +265,10 @@ export class Morph {
 
     const normalizedURL = this.normalizePath(modifiedPath)
 
+    this.#links.forEach((link) => {
+      link.checkCurrent(normalizedURL.path)
+    })
+
     if (
       this.#candidateURL?.pathname === normalizedURL.pathname ||
       this.#currentURL.pathname === normalizedURL.pathname
@@ -306,10 +310,6 @@ export class Morph {
 
     this.#candidateURL = normalizedURL
 
-    this.#links.forEach((link) => {
-      link.checkCurrent(normalizedURL.pathname)
-    })
-
     try {
       let preprocessedSuccesfully = true
 
@@ -338,7 +338,7 @@ export class Morph {
         this.#candidateURL.pathname !== normalizedURL.pathname
       ) {
         this.#links.forEach((link) => {
-          link.checkCurrent(this.#currentURL.pathname)
+          link.checkCurrent(this.#currentURL.path)
         })
 
         return

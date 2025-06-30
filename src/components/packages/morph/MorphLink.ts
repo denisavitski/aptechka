@@ -15,7 +15,7 @@ export class MorphLink {
 
     this.#element.addEventListener('click', this.#clickListener)
 
-    this.checkCurrent(location.pathname)
+    this.checkCurrent(location.href.replace(location.origin, ''))
 
     if (this.#element.hasAttribute('data-prefetch')) {
       this.#element.addEventListener('pointerenter', this.#pointerListener)
@@ -46,6 +46,12 @@ export class MorphLink {
       this.#element.classList.add('current')
     } else {
       this.#element.classList.remove('current')
+    }
+
+    if (locationUrl.path === linkUrl.path) {
+      this.#element.classList.add('exact')
+    } else {
+      this.#element.classList.remove('exact')
     }
   }
 
