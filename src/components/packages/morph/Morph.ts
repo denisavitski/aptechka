@@ -58,6 +58,7 @@ export interface MorphNavigateOptions {
   historyAction?: ChangeHistoryAction
   centerScroll?: boolean
   offsetScroll?: number | ElementOrSelector<HTMLElement>
+  scrollBehaviour?: ScrollBehavior
   revalidate?: boolean
   keepSearchParameters?: boolean
   submorph?: Array<string>
@@ -248,6 +249,7 @@ export class Morph {
       historyAction = 'push',
       centerScroll,
       offsetScroll,
+      scrollBehaviour,
       revalidate,
       keepSearchParameters,
       submorph,
@@ -649,9 +651,11 @@ export class Morph {
 
       if (normalizedURL.hash) {
         nextRoute.clearScrollState()
+
         this.#tryScrollToElement(normalizedURL.hash, {
           centerScroll,
           offsetScroll,
+          behavior: scrollBehaviour,
         })
       } else if (this.#isPopstateNavigation) {
         nextRoute.restoreScrollPosition()

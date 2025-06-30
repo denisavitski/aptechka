@@ -100,6 +100,10 @@ export class MorphLink {
         'data-keep-scroll-position'
       )
 
+      const scrollBehaviour = this.#element.getAttribute(
+        'data-scroll-behaviour'
+      ) as ScrollBehavior
+
       const submorph = this.#element
         .getAttribute('data-submorph')
         ?.split(',')
@@ -116,6 +120,7 @@ export class MorphLink {
         submorph,
         clearState,
         keepScrollPosition,
+        scrollBehaviour,
       })
     }
   }
