@@ -270,8 +270,9 @@ export class Morph {
     })
 
     if (
-      this.#candidateURL?.pathname === normalizedURL.pathname ||
-      this.#currentURL.pathname === normalizedURL.pathname
+      !revalidate &&
+      (this.#candidateURL?.pathname === normalizedURL.pathname ||
+        this.#currentURL.pathname === normalizedURL.pathname)
     ) {
       this.#tryScrollToElement(normalizedURL.hash || 0, {
         centerScroll,

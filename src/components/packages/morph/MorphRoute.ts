@@ -61,11 +61,12 @@ export class MorphRoute {
 
   public async fetch(path: string, currentPath: string, revalidate?: boolean) {
     if (
-      this.#fetching ||
-      (this.#initialDocument &&
-        this.#initialDocument.documentElement.hasAttribute('data-cache') &&
-        (!revalidate || this.#previouslyFetchedPath !== path)) ||
-      (this.#initialDocument && this.#morph.isPopstateNavigation)
+      !revalidate &&
+      (this.#fetching ||
+        (this.#initialDocument &&
+          this.#initialDocument.documentElement.hasAttribute('data-cache') &&
+          this.#previouslyFetchedPath !== path) ||
+        (this.#initialDocument && this.#morph.isPopstateNavigation))
     ) {
       return this.#fetching
     }
