@@ -24,13 +24,11 @@ export class MorphRoute {
   #savedState: any = null
   #abortController: AbortController | null = null
   #fetching: Promise<void> | null = null
-  #previouslyFetchedPath: string
   #headers: HeadersInit | undefined
 
   constructor(morph: Morph, pathname: string) {
     this.#morph = morph
     this.#pathname = pathname
-    this.#previouslyFetchedPath = pathname
   }
 
   public get pathname() {
@@ -60,18 +58,24 @@ export class MorphRoute {
   }
 
   public async fetch(path: string, currentPath: string, revalidate?: boolean) {
-    if (
-      !revalidate &&
-      (this.#fetching ||
-        (this.#initialDocument &&
-          this.#initialDocument.documentElement.hasAttribute('data-cache') &&
-          this.#previouslyFetchedPath !== path) ||
-        (this.#initialDocument && this.#morph.isPopstateNavigation))
-    ) {
-      return this.#fetching
-    }
+    if (!revalidate) {
+      const isCachedPage =
+        this.#initialDocument?.documentElement.getAttribute('data-cache')
 
-    this.#previouslyFetchedPath = path
+      const isDifferentPath = currentPath !== path
+
+      const shouldUseCache = isCachedPage && isDifferentPath
+
+      const isPopstateNavigation =
+        this.#initialDocument && this.#morph.isPopstateNavigation
+
+      const shouldSkipFetch =
+        this.#fetching || shouldUseCache || isPopstateNavigation
+
+      if (shouldSkipFetch) {
+        return this.#fetching
+      }
+    }
 
     this.#fetching = new Promise<void>(async (res) => {
       try {
