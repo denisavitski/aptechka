@@ -99,7 +99,7 @@ export class BillboardItem {
 export class BillboardElement extends HTMLElement {
   public handleSet: ((number: number) => boolean) | undefined
 
-  #resize = new CSSProperty<boolean>(this, '--resize', true)
+  #resize = new CSSProperty<boolean>(this, '--resize', false)
   #loop = new CSSProperty<boolean>(this, '--loop', true)
   #autoplay = new CSSProperty<string | false>(this, '--autoplay', false)
   #swipe = new CSSProperty<Axes2D | false>(this, '--swipe', 'x')
