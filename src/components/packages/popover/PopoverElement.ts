@@ -158,6 +158,7 @@ export class PopoverElement extends HTMLElement {
 
   #history = new CSSProperty(this, '--history', false)
   #restore = new CSSProperty(this, '--restore', false)
+  #dispatchResize = new CSSProperty(this, '--dispatch-resize', false)
   #closeRest = new CSSProperty<boolean>(this, '--close-rest', false)
   #closeRestInGroup = new CSSProperty<boolean>(
     this,
@@ -231,6 +232,10 @@ export class PopoverElement extends HTMLElement {
 
   public get restore() {
     return this.#restore
+  }
+
+  public get dispatchResize() {
+    return this.#dispatchResize
   }
 
   public get closeRest() {
@@ -319,7 +324,11 @@ export class PopoverElement extends HTMLElement {
       this.#toggleGlobalClass(true, this.openClass)
       this.#status.set('opened', true)
 
-      dispatchEvent(window, 'resize')
+      if (this.#dispatchResize.current) {
+        dispatchEvent(window, 'resize', { custom: true })
+      } else {
+        this.#resizeListener()
+      }
 
       dispatchEvent(this, 'popoverOpened', {
         custom: true,
@@ -404,6 +413,7 @@ export class PopoverElement extends HTMLElement {
 
     this.#history.observe()
     this.#restore.observe()
+    this.#dispatchResize.observe()
     this.#closeRest.observe()
     this.#closeRestInGroup.observe()
     this.#group.observe()
@@ -450,6 +460,7 @@ export class PopoverElement extends HTMLElement {
 
     this.#history.close()
     this.#restore.close()
+    this.#dispatchResize.close()
     this.#closeRest.close()
     this.#closeRestInGroup.close()
     this.#group.close()
