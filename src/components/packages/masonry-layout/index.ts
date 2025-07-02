@@ -6,6 +6,14 @@ export interface MasonryLayoutElementEvents {
 }
 
 export class MasonryLayoutElement extends HTMLElement {
+  #distributeRule = new CSSProperty<'default' | 'chessboard'>(
+    this,
+    '--distribute-rule',
+    'default',
+    {
+      skipSubscribeNotification: true,
+    }
+  )
   #columns = new CSSProperty<number>(this, '--columns', 2)
 
   #columnElements: Array<HTMLElement> = []
@@ -44,6 +52,10 @@ export class MasonryLayoutElement extends HTMLElement {
       childList: true,
     })
 
+    this.#distributeRule.subscribe(() => {
+      this.#distribute()
+    })
+
     this.#columns.subscribe((e) => {
       this.shadowRoot!.innerHTML = ''
       this.#columnElements = []
@@ -61,6 +73,7 @@ export class MasonryLayoutElement extends HTMLElement {
       this.#distribute()
     })
 
+    this.#distributeRule.observe()
     this.#columns.observe()
   }
 
@@ -78,10 +91,23 @@ export class MasonryLayoutElement extends HTMLElement {
 
   #distribute() {
     const children = [...this.children]
+    const columns = this.#columns.current
 
-    children.forEach((el, i) => {
-      el.slot = `col-${i % this.#columns.current}`
-    })
+    if (this.#distributeRule.current === 'chessboard' && columns % 2 === 0) {
+      children.forEach((el, i) => {
+        const row = Math.floor(i / columns)
+        const posInRow = i % columns
+
+        const shift = row % 2
+        const col = (posInRow + shift) % columns
+
+        el.slot = `col-${col}`
+      })
+    } else if (this.#distributeRule.current === 'default') {
+      children.forEach((el, i) => {
+        el.slot = `col-${i % columns}`
+      })
+    }
 
     this.classList.add('distributed')
     dispatchEvent(this, 'masonryLayoutDistributed', { custom: true })

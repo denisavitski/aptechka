@@ -602,7 +602,7 @@ export class Morph {
           }
         }
 
-        requestIdleCallback(() => {
+        setTimeout(() => {
           if (!submorphAppend) {
             currentMorphElementChildNodes.forEach((element) => {
               if (element instanceof HTMLElement) {
@@ -620,7 +620,7 @@ export class Morph {
               element.classList.add('new-idle')
             }
           })
-        })
+        }, 0)
 
         const detail: MorphChildrenActionEntry = {
           ...documentFetchedEntry,
