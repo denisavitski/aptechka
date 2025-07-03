@@ -116,6 +116,7 @@ export class Morph {
   #currentScrollY = 0
   #lastSubmorph: Array<string> | undefined
   #lastRevalidate: boolean | undefined
+  #lastKeepScrollPosition: boolean | undefined
 
   constructor(parameters?: Partial<MorphOptions>) {
     if (isBrowser && !Morph.instance) {
@@ -266,6 +267,7 @@ export class Morph {
 
     this.#lastSubmorph = submorph
     this.#lastRevalidate = revalidate
+    this.#lastKeepScrollPosition = keepScrollPosition
 
     const modifiedPath = this.pathnameModifier?.(path) || path
 
@@ -280,11 +282,13 @@ export class Morph {
       (this.#candidateURL?.pathname === normalizedURL.pathname ||
         this.#currentURL.pathname === normalizedURL.pathname)
     ) {
-      this.#tryScrollToElement(normalizedURL.hash || 0, {
-        centerScroll,
-        offsetScroll,
-        behavior: 'smooth',
-      })
+      if (!keepScrollPosition) {
+        this.#tryScrollToElement(normalizedURL.hash || 0, {
+          centerScroll,
+          offsetScroll,
+          behavior: 'smooth',
+        })
+      }
 
       dispatchEvent(document, 'morphSamePath', {
         custom: true,
@@ -897,6 +901,7 @@ export class Morph {
       historyAction: 'none',
       submorph: !this.#lastRevalidate ? this.#lastSubmorph : undefined,
       revalidate: this.#lastRevalidate,
+      keepScrollPosition: this.#lastKeepScrollPosition,
     })
 
     this.#isPopstateNavigation = false
