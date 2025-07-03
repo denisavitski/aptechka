@@ -183,8 +183,6 @@ export class MorphLink {
         this.#element.hasAttribute('data-keep-scroll-position') ||
         this.#element.hasAttribute('data-pagination-more-link')
 
-      console.log(keepScrollPosition)
-
       const scrollBehaviour = this.#element.getAttribute(
         'data-scroll-behaviour'
       ) as ScrollBehavior
