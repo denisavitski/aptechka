@@ -1,6 +1,7 @@
 import {
   ChangeHistoryAction,
   ElementOrSelector,
+  SplitPathOptions,
   changeHistory,
   dispatchEvent,
   isBrowser,
@@ -17,6 +18,7 @@ import { MorphLink } from './MorphLink'
 import { MorphAnnouncer } from './MorphAnnouncer'
 
 import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
+import { MorphParamsDependent } from './MorphParamsDependent'
 
 export interface MorphOptions {
   base: string
@@ -65,6 +67,7 @@ export interface MorphNavigateOptions {
   submorphAppend?: boolean
   clearState?: boolean
   keepScrollPosition?: boolean
+  mergeParams?: boolean
 }
 
 export interface MorphScrollDetail {
@@ -111,6 +114,7 @@ export class Morph {
   #currentScrollElement: HTMLElement | Window = null!
   #isWindowScroll = false
   #routes = new Map<string, MorphRoute>()
+  #paramDependent: Array<MorphParamsDependent> = []
   #announcer: MorphAnnouncer = null!
   #currentScrollX = 0
   #currentScrollY = 0
@@ -156,6 +160,7 @@ export class Morph {
       )
 
       this.findLinks()
+      this.findParamsDependent()
 
       history.scrollRestoration = 'manual'
 
@@ -222,10 +227,14 @@ export class Morph {
     return route?.clearState()
   }
 
-  public normalizePath(path: string) {
+  public normalizePath(
+    path: string,
+    options?: Pick<MorphNavigateOptions, 'mergeParams'>
+  ) {
     return splitPath(path, {
       base: this.#options.base,
       trailingSlash: this.#options.trailingSlash,
+      mergeParams: options?.mergeParams ? location.search : '',
     })
   }
 
@@ -259,6 +268,7 @@ export class Morph {
       submorphAppend,
       clearState,
       keepScrollPosition,
+      mergeParams,
     }: MorphNavigateOptions = {}
   ) {
     if (this.#promises.length) {
@@ -271,10 +281,8 @@ export class Morph {
 
     const modifiedPath = this.pathnameModifier?.(path) || path
 
-    const normalizedURL = this.normalizePath(modifiedPath)
-
-    this.#links.forEach((link) => {
-      link.checkCurrent(normalizedURL.path)
+    const normalizedURL = this.normalizePath(modifiedPath, {
+      mergeParams,
     })
 
     if (
@@ -316,7 +324,15 @@ export class Morph {
         })
       }
 
+      this.#links.forEach((link) => {
+        link.checkCurrent(normalizedURL.path)
+      })
+
       return
+    } else {
+      this.#links.forEach((link) => {
+        link.checkCurrent(normalizedURL.path)
+      })
     }
 
     this.#candidateURL = normalizedURL
@@ -713,6 +729,8 @@ export class Morph {
         link.checkCurrent(this.#currentURL.path)
       })
 
+      this.findParamsDependent()
+
       dispatchEvent(document, 'morphComplete', {
         detail: documentFetchedEntry,
       })
@@ -779,6 +797,20 @@ export class Morph {
     this.#links.forEach((link) => link.destroy())
 
     this.#links = linkElements.map((element) => new MorphLink(element, this))
+  }
+
+  public findParamsDependent() {
+    const elements = [
+      ...document.documentElement.querySelectorAll<HTMLElement>(
+        '[data-morph-params-dependent]'
+      ),
+    ]
+
+    this.#paramDependent.forEach((link) => link.destroy())
+
+    this.#paramDependent = elements.map(
+      (element) => new MorphParamsDependent(element)
+    )
   }
 
   #createScript(element: HTMLScriptElement) {

@@ -1,11 +1,12 @@
 export interface SplitPathOptions {
   base?: string
   trailingSlash?: boolean
+  mergeParams?: string
 }
 
 export function splitPath(
   value: string,
-  { base = '', trailingSlash = false }: SplitPathOptions = {}
+  { base = '', trailingSlash = false, mergeParams }: SplitPathOptions = {}
 ) {
   base = base.endsWith('/') ? base.slice(0, -1) : base
 
@@ -26,10 +27,24 @@ export function splitPath(
     leaf = leaf.endsWith('/') && leaf !== '/' ? leaf.slice(0, -1) : leaf
   }
 
+  let parameters = split2[1] || ''
+
+  if (mergeParams) {
+    const existingParams = new URLSearchParams(parameters)
+    const mergeParamsObj = new URLSearchParams(mergeParams)
+
+    for (const [key, value] of mergeParamsObj) {
+      existingParams.set(key, value)
+    }
+
+    parameters = existingParams.toString()
+  }
+
   const pathname = base + leaf
-  const parameters = split2?.[1] || ''
-  const hash = split1?.[1]
-  const path = `${pathname}${parameters ? '?' + parameters : ''}`
+  const hash = split1[1]
+  const path = `${pathname}${parameters ? '?' + parameters : ''}${
+    hash ? '#' + hash : ''
+  }`
 
   return {
     leaf,

@@ -64,6 +64,35 @@ export class MorphLink {
     } else {
       this.#element.classList.remove('exact')
     }
+
+    const [pathWithoutParams, pathParamsStr] = this.#path.split('?')
+    const pathParams = new URLSearchParams(pathParamsStr)
+    const locationParams = new URLSearchParams(location.search)
+
+    let matchCounter = 0
+
+    for (const [key] of locationParams) {
+      if (
+        pathParams.has(key) &&
+        locationParams.get(key) === pathParams.get(key)
+      ) {
+        matchCounter++
+      }
+    }
+
+    if (matchCounter) {
+      this.#element.classList.toggle(
+        'all-params-matched',
+        locationParams.size === matchCounter
+      )
+      this.#element.classList.toggle(
+        'some-params-matched',
+        locationParams.size !== matchCounter
+      )
+    } else {
+      this.#element.classList.remove('all-params-matched')
+      this.#element.classList.remove('some-params-matched')
+    }
   }
 
   public updatePagination(newPage: number, selector: string) {
@@ -225,7 +254,36 @@ export class MorphLink {
 
       const clearState = this.#element.hasAttribute('data-clear-state')
 
-      this.#morph.navigate(this.#path, {
+      let path = this.#path
+
+      if (this.#element.hasAttribute('data-toggle-params')) {
+        const [pathWithoutParams, pathParamsStr] = this.#path.split('?')
+        const pathParams = new URLSearchParams(pathParamsStr)
+        const locationParams = new URLSearchParams(location.search)
+        const resultParams = new URLSearchParams()
+
+        for (const [key] of pathParams) {
+          if (
+            !locationParams.has(key) ||
+            (locationParams.has(key) &&
+              locationParams.get(key) !== pathParams.get(key))
+          ) {
+            resultParams.append(key, pathParams.get(key)!)
+          }
+        }
+
+        if (this.#element.hasAttribute('data-merge-params')) {
+          for (const [key] of locationParams) {
+            if (!pathParams.has(key)) {
+              resultParams.append(key, locationParams.get(key)!)
+            }
+          }
+        }
+
+        path = `${pathWithoutParams}?${resultParams.toString()}`
+      }
+
+      this.#morph.navigate(path, {
         historyAction,
         centerScroll,
         offsetScroll,
@@ -236,6 +294,9 @@ export class MorphLink {
         keepScrollPosition,
         scrollBehaviour,
         submorphAppend: this.#element.hasAttribute('data-pagination-more-link'),
+        mergeParams:
+          this.#element.hasAttribute('data-merge-params') &&
+          !this.#element.hasAttribute('data-toggle-params'),
       })
     }
   }

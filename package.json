@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.74.2",
+  "version": "0.75.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
