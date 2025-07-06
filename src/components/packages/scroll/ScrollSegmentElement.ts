@@ -14,7 +14,6 @@ import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { debounce } from '@packages/utils'
 import { Damped } from '@packages/animation'
 import { ScrollUserElement } from './ScrollUserElement'
-import { ScrollElement } from './ScrollElement'
 
 export interface ScrollSegmentEvents {
   scrollSegmentCapture: CustomEvent

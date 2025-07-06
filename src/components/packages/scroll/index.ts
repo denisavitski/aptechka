@@ -3,7 +3,7 @@ export {
   type ScrollBehaviour,
   type ScrollEvents,
 } from './ScrollElement'
-export { ScrollbarElement } from './ScrollbarElement'
+export { ScrollScrollbarElement } from './ScrollScrollbarElement'
 export { ScrollSetButtonElement } from './ScrollSetButtonElement'
 export { ScrollStepButtonElement } from './ScrollStepButtonElement'
 export { ScrollBulletButtonsElement } from './ScrollBulletButtonsElement'

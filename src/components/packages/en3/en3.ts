@@ -7,7 +7,6 @@ import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 
 import { En3View, En3ViewOptions } from './En3View'
-import { En3Raycaster } from './En3Raycaster'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
@@ -19,14 +18,12 @@ export interface En3Options {
   composer?: typeof EffectComposer
 }
 
-class En3 {
+export class En3 {
   #CDNVersion = `https://unpkg.com/three@0.${REVISION}.x`
 
   #containerElement: HTMLElement = null!
 
   #webglRenderer: WebGLRenderer = null!
-
-  #raycaster: En3Raycaster = null!
 
   #views: Map<string, En3View> = new Map()
 
@@ -50,10 +47,6 @@ class En3 {
 
   public get webglRenderer() {
     return this.#webglRenderer
-  }
-
-  public get raycaster() {
-    return this.#raycaster
   }
 
   public get views() {
@@ -116,13 +109,11 @@ class En3 {
 
     this.#views.set(
       'default',
-      new En3View('default', {
+      new En3View(this, 'default', {
         sizeElement: this.#containerElement,
         ...options?.view,
       })
     )
-
-    this.#raycaster = new En3Raycaster()
 
     if (options?.composer) {
       this.#composer = new options.composer(this.#webglRenderer)
@@ -150,8 +141,6 @@ class En3 {
     windowResizer.unsubscribe(this.#resizeListener)
     ticker.unsubscribe(this.#tickListener)
 
-    this.#raycaster.destroy()
-
     this.#views.forEach((view) => {
       view.destroy()
     })
@@ -171,7 +160,7 @@ class En3 {
   public createView(viewName: string, viewOptions?: En3ViewOptions) {
     const size = this.#views.size
 
-    const view = new En3View(viewName, viewOptions)
+    const view = new En3View(this, viewName, viewOptions)
 
     this.#views.set(viewName, view)
 
@@ -206,7 +195,7 @@ class En3 {
         view.box.left + view.box.CSSTranslation.x + view.box.scrollValue.x
 
       const top =
-        en3.height -
+        this.height -
         view.box.height -
         view.box.top +
         view.box.CSSTranslation.y +
@@ -251,5 +240,3 @@ class En3 {
     })
   }
 }
-
-export const en3 = new En3()

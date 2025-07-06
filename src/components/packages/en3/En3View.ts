@@ -1,8 +1,8 @@
 import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three'
-import { en3 } from './en3'
 import { dispose } from './utils/dispose'
+import { En3 } from './En3'
 
 export interface En3ViewOptions {
   cameraType?: 'perspective' | 'orthographic'
@@ -28,6 +28,8 @@ export type En3AttachOptions = Omit<
 export type En3ViewBeforeRenderCallback = () => void
 
 export class En3View {
+  #en3: En3
+
   #name: string
 
   #camera: PerspectiveCamera | OrthographicCamera
@@ -45,7 +47,8 @@ export class En3View {
 
   #box: LayoutBox
 
-  constructor(name: string, options?: En3ViewOptions) {
+  constructor(en3: En3, name: string, options?: En3ViewOptions) {
+    this.#en3 = en3
     this.#name = name
 
     this.#camera =
@@ -108,7 +111,7 @@ export class En3View {
   }
 
   public get isClipped() {
-    return this.#sizeElement !== en3.containerElement
+    return this.#sizeElement !== this.#en3.containerElement
   }
 
   public resize() {
@@ -145,7 +148,7 @@ export class En3View {
 
     dispose(this.#scene)
 
-    en3.destroyView(this.name)
+    this.#en3.destroyView(this.name)
 
     this.#box.destroy()
   }

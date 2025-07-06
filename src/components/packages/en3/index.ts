@@ -1,4 +1,4 @@
-export { en3 } from './en3'
+export { En3, type En3Options } from './En3'
 
 export {
   En3View,

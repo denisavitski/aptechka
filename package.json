@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.75.0",
+  "version": "0.76.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -72,11 +72,6 @@
       "types": "./lib/css-value-parser/index.d.ts",
       "require": "./lib/css-value-parser/index.cjs",
       "default": "./lib/css-value-parser/index.js"
-    },
-    "./custom-scrollbar": {
-      "types": "./lib/custom-scrollbar/index.d.ts",
-      "require": "./lib/custom-scrollbar/index.cjs",
-      "default": "./lib/custom-scrollbar/index.js"
     },
     "./dev": {
       "types": "./lib/dev/index.d.ts",
@@ -188,6 +183,11 @@
       "require": "./lib/scroll-entries/index.cjs",
       "default": "./lib/scroll-entries/index.js"
     },
+    "./scroll-kit": {
+      "types": "./lib/scroll-kit/index.d.ts",
+      "require": "./lib/scroll-kit/index.cjs",
+      "default": "./lib/scroll-kit/index.js"
+    },
     "./sequence": {
       "types": "./lib/sequence/index.d.ts",
       "require": "./lib/sequence/index.cjs",
@@ -282,9 +282,6 @@
       "css-value-parser": [
         "lib/css-value-parser/index.d.ts"
       ],
-      "custom-scrollbar": [
-        "lib/custom-scrollbar/index.d.ts"
-      ],
       "dev": [
         "lib/dev/index.d.ts"
       ],
@@ -350,6 +347,9 @@
       ],
       "scroll-entries": [
         "lib/scroll-entries/index.d.ts"
+      ],
+      "scroll-kit": [
+        "lib/scroll-kit/index.d.ts"
       ],
       "sequence": [
         "lib/sequence/index.d.ts"

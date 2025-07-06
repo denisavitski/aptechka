@@ -1,11 +1,12 @@
 import { OrthographicCamera, Vector3 } from 'three'
-import { en3 } from '../en3'
+import { En3 } from '../En3'
 
 const tempTarget = new Vector3()
 const position = new Vector3()
 
 // https://github.com/pmndrs/react-three-fiber/blob/e1acae8e1aea6ac8b255d42ffd19d0bfdd6cd529/packages/fiber/src/core/store.ts#L173
 export function getCurrentViewport(
+  en3: En3,
   target: Vector3 | [number, number, number],
   viewName: string = 'default'
 ) {

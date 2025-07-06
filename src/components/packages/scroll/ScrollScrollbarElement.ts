@@ -4,7 +4,7 @@ import { createStylesheet, isBrowser, setupDrag } from '@packages/utils'
 import { elementResizer } from '@packages/element-resizer'
 import { ScrollUserElement } from './ScrollUserElement'
 
-export class ScrollbarElement extends ScrollUserElement {
+export class ScrollScrollbarElement extends ScrollUserElement {
   #slotElement: HTMLSlotElement = null!
   #thumbElement: HTMLElement = null!
 
@@ -174,12 +174,12 @@ export class ScrollbarElement extends ScrollUserElement {
   }
 }
 
-if (isBrowser && !customElements.get('e-scrollbar')) {
-  customElements.define('e-scrollbar', ScrollbarElement)
+if (isBrowser && !customElements.get('e-scroll-scrollbar')) {
+  customElements.define('e-scroll-scrollbar', ScrollScrollbarElement)
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'e-scrollbar': ScrollbarElement
+    'e-scroll-scrollbar': ScrollScrollbarElement
   }
 }

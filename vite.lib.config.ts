@@ -40,8 +40,6 @@ export function libConfig() {
             './src/components/packages/css-unit-parser/index.ts',
           'css-value-parser/index':
             './src/components/packages/css-value-parser/index.ts',
-          'custom-scrollbar/index':
-            './src/components/packages/custom-scrollbar/index.ts',
           'dev/index': './src/components/packages/dev/index.ts',
           'device/index': './src/components/packages/device/index.ts',
           'element-resizer/index':
@@ -68,6 +66,7 @@ export function libConfig() {
           'scroll/index': './src/components/packages/scroll/index.ts',
           'scroll-entries/index':
             './src/components/packages/scroll-entries/index.ts',
+          'scroll-kit/index': './src/components/packages/scroll-kit/index.ts',
           'sequence/index': './src/components/packages/sequence/index.ts',
           'size-element/index':
             './src/components/packages/size-element/index.ts',

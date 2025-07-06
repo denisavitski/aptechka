@@ -2,7 +2,7 @@ import { findScrollParentElement, isBrowser, setupDrag } from '@packages/utils'
 import { ticker } from '@packages/ticker'
 import { intersector } from '@packages/intersector'
 
-export class CustomScrollbarElement extends HTMLElement {
+export class ScrollbarElement extends HTMLElement {
   #scrollElement: HTMLElement | Window = null!
   #thumbElement: HTMLElement = null!
   #thumbScrollSize = 0
@@ -13,8 +13,6 @@ export class CustomScrollbarElement extends HTMLElement {
 
   protected connectedCallback() {
     const scrollSelector = this.getAttribute('data-scroll')
-
-    this.#isHorizontal = this.hasAttribute('horisontal')
 
     let scrollElement: HTMLElement | Window | null = null
 
@@ -33,6 +31,8 @@ export class CustomScrollbarElement extends HTMLElement {
         scrollElement = window
       }
     }
+
+    this.#isHorizontal = this.hasAttribute('horisontal')
 
     const thumbElement = this.querySelector<HTMLElement>('[data-thumb]')
 
@@ -203,12 +203,12 @@ export class CustomScrollbarElement extends HTMLElement {
   }
 }
 
-if (isBrowser && !customElements.get('e-custom-scrollbar')) {
-  customElements.define('e-custom-scrollbar', CustomScrollbarElement)
+if (isBrowser && !customElements.get('e-scrollbar')) {
+  customElements.define('e-scrollbar', ScrollbarElement)
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'e-custom-scrollbar': CustomScrollbarElement
+    'e-scrollbar': ScrollbarElement
   }
 }

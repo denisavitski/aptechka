@@ -1,5 +1,4 @@
 import { Store } from '@packages/store'
-import { camelToKebab } from '@packages/utils'
 
 export type ElementLinkedStoreValueType = boolean | string | number
 
@@ -20,10 +19,22 @@ export class ElementLinkedStore<
 
   public addElement(element: HTMLElement) {
     this.#elements.push(element)
+
+    for (const key in this.current) {
+      this.#updateElements([element], key, this.current[key])
+    }
   }
 
   public removeElement(element: HTMLElement) {
-    this.#elements = this.#elements.filter((el) => el !== element)
+    const founded = this.#elements.find((el) => el === element)
+
+    if (founded) {
+      this.#elements = this.#elements.filter((el) => el !== element)
+
+      for (const key in this.current) {
+        this.#updateElements([founded], key, false)
+      }
+    }
   }
 
   public isTrue(key: keyof T) {
@@ -57,9 +68,25 @@ export class ElementLinkedStore<
       }
     } else {
       if (value) {
-        this.#elements.forEach((el) => el.classList.add(camelToKebab(k)))
+        this.#elements.forEach((el) => el.classList.add(k))
       } else {
-        this.#elements.forEach((el) => el.classList.remove(camelToKebab(k)))
+        this.#elements.forEach((el) => el.classList.remove(k))
+      }
+    }
+  }
+
+  #updateElements(elements: Array<HTMLElement>, key: string, value: any) {
+    if (key.startsWith('--')) {
+      if (value) {
+        elements.forEach((el) => el.style.setProperty(key, value.toString()))
+      } else {
+        elements.forEach((el) => el.style.removeProperty(key))
+      }
+    } else {
+      if (value) {
+        elements.forEach((el) => el.classList.add(key))
+      } else {
+        elements.forEach((el) => el.classList.remove(key))
       }
     }
   }
