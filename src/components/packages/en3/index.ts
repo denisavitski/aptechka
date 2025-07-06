@@ -1,4 +1,4 @@
-export { En3, type En3Options } from './x'
+export { En3, type En3Options } from './En3'
 
 export {
   En3View,
@@ -6,7 +6,7 @@ export {
   type En3AttachedObject3D,
   type En3AttachOptions,
   type En3ViewBeforeRenderCallback,
-} from './y'
+} from './En3View'
 
 export { coverTexture } from './utils/coverTexture'
 export { dispose } from './utils/dispose'

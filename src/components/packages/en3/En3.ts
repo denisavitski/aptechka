@@ -6,7 +6,7 @@ import { windowResizer } from '@packages/window-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 
-import { En3View, En3ViewOptions } from './y'
+import { En3View, En3ViewOptions } from './En3View'
 
 export interface En3Options {
   webGLRendererParameters?: WebGLRendererParameters
