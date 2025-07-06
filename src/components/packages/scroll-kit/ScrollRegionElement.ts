@@ -1,14 +1,14 @@
 import { ElementLinkedStore } from '@packages/element-linked-store'
-import { CSSProperty } from 'aptechka/css-property'
-import { elementResizer } from 'aptechka/element-resizer'
-import { ticker } from 'aptechka/ticker'
+import { CSSProperty } from '@packages/css-property'
+import { elementResizer } from '@packages/element-resizer'
+import { ticker } from '@packages/ticker'
 import {
   clamp,
   dispatchEvent,
   getCumulativeOffsetTop,
   getStickyOffset,
-} from 'aptechka/utils'
-import { windowResizer } from 'aptechka/window-resizer'
+} from '@packages/utils'
+import { windowResizer } from '@packages/window-resizer'
 
 export interface ScrollRegionElementEvents {
   scrollRegionProgress: CustomEvent<{

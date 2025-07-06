@@ -1,6 +1,6 @@
 import { scrollEntries } from '@packages/scroll-entries'
-import { Damped, type DampedOptions } from 'aptechka/animation'
-import { CSSProperty } from 'aptechka/css-property'
+import { Damped, type DampedOptions } from '@packages/animation'
+import { CSSProperty } from '@packages/css-property'
 
 const scrollKeys = new Set([
   'ArrowUp',
