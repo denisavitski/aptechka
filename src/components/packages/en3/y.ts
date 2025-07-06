@@ -2,7 +2,7 @@ import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three'
 import { dispose } from './utils/dispose'
-import { En3 } from './En3'
+import { En3 } from './x'
 
 export interface En3ViewOptions {
   cameraType?: 'perspective' | 'orthographic'
