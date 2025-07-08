@@ -42,7 +42,15 @@ export class MorphParamsDependent {
     let matched: any = !!this.#params.find((param) => {
       return (
         locationParams.has(param.name) &&
-        (locationParams.get(param.name) === param.value || param.value === '*')
+        (locationParams.get(param.name) === param.value ||
+          param.value === '*' ||
+          param.value === 'all' ||
+          param.value === 'any' ||
+          param.value === 'vse' ||
+          locationParams.get(param.name) === '*' ||
+          locationParams.get(param.name) === 'all' ||
+          locationParams.get(param.name) === 'any' ||
+          locationParams.get(param.name) === 'vse')
       )
     })
 

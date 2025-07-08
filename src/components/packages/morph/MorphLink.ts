@@ -89,6 +89,11 @@ export class MorphLink {
         'some-params-matched',
         locationParams.size !== matchCounter
       )
+    } else if (
+      !locationParams.size &&
+      this.#element.hasAttribute('data-match-no-params')
+    ) {
+      this.#element.classList.add('all-params-matched')
     } else {
       this.#element.classList.remove('all-params-matched')
       this.#element.classList.remove('some-params-matched')
