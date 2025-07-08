@@ -22,13 +22,19 @@ export class Media extends Store<boolean> {
 
     this.#query = query
 
-    this.#unsubscribeFromwindowResizer = windowResizer.subscribe(() => {
+    const callback = () => {
       if (matchMedia(this.#query).matches) {
         this.current = true
       } else {
         this.current = false
       }
-    }, RESIZE_ORDER.MEDIA)
+    }
+
+    this.#unsubscribeFromwindowResizer = windowResizer.subscribe(
+      callback,
+      RESIZE_ORDER.MEDIA
+    )
+    callback()
   }
 
   public override close() {
