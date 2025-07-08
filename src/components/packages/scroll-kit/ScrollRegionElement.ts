@@ -227,7 +227,7 @@ export class ScrollRegionElement extends HTMLElement {
       this.#readyStateChangeListener
     )
 
-    this.disable()
+    this.disable(false)
 
     this.#statusHolderCSSProperty.close()
     this.#disabledCSSProperty.close()
@@ -249,12 +249,14 @@ export class ScrollRegionElement extends HTMLElement {
     this.#status.set('enabled', true)
   }
 
-  public disable() {
+  public disable(resetStatus = true) {
     ticker.unsubscribe(this.#tickListener)
     elementResizer.unsubscribe(this.#resizeListener)
     windowResizer.unsubscribe(this.#resizeListener)
 
-    this.#status.reset()
+    if (resetStatus) {
+      this.#status.reset()
+    }
 
     this.#removeGlobalClasses()
   }
@@ -311,8 +313,6 @@ export class ScrollRegionElement extends HTMLElement {
       this.#statusHolderElement = e.current
         ? document.querySelector(e.current) || this
         : this
-
-      console.log(e.current)
 
       this.#status.addElement(this.#statusHolderElement)
     })

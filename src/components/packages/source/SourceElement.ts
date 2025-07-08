@@ -138,7 +138,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#consumerHolderElement =
       this.querySelector('[data-consumer-holder]') || this
 
-    this.querySelector('.source-consumer')?.remove()
+    this.querySelectorAll('.source-consumer').forEach((el) => el?.remove())
 
     this.#consumerElement = this.createConsumer()
 
