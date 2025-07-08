@@ -106,6 +106,15 @@ export class En3View {
     this.resize()
   }
 
+  public set fov(value: 'auto' | number) {
+    this.#cameraFov = value
+    this.resize()
+  }
+
+  public get fov() {
+    return this.#cameraFov
+  }
+
   public get sizeElement() {
     return this.#sizeElement
   }
