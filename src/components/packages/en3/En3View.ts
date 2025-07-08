@@ -1,5 +1,5 @@
 import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
-import { ElementOrSelector, getElement } from '@packages/utils'
+import { debounce, ElementOrSelector, getElement } from '@packages/utils'
 import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three'
 import { dispose } from './utils/dispose'
 import { En3 } from './En3'
@@ -61,7 +61,6 @@ export class En3View {
     this.#attachedObjects = []
 
     this.#cameraDistance = options?.cameraDistance || 1000
-
     this.#camera.near = options?.cameraNear || 1
     this.#camera.far = options?.cameraFar || 11000
     this.#cameraFov = options?.cameraFov || 'auto'
@@ -103,16 +102,34 @@ export class En3View {
 
   public set cameraDistance(value: number) {
     this.#cameraDistance = value
-    this.resize()
+    this.#debouncedResize()
   }
 
   public set fov(value: 'auto' | number) {
     this.#cameraFov = value
-    this.resize()
+    this.#debouncedResize()
   }
 
   public get fov() {
     return this.#cameraFov
+  }
+
+  public set near(value: number) {
+    this.#camera.near = value
+    this.#debouncedResize()
+  }
+
+  public get near() {
+    return this.#camera.near
+  }
+
+  public set far(value: number) {
+    this.#camera.far = value
+    this.#debouncedResize()
+  }
+
+  public get far() {
+    return this.#camera.far
   }
 
   public get sizeElement() {
@@ -224,4 +241,8 @@ export class En3View {
       this.detachFromHTMLElement(object)
     }
   }
+
+  #debouncedResize = debounce(() => {
+    this.resize()
+  }, 0)
 }
