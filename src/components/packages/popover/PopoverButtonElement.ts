@@ -89,6 +89,7 @@ export class PopoverButtonElement extends HTMLElement {
         let selector = targetId
 
         if (
+          isNaN(parseInt(selector)) &&
           !targetId.startsWith('.') &&
           !targetId.startsWith('[') &&
           !targetId.startsWith('#')
@@ -97,8 +98,8 @@ export class PopoverButtonElement extends HTMLElement {
         }
 
         popoverElement =
-          document.querySelector(targetId) ||
-          (this.getRootNode() as ParentNode).querySelector(targetId)
+          document.querySelector(selector) ||
+          (this.getRootNode() as ParentNode).querySelector(selector)
 
         if (!popoverElement) {
           const elements = [...document.querySelectorAll('[data-popover-ids]')]
