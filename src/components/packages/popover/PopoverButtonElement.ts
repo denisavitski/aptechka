@@ -86,13 +86,33 @@ export class PopoverButtonElement extends HTMLElement {
 
         popoverElement = find(this.parentElement) || null
       } else {
-        if (!targetId.startsWith('.') && !targetId.startsWith('[')) {
-          targetId = `#${targetId}`
+        let selector = targetId
+
+        if (
+          !targetId.startsWith('.') &&
+          !targetId.startsWith('[') &&
+          !targetId.startsWith('#')
+        ) {
+          selector = `#${targetId}`
         }
 
         popoverElement =
           document.querySelector(targetId) ||
           (this.getRootNode() as ParentNode).querySelector(targetId)
+
+        if (!popoverElement) {
+          const elements = [...document.querySelectorAll('[data-popover-ids]')]
+          const founded = elements.find((el) =>
+            el
+              .getAttribute('data-popover-ids')
+              ?.split(',')
+              .find((v) => v.trim() === targetId)
+          )
+
+          if (founded) {
+            popoverElement = founded
+          }
+        }
       }
 
       if (popoverElement instanceof HTMLElement) {
