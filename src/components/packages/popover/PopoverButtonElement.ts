@@ -88,18 +88,19 @@ export class PopoverButtonElement extends HTMLElement {
       } else {
         let selector = targetId
 
-        if (
-          isNaN(parseInt(selector)) &&
-          !targetId.startsWith('.') &&
-          !targetId.startsWith('[') &&
-          !targetId.startsWith('#')
-        ) {
-          selector = `#${targetId}`
-        }
+        if (isNaN(parseInt(selector))) {
+          if (
+            !targetId.startsWith('.') &&
+            !targetId.startsWith('[') &&
+            !targetId.startsWith('#')
+          ) {
+            selector = `#${targetId}`
+          }
 
-        popoverElement =
-          document.querySelector(selector) ||
-          (this.getRootNode() as ParentNode).querySelector(selector)
+          popoverElement =
+            document.querySelector(selector) ||
+            (this.getRootNode() as ParentNode).querySelector(selector)
+        }
 
         if (!popoverElement) {
           const elements = [...document.querySelectorAll('[data-popover-ids]')]
