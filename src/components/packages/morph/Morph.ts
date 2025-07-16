@@ -830,7 +830,8 @@ export class Morph {
 
   #checkLink = (element: HTMLElement) => {
     return (
-      element.getAttribute('href')?.startsWith('/') &&
+      (element.getAttribute('href')?.startsWith('/') ||
+        element.getAttribute('href')?.startsWith('?')) &&
       !element.hasAttribute('download') &&
       !element.hasAttribute('data-morph-skip') &&
       !element.closest('[data-morph-skip]') &&

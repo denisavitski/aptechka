@@ -5,7 +5,6 @@ import { cssValueParser } from '@packages/css-value-parser'
 export class MorphLink {
   #morph: Morph
   #element: HTMLAnchorElement
-  #path: string
 
   constructor(element: HTMLAnchorElement, morph: Morph) {
     this.#morph = morph
@@ -13,7 +12,6 @@ export class MorphLink {
 
     this.#element.addEventListener('click', this.#clickListener)
 
-    this.#path = this.#element.getAttribute('href') || '/'
     this.checkCurrent(location.href.replace(location.origin, ''))
 
     const paginatedElement = this.#getPaginatedElement(
@@ -151,6 +149,15 @@ export class MorphLink {
     this.#element.classList.remove('current', 'exact', 'pagination-current')
   }
 
+  get #path() {
+    const url = new URL(this.#element.href)
+    const normalizedURL = this.#morph.normalizePath(
+      url.pathname + url.search + url.hash
+    )
+
+    return normalizedURL.path
+  }
+
   #getPaginatedElement(selector?: string | undefined | null) {
     if (!selector) {
       return
@@ -187,8 +194,6 @@ export class MorphLink {
     if (back && this.#morph.previousURL) {
       history.back()
     } else {
-      this.#path = this.#element.getAttribute('href') || '/'
-
       const historyAction =
         (this.#element.getAttribute(
           'data-history-action'
