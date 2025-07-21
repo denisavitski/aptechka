@@ -616,9 +616,6 @@ export class Morph {
 
         newMorphElementChildNodes.forEach((element) => {
           if (element instanceof HTMLElement) {
-            this.findNewLinks(element)
-            element.classList.add('new')
-
             transfer.forEach((item) => {
               const nestlement = element.querySelector(item.selector)
 
@@ -626,6 +623,9 @@ export class Morph {
                 nestlement.replaceWith(item.element)
               }
             })
+
+            this.findNewLinks(element)
+            element.classList.add('new')
           }
         })
 
