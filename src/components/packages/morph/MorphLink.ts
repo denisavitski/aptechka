@@ -1,4 +1,4 @@
-import { ChangeHistoryAction } from '@packages/utils'
+import { ChangeHistoryAction, clamp, debounce } from '@packages/utils'
 import { Morph } from './Morph'
 import { cssValueParser } from '@packages/css-value-parser'
 
@@ -16,7 +16,9 @@ export class MorphLink {
 
     const paginatedElement = this.#getPaginatedElement(
       this.#element.getAttribute('data-pagination-set-link') ||
-        this.#element.getAttribute('data-pagination-more-link')
+        this.#element.getAttribute('data-pagination-more-link') ||
+        this.#element.getAttribute('data-pagination-next-link') ||
+        this.#element.getAttribute('data-pagination-prev-link')
     )
 
     if (paginatedElement) {
@@ -131,6 +133,41 @@ export class MorphLink {
         } else {
           this.#element.style.display = 'none'
         }
+      } else if (
+        this.#element.hasAttribute('data-pagination-prev-link') ||
+        this.#element.hasAttribute('data-pagination-next-link')
+      ) {
+        const isPrev = this.#element.hasAttribute('data-pagination-prev-link')
+        const href = this.#element.getAttribute('href')!
+        const url = new URL(href, window.location.origin)
+
+        const nextPage = newPage + (isPrev ? -1 : 1)
+
+        url.searchParams.set(
+          'page',
+          clamp(nextPage, 1, paginatedElement.totalPages).toString()
+        )
+
+        const path = url.href.replace(url.origin, '').toString()
+        this.#element.setAttribute('href', path)
+
+        if (isPrev) {
+          if (nextPage < 1) {
+            this.#element.classList.add('pagination-disabled')
+            this.#element.setAttribute('tabindex', '-1')
+          } else {
+            this.#element.classList.remove('pagination-disabled')
+            this.#element.removeAttribute('tabindex')
+          }
+        } else {
+          if (nextPage > paginatedElement.totalPages) {
+            this.#element.classList.add('pagination-disabled')
+            this.#element.setAttribute('tabindex', '-1')
+          } else {
+            this.#element.classList.remove('pagination-disabled')
+            this.#element.removeAttribute('tabindex')
+          }
+        }
       } else if (this.#element.hasAttribute('data-pagination-set-link')) {
         const value = this.#element.getAttribute('data-value')
 
@@ -182,9 +219,7 @@ export class MorphLink {
     }
   }
 
-  #clickListener = (e: MouseEvent) => {
-    e.preventDefault()
-
+  #click() {
     if (document.documentElement.classList.contains('click-disabled')) {
       return
     }
@@ -212,7 +247,9 @@ export class MorphLink {
       const revalidate =
         this.#element.hasAttribute('data-revalidate') ||
         this.#element.hasAttribute('data-pagination-more-link') ||
-        this.#element.hasAttribute('data-pagination-set-link')
+        this.#element.hasAttribute('data-pagination-set-link') ||
+        this.#element.hasAttribute('data-pagination-next-link') ||
+        this.#element.hasAttribute('data-pagination-prev-link')
 
       const keepSearchParameters = this.#element.hasAttribute(
         'data-keep-search-parameters'
@@ -226,29 +263,6 @@ export class MorphLink {
         'data-scroll-behaviour'
       ) as ScrollBehavior
 
-      const paginatedElement = this.#getPaginatedElement(
-        this.#element.getAttribute('data-pagination-set-link') ||
-          this.#element.getAttribute('data-pagination-more-link')
-      )
-
-      if (paginatedElement) {
-        if (this.#element.hasAttribute('data-pagination-set-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              parseInt(this.#element.getAttribute('data-value') || '1'),
-              paginatedElement.selector
-            )
-          })
-        } else if (this.#element.hasAttribute('data-pagination-more-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              paginatedElement.currentPage + 1,
-              paginatedElement.selector
-            )
-          })
-        }
-      }
-
       const submorph =
         this.#element
           .getAttribute('data-submorph')
@@ -259,6 +273,12 @@ export class MorphLink {
         ]) ||
         (this.#element.hasAttribute('data-pagination-set-link') && [
           this.#element.getAttribute('data-pagination-set-link')!,
+        ]) ||
+        (this.#element.hasAttribute('data-pagination-next-link') && [
+          this.#element.getAttribute('data-pagination-next-link')!,
+        ]) ||
+        (this.#element.hasAttribute('data-pagination-prev-link') && [
+          this.#element.getAttribute('data-pagination-prev-link')!,
         ]) ||
         undefined
 
@@ -293,6 +313,45 @@ export class MorphLink {
         path = `${pathWithoutParams}?${resultParams.toString()}`
       }
 
+      const paginatedElement = this.#getPaginatedElement(
+        this.#element.getAttribute('data-pagination-set-link') ||
+          this.#element.getAttribute('data-pagination-more-link') ||
+          this.#element.getAttribute('data-pagination-next-link') ||
+          this.#element.getAttribute('data-pagination-prev-link')
+      )
+
+      if (paginatedElement) {
+        if (this.#element.hasAttribute('data-pagination-set-link')) {
+          this.#morph.links.forEach((link) => {
+            link.updatePagination(
+              parseInt(this.#element.getAttribute('data-value') || '1'),
+              paginatedElement.selector
+            )
+          })
+        } else if (this.#element.hasAttribute('data-pagination-prev-link')) {
+          this.#morph.links.forEach((link) => {
+            link.updatePagination(
+              paginatedElement.currentPage - 1,
+              paginatedElement.selector
+            )
+          })
+        } else if (this.#element.hasAttribute('data-pagination-next-link')) {
+          this.#morph.links.forEach((link) => {
+            link.updatePagination(
+              paginatedElement.currentPage + 1,
+              paginatedElement.selector
+            )
+          })
+        } else if (this.#element.hasAttribute('data-pagination-more-link')) {
+          this.#morph.links.forEach((link) => {
+            link.updatePagination(
+              paginatedElement.currentPage + 1,
+              paginatedElement.selector
+            )
+          })
+        }
+      }
+
       this.#morph.navigate(path, {
         historyAction,
         centerScroll,
@@ -309,6 +368,12 @@ export class MorphLink {
           !this.#element.hasAttribute('data-toggle-params'),
       })
     }
+  }
+
+  #clickListener = (e: MouseEvent) => {
+    e.preventDefault()
+
+    this.#click()
   }
 
   #pointerListener = () => {
