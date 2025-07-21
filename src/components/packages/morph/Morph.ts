@@ -606,7 +606,7 @@ export class Morph {
                 const selector = el.getAttribute('data-morph-transfer')!
 
                 transfer.push({
-                  element: el,
+                  element: el.cloneNode(true) as HTMLElement,
                   selector,
                 })
               })
