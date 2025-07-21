@@ -1015,10 +1015,6 @@ export class ScrollElement extends HTMLElement {
     this.#mutationObserver.observe(this, { childList: true })
   }
 
-  protected adoptedCallback() {
-    this.shadowRoot!.adoptedStyleSheets = [stylesheet]
-  }
-
   protected disconnectedCallback() {
     this.removeAttribute('tabindex')
 
