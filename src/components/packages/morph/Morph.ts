@@ -587,11 +587,29 @@ export class Morph {
           morphedElements.push(morphElement)
         }
 
+        const transfer: Array<{
+          element: HTMLElement
+          selector: string
+        }> = []
+
         if (!submorphAppend) {
           currentMorphElementChildNodes.forEach((element) => {
             if (element instanceof HTMLElement) {
               this.destroyOldLinks(element)
               element.classList.add('old')
+
+              const transferElements = element.querySelectorAll<HTMLElement>(
+                '[data-morph-transfer]'
+              )
+
+              transferElements.forEach((el) => {
+                const selector = el.getAttribute('data-morph-transfer')!
+
+                transfer.push({
+                  element: el,
+                  selector,
+                })
+              })
             }
           })
         }
@@ -600,6 +618,14 @@ export class Morph {
           if (element instanceof HTMLElement) {
             this.findNewLinks(element)
             element.classList.add('new')
+
+            transfer.forEach((item) => {
+              const nestlement = element.querySelector(item.selector)
+
+              if (nestlement) {
+                nestlement.replaceWith(item.element)
+              }
+            })
           }
         })
 
@@ -654,7 +680,9 @@ export class Morph {
         const promise = new Promise<void>((res) => {
           setTimeout(() => {
             if (!submorphAppend) {
-              currentMorphElementChildNodes.forEach((el) => el.remove())
+              currentMorphElementChildNodes.forEach((el) => {
+                el.remove()
+              })
             }
 
             newMorphElementChildNodes.forEach((element) => {
