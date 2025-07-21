@@ -1,4 +1,9 @@
-import { ChangeHistoryAction, clamp, debounce } from '@packages/utils'
+import {
+  camelToKebab,
+  ChangeHistoryAction,
+  clamp,
+  debounce,
+} from '@packages/utils'
 import { Morph } from './Morph'
 import { cssValueParser } from '@packages/css-value-parser'
 
@@ -65,7 +70,9 @@ export class MorphLink {
       this.#element.classList.remove('exact')
     }
 
-    const [pathWithoutParams, pathParamsStr] = this.#path.split('?')
+    const [pathWithoutParams, pathParamsStr] = this.#path
+      .split('#')[0]
+      ?.split('?')
     const pathParams = new URLSearchParams(pathParamsStr)
     const locationParams = new URLSearchParams(location.search)
 
@@ -97,6 +104,31 @@ export class MorphLink {
     } else {
       this.#element.classList.remove('all-params-matched')
       this.#element.classList.remove('some-params-matched')
+    }
+
+    for (const key in this.#element.dataset) {
+      const kebabKey = camelToKebab(key)
+
+      if (kebabKey.startsWith('match-param-')) {
+        const name = kebabKey.split('match-param-')[1]
+        const value = this.#element.dataset[key]!
+
+        const className = `param-${name}-matched`
+
+        if (
+          (locationParams.has(name) && locationParams.get(name) === value) ||
+          (!locationParams.has(name) &&
+            (value === '' ||
+              value === '*' ||
+              value === 'all' ||
+              value === 'any' ||
+              value === 'vse'))
+        ) {
+          this.#element.classList.add(className)
+        } else {
+          this.#element.classList.remove(className)
+        }
+      }
     }
   }
 

@@ -606,7 +606,7 @@ export class Morph {
                 const selector = el.getAttribute('data-morph-transfer')!
 
                 transfer.push({
-                  element: el.cloneNode(true) as HTMLElement,
+                  element: el as HTMLElement,
                   selector,
                 })
               })
@@ -620,7 +620,9 @@ export class Morph {
               const nestlement = element.querySelector(item.selector)
 
               if (nestlement) {
-                nestlement.replaceWith(item.element)
+                nestlement.replaceWith(
+                  nextRoute.document.importNode(item.element, true)
+                )
               }
             })
 
