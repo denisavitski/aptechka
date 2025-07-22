@@ -48,39 +48,78 @@ export class SlicerElement extends HTMLElement {
 
   #split() {
     const nodes: Array<Node> = []
-
     this.#words = []
-
     let wordsAcc = 0
-
     let lettersAcc = 0
 
-    this.childNodes.forEach((node) => {
-      if (node.nodeName === '#text' && node.textContent) {
-        const text = node.textContent.trim()
+    const processTextNode = (textNode: Text) => {
+      const text = textNode.textContent?.trim()
+      if (!text) return document.createDocumentFragment()
 
-        text
-          .replace(/  +/g, ' ')
-          .split(' ')
-          .map((text) => {
-            const word = new Word({
-              index: wordsAcc,
-              text: text + ' ',
-              letters: this.hasAttribute('letters'),
-              lettersAcc,
-              clone: this.hasAttribute('clone'),
-            })
+      const fragment = document.createDocumentFragment()
 
-            lettersAcc += word.letters.length
-            wordsAcc += 1
+      text
+        .replace(/  +/g, ' ')
+        .split(' ')
+        .forEach((wordText, i, arr) => {
+          if (!wordText) return
 
-            this.#letters.push(...word.letters)
-
-            this.#words.push(word)
-            nodes.push(word.element)
+          const word = new Word({
+            index: wordsAcc,
+            text: wordText + (i < arr.length - 1 ? ' ' : ''),
+            letters: this.hasAttribute('letters'),
+            lettersAcc,
+            clone: this.hasAttribute('clone'),
           })
+
+          lettersAcc += word.letters.length
+          wordsAcc += 1
+
+          this.#letters.push(...word.letters)
+          this.#words.push(word)
+          fragment.appendChild(word.element)
+        })
+
+      return fragment
+    }
+
+    const walk = (node: Node): Node => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return processTextNode(node as Text)
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        const clone = node.cloneNode(false) as Element
+
+        Array.from(node.childNodes).forEach((child) => {
+          const processedChild = walk(child)
+
+          if (processedChild) {
+            if (processedChild.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+              Array.from(processedChild.childNodes).forEach((node, i, arr) => {
+                clone.append(node)
+
+                if (i !== arr.length - 1) {
+                  clone.append(new Text(' '))
+                }
+              })
+            } else {
+              clone.appendChild(processedChild)
+            }
+          }
+        })
+
+        return clone
+      }
+
+      return node.cloneNode()
+    }
+
+    Array.from(this.childNodes).forEach((node) => {
+      const processedNode = walk(node)
+
+      if (processedNode.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        nodes.push(...Array.from(processedNode.childNodes))
       } else {
-        nodes.push(node)
+        nodes.push(processedNode)
       }
     })
 
@@ -99,10 +138,10 @@ export class SlicerElement extends HTMLElement {
 
     this.innerHTML = ''
 
-    nodes.forEach((node, i, arr) => {
+    nodes.forEach((node, i) => {
       this.appendChild(node)
 
-      if (i !== arr.length - 1) {
+      if (i < nodes.length - 1 && node.nodeType === Node.ELEMENT_NODE) {
         this.appendChild(new Text(' '))
       }
     })
