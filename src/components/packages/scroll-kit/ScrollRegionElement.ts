@@ -21,11 +21,17 @@ export interface ScrollRegionElementEvents {
 
 export class ScrollRegionElement extends HTMLElement {
   #statusHolderElement = this
+  #progressHolderElement = this
   #scrollElement: HTMLElement | Window | null = null
 
   #statusHolderCSSProperty = new CSSProperty<string | false>(
     this,
     '--scroll-region-status-holder',
+    false
+  )
+  #progressHolderCSSProperty = new CSSProperty<string | false>(
+    this,
+    '--scroll-region-progress-holder',
     false
   )
   #disabledCSSProperty = new CSSProperty<boolean>(
@@ -181,7 +187,7 @@ export class ScrollRegionElement extends HTMLElement {
     this.#progress = this.#scrolled / this.#distance || 0
 
     if (this.#progressVarCSSProperty.current) {
-      this.#statusHolderElement.style.setProperty(
+      this.#progressHolderElement.style.setProperty(
         this.#cssVar(this.#progressVarCSSProperty.current),
         this.#progress.toFixed(6)
       )
@@ -230,6 +236,7 @@ export class ScrollRegionElement extends HTMLElement {
     this.disable(false)
 
     this.#statusHolderCSSProperty.close()
+    this.#progressHolderCSSProperty.close()
     this.#disabledCSSProperty.close()
     this.#startOffsetCSSProperty.close()
     this.#startOffsetMinCSSProperty.close()
@@ -304,10 +311,6 @@ export class ScrollRegionElement extends HTMLElement {
     this.#statusHolderCSSProperty.subscribe((e) => {
       if (this.#statusHolderElement) {
         this.#status.removeElement(this.#statusHolderElement)
-
-        this.#statusHolderElement.style.removeProperty(
-          this.#cssVar(this.#progressVarCSSProperty.current)
-        )
       }
 
       this.#statusHolderElement = e.current
@@ -315,6 +318,18 @@ export class ScrollRegionElement extends HTMLElement {
         : this
 
       this.#status.addElement(this.#statusHolderElement)
+    })
+
+    this.#progressHolderCSSProperty.subscribe((e) => {
+      if (this.#progressHolderElement) {
+        this.#progressHolderElement.style.removeProperty(
+          this.#cssVar(this.#progressVarCSSProperty.current)
+        )
+      }
+
+      this.#progressHolderElement = e.current
+        ? document.querySelector(e.current) || this
+        : this
     })
 
     this.#disabledCSSProperty.subscribe((e) => {
@@ -329,7 +344,9 @@ export class ScrollRegionElement extends HTMLElement {
       if (e.current) {
         this.#tickListener()
       } else if (e.previous) {
-        this.#statusHolderElement.style.removeProperty(this.#cssVar(e.previous))
+        this.#progressHolderElement.style.removeProperty(
+          this.#cssVar(e.previous)
+        )
       }
     })
 
@@ -338,6 +355,7 @@ export class ScrollRegionElement extends HTMLElement {
     })
 
     this.#statusHolderCSSProperty.observe()
+    this.#progressHolderCSSProperty.observe()
     this.#disabledCSSProperty.observe()
     this.#startOffsetCSSProperty.observe()
     this.#startOffsetMinCSSProperty.observe()
