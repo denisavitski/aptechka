@@ -26,25 +26,36 @@ export class Word {
     }
 
     if (parameters.letters && parameters.lettersAcc !== undefined) {
-      this.#letters = parameters.text.split('').map((letter, i) => {
-        return new Letter({
-          index: parameters.lettersAcc! + i,
-          text: letter,
-          clone: parameters.clone,
-        })
+      let i = 0
+
+      const letters = parameters.text.split('').map((letter) => {
+        if (letter !== ' ') {
+          return new Letter({
+            index: parameters.lettersAcc! + i++,
+            text: letter,
+            clone: parameters.clone,
+          })
+        } else {
+          return new Text(' ')
+        }
       })
 
-      this.#element.append(...this.#letters.map((l) => l.element))
+      this.#letters = letters.filter((l) => l instanceof Letter)
+
+      this.#element.append(
+        ...letters.map((l) => {
+          if (l instanceof Letter) {
+            return l.element
+          } else {
+            return l
+          }
+        })
+      )
     } else {
       if (parameters.clone) {
-        this.#element.innerHTML = `
-          <span class="original">${parameters.text}</span>
-          <span class="clone" aria-hidden>${parameters.text}</span>
-        `
+        this.#element.innerHTML = `<span class="original">${parameters.text}</span><span class="clone" aria-hidden>${parameters.text}</span>`
       } else {
-        this.#element.innerHTML = `
-          <span class="value">${parameters.text}</span>
-        `
+        this.#element.innerHTML = `<span class="value">${parameters.text}</span>`
       }
     }
 
