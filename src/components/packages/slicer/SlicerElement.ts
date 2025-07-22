@@ -99,8 +99,12 @@ export class SlicerElement extends HTMLElement {
 
     this.innerHTML = ''
 
-    nodes.forEach((node) => {
+    nodes.forEach((node, i, arr) => {
       this.appendChild(node)
+
+      if (i !== arr.length - 1) {
+        this.appendChild(new Text(' '))
+      }
     })
 
     this.style.setProperty('--words-length', this.#words.length.toString())

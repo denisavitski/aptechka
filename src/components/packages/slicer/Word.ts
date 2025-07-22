@@ -35,27 +35,21 @@ export class Word {
             text: letter,
             clone: parameters.clone,
           })
-        } else {
-          return new Text(' ')
         }
       })
 
       this.#letters = letters.filter((l) => l instanceof Letter)
 
       this.#element.append(
-        ...letters.map((l) => {
-          if (l instanceof Letter) {
-            return l.element
-          } else {
-            return l
-          }
+        ...this.#letters.map((l) => {
+          return l.element
         })
       )
     } else {
       if (parameters.clone) {
-        this.#element.innerHTML = `<span class="original">${parameters.text}</span><span class="clone" aria-hidden>${parameters.text}</span>`
+        this.#element.innerHTML = `<span class="original"><span class="value">${parameters.text}</span></span><span class="clone" aria-hidden><span class="value">${parameters.text}</span></span>`
       } else {
-        this.#element.innerHTML = `<span class="value">${parameters.text}</span>`
+        this.#element.innerHTML = `<span class="original"><span class="value">${parameters.text}</span></span>`
       }
     }
 

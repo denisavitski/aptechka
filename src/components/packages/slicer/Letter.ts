@@ -14,9 +14,9 @@ export class Letter {
     this.#element.classList.add('letter')
 
     if (parameters.clone) {
-      this.#element.innerHTML = `<span class="original">${parameters.text}</span><span class="clone" aria-hidden>${parameters.text}</span>`
+      this.#element.innerHTML = `<span class="original"><span class="value">${parameters.text}</span></span><span class="clone" aria-hidden><span class="value">${parameters.text}</span></span>`
     } else {
-      this.#element.innerHTML = `<span class="value">${parameters.text}</span>`
+      this.#element.innerHTML = `<span class="original"><span class="value">${parameters.text}</span></span>`
     }
   }
 
