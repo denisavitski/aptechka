@@ -57,9 +57,11 @@ export class SlicerElement extends HTMLElement {
       if (!text) return document.createDocumentFragment()
 
       const fragment = document.createDocumentFragment()
-
       text
-        .replace(/  +/g, ' ')
+        .replace(
+          /[\s\u00A0\u1680\u2000-\u200F\u2028\u2029\u202F\u205F\u3000\uFEFF]+/g,
+          ' '
+        )
         .split(' ')
         .forEach((wordText, i, arr) => {
           if (!wordText) return
