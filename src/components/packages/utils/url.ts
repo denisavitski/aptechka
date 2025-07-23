@@ -34,7 +34,9 @@ export function splitPath(
     const mergeParamsObj = new URLSearchParams(mergeParams)
 
     for (const [key, value] of mergeParamsObj) {
-      existingParams.set(key, value)
+      if (!existingParams.has(key)) {
+        existingParams.set(key, value)
+      }
     }
 
     parameters = existingParams.toString()

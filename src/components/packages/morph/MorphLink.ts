@@ -396,8 +396,9 @@ export class MorphLink {
         scrollBehaviour,
         submorphAppend: this.#element.hasAttribute('data-pagination-more-link'),
         mergeParams:
-          this.#element.hasAttribute('data-merge-params') &&
-          !this.#element.hasAttribute('data-toggle-params'),
+          !!paginatedElement ||
+          (this.#element.hasAttribute('data-merge-params') &&
+            !this.#element.hasAttribute('data-toggle-params')),
       })
     }
   }

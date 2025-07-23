@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.78.5",
+  "version": "0.78.6",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -401,6 +401,7 @@
     "vite-plugin-htmc": "0.1.16"
   },
   "dependencies": {
+    "aptechka": "^0.78.5",
     "construct-style-sheets-polyfill": "^3.1.0",
     "three": "^0.176.0",
     "urlpattern-polyfill": "^10.0.0"
