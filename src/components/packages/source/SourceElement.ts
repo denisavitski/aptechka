@@ -158,6 +158,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     )
     this.#loadedmetadataListener()
 
+    if (this.classList.contains('MaskedVideo__video__element')) {
+      console.log()
+    }
+
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
         const value = attr.nodeValue || ''
@@ -168,6 +172,19 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
         }
       }
     })
+
+    for (const key in this.dataset) {
+      const value = this.dataset[key]
+      const camelCased = kebabToCamel(key)
+
+      if (camelCased in this.#consumerElement) {
+        ;(this.#consumerElement as any)[camelCased] = value
+          ? value === 'false'
+            ? false
+            : value
+          : true
+      }
+    }
 
     this.#consumerHolderElement.appendChild(this.#consumerElement)
 

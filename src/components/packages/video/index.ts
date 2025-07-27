@@ -12,9 +12,21 @@ export interface VideoEvents {
 export class VideoElement extends SourceElement<HTMLVideoElement> {
   #progress = 0
   #needToPlay = false
+  #clickElement: HTMLElement = this
 
   protected override connectedCallback() {
     super.connectedCallback()
+
+    const clickControlsSelector = this.getAttribute('click-controls')
+
+    if (clickControlsSelector) {
+      if (clickControlsSelector === 'parent') {
+        this.#clickElement = this.parentElement!
+      } else {
+        this.#clickElement =
+          document.querySelector(clickControlsSelector) || this
+      }
+    }
 
     this.addEventListener('sourceCapture', () => {
       this.#needToPlay = false
@@ -59,15 +71,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       }
     })
 
-    this.addEventListener('click', () => {
-      if (this.hasAttribute('click-controls')) {
-        if (this.consumerElement.paused) {
-          this.consumerElement.play()
-        } else if (!this.hasAttribute('controls')) {
-          this.consumerElement.pause()
-        }
-      }
-    })
+    this.#clickElement.addEventListener('click', this.#clickListener)
   }
 
   protected override disconnectedCallback() {
@@ -76,6 +80,8 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     ticker.unsubscribe(this.#checkReady)
 
     this.#progress = 0
+
+    this.#clickElement.removeEventListener('click', this.#clickListener)
   }
 
   protected override createConsumer() {
@@ -117,6 +123,16 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
       if (this.#needToPlay && this.sourceManager.current) {
         this.consumerElement.play()
+      }
+    }
+  }
+
+  #clickListener = () => {
+    if (this.hasAttribute('click-controls')) {
+      if (this.consumerElement.paused) {
+        this.consumerElement.play()
+      } else if (!this.hasAttribute('controls')) {
+        this.consumerElement.pause()
       }
     }
   }
