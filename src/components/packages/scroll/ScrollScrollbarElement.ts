@@ -153,21 +153,14 @@ export class ScrollScrollbarElement extends ScrollUserElement {
   }
 
   #grabListener = (grabEvent: PointerEvent) => {
-    document.documentElement.classList.add('grabbing')
+    setupDrag((moveEvent: PointerEvent) => {
+      const moveCursor = this.#isHorisontal ? moveEvent.x : moveEvent.y
 
-    setupDrag(
-      (moveEvent: PointerEvent) => {
-        const moveCursor = this.#isHorisontal ? moveEvent.x : moveEvent.y
+      const mult = this.scrollElement.distance / this.#thumbScrollSize
+      const delta = (moveCursor - grabCursor) * mult
 
-        const mult = this.scrollElement.distance / this.#thumbScrollSize
-        const delta = (moveCursor - grabCursor) * mult
-
-        this.scrollElement.setPosition(startValue + delta)
-      },
-      () => {
-        document.documentElement.classList.remove('grabbing')
-      }
-    )
+      this.scrollElement.setPosition(startValue + delta)
+    })
 
     const startValue = this.scrollElement.damped.target
     const grabCursor = this.#isHorisontal ? grabEvent.x : grabEvent.y

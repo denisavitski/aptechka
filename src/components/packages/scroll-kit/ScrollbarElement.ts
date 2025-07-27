@@ -157,36 +157,29 @@ export class ScrollbarElement extends HTMLElement {
   }
 
   #grabListener = (grabEvent: PointerEvent) => {
-    document.documentElement.classList.add('grabbing')
-
     const startValue = this.#scrollPosition
 
     const grabCursor = this.#isHorizontal ? grabEvent.x : grabEvent.y
 
-    setupDrag(
-      (moveEvent: PointerEvent) => {
-        const mult = this.#limit / this.#thumbScrollSize
-        const delta =
-          (this.#isHorizontal
-            ? moveEvent.x - grabCursor
-            : moveEvent.y - grabCursor) * mult
+    setupDrag((moveEvent: PointerEvent) => {
+      const mult = this.#limit / this.#thumbScrollSize
+      const delta =
+        (this.#isHorizontal
+          ? moveEvent.x - grabCursor
+          : moveEvent.y - grabCursor) * mult
 
-        if (this.#isHorizontal) {
-          this.#scrollElement.scroll({
-            left: startValue + delta,
-            behavior: 'instant',
-          })
-        } else {
-          this.#scrollElement.scroll({
-            top: startValue + delta,
-            behavior: 'instant',
-          })
-        }
-      },
-      () => {
-        document.documentElement.classList.remove('grabbing')
+      if (this.#isHorizontal) {
+        this.#scrollElement.scroll({
+          left: startValue + delta,
+          behavior: 'instant',
+        })
+      } else {
+        this.#scrollElement.scroll({
+          top: startValue + delta,
+          behavior: 'instant',
+        })
       }
-    )
+    })
   }
 
   #tickListener = () => {
