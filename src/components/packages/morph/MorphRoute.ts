@@ -25,6 +25,7 @@ export class MorphRoute {
   #abortController: AbortController | null = null
   #fetching: Promise<void> | null = null
   #headers: HeadersInit | undefined
+  #needRavalidation = false
 
   constructor(morph: Morph, pathname: string) {
     this.#morph = morph
@@ -43,6 +44,10 @@ export class MorphRoute {
     return this.#currentDocument
   }
 
+  public needRavalidation() {
+    this.#needRavalidation = true
+  }
+
   public setHeaders(headers: HeadersInit) {
     this.#headers = headers
   }
@@ -58,7 +63,7 @@ export class MorphRoute {
   }
 
   public async fetch(path: string, currentPath: string, revalidate?: boolean) {
-    if (!revalidate) {
+    if (!revalidate && !this.#needRavalidation) {
       const isCachedPage =
         this.#initialDocument?.documentElement.getAttribute('data-cache')
 
@@ -96,6 +101,8 @@ export class MorphRoute {
         const document = domParser.parseFromString(text, 'text/html')
 
         this.setInitialDocument(document)
+
+        this.#needRavalidation = false
       } catch (e) {
         console.warn(e)
       } finally {

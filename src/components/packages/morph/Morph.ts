@@ -255,6 +255,12 @@ export class Morph {
 
   public setHeaders(path: string) {}
 
+  public needRavalidation(path: string) {
+    const normalizedURL = this.normalizePath(path)
+    const route = this.#getRoute(normalizedURL.path)
+    route?.needRavalidation()
+  }
+
   public async navigate(
     path: string,
     {
