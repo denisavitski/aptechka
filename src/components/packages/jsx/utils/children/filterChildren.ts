@@ -1,0 +1,22 @@
+import { Store } from '@packages/store'
+import { Children } from './appendChildren'
+
+export function filterChildren(children: Children) {
+  const filtered: Array<string | Element | Store<any>> = []
+
+  children.forEach((child) => {
+    if (child !== null && child !== undefined) {
+      if (typeof child === 'number') {
+        filtered.push(child.toString())
+      } else if (Array.isArray(child)) {
+        child.forEach((c) => {
+          filtered.push(...filterChildren(c))
+        })
+      } else {
+        filtered.push(child)
+      }
+    }
+  })
+
+  return filtered
+}

@@ -24,6 +24,7 @@ export class SlicerElement extends HTMLElement {
 
   protected connectedCallback() {
     this.#originalHTML = this.innerHTML.trim()
+    console.log(this.#originalHTML)
 
     if (this.hasAttribute('media')) {
       this.#media = new Media(this.getAttribute('media')!)

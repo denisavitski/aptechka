@@ -9,6 +9,11 @@ export function sharedConfig() {
         localsConvention: 'camelCaseOnly',
       },
     },
+    esbuild: {
+      jsxFactory: 'h',
+      jsxFragment: 'Fragment',
+      jsxInject: `import { h, Fragment } from '@packages/jsx'`,
+    },
     resolve: {
       alias: {
         '@packages': resolve(__dirname, 'src/components/packages'),

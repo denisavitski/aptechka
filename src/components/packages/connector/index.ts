@@ -4,7 +4,7 @@ import { ticker, TickerCallback } from '@packages/ticker'
 export type ConnectorConnectCallback<T extends Node = Node> = (node: T) => void
 export type ConnectorDisconnectCallback<T extends Node = Node> = (
   node: T,
-  expired?: boolean
+  expired?: boolean,
 ) => void
 
 interface ConnectorSubscriber<T extends Node = Node> {
@@ -67,7 +67,7 @@ export class Connector {
     })
 
     this.#subscribers = this.#subscribers.filter(
-      (sub) => sub.connectCallback || sub.disconnectCallback
+      (sub) => sub.connectCallback || sub.disconnectCallback,
     )
 
     if (!this.#subscribers.length) {
@@ -100,7 +100,7 @@ export class Connector {
       if (!subscriber.isConnected) {
         subscriber.timer = Math.max(
           0,
-          e.timeElapsedSinceSubscription - subscriber.startTime
+          e.timeElapsedSinceSubscription - subscriber.startTime,
         )
 
         if (subscriber.timer > subscriber.maxWaitSec * 1000) {

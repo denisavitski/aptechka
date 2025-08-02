@@ -32,7 +32,9 @@
       "@assets/*": ["src/assets/*"]
     },
 
-    "jsx": "react-jsx"
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment"
   },
   "include": ["src"]
 }

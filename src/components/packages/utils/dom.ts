@@ -76,3 +76,11 @@ export function getAllParentElements(node: Node) {
 
   return allParentNodes
 }
+
+export function traverseNodes(node: Node, callback: (node: Node) => void) {
+  callback(node)
+
+  node.childNodes.forEach((child) => {
+    traverseNodes(child, callback)
+  })
+}

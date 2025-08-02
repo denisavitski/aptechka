@@ -1,5 +1,6 @@
 import { Notifier } from '@packages/notifier'
 import { storeRegistry } from './StoreRegistry'
+import { generateId } from '@packages/utils'
 
 export interface StoreState<StoreType> {
   current: StoreType
@@ -39,6 +40,7 @@ export class Store<StoreType = unknown> {
   #middlewares: Set<StoreMiddleware<StoreType>> | undefined
   #notifyAndClose: boolean
   #invisible: boolean
+  #id = 'store-' + generateId(10)
 
   constructor(value: StoreType, options?: StoreOptions<StoreType>) {
     this.#name = options?.name
@@ -68,6 +70,10 @@ export class Store<StoreType = unknown> {
     if (this.#name) {
       storeRegistry.updateStore(this)
     }
+  }
+
+  public get id() {
+    return this.#id
   }
 
   public get name() {
