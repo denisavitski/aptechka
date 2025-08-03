@@ -1,6 +1,7 @@
-export type ComponentConnectCallback = () => void
-export type ComponentDisconnectCallback = () => void
-export type ComponentInternalsCallback = (internals: ElementInternals) => void
+export type ComponentConnectCallback = (
+  element: HTMLElement,
+) => void | ComponentDisconnectCallback
+export type ComponentDisconnectCallback = (element: HTMLElement) => void
 
 export const activeComponent: { current: ComponentElement } = { current: null! }
 
@@ -24,13 +25,17 @@ export class ComponentElement extends HTMLElement {
 
   protected connectedCallback() {
     this.#connectCallbacks.forEach((callback) => {
-      callback()
+      const unsub = callback(this)
+
+      if (unsub) {
+        this.#disconnectCallbacks.push(unsub)
+      }
     })
   }
 
   protected disconnectedCallback() {
     this.#disconnectCallbacks.forEach((callback) => {
-      callback()
+      callback(this)
     })
 
     this.#connectCallbacks = []

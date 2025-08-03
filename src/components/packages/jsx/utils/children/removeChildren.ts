@@ -1,9 +1,8 @@
 import { Store } from '@packages/store'
-import { Children } from './appendChildren'
 import { filterChildren } from './filterChildren'
 import { findTextNode } from './findTextNode'
 
-export function removeChildren(element: Element, ...children: Children) {
+export function removeChildren(element: Element, ...children: JSX.Children) {
   const filteredChildren = filterChildren(children)
 
   filteredChildren.forEach((child) => {

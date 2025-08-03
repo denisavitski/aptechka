@@ -1,11 +1,19 @@
-export { h, Fragment } from './h'
 export {
-  useComponent,
-  useConnect,
-  useDisconnect,
+  type ComponentConnectCallback,
+  type ComponentDisconnectCallback,
+} from './ComponentElement'
+export { Fragment, h } from './h'
+export { useRef } from './hooks/common'
+export { useConnect, useDisconnect } from './hooks/component/lifecycle'
+export {
   useInternals,
-  useStore,
-  useDerivedStore,
-  useDerivedArrayStore,
-  useRef,
-} from './hooks'
+  type UseInternalsCallback,
+} from './hooks/component/useInternals'
+export { useShadow, type UseShadowCallback } from './hooks/component/useShadow'
+export {
+  useStylesheet,
+  type UseStylesheetNestedObject,
+  type UseStylesheetSource,
+} from './hooks/component/useStylesheet'
+export { useDerivedArrayStore, useDerivedStore, useStore } from './hooks/store'
+export { render } from './render'

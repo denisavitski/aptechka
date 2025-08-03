@@ -1,40 +1,35 @@
 import type { Store } from '@packages/store'
 import type { ClassListInput } from './utils/attributes/class'
-import type { JSS } from './utils/attributes/style'
-import type {
-  ComponentDisconnectCallback,
-  ComponentOnConnect,
-  ComponentOnDisconnect,
-} from './ComponentElement'
+import type { StyleAttribute } from './utils/attributes/style'
 
 type StoreOr<T> = T | Store<T | null | undefined>
 
 declare global {
   namespace JSX {
-    export type ComponentChild =
-      | Node
+    export type Children = Array<
+      | Element
       | string
       | number
-      | boolean
-      | undefined
       | null
-      | void
-      | Store<any, any, any>
+      | undefined
+      | Store<any>
+      | Array<Children>
+    >
+
+    type Fragment = any
 
     type StoreOr<T> = T | Store<T | null | undefined>
-
-    type ComponentChildren = Array<ComponentChild>
 
     type Ref<T = unknown> = { value: T }
 
     type ComponentBaseProps = {
-      children?: Array<ComponentChild>
-      ref?: Ref<Element>
+      children?: Children
     }
 
     type Component<TProps extends object = object> = {
       formAssociated?: boolean
-      (props: ComponentBaseProps & TProps): ComponentChild
+      template?: boolean
+      (props: ComponentBaseProps & TProps): Children['number']
     }
 
     type EventMap = keyof HTMLElementEventMap | keyof SVGElementEventMap
@@ -43,11 +38,11 @@ declare global {
       [K in `on${Capitalize<EventMap>}`]: (
         event: (HTMLElementEventMap & SVGElementEventMap)[Uncapitalize<
           Extract<K, `on${string}`> extends `on${infer T}` ? T : never
-        >]
+        >],
       ) => void
     }>
 
-    interface Attributes {
+    interface KnownAttributes {
       accept?: StoreOr<string>
       acceptCharset?: StoreOr<string>
       accessKey?: StoreOr<string>
@@ -169,7 +164,7 @@ declare global {
       srcSet?: StoreOr<string>
       start?: StoreOr<number>
       step?: StoreOr<number | string>
-      style?: JSS
+      style?: StyleAttribute
       summary?: StoreOr<string>
       tabIndex?: StoreOr<number>
       target?: StoreOr<string>
@@ -200,18 +195,21 @@ declare global {
       ref?: { current: any }
     }
 
-    type AllAttributes = Attributes &
+    type UnknownAttributes = { [key: string]: any }
+
+    type Attributes = KnownAttributes &
       Events & {
         [key: string]: any
-      }
+      } & UnknownAttributes
 
     type TagNameMap =
       | 'component'
+      | 'shadow'
       | keyof HTMLElementTagNameMap
       | keyof SVGElementTagNameMap
 
     type IntrinsicElementsHTML = {
-      [TKey in TagNameMap]?: AllAttributes
+      [TKey in TagNameMap]?: Attributes
     }
 
     type IntrinsicElements = IntrinsicElementsHTML

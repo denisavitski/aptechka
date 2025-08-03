@@ -393,22 +393,24 @@
     "dev": "vite --host --mode site"
   },
   "devDependencies": {
-    "@types/node": "^22.13.17",
-    "@types/three": "^0.175.0",
-    "tsx": "^4.19.3",
-    "vite": "^6.2.4",
-    "vite-plugin-dts": "^4.5.3",
+    "@types/node": "^24.1.0",
+    "@types/three": "^0.178.1",
+    "tsx": "^4.20.3",
+    "vite": "^7.0.6",
+    "vite-plugin-dts": "^4.5.4",
     "vite-plugin-htmc": "0.1.16"
   },
   "dependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
+    "csstype": "^3.1.3",
     "prettier-plugin-organize-imports": "^4.2.0",
-    "three": "^0.176.0",
-    "urlpattern-polyfill": "^10.0.0"
+    "three": "^0.179.1",
+    "urlpattern-polyfill": "^10.1.0"
   },
   "peerDependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
-    "three": "^0.176.0",
-    "urlpattern-polyfill": "^10.0.0"
+    "prettier-plugin-organize-imports": "^4.2.0",
+    "three": "^0.179.1",
+    "urlpattern-polyfill": "^10.1.0"
   }
 }

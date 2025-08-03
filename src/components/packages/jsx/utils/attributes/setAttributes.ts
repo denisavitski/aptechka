@@ -3,8 +3,6 @@ import { subscribeToStore } from '../elementStoreSubscription'
 import { ClassListInput, setClassAttribute } from './class'
 import { setStyleAttribute } from './style'
 
-export type Attributes = null | { [key: string]: any }
-
 export function setAttribute(element: Element, key: string, value: unknown) {
   if (
     key === 'ref' &&
@@ -42,7 +40,7 @@ export function setAttribute(element: Element, key: string, value: unknown) {
   }
 }
 
-export function setAttributes(ele: HTMLElement, attributes?: Attributes) {
+export function setAttributes(ele: Element, attributes?: JSX.Attributes) {
   for (const [key, value] of Object.entries(attributes ?? {})) {
     if (typeof value === 'function') {
       if (!key.startsWith('on')) {

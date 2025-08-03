@@ -1,30 +1,14 @@
 import { Store } from '@packages/store'
+import type * as CSS from 'csstype'
 import { subscribeToStore } from '../elementStoreSubscription'
 
-export type StyleToken = Exclude<
-  Extract<keyof CSSStyleDeclaration, string> | `--${string}`,
-  'length' | 'parentRule'
->
-
-export type StyleValue = string | Store<any>
-
-export type Style = Partial<{
-  [K in StyleToken]: StyleValue
+export type StyleAttribute = Partial<{
+  [K in keyof CSS.Properties]: CSS.Properties[K] | Store<any>
 }>
-
-export type StyleWrapper = {
-  [key: string]: object | Style
-}
-
-export type JSS =
-  | Style
-  | {
-      [key: string]: StyleWrapper | Style
-    }
 
 export function setStyleAttribute(
   element: HTMLElement | SVGElement,
-  value: JSS,
+  value: StyleAttribute,
 ) {
   if (!value) {
     return

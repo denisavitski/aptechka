@@ -1,7 +1,6 @@
 import { Store } from '@packages/store'
-import { Children } from './appendChildren'
 
-export function filterChildren(children: Children) {
+export function filterChildren(children: JSX.Children) {
   const filtered: Array<string | Element | Store<any>> = []
 
   children.forEach((child) => {

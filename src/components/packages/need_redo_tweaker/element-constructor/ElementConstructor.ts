@@ -1,3 +1,8 @@
+import {
+  ConnectorConnectCallback,
+  ConnectorDisconnectCallback,
+  connector,
+} from '@packages/connector'
 import { Store } from '@packages/store'
 import {
   SplitFirst,
@@ -7,11 +12,6 @@ import {
   uncapitalize,
 } from '@packages/utils'
 import { knownSvgTags } from './knownSvgTags'
-import {
-  ConnectorConnectCallback,
-  ConnectorDisconnectCallback,
-  connector,
-} from '@packages/connector'
 
 export type StoreOr<T> = T | Store<T>
 
@@ -67,13 +67,13 @@ export type ElementConstructorNativeAttribute<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
   E = T extends ElementConstructorTagNames
     ? ElementConstructorTagNameMap[T]
-    : Node
+    : Node,
 > = {
   [K in keyof E]: E[K] extends string | null ? K : never
 }[keyof E]
 
 export type ElementConstructorNativeAttributes<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = Partial<{
   [K in ElementConstructorNativeAttribute<T>]: any
 }>
@@ -83,21 +83,21 @@ export type ElementConstructorCustomAttributes = {
 }
 
 export type ElementConstructorAttributes<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = ElementConstructorNativeAttributes<T> | ElementConstructorCustomAttributes
 
 export type ElementConstructorParent = Node | ElementConstructor
 
 export type ElementConstructorRefCallback<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = (
   element: T extends ElementConstructorTagNames
     ? ElementConstructorTagNameMap[T]
-    : Node
+    : Node,
 ) => void
 
 export type ElementConstructorObjectRef<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = {
   current: T extends ElementConstructorTagNames
     ? ElementConstructorTagNameMap[T]
@@ -105,7 +105,7 @@ export type ElementConstructorObjectRef<
 }
 
 export type ElementConstructorRef<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = ElementConstructorRefCallback<T> | ElementConstructorObjectRef<T>
 
 export type ElementConstructorEventValue<E extends Event> =
@@ -129,7 +129,7 @@ export type ElementConstructorEvents = Partial<{
 export type ElementConstructorChildrenChangeCallback = () => void
 
 export type ElementConstructorTagObject<
-  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames
+  T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
 > = {
   class?: ElementConstructorClass
   style?: T extends 'style' ? ElementConstructorJSS : ElementConstructorStyle
@@ -147,7 +147,7 @@ export class ElementConstructor<
   T extends ElementConstructorTagNames | Node = ElementConstructorTagNames,
   N = T extends ElementConstructorTagNames
     ? ElementConstructorTagNameMap[T]
-    : Node
+    : Node,
 > {
   #node: N = null!
   #connectCallbacks: Set<ConnectorConnectCallback> = new Set()
@@ -213,7 +213,7 @@ export class ElementConstructor<
       } else if (knownSvgTags.has(value) || forceSvg) {
         node = document.createElementNS(
           'http://www.w3.org/2000/svg',
-          value
+          value,
         ) as N
       } else {
         node = document.createElement(value) as N
@@ -264,13 +264,13 @@ export class ElementConstructor<
           this.#node instanceof Element
             ? this.#node.shadowRoot || this.#node
             : (this.#node as any),
-          value
+          value,
         )
       } else if (propertyName === 'connectedClass') {
         this.#connectCallbacks.add(() => {
           requestAnimationFrame(() => {
             ;(this.#node as HTMLElement).classList.add(
-              typeof value === 'boolean' ? 'connected' : value
+              typeof value === 'boolean' ? 'connected' : value,
             )
           })
         })
@@ -320,7 +320,7 @@ export class ElementConstructor<
           disconnectCallback: this.#disconnect,
           unsubscribeAfterDisconnect: true,
           maxWaitSec: 20,
-        }
+        },
       )
     }
   }
@@ -341,7 +341,7 @@ export class ElementConstructor<
         this.#manageStringStoreClass(
           classObject as
             | ElementConstructorStringStoreClass
-            | ElementConstructorStringArrayStoreClass
+            | ElementConstructorStringArrayStoreClass,
         )
       } else {
         for (const className in classObject) {
@@ -362,7 +362,7 @@ export class ElementConstructor<
   #manageStringStoreClass(
     store:
       | ElementConstructorStringStoreClass
-      | ElementConstructorStringArrayStoreClass
+      | ElementConstructorStringArrayStoreClass,
   ) {
     this.#disconnectCallbacks.add(
       store.subscribe(({ current, previous }) => {
@@ -381,7 +381,7 @@ export class ElementConstructor<
             }
           })
         }
-      })
+      }),
     )
   }
 
@@ -393,7 +393,7 @@ export class ElementConstructor<
         } else {
           ;(this.#node as Element).classList.remove(className)
         }
-      })
+      }),
     )
   }
 
@@ -422,7 +422,7 @@ export class ElementConstructor<
         this.#disconnectCallbacks.add(
           value.subscribe(({ current }) => {
             this.#setStyleProperty(token, current)
-          })
+          }),
         )
       } else {
         this.#setStyleProperty(token, value)
@@ -436,7 +436,7 @@ export class ElementConstructor<
 
       if (typeof value === 'object' && !(value instanceof Store)) {
         ;(this.#node as HTMLElement).appendChild(
-          document.createTextNode(`${key} {`)
+          document.createTextNode(`${key} {`),
         )
         this.#createJSSStyle(value)
         ;(this.#node as HTMLElement).appendChild(document.createTextNode(`}`))
@@ -451,12 +451,12 @@ export class ElementConstructor<
               } else {
                 text.nodeValue = ''
               }
-            })
+            }),
           )
           ;(this.#node as HTMLElement).appendChild(text)
         } else {
           ;(this.#node as HTMLElement).appendChild(
-            document.createTextNode(`${camelToKebab(key)}: ${value};`)
+            document.createTextNode(`${camelToKebab(key)}: ${value};`),
           )
         }
       }
@@ -465,7 +465,7 @@ export class ElementConstructor<
 
   #setStyleProperty(
     token: ElementConstructorStyleToken,
-    value?: string | number | null | undefined
+    value?: string | number | null | undefined,
   ) {
     if (token.includes('--')) {
       if (value) {
@@ -494,7 +494,7 @@ export class ElementConstructor<
     for (const k in events) {
       const eventName = k as keyof ElementConstructorEvents
       const readyEventName = uncapitalize(
-        eventName.split('on').slice(1).join('on')
+        eventName.split('on').slice(1).join('on'),
       )
 
       const listener = events[eventName]
@@ -521,7 +521,7 @@ export class ElementConstructor<
       ;(this.#node as HTMLElement).addEventListener(
         event.name,
         event.callback,
-        event.options
+        event.options,
       )
     })
   }
@@ -531,7 +531,7 @@ export class ElementConstructor<
       ;(this.#node as HTMLElement).removeEventListener(
         event.name,
         event.callback,
-        event.options
+        event.options,
       )
     })
   }
@@ -544,7 +544,7 @@ export class ElementConstructor<
         this.#disconnectCallbacks.add(
           value.subscribe(({ current }) => {
             this.#setAttribute(attributeName, current)
-          })
+          }),
         )
       } else {
         this.#setAttribute(attributeName, value)
@@ -554,7 +554,7 @@ export class ElementConstructor<
 
   #setAttribute(
     name: string,
-    value: string | boolean | number | null | undefined
+    value: string | boolean | number | null | undefined,
   ) {
     const element = this.#node as HTMLElement
 
@@ -610,7 +610,7 @@ export class ElementConstructor<
               new CustomEvent('beforeChildrenChange', {
                 bubbles: true,
                 composed: true,
-              })
+              }),
             )
 
             const currentNodes = Array.from(rootElement.childNodes)
@@ -667,9 +667,9 @@ export class ElementConstructor<
               new CustomEvent('afterChildrenChange', {
                 bubbles: true,
                 composed: true,
-              })
+              }),
             )
-          })
+          }),
         )
       } else if (child instanceof ElementConstructor) {
         this.#appendChild(root, child.node)

@@ -1,89 +1,47 @@
-import { Store } from '@packages/store'
-import {
-  useDerivedArrayStore,
-  useDerivedStore,
-  useRef,
-  useStore,
-} from '../hooks'
+import { useStylesheet } from '..'
+import { useComponent } from '../hooks/component/lifecycle'
+import { useResourceStore } from '../hooks/store'
 
-interface ItemProps {
-  completed?: boolean
-  name: string
-}
-
-const store = useStore<Array<ItemProps>>([])
-
-export const Item: JSX.Component<ItemProps> = (props) => {
-  return (
-    <component>
-      <div>{props.name}</div>
-      <button
-        onClick={() => {
-          store.current = store.current.filter((v) => v.name !== props.name)
-        }}
-      >
-        complete
-        {store}
-      </button>
-    </component>
-  )
-}
-
-export const List: JSX.Component = (props) => {
-  const derivedStore = useDerivedArrayStore(store, (v) => {
-    return <Item {...v}></Item>
-  })
-
-  return <component>{derivedStore}</component>
-}
-
-export const Form: JSX.Component = (props) => {
-  const color = new Store('')
-  const ref = useRef<HTMLInputElement>()
-
-  addEventListener('keydown', (e) => {
-    if (e.key === '1') {
-      color.current = 'red'
-    } else if (e.key === '2') {
-      color.current = 'blue'
-    }
+const Item: JSX.Component = (props) => {
+  useComponent((e) => {
+    console.log(e)
   })
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault()
-
-        if (
-          !store.current.find((v) => {
-            return v.name === ref.current!.value
-          })
-        ) {
-          store.current = [
-            ...store.current,
-            {
-              name: ref.current!.value,
-              completed: false,
-            },
-          ]
-        }
+    <div
+      onClick={() => {
+        console.log('A')
       }}
     >
-      <div style={{ color: color }}>TITLE</div>
-      <input
-        ref={ref}
-        type="text"
-      />
-      <button>Add</button>
-    </form>
+      DIVVIVIVVIVIV
+    </div>
   )
 }
 
+Item.template = true
+
 export const App: JSX.Component = (props) => {
+  useStylesheet({
+    div: {
+      display: 'block',
+      color: 'red',
+    },
+  })
+
+  const resource = useResourceStore('fetching....', async () => {
+    await new Promise<void>((res) => {
+      setTimeout(() => {
+        res()
+      }, 1000)
+    })
+
+    return 'fetched'
+  })
+
   return (
     <component>
-      <Form></Form>
-      <List></List>
+      {resource}
+      <Item></Item>
     </component>
   )
 }

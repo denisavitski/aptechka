@@ -1,6 +1,6 @@
 import { Notifier } from '@packages/notifier'
-import { storeRegistry } from './StoreRegistry'
 import { generateId } from '@packages/utils'
+import { storeRegistry } from './StoreRegistry'
 
 export interface StoreState<StoreType> {
   current: StoreType
@@ -9,12 +9,12 @@ export interface StoreState<StoreType> {
 }
 
 export type StoreSubscribeCallback<StoreType> = (
-  state: StoreState<StoreType>
+  state: StoreState<StoreType>,
 ) => void
 
 export type StoreEqualityCheckCallback<StoreType> = (
   currentValue: StoreType,
-  newValue: StoreType
+  newValue: StoreType,
 ) => boolean
 
 export type StoreMiddleware<T> = (value: T) => T
@@ -138,7 +138,7 @@ export class Store<StoreType = unknown> {
 
   public subscribe(
     callback: StoreSubscribeCallback<StoreType>,
-    order?: number
+    order?: number,
   ) {
     if (!this.#invisible && !this.#notifier.size) {
       shareStore(this)

@@ -47,6 +47,7 @@ export class Connector {
     if (!l) {
       ticker.subscribe(this.#animationFrameListener, {
         order: TICK_ORDER.CONNECTOR,
+        maxFPS: 2,
       })
     }
 
