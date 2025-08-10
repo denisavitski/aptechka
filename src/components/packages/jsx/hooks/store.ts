@@ -1,4 +1,11 @@
-import { Derived, DerivedArray, Resource, Store } from '@packages/store'
+import {
+  Composed,
+  Derived,
+  DerivedArray,
+  Resource,
+  Store,
+} from '@packages/store'
+import { DerivedKeyedArray } from '@packages/store/DerivedArray'
 import { activeComponent } from '../ComponentElement'
 
 export function useStore<StoreType = unknown>(
@@ -43,10 +50,40 @@ export function useDerivedArrayStore<Type, SourceType extends Array<any>>(
   return store
 }
 
+export function useDerivedKeyedArrayStore<Type, SourceType extends Array<any>>(
+  ...parameters: ConstructorParameters<
+    typeof DerivedKeyedArray<Type, SourceType>
+  >
+) {
+  const store = new DerivedKeyedArray<Type, SourceType>(...parameters)
+
+  if (activeComponent.current) {
+    activeComponent.current.addDisconnectCallback(() => {
+      store.close()
+    })
+  }
+
+  return store
+}
+
 export function useResourceStore<Type>(
   ...parameters: ConstructorParameters<typeof Resource<Type>>
 ) {
   const store = new Resource<Type>(...parameters)
+
+  if (activeComponent.current) {
+    activeComponent.current.addDisconnectCallback(() => {
+      store.close()
+    })
+  }
+
+  return store
+}
+
+export function useComposedStore<Type>(
+  ...parameters: ConstructorParameters<typeof Composed<Type>>
+) {
+  const store = new Composed<Type>(...parameters)
 
   if (activeComponent.current) {
     activeComponent.current.addDisconnectCallback(() => {

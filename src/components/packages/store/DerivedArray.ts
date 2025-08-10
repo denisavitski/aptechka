@@ -49,3 +49,60 @@ export class DerivedArray<Type, SourceType extends Array<any>> extends Store<
     this.#unsubscriber()
   }
 }
+
+export class DerivedKeyedArray<
+  Type,
+  SourceType extends Array<{ key: string } & object>,
+> extends Store<Array<Type>> {
+  #unsubscriber: Function
+  #revalidateAll?: boolean
+
+  constructor(
+    store: Store<SourceType>,
+    callback: DerivedArrayCallback<Type, SourceType>,
+    options?: DerivedArrayOptions<Type>,
+  ) {
+    super(null!, options)
+
+    this.#revalidateAll = !!options?.revalidateAll
+
+    this.#unsubscriber = store.subscribe((e) => {
+      this.current = e.current.map((item, i, arr) => {
+        if (!this.#revalidateAll) {
+          const same = e.previous?.find(
+            (previous) =>
+              previous.key === item.key &&
+              JSON.stringify(previous) === JSON.stringify(item),
+          )
+
+          if (same) {
+            const founded = this.current.find(
+              (current) =>
+                typeof current === 'object' &&
+                current &&
+                '__key' in current &&
+                current.__key === same.key,
+            )
+
+            if (founded) {
+              return founded
+            }
+          }
+        }
+
+        const callbackResult = callback(item, i, arr as SourceType)
+
+        if (callbackResult && typeof callbackResult === 'object') {
+          ;(callbackResult as any).__key = item.key
+        }
+
+        return callbackResult
+      })
+    })
+  }
+
+  public override close() {
+    super.close()
+    this.#unsubscriber()
+  }
+}

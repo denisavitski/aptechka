@@ -18,7 +18,7 @@ export function setStyleAttribute(
     Object.entries(value).forEach(([key, value]) => {
       if (value instanceof Store) {
         subscribeToStore(element, value, (e) => {
-          element.style[key as any] = e.current.toString()
+          element.style[key as any] = e.current?.toString()
         })
       } else if (
         typeof value === 'number' ||

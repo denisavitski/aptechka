@@ -1,49 +1,26 @@
-import { ChangeHistoryAction } from '@packages/utils'
+import { ChangeHistoryAction, SplitPathResult } from '@packages/utils'
 import { Router } from './Router'
 
 export class Link {
   #router: Router
-  #element: HTMLElement
-  #pathname: string
-  #historyAction: ChangeHistoryAction
-  #matchPaths: Array<string> | undefined
+  #element: HTMLAnchorElement
 
-  constructor(router: Router, element: HTMLElement) {
+  constructor(router: Router, element: HTMLAnchorElement) {
     this.#router = router
     this.#element = element
 
-    this.#pathname = this.#element.getAttribute('href') || '/'
-
-    this.#historyAction =
-      (this.#element.getAttribute(
-        'data-history-action'
-      ) as ChangeHistoryAction) || 'push'
-
     this.#element.addEventListener('click', this.#clickListener)
+  }
 
-    const p1 = router.normalizePath(this.#pathname)
-    const p2 = router.normalizePath(location.pathname)
+  public checkCurrent(url: SplitPathResult) {}
 
-    this.#matchPaths = this.#element
-      .getAttribute('data-match-paths')
-      ?.split(',')
-      .map((v) => router.normalizePath(v.trim()).pathname)
+  get #path() {
+    const url = new URL(this.#element.href)
+    const normalizedURL = this.#router.normalizePath(
+      url.pathname + url.search + url.hash,
+    )
 
-    if (this.#element.hasAttribute('data-include')) {
-      if (p2.pathname.includes(p1.pathname)) {
-        this.#element.classList.add('current')
-      }
-    } else {
-      if (
-        p1.pathname === p2.pathname ||
-        this.#matchPaths?.includes(p2.pathname)
-      ) {
-        this.#element.classList.add('current')
-        this.#element.classList.add('clicked')
-      } else {
-        this.#element.classList.remove('clicked')
-      }
-    }
+    return normalizedURL.path
   }
 
   public destroy() {
@@ -54,17 +31,15 @@ export class Link {
   #clickListener = (e: Event) => {
     e.preventDefault()
 
-    this.#router.links.forEach((link) => {
-      if (
-        this.#pathname === link.#pathname ||
-        link.#matchPaths?.includes(this.#pathname)
-      ) {
-        link.#element.classList.add('clicked')
-      } else {
-        link.#element.classList.remove('clicked')
-      }
-    })
+    const path = this.#path
 
-    this.#router.navigate(this.#pathname, this.#historyAction)
+    const historyAction =
+      (this.#element.getAttribute(
+        'data-history-action',
+      ) as ChangeHistoryAction) || 'push'
+
+    this.#router.navigate(path, {
+      historyAction,
+    })
   }
 }

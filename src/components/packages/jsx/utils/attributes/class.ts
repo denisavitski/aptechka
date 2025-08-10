@@ -52,6 +52,11 @@ export function setClassAttribute(element: Element, classes: ClassListInput) {
       }
     })
   } else {
-    element.classList.add(classes.toString())
+    classes
+      .toString()
+      .split(' ')
+      .map((v) => {
+        return element.classList.add(v.trim())
+      })
   }
 }

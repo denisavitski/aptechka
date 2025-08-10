@@ -1,6 +1,6 @@
 export function findParentElement<T extends CustomElementConstructor>(
   element: Element | null,
-  Constructor: T
+  Constructor: T,
 ): InstanceType<T> | null {
   if (!element) {
     return null
@@ -19,7 +19,7 @@ export type ElementOrSelector<T extends Element = Element> = string | T
 
 export function getElement<T extends Element>(
   elementOrSelector: ElementOrSelector<T> | undefined,
-  from = document
+  from = document,
 ) {
   return typeof elementOrSelector === 'string'
     ? from.querySelector<T>(elementOrSelector)
@@ -28,7 +28,7 @@ export function getElement<T extends Element>(
 
 export function findScrollParentElement(
   node: Node | null,
-  _initial: Node | null = null
+  _initial: Node | null = null,
 ): HTMLElement {
   _initial = _initial || node
 
@@ -64,14 +64,14 @@ export function getAllParentElements(node: Node) {
         }
       })
     },
-    { once: true }
+    { once: true },
   )
 
   node.dispatchEvent(
     new CustomEvent('__illuminate-tree', {
       bubbles: true,
       composed: true,
-    })
+    }),
   )
 
   return allParentNodes
@@ -83,4 +83,36 @@ export function traverseNodes(node: Node, callback: (node: Node) => void) {
   node.childNodes.forEach((child) => {
     traverseNodes(child, callback)
   })
+}
+
+export function traverseShadowRoots(
+  root: Element,
+  callback: (element: Element) => void,
+  includeShadowRoots: boolean = true,
+): void {
+  // Check if the current element has a shadow root
+  if (root.shadowRoot) {
+    callback(root)
+
+    if (includeShadowRoots) {
+      // Traverse the shadow DOM if enabled
+      traverseElements(root.shadowRoot, callback, includeShadowRoots)
+    }
+  }
+
+  // Traverse light DOM children
+  traverseElements(root, callback, includeShadowRoots)
+}
+
+function traverseElements(
+  root: Element | ShadowRoot,
+  callback: (element: Element) => void,
+  includeShadowRoots: boolean,
+): void {
+  const children =
+    root.children || (root instanceof ShadowRoot ? root.children : [])
+
+  for (const element of Array.from(children)) {
+    traverseShadowRoots(element, callback, includeShadowRoots)
+  }
 }

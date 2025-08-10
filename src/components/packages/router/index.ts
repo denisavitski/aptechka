@@ -1,14 +1,10 @@
 export {
   Router,
-  type RouterPreprocessorEntry,
-  type RouterPreprocessor,
-  type RouterPostprocessor,
   type RouterAfterNavigationCallback,
   type RouterParameters,
+  type RouterPostprocessor,
+  type RouterPreprocessor,
+  type RouterPreprocessorEntry,
 } from './Router'
 
-export {
-  type RouteModule,
-  type RouteParameters,
-  type RouteURLParams,
-} from './Route'
+export { type RouteModule, type RouteParameters } from './Route'

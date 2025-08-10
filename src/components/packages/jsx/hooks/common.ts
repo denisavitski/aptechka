@@ -1,5 +1,5 @@
 export function useRef<T>() {
-  const ref: { current: T | null } = { current: null }
+  const ref: JSX.Ref<T> = { value: null! }
 
   return ref
 }

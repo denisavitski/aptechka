@@ -4,13 +4,16 @@ import { ClassListInput, setClassAttribute } from './class'
 import { setStyleAttribute } from './style'
 
 export function setAttribute(element: Element, key: string, value: unknown) {
-  if (
-    key === 'ref' &&
-    value &&
-    typeof value === 'object' &&
-    'current' in value
-  ) {
-    value.current = element
+  if (key === 'ref' && value) {
+    if (Array.isArray(value)) {
+      value.forEach((v) => {
+        if (typeof v === 'object' && 'value' in v) {
+          v.value = element
+        }
+      })
+    } else if (typeof value === 'object' && 'value' in value) {
+      value.value = element
+    }
   } else if (key === 'className' || key === 'class') {
     setClassAttribute(element, value as ClassListInput)
   } else if (key === 'style') {
@@ -35,7 +38,11 @@ export function setAttribute(element: Element, key: string, value: unknown) {
     }
   } else if (value instanceof Store) {
     subscribeToStore(element, value, (e) => {
-      setAttribute(element, key, e.current)
+      if (key in element) {
+        ;(element as any)[key] = e.current
+      } else {
+        setAttribute(element, key, e.current)
+      }
     })
   }
 }

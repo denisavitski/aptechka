@@ -18,7 +18,7 @@ declare global {
 
     type Fragment = any
 
-    type StoreOr<T> = T | Store<T | null | undefined>
+    type StoreOr<T> = T | Store<any>
 
     type Ref<T = unknown> = { value: T }
 
@@ -84,7 +84,7 @@ declare global {
       disabled?: StoreOr<boolean>
       disableRemotePlayback?: StoreOr<boolean>
       download?: StoreOr<string>
-      draggable?: StoreOr<boolean>
+      draggable?: StoreOr<'false' | true>
       encType?: StoreOr<string>
       form?: StoreOr<string>
       formAction?: StoreOr<string>
@@ -172,8 +172,8 @@ declare global {
       type?: StoreOr<string>
       useMap?: StoreOr<string>
       value?: StoreOr<string | string[] | number>
-      volume?: StoreOr<string | number>
-      width?: StoreOr<number | string>
+      volume?: StoreOr<number>
+      width?: StoreOr<number>
       wmode?: StoreOr<string>
       wrap?: StoreOr<string>
 
@@ -192,7 +192,8 @@ declare global {
       itemID?: StoreOr<string>
       itemRef?: StoreOr<string>
 
-      ref?: { current: any }
+      ref?: Ref<any> | Array<Ref<any>>
+      key?: string
     }
 
     type UnknownAttributes = { [key: string]: any }
@@ -205,6 +206,8 @@ declare global {
     type TagNameMap =
       | 'component'
       | 'shadow'
+      | 'nest'
+      | `${string}-${string}`
       | keyof HTMLElementTagNameMap
       | keyof SVGElementTagNameMap
 
@@ -217,5 +220,6 @@ declare global {
 
   interface Node {
     __storeId: string
+    __key: string
   }
 }

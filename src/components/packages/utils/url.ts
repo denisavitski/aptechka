@@ -4,9 +4,17 @@ export interface SplitPathOptions {
   mergeParams?: string
 }
 
+export interface SplitPathResult {
+  leaf: string
+  pathname: string
+  parameters: string
+  hash: string
+  path: string
+}
+
 export function splitPath(
   value: string,
-  { base = '', trailingSlash = false, mergeParams }: SplitPathOptions = {}
+  { base = '', trailingSlash = false, mergeParams }: SplitPathOptions = {},
 ) {
   base = base.endsWith('/') ? base.slice(0, -1) : base
 
@@ -48,13 +56,15 @@ export function splitPath(
     hash ? '#' + hash : ''
   }`
 
-  return {
+  const result: SplitPathResult = {
     leaf,
     pathname,
     parameters,
     hash,
     path,
   }
+
+  return result
 }
 
 export function normalizeBase(base: string = '/') {
@@ -113,7 +123,7 @@ export function parseSearchParameters(search: string) {
 
 export function updateSearchParameter(
   parameterName: string,
-  value?: string | number
+  value?: string | number,
 ) {
   const url = new URL(location.href)
 

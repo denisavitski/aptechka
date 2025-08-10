@@ -14,21 +14,29 @@ class ComponentProps {
   ) {}
 }
 
-export function appendChildren(element: Element, ...children: JSX.Children) {
+export function appendChildren(
+  element: Element,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
   const filteredChildren = filterChildren(children)
+
+  setAttributes(element, attributes)
 
   filteredChildren.forEach((child) => {
     if (child instanceof Store) {
-      subscribeToStore(element, child, (e) => {
-        storeChildren(element, child.id, e.current)
+      subscribeToStore(element, child, () => {
+        storeChildren(element, child)
       })
     } else if (child instanceof ComponentProps) {
-      setAttributes(element, child.attributes)
-
       if (child.tag === 'shadow' && element.shadowRoot) {
-        appendChildren(element.shadowRoot as any, ...child.children)
+        appendChildren(
+          element.shadowRoot as any,
+          child.attributes,
+          child.children,
+        )
       } else {
-        appendChildren(element, ...child.children)
+        appendChildren(element, child.attributes, child.children)
       }
     } else {
       element.append(child)
@@ -48,10 +56,7 @@ export function h(
       return new ComponentProps(jsxTag, attributes, children)
     } else {
       const element: HTMLElement = document.createElement(jsxTag)
-
-      appendChildren(element, ...children)
-      setAttributes(element, attributes)
-
+      appendChildren(element, attributes, children)
       return element
     }
   } else {
@@ -92,7 +97,11 @@ export function h(
 
     const res = jsxTag(props)
 
-    appendChildren(element, ...res.children)
+    if (res instanceof ComponentProps) {
+      if (res?.children || res.attributes) {
+        appendChildren(element, res.attributes, res.children)
+      }
+    }
 
     return element
   }
@@ -100,7 +109,7 @@ export function h(
 
 export function Fragment(children: any) {
   const fragment = document.createDocumentFragment()
-  appendChildren(fragment as any, ...children)
+  appendChildren(fragment as any, undefined, children)
 
   return fragment
 }

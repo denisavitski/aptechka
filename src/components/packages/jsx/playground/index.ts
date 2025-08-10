@@ -1,4 +1,10 @@
-import { render } from '../render.tsx'
-import { App } from './index.tsx'
+// const router = new Router({
+//   base: '/components/packages/jsx/playground',
+// })
 
-render(App, document.body)
+// router.defineRoute('*', () => import('./routes/Layout.tsx'))
+// router.defineRoute('/', () => import('./routes/Home.tsx'))
+// router.defineRoute('/about*', () => import('./routes/About.tsx'))
+// router.defineRoute('/about/company', () => import('./routes/Company.tsx'))
+
+// router.run()
