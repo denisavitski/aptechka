@@ -15,5 +15,12 @@ export {
   type UseStylesheetNestedObject,
   type UseStylesheetSource,
 } from './hooks/component/useStylesheet'
-export { useDerivedArrayStore, useDerivedStore, useStore } from './hooks/store'
+export {
+  useComposedStore,
+  useDerivedArrayStore,
+  useDerivedKeyedArrayStore,
+  useDerivedStore,
+  useResourceStore,
+  useStore,
+} from './hooks/store'
 export { render } from './render'

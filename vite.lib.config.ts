@@ -48,6 +48,7 @@ export function libConfig() {
           'image/index': './src/components/packages/image/index.ts',
           'iframe/index': './src/components/packages/iframe/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
+          'jsx/index': './src/components/packages/jsx/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',

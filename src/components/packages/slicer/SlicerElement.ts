@@ -1,7 +1,7 @@
-import { Word } from './Word'
-import { Letter } from './Letter'
 import { Media } from '@packages/media'
 import { isBrowser } from '@packages/utils'
+import { Letter } from './Letter'
+import { Word } from './Word'
 
 export class SlicerElement extends HTMLElement {
   #originalHTML = ''
@@ -23,8 +23,11 @@ export class SlicerElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    if (this.classList.contains('splitted')) {
+      return
+    }
+
     this.#originalHTML = this.innerHTML.trim()
-    console.log(this.#originalHTML)
 
     if (this.hasAttribute('media')) {
       this.#media = new Media(this.getAttribute('media')!)
@@ -39,6 +42,8 @@ export class SlicerElement extends HTMLElement {
     } else {
       this.#split()
     }
+
+    this.classList.add('splitted')
   }
 
   protected disconnectedCallback() {
@@ -61,7 +66,7 @@ export class SlicerElement extends HTMLElement {
       text
         .replace(
           /[\s\u00A0\u1680\u2000-\u200F\u2028\u2029\u202F\u205F\u3000\uFEFF]+/g,
-          ' '
+          ' ',
         )
         .split(' ')
         .forEach((wordText, i, arr) => {
@@ -134,7 +139,7 @@ export class SlicerElement extends HTMLElement {
       this.#letters.forEach((letter) => {
         letter.element.style.setProperty(
           '--letter-index',
-          letter.index.toString()
+          letter.index.toString(),
         )
       })
     }
