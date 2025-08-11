@@ -20,7 +20,7 @@ export class ElementResizer {
 
   public subscribe(
     elementOrSelector: ElementOrSelector,
-    callback: ElementResizerCallback
+    callback: ElementResizerCallback,
   ) {
     const element = getElement(elementOrSelector)
 
@@ -29,14 +29,14 @@ export class ElementResizer {
     }
 
     const alreadyObserved = this.#subscribers.find(
-      (sub) => sub.element === element
+      (sub) => sub.element === element,
     )
 
     if (!alreadyObserved) {
       this.#resizeObserver.observe(element)
     } else {
       const alreadyResized = this.#subscribers.find(
-        (s) => s.element === element && s.entry
+        (s) => s.element === element && s.entry,
       )
 
       if (alreadyResized?.element.isConnected) {
@@ -57,12 +57,12 @@ export class ElementResizer {
 
   public unsubscribe(callback: ElementResizerCallback) {
     const subscriber = this.#subscribers.find(
-      (sub) => sub.callback === callback
+      (sub) => sub.callback === callback,
     )
 
     if (subscriber) {
       this.#subscribers = this.#subscribers.filter(
-        (sub) => sub.callback !== subscriber.callback
+        (sub) => sub.callback !== subscriber.callback,
       )
 
       if (

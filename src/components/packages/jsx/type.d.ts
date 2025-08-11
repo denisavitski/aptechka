@@ -164,7 +164,7 @@ declare global {
       srcSet?: StoreOr<string>
       start?: StoreOr<number>
       step?: StoreOr<number | string>
-      style?: StyleAttribute
+      style?: StyleAttribute | string
       summary?: StoreOr<string>
       tabIndex?: StoreOr<number>
       target?: StoreOr<string>
@@ -173,7 +173,7 @@ declare global {
       useMap?: StoreOr<string>
       value?: StoreOr<string | string[] | number>
       volume?: StoreOr<number>
-      width?: StoreOr<number>
+      width?: StoreOr<number | string>
       wmode?: StoreOr<string>
       wrap?: StoreOr<string>
 

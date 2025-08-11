@@ -38,7 +38,7 @@ class TickerSubscriber {
 
       if (element) {
         this.#intersectionObserver = new IntersectionObserver(
-          this.#intersectionListener
+          this.#intersectionListener,
         )
 
         this.#intersectionObserver.observe(element)
@@ -119,7 +119,7 @@ export class Ticker {
     if (isBrowser) {
       document.addEventListener(
         'visibilitychange',
-        this.#documentVisibilityChangeListener
+        this.#documentVisibilityChangeListener,
       )
     }
   }
@@ -139,14 +139,14 @@ export class Ticker {
 
   public unsubscribe(callback: TickerCallback) {
     const matches = this.#subscribers.filter(
-      (subscriber) => subscriber.callback === callback
+      (subscriber) => subscriber.callback === callback,
     )
 
     if (matches.length) {
       matches.forEach((m) => m.destroy())
 
       this.#subscribers = this.#subscribers.filter(
-        (subscriber) => subscriber.callback !== callback
+        (subscriber) => subscriber.callback !== callback,
       )
 
       if (!this.#subscribers.length) {
@@ -160,7 +160,7 @@ export class Ticker {
       this.#cancelAnimationFrame()
       document.removeEventListener(
         'visibilitychange',
-        this.#documentVisibilityChangeListener
+        this.#documentVisibilityChangeListener,
       )
     }
   }

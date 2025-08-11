@@ -1,10 +1,12 @@
-// const router = new Router({
-//   base: '/components/packages/jsx/playground',
-// })
+import { Router } from '@packages/router/Router.ts'
 
-// router.defineRoute('*', () => import('./routes/Layout.tsx'))
-// router.defineRoute('/', () => import('./routes/Home.tsx'))
-// router.defineRoute('/about*', () => import('./routes/About.tsx'))
-// router.defineRoute('/about/company', () => import('./routes/Company.tsx'))
+const router = new Router({
+  base: '/components/packages/jsx/playground',
+})
 
-// router.run()
+router.defineRoute('*', () => import('./routes/Layout.tsx'))
+router.defineRoute('/', () => import('./routes/Home.tsx'))
+router.defineRoute('/about*', () => import('./routes/About.tsx'))
+router.defineRoute('/about/company', () => import('./routes/Company.tsx'))
+
+router.run()

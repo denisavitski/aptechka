@@ -14,10 +14,19 @@ class ComponentProps {
   ) {}
 }
 
+class ElementProps {
+  constructor(
+    public tag: string,
+    public attributes: JSX.Attributes | undefined,
+    public children: JSX.Children,
+  ) {}
+}
+
 export function appendChildren(
   element: Element,
   attributes: JSX.Attributes | undefined,
   children: JSX.Children,
+  isSVG = false,
 ) {
   const filteredChildren = filterChildren(children)
 
@@ -38,6 +47,23 @@ export function appendChildren(
       } else {
         appendChildren(element, child.attributes, child.children)
       }
+    } else if (child instanceof ElementProps) {
+      let childElement: Element = null!
+
+      if (child.tag === 'svg') {
+        childElement = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'svg',
+        )
+        appendChildren(childElement, child.attributes, child.children, true)
+      } else {
+        childElement = isSVG
+          ? document.createElementNS('http://www.w3.org/2000/svg', child.tag)
+          : document.createElement(child.tag)
+      }
+
+      appendChildren(childElement, child.attributes, child.children, isSVG)
+      element.append(childElement)
     } else {
       element.append(child)
     }
@@ -55,9 +81,7 @@ export function h(
     } else if (jsxTag === 'shadow') {
       return new ComponentProps(jsxTag, attributes, children)
     } else {
-      const element: HTMLElement = document.createElement(jsxTag)
-      appendChildren(element, attributes, children)
-      return element
+      return new ElementProps(jsxTag, attributes, children)
     }
   } else {
     if (jsxTag === Fragment) {

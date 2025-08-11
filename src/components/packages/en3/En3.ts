@@ -1,11 +1,9 @@
-import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
-import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
-
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer'
 import { ticker, TickerCallback } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
-
+import { windowResizer } from '@packages/window-resizer'
+import { REVISION, WebGLRenderer, WebGLRendererParameters } from 'three'
+import type { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { En3View, En3ViewOptions } from './En3View'
 
 export interface En3Options {
@@ -112,7 +110,7 @@ export class En3 {
       new En3View(this, 'default', {
         sizeElement: this.#containerElement,
         ...options?.view,
-      })
+      }),
     )
 
     if (options?.composer) {
@@ -207,7 +205,7 @@ export class En3 {
         left,
         top,
         view.box.width,
-        view.box.height
+        view.box.height,
       )
     }
 

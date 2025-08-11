@@ -66,7 +66,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
           'state-1',
           'state-2',
           'state-3',
-          'state-4'
+          'state-4',
         )
       }
     })
@@ -94,7 +94,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     if (url) {
       if (this.hasAttribute('volume')) {
         this.consumerElement.volume = parseFloat(
-          this.getAttribute('volume') || '1'
+          this.getAttribute('volume') || '1',
         )
       }
     }
