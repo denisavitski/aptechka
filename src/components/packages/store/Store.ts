@@ -112,7 +112,7 @@ export class Store<StoreType = unknown> {
     }
   }
 
-  public set(value: StoreType) {
+  public setCurrent(value: StoreType) {
     this.current = value
   }
 

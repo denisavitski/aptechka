@@ -1,4 +1,4 @@
-import { render } from '@packages/jsx'
+import { render } from '@packages/jsx/render'
 import { isESClass, traverseShadowRoots } from '@packages/utils'
 
 export type RouteModule = () => Promise<{ default?: RouteComponent }>
