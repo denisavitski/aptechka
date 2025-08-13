@@ -1,12 +1,10 @@
 import {
   ChangeHistoryAction,
   ElementOrSelector,
-  SplitPathOptions,
   changeHistory,
   dispatchEvent,
   isBrowser,
   normalizeBase,
-  requestIdleCallback,
   scrollToElement,
   splitPath,
   wait,
@@ -17,8 +15,8 @@ import { MorphLink } from './MorphLink'
 
 import { MorphAnnouncer } from './MorphAnnouncer'
 
-import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 import { MorphParamsDependent } from './MorphParamsDependent'
+import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 
 export interface MorphOptions {
   base: string
@@ -139,7 +137,7 @@ export class Morph {
       this.#morphElements = this.#getMorphElements(document.body)
 
       const normalizedURL = this.normalizePath(
-        location.pathname + location.search + location.hash
+        location.pathname + location.search + location.hash,
       )
 
       this.#currentURL = normalizedURL
@@ -151,12 +149,12 @@ export class Morph {
 
       document.documentElement.setAttribute(
         'data-current-pathname',
-        this.#currentURL.pathname
+        this.#currentURL.pathname,
       )
 
       document.documentElement.setAttribute(
         'data-current-leaf',
-        normalizedURL.leaf
+        normalizedURL.leaf,
       )
 
       this.findLinks()
@@ -214,6 +212,10 @@ export class Morph {
     return { top, left }
   }
 
+  public get isNavigating() {
+    return !!this.#promises.length
+  }
+
   public saveState(state: any) {
     const route = this.#routes.get(this.#currentURL.path)
 
@@ -229,7 +231,7 @@ export class Morph {
 
   public normalizePath(
     path: string,
-    options?: Pick<MorphNavigateOptions, 'mergeParams'>
+    options?: Pick<MorphNavigateOptions, 'mergeParams'>,
   ) {
     return splitPath(path, {
       base: this.#options.base,
@@ -275,7 +277,7 @@ export class Morph {
       clearState,
       keepScrollPosition,
       mergeParams,
-    }: MorphNavigateOptions = {}
+    }: MorphNavigateOptions = {},
   ) {
     if (this.#promises.length) {
       return
@@ -462,23 +464,23 @@ export class Morph {
 
       const identicalHeadChildren = this.#intersectElements(
         currentHeadChildren,
-        newHeadChildren
+        newHeadChildren,
       )
 
       const removeHeadChildren = this.#excludeElements(
         currentHeadChildren,
-        identicalHeadChildren
+        identicalHeadChildren,
       )
 
       const addHeadChildren = this.#excludeElements(
         newHeadChildren,
-        identicalHeadChildren
+        identicalHeadChildren,
       ).filter((child) => !this.excludeHeadChild(child))
 
       addHeadChildren.forEach((child, index) => {
         if (child.tagName === 'SCRIPT') {
           addHeadChildren[index] = this.#createScript(
-            child as HTMLScriptElement
+            child as HTMLScriptElement,
           )
         }
       })
@@ -530,7 +532,7 @@ export class Morph {
       }
 
       const newMorphElements = this.#getMorphElements(
-        nextRoute.document.body as HTMLElement
+        nextRoute.document.body as HTMLElement,
       )
 
       if (!this.#options.morphInsideScrollContainer && !submorph) {
@@ -539,11 +541,11 @@ export class Morph {
 
       document.documentElement.setAttribute(
         'data-current-pathname',
-        normalizedURL.pathname
+        normalizedURL.pathname,
       )
       document.documentElement.setAttribute(
         'data-current-leaf',
-        normalizedURL.leaf
+        normalizedURL.leaf,
       )
 
       changeHistory({
@@ -605,7 +607,7 @@ export class Morph {
               element.classList.add('old')
 
               const transferElements = element.querySelectorAll<HTMLElement>(
-                '[data-morph-transfer]'
+                '[data-morph-transfer]',
               )
 
               transferElements.forEach((el) => {
@@ -627,7 +629,7 @@ export class Morph {
 
               if (nestlement) {
                 nestlement.replaceWith(
-                  nextRoute.document.importNode(item.element, true)
+                  nextRoute.document.importNode(item.element, true),
                 )
               }
             })
@@ -644,7 +646,7 @@ export class Morph {
             newMorphElementChildNodes.forEach((el, i) => {
               currentMorphElementChildNodes[i].parentElement?.insertBefore(
                 el,
-                currentMorphElementChildNodes[i]
+                currentMorphElementChildNodes[i],
               )
             })
           } else {
@@ -669,7 +671,7 @@ export class Morph {
             if (element instanceof HTMLElement) {
               element.parentElement?.style.setProperty(
                 '--new-content-height',
-                element.offsetHeight + 'px'
+                element.offsetHeight + 'px',
               )
               element.classList.add('new-idle')
             }
@@ -686,30 +688,33 @@ export class Morph {
         })
 
         const promise = new Promise<void>((res) => {
-          setTimeout(() => {
-            if (!submorphAppend) {
-              currentMorphElementChildNodes.forEach((el) => {
-                el.remove()
-              })
-            }
-
-            newMorphElementChildNodes.forEach((element) => {
-              if (element instanceof HTMLElement) {
-                element.parentElement?.style.removeProperty(
-                  '--new-content-height'
-                )
-                element.classList.remove('new-idle', 'new')
+          setTimeout(
+            () => {
+              if (!submorphAppend) {
+                currentMorphElementChildNodes.forEach((el) => {
+                  el.remove()
+                })
               }
-            })
 
-            if (!submorphAppend) {
-              dispatchEvent(document, 'morphOldChildrenRemoved', {
-                detail,
+              newMorphElementChildNodes.forEach((element) => {
+                if (element instanceof HTMLElement) {
+                  element.parentElement?.style.removeProperty(
+                    '--new-content-height',
+                  )
+                  element.classList.remove('new-idle', 'new')
+                }
               })
-            }
 
-            res()
-          }, (parseFloat(duration) || 0) * 1000 + 10)
+              if (!submorphAppend) {
+                dispatchEvent(document, 'morphOldChildrenRemoved', {
+                  detail,
+                })
+              }
+
+              res()
+            },
+            (parseFloat(duration) || 0) * 1000 + 10,
+          )
         })
 
         this.#promises.push(promise)
@@ -718,12 +723,12 @@ export class Morph {
       if (this.isPopstateNavigation) {
         document.documentElement.style.setProperty(
           '--new-document-scroll-position',
-          (this.scrollValue.top - nextRoute.scrollState.y) * 1 + 'px'
+          (this.scrollValue.top - nextRoute.scrollState.y) * 1 + 'px',
         )
       } else {
         document.documentElement.style.setProperty(
           '--new-document-scroll-position',
-          this.scrollValue.top + 'px'
+          this.scrollValue.top + 'px',
         )
       }
 
@@ -772,7 +777,7 @@ export class Morph {
       })
 
       document.documentElement.style.removeProperty(
-        '--new-document-scroll-position'
+        '--new-document-scroll-position',
       )
 
       window.dispatchEvent(new Event('resize'))
@@ -817,11 +822,11 @@ export class Morph {
 
   public findNewLinks(morphElement: HTMLElement) {
     const linkElements = [...morphElement.querySelectorAll('a')].filter(
-      this.#checkLink
+      this.#checkLink,
     )
 
     this.#links.push(
-      ...linkElements.map((element) => new MorphLink(element, this))
+      ...linkElements.map((element) => new MorphLink(element, this)),
     )
   }
 
@@ -838,14 +843,14 @@ export class Morph {
   public findParamsDependent() {
     const elements = [
       ...document.documentElement.querySelectorAll<HTMLElement>(
-        '[data-morph-params-dependent]'
+        '[data-morph-params-dependent]',
       ),
     ]
 
     this.#paramDependent.forEach((link) => link.destroy())
 
     this.#paramDependent = elements.map(
-      (element) => new MorphParamsDependent(element)
+      (element) => new MorphParamsDependent(element),
     )
   }
 
@@ -896,25 +901,26 @@ export class Morph {
 
   #intersectElements(
     elements: Array<Element>,
-    elementsToIntersect: Array<Element>
+    elementsToIntersect: Array<Element>,
   ) {
     return elements.filter((element) =>
       elementsToIntersect.find(
         (elementToIntersect) =>
-          elementToIntersect.outerHTML === element.outerHTML
-      )
+          elementToIntersect.outerHTML === element.outerHTML,
+      ),
     )
   }
 
   #excludeElements(
     elements: Array<Element>,
-    elementsToExclude: Array<Element>
+    elementsToExclude: Array<Element>,
   ) {
     return elements.filter(
       (element) =>
         !elementsToExclude.find(
-          (elementToExclude) => elementToExclude.outerHTML === element.outerHTML
-        )
+          (elementToExclude) =>
+            elementToExclude.outerHTML === element.outerHTML,
+        ),
     )
   }
 
@@ -930,7 +936,7 @@ export class Morph {
   #updateCurrentScrollElement(document: Document) {
     this.#currentScrollElement?.removeEventListener(
       'scroll',
-      this.#scrollListener
+      this.#scrollListener,
     )
 
     this.#currentScrollY = 0
@@ -990,20 +996,20 @@ export class Morph {
 
     document.documentElement.classList.toggle(
       'scroll-y-forward',
-      directionY > 0
+      directionY > 0,
     )
     document.documentElement.classList.toggle(
       'scroll-y-backward',
-      directionY < 0
+      directionY < 0,
     )
 
     document.documentElement.classList.toggle(
       'scroll-x-forward',
-      directionX > 0
+      directionX > 0,
     )
     document.documentElement.classList.toggle(
       'scroll-x-backward',
-      directionX < 0
+      directionX < 0,
     )
 
     dispatchEvent(document, 'morphScroll', {

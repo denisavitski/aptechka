@@ -1,6 +1,6 @@
-import { findScrollParentElement, isBrowser, setupDrag } from '@packages/utils'
-import { ticker } from '@packages/ticker'
 import { intersector } from '@packages/intersector'
+import { ticker } from '@packages/ticker'
+import { findScrollParentElement, isBrowser, setupDrag } from '@packages/utils'
 
 export class ScrollbarElement extends HTMLElement {
   #scrollElement: HTMLElement | Window = null!
@@ -45,14 +45,14 @@ export class ScrollbarElement extends HTMLElement {
 
       intersector.subscribe(
         this.parentElement === document.body ? this : this.parentElement!,
-        this.#intersectionListener
+        this.#intersectionListener,
       )
     }
   }
 
   protected disconnectedCallback() {
-    this.#scrollElement.removeEventListener('scroll', this.#scrollListener)
-    this.#thumbElement.removeEventListener('pointerdown', this.#grabListener)
+    this.#scrollElement?.removeEventListener('scroll', this.#scrollListener)
+    this.#thumbElement?.removeEventListener('pointerdown', this.#grabListener)
 
     clearTimeout(this.#activeTimeoutId)
 
@@ -85,7 +85,7 @@ export class ScrollbarElement extends HTMLElement {
             document.body.offsetWidth,
             document.documentElement.offsetWidth,
             document.body.clientWidth,
-            document.documentElement.clientWidth
+            document.documentElement.clientWidth,
           )
         : Math.max(
             document.body.scrollHeight,
@@ -93,7 +93,7 @@ export class ScrollbarElement extends HTMLElement {
             document.body.offsetHeight,
             document.documentElement.offsetHeight,
             document.body.clientHeight,
-            document.documentElement.clientHeight
+            document.documentElement.clientHeight,
           )
     }
   }
