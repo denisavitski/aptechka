@@ -48,6 +48,10 @@ export interface MorphURLParametersChangeEntry {
   detail: any
 }
 
+export interface MorphSamePathEntry {
+  detail: any
+}
+
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
   resolve: () => void
   reject: () => void
@@ -68,6 +72,7 @@ export interface MorphNavigateOptions {
   clearState?: boolean
   keepScrollPosition?: boolean
   mergeParams?: boolean
+  removeParams?: string
   detail?: any
 }
 
@@ -85,7 +90,7 @@ export interface MorphEvents {
   morphScroll: CustomEvent<MorphScrollDetail>
   morphBeforeNavigationScroll: CustomEvent<MorphRouteScrollState>
   morphURLParametersChange: CustomEvent<MorphURLParametersChangeEntry>
-  morphSamePath: CustomEvent
+  morphSamePath: CustomEvent<MorphSamePathEntry>
 }
 
 export interface MorphGetRouteOptions {
@@ -234,12 +239,13 @@ export class Morph {
 
   public normalizePath(
     path: string,
-    options?: Pick<MorphNavigateOptions, 'mergeParams'>,
+    options?: Pick<MorphNavigateOptions, 'mergeParams' | 'removeParams'>,
   ) {
     return splitPath(path, {
       base: this.#options.base,
       trailingSlash: this.#options.trailingSlash,
       mergeParams: options?.mergeParams ? location.search : '',
+      removeParams: options?.removeParams,
     })
   }
 
@@ -280,6 +286,7 @@ export class Morph {
       clearState,
       keepScrollPosition,
       mergeParams,
+      removeParams,
       detail,
     }: MorphNavigateOptions = {},
   ) {
@@ -295,6 +302,7 @@ export class Morph {
 
     const normalizedURL = this.normalizePath(modifiedPath, {
       mergeParams,
+      removeParams,
     })
 
     if (
@@ -311,7 +319,9 @@ export class Morph {
       }
 
       dispatchEvent(document, 'morphSamePath', {
-        custom: true,
+        detail: {
+          detail,
+        },
       })
 
       if (this.#currentURL?.parameters !== normalizedURL.parameters) {

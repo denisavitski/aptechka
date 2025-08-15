@@ -2,6 +2,7 @@ export interface SplitPathOptions {
   base?: string
   trailingSlash?: boolean
   mergeParams?: string
+  removeParams?: string
 }
 
 export interface SplitPathResult {
@@ -14,7 +15,12 @@ export interface SplitPathResult {
 
 export function splitPath(
   value: string,
-  { base = '', trailingSlash = false, mergeParams }: SplitPathOptions = {},
+  {
+    base = '',
+    trailingSlash = false,
+    mergeParams,
+    removeParams,
+  }: SplitPathOptions = {},
 ) {
   base = base.endsWith('/') ? base.slice(0, -1) : base
 
@@ -46,6 +52,14 @@ export function splitPath(
         existingParams.set(key, value)
       }
     }
+
+    console.log(removeParams)
+
+    removeParams?.split(',').forEach((param) => {
+      if (existingParams.has(param)) {
+        existingParams.delete(param)
+      }
+    })
 
     parameters = existingParams.toString()
   }

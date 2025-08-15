@@ -1,11 +1,6 @@
-import {
-  camelToKebab,
-  ChangeHistoryAction,
-  clamp,
-  debounce,
-} from '@packages/utils'
-import { Morph } from './Morph'
 import { cssValueParser } from '@packages/css-value-parser'
+import { camelToKebab, ChangeHistoryAction, clamp } from '@packages/utils'
+import { Morph } from './Morph'
 
 export class MorphLink {
   #morph: Morph
@@ -23,13 +18,13 @@ export class MorphLink {
       this.#element.getAttribute('data-pagination-set-link') ||
         this.#element.getAttribute('data-pagination-more-link') ||
         this.#element.getAttribute('data-pagination-next-link') ||
-        this.#element.getAttribute('data-pagination-prev-link')
+        this.#element.getAttribute('data-pagination-prev-link'),
     )
 
     if (paginatedElement) {
       this.updatePagination(
         paginatedElement.currentPage,
-        paginatedElement.selector
+        paginatedElement.selector,
       )
     }
 
@@ -90,11 +85,11 @@ export class MorphLink {
     if (matchCounter) {
       this.#element.classList.toggle(
         'all-params-matched',
-        locationParams.size === matchCounter
+        locationParams.size === matchCounter,
       )
       this.#element.classList.toggle(
         'some-params-matched',
-        locationParams.size !== matchCounter
+        locationParams.size !== matchCounter,
       )
     } else if (
       !locationParams.size &&
@@ -138,7 +133,7 @@ export class MorphLink {
     if (paginatedElement) {
       paginatedElement.element.setAttribute(
         'data-current-page',
-        newPage.toString()
+        newPage.toString(),
       )
 
       if (this.#element.hasAttribute('data-pagination-more-link')) {
@@ -146,7 +141,7 @@ export class MorphLink {
           this.#element.style.display = ''
 
           const counterElement = this.#element.querySelector(
-            '[data-pagination-more-link-counter]'
+            '[data-pagination-more-link-counter]',
           )
 
           if (counterElement) {
@@ -177,7 +172,7 @@ export class MorphLink {
 
         url.searchParams.set(
           'page',
-          clamp(nextPage, 1, paginatedElement.totalPages).toString()
+          clamp(nextPage, 1, paginatedElement.totalPages).toString(),
         )
 
         const path = url.href.replace(url.origin, '').toString()
@@ -221,7 +216,7 @@ export class MorphLink {
   get #path() {
     const url = new URL(this.#element.href)
     const normalizedURL = this.#morph.normalizePath(
-      url.pathname + url.search + url.hash
+      url.pathname + url.search + url.hash,
     )
 
     return normalizedURL.path
@@ -236,10 +231,10 @@ export class MorphLink {
 
     if (element) {
       const currentPage = parseInt(
-        element.getAttribute('data-current-page') || '1'
+        element.getAttribute('data-current-page') || '1',
       )
       const totalPages = parseInt(
-        element.getAttribute('data-total-pages') || '1'
+        element.getAttribute('data-total-pages') || '1',
       )
 
       return {
@@ -263,7 +258,7 @@ export class MorphLink {
     } else {
       const historyAction =
         (this.#element.getAttribute(
-          'data-history-action'
+          'data-history-action',
         ) as ChangeHistoryAction) || 'push'
 
       const centerScroll = this.#element.hasAttribute('data-center-scroll')
@@ -284,7 +279,7 @@ export class MorphLink {
         this.#element.hasAttribute('data-pagination-prev-link')
 
       const keepSearchParameters = this.#element.hasAttribute(
-        'data-keep-search-parameters'
+        'data-keep-search-parameters',
       )
 
       const keepScrollPosition =
@@ -292,7 +287,7 @@ export class MorphLink {
         this.#element.hasAttribute('data-pagination-more-link')
 
       const scrollBehaviour = this.#element.getAttribute(
-        'data-scroll-behaviour'
+        'data-scroll-behaviour',
       ) as ScrollBehavior
 
       const submorph =
@@ -349,7 +344,7 @@ export class MorphLink {
         this.#element.getAttribute('data-pagination-set-link') ||
           this.#element.getAttribute('data-pagination-more-link') ||
           this.#element.getAttribute('data-pagination-next-link') ||
-          this.#element.getAttribute('data-pagination-prev-link')
+          this.#element.getAttribute('data-pagination-prev-link'),
       )
 
       if (paginatedElement) {
@@ -357,28 +352,28 @@ export class MorphLink {
           this.#morph.links.forEach((link) => {
             link.updatePagination(
               parseInt(this.#element.getAttribute('data-value') || '1'),
-              paginatedElement.selector
+              paginatedElement.selector,
             )
           })
         } else if (this.#element.hasAttribute('data-pagination-prev-link')) {
           this.#morph.links.forEach((link) => {
             link.updatePagination(
               paginatedElement.currentPage - 1,
-              paginatedElement.selector
+              paginatedElement.selector,
             )
           })
         } else if (this.#element.hasAttribute('data-pagination-next-link')) {
           this.#morph.links.forEach((link) => {
             link.updatePagination(
               paginatedElement.currentPage + 1,
-              paginatedElement.selector
+              paginatedElement.selector,
             )
           })
         } else if (this.#element.hasAttribute('data-pagination-more-link')) {
           this.#morph.links.forEach((link) => {
             link.updatePagination(
               paginatedElement.currentPage + 1,
-              paginatedElement.selector
+              paginatedElement.selector,
             )
           })
         }
@@ -399,6 +394,9 @@ export class MorphLink {
           !!paginatedElement ||
           (this.#element.hasAttribute('data-merge-params') &&
             !this.#element.hasAttribute('data-toggle-params')),
+        detail: this.#element.getAttribute('data-detail'),
+        removeParams:
+          this.#element.getAttribute('data-remove-params') || undefined,
       })
     }
   }
