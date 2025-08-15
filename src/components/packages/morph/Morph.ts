@@ -29,6 +29,7 @@ export interface MorphOptions {
 export interface MorphNavigationEntry {
   url: ReturnType<typeof splitPath>
   submorph?: Array<string>
+  detail: any
 }
 
 export interface MorphNavigationDocumentFetchedEntry
@@ -44,6 +45,7 @@ export interface MorphChildrenActionEntry
 export interface MorphURLParametersChangeEntry {
   newURL: ReturnType<typeof splitPath>
   previousURL: ReturnType<typeof splitPath>
+  detail: any
 }
 
 export interface MorphPreprocessorEntry extends MorphNavigationEntry {
@@ -66,6 +68,7 @@ export interface MorphNavigateOptions {
   clearState?: boolean
   keepScrollPosition?: boolean
   mergeParams?: boolean
+  detail?: any
 }
 
 export interface MorphScrollDetail {
@@ -277,6 +280,7 @@ export class Morph {
       clearState,
       keepScrollPosition,
       mergeParams,
+      detail,
     }: MorphNavigateOptions = {},
   ) {
     if (this.#promises.length) {
@@ -328,6 +332,7 @@ export class Morph {
           detail: {
             newURL: this.#currentURL,
             previousURL: this.#previousURL,
+            detail,
           },
         })
       }
@@ -356,6 +361,7 @@ export class Morph {
               resolve,
               reject,
               submorph,
+              detail,
             })
           })
         } catch (e: any) {
@@ -382,6 +388,7 @@ export class Morph {
       const navigationEntry: MorphNavigationEntry = {
         url: normalizedURL,
         submorph,
+        detail,
       }
 
       if (!submorph) {
