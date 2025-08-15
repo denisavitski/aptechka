@@ -53,8 +53,6 @@ export function splitPath(
       }
     }
 
-    console.log(removeParams)
-
     removeParams?.split(',').forEach((param) => {
       if (existingParams.has(param)) {
         existingParams.delete(param)

@@ -1,11 +1,10 @@
 import { ElementLinkedStore } from '@packages/element-linked-store'
-import { isBrowser, kebabToCamel } from '@packages/utils'
-import { dispatchEvent } from '@packages/utils'
 import { loading } from '@packages/loading'
-import { type Source } from './SourceClass'
-import { type SourceSetOptions } from './SourceSet'
-import { SourceManager } from './SourceManager'
+import { dispatchEvent, isBrowser, kebabToCamel } from '@packages/utils'
 import { formatMediaDuration } from '@packages/utils/metadata'
+import { type Source } from './SourceClass'
+import { SourceManager } from './SourceManager'
+import { type SourceSetOptions } from './SourceSet'
 
 let id = 0
 
@@ -57,13 +56,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     if (isBrowser && window.IntersectionObserver) {
       this.#intersectionObserver = new IntersectionObserver(
-        this.#intersectionListener
+        this.#intersectionListener,
       )
     }
 
     this.#status.subscribe((e) => {
       const globalClasses = this.getAttribute('data-global-play-class')?.split(
-        ','
+        ',',
       )
 
       if (globalClasses?.length) {
@@ -154,13 +153,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#consumerElement.addEventListener('pause', this.#pauseListener)
     this.#consumerElement.addEventListener(
       'loadedmetadata',
-      this.#loadedmetadataListener
+      this.#loadedmetadataListener,
     )
     this.#loadedmetadataListener()
-
-    if (this.classList.contains('MaskedVideo__video__element')) {
-      console.log()
-    }
 
     Array.from(this.attributes).forEach((attr) => {
       if (attr.name !== 'srcset') {
@@ -220,7 +215,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       this.#consumerElement.removeEventListener('pause', this.#pauseListener)
       this.#consumerElement.removeEventListener(
         'loadedmetadata',
-        this.#loadedmetadataListener
+        this.#loadedmetadataListener,
       )
 
       this.#consumerElement.onloadeddata = null
@@ -322,9 +317,12 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
       getComputedStyle(this).getPropertyValue('--clear-duration')
 
     if (clearDuration) {
-      this.#clearTimeoutId = setTimeout(() => {
-        this.#status.set('clear', true)
-      }, parseFloat(clearDuration) * 1000)
+      this.#clearTimeoutId = setTimeout(
+        () => {
+          this.#status.set('clear', true)
+        },
+        parseFloat(clearDuration) * 1000,
+      )
     } else {
       this.#status.set('clear', true)
     }
