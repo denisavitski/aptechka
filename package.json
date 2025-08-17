@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.81.1",
+  "version": "0.82.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -37,6 +37,11 @@
       "types": "./lib/billboard/index.d.ts",
       "require": "./lib/billboard/index.cjs",
       "default": "./lib/billboard/index.js"
+    },
+    "./cache": {
+      "types": "./lib/cache/index.d.ts",
+      "require": "./lib/cache/index.cjs",
+      "default": "./lib/cache/index.js"
     },
     "./canvas": {
       "types": "./lib/canvas/index.d.ts",
@@ -93,6 +98,11 @@
       "require": "./lib/en3/index.cjs",
       "default": "./lib/en3/index.js"
     },
+    "./history": {
+      "types": "./lib/history/index.d.ts",
+      "require": "./lib/history/index.cjs",
+      "default": "./lib/history/index.js"
+    },
     "./iframe": {
       "types": "./lib/iframe/index.d.ts",
       "require": "./lib/iframe/index.cjs",
@@ -128,6 +138,11 @@
       "require": "./lib/loading/index.cjs",
       "default": "./lib/loading/index.js"
     },
+    "./local-links": {
+      "types": "./lib/local-links/index.d.ts",
+      "require": "./lib/local-links/index.cjs",
+      "default": "./lib/local-links/index.js"
+    },
     "./masonry-layout": {
       "types": "./lib/masonry-layout/index.d.ts",
       "require": "./lib/masonry-layout/index.cjs",
@@ -152,6 +167,16 @@
       "types": "./lib/order/index.d.ts",
       "require": "./lib/order/index.cjs",
       "default": "./lib/order/index.js"
+    },
+    "./page-announcer": {
+      "types": "./lib/page-announcer/index.d.ts",
+      "require": "./lib/page-announcer/index.cjs",
+      "default": "./lib/page-announcer/index.js"
+    },
+    "./page-scroll": {
+      "types": "./lib/page-scroll/index.d.ts",
+      "require": "./lib/page-scroll/index.cjs",
+      "default": "./lib/page-scroll/index.js"
     },
     "./pixel-perfect": {
       "types": "./lib/pixel-perfect/index.d.ts",
@@ -213,6 +238,11 @@
       "require": "./lib/source/index.cjs",
       "default": "./lib/source/index.js"
     },
+    "./spa": {
+      "types": "./lib/spa/index.d.ts",
+      "require": "./lib/spa/index.cjs",
+      "default": "./lib/spa/index.js"
+    },
     "./store": {
       "types": "./lib/store/index.d.ts",
       "require": "./lib/store/index.cjs",
@@ -263,6 +293,9 @@
       "billboard": [
         "lib/billboard/index.d.ts"
       ],
+      "cache": [
+        "lib/cache/index.d.ts"
+      ],
       "canvas": [
         "lib/canvas/index.d.ts"
       ],
@@ -299,6 +332,9 @@
       "en3": [
         "lib/en3/index.d.ts"
       ],
+      "history": [
+        "lib/history/index.d.ts"
+      ],
       "iframe": [
         "lib/iframe/index.d.ts"
       ],
@@ -320,6 +356,9 @@
       "loading": [
         "lib/loading/index.d.ts"
       ],
+      "local-links": [
+        "lib/local-links/index.d.ts"
+      ],
       "masonry-layout": [
         "lib/masonry-layout/index.d.ts"
       ],
@@ -334,6 +373,12 @@
       ],
       "order": [
         "lib/order/index.d.ts"
+      ],
+      "page-announcer": [
+        "lib/page-announcer/index.d.ts"
+      ],
+      "page-scroll": [
+        "lib/page-scroll/index.d.ts"
       ],
       "pixel-perfect": [
         "lib/pixel-perfect/index.d.ts"
@@ -370,6 +415,9 @@
       ],
       "source": [
         "lib/source/index.d.ts"
+      ],
+      "spa": [
+        "lib/spa/index.d.ts"
       ],
       "store": [
         "lib/store/index.d.ts"

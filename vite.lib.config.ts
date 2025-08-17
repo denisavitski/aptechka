@@ -29,6 +29,7 @@ export function libConfig() {
           'animation/index': './src/components/packages/animation/index.ts',
           'attribute/index': './src/components/packages/attribute/index.ts',
           'billboard/index': './src/components/packages/billboard/index.ts',
+          'cache/index': './src/components/packages/cache/index.ts',
           'canvas/index': './src/components/packages/canvas/index.ts',
           'element-linked-store/index':
             './src/components/packages/element-linked-store/index.ts',
@@ -45,6 +46,7 @@ export function libConfig() {
           'element-resizer/index':
             './src/components/packages/element-resizer/index.ts',
           'en3/index': './src/components/packages/en3/index.ts',
+          'history/index': './src/components/packages/history/index.ts',
           'image/index': './src/components/packages/image/index.ts',
           'iframe/index': './src/components/packages/iframe/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
@@ -52,12 +54,17 @@ export function libConfig() {
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
+          'local-links/index': './src/components/packages/local-links/index.ts',
           'masonry-layout/index':
             './src/components/packages/masonry-layout/index.ts',
           'media/index': './src/components/packages/media/index.ts',
           'morph/index': './src/components/packages/morph/index.ts',
           'notifier/index': './src/components/packages/notifier/index.ts',
+
           'order/index': './src/components/packages/order/index.ts',
+          'page-announcer/index':
+            './src/components/packages/page-announcer/index.ts',
+          'page-scroll/index': './src/components/packages/page-scroll/index.ts',
           'pixel-perfect/index':
             './src/components/packages/pixel-perfect/index.ts',
           'pointer/index': './src/components/packages/pointer/index.ts',
@@ -73,6 +80,7 @@ export function libConfig() {
             './src/components/packages/size-element/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
           'source/index': './src/components/packages/source/index.ts',
+          'spa/index': './src/components/packages/spa/index.ts',
           'store/index': './src/components/packages/store/index.ts',
           'ticker/index': './src/components/packages/ticker/index.ts',
           'need_redo_tweaker/index':

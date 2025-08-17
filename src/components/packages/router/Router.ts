@@ -1,20 +1,20 @@
-import { Notifier } from '@packages/notifier'
+import { History } from '@packages/history'
 import {
-  changeHistory,
-  ChangeHistoryAction,
-  normalizeBase,
-  splitPath,
-  type SplitPathResult,
-} from '@packages/utils'
+  LocalLinks,
+  LocalLinksLinkOptions,
+  LocalLinksOptions,
+} from '@packages/local-links'
+import { PageAnnouncerElement } from '@packages/page-announcer'
+import { PageScroll } from '@packages/page-scroll'
+import { normalizeBase, normalizeURL } from '@packages/utils'
 import { URLPattern } from 'urlpattern-polyfill'
-import { Link } from './Link'
 import { Route, RouteModule } from './Route'
 
 // @ts-ignore
 globalThis.URLPattern = URLPattern
 
 export interface RouterPreprocessorEntry {
-  path: SplitPathResult
+  url: URL
   resolve: () => void
   reject: () => void
 }
@@ -22,83 +22,89 @@ export interface RouterPreprocessorEntry {
 export type RouterPreprocessor = (entry: RouterPreprocessorEntry) => void
 
 export interface RouterPostprocessorEntry {
-  pathname: string
+  url: URL
 }
 
 export type RouterPostprocessor = (entry: RouterPostprocessorEntry) => void
 
-export interface RouterAfterNavigationEntry {
-  pathname: string
-}
+export type RouterURLModifier = (url: URL) => URL
 
-export type RouterAfterNavigationCallback = (
-  entry: RouterAfterNavigationEntry,
-) => void
+export interface RouterNavigateOptions extends LocalLinksLinkOptions {}
 
-export interface RouterNavigateOptions {
-  historyAction?: ChangeHistoryAction
-  revalidate?: boolean
-}
-
-export interface RouterParameters {
+export interface RouterOptions
+  extends Pick<LocalLinksOptions, 'base' | 'trailingSlash' | 'includeAnchor'> {
   rootElement?: HTMLElement
-  base?: string
+  scrollSelector?: string
+  beforeNavigation?: () => void | Promise<void>
+  afterNavigation?: () => void | Promise<void>
+  urlModifier?: RouterURLModifier
+  preprocessor?: RouterPreprocessor
+  postprocessor?: RouterPostprocessor
+  viewTransition?: boolean
 }
 
 export class Router {
-  #rootElement: HTMLElement
-  #base: string
-  #routes: Route[] = []
+  #options: Omit<RouterOptions, 'rootElement'> &
+    Pick<Required<RouterOptions>, 'rootElement' | 'base'> = null!
+
+  #scroll: PageScroll = null!
+  #links: LocalLinks = null!
+  #history: History = null!
+
+  #announcerElement: PageAnnouncerElement = null!
+  #updateId = 0
+
+  #routes: Array<Route> = []
   #lastRoute: Route | null = null
-  #links: Link[] = []
-  #candidateURL: SplitPathResult | null = null
-  #previousURL: SplitPathResult | null = null
-  #currentURL: SplitPathResult = null!
-  #navigationEvent = new Notifier<RouterAfterNavigationCallback>()
 
-  public preprocessor?: RouterPreprocessor
-  public postprocessor?: RouterPostprocessor
+  constructor(options?: RouterOptions) {
+    this.#options = {
+      ...options,
+      rootElement: options?.rootElement || document.body,
+      base: normalizeBase(options?.base),
+    }
 
-  constructor(parameters?: RouterParameters) {
-    this.#base = parameters?.base ? normalizeBase(parameters.base) : '/'
-    this.#rootElement = parameters?.rootElement ?? document.body
-    this.#currentURL = this.normalizePath(
-      location.pathname + location.search + location.hash,
-    )
+    this.#announcerElement = new PageAnnouncerElement()
 
-    this.#setupEventListeners()
+    this.#scroll = new PageScroll(this.#options.scrollSelector)
+    this.#scroll.update()
+
+    this.#links = new LocalLinks({
+      base: this.#options.base,
+      trailingSlash: this.#options.trailingSlash,
+      includeAnchor: options?.includeAnchor,
+      onClick: (url, options) => {
+        try {
+          this.navigate(url, options)
+        } catch (e) {
+          window.location.assign(url)
+        }
+      },
+    })
+    this.#links.update()
+
+    this.#history = new History({
+      onPop: (url) => {
+        this.navigate(url)
+      },
+    })
   }
 
-  public get candidateURL() {
-    return this.#candidateURL
+  public history() {
+    return this.#history
   }
 
-  public get currentURL() {
-    return this.#currentURL
+  public get scroll() {
+    return scroll
   }
 
   public get routes() {
     return this.#routes
   }
 
-  public get links() {
-    return this.#links
-  }
-
   public run() {
     this.#sortRoutesByPathDepth()
-    this.navigate(this.#currentURL.path, { revalidate: true })
-  }
-
-  public destroy() {
-    removeEventListener('popstate', this.#popStateListener)
-    this.#cleanupExistingLinks()
-    this.#routes.forEach((route) => route.close())
-    this.#navigationEvent.close()
-  }
-
-  public navigationEvent(callback: RouterAfterNavigationCallback): () => void {
-    return this.#navigationEvent.subscribe(callback)
+    this.navigate(new URL(location.href), { revalidate: true })
   }
 
   public defineRoute(pattern: string, module: RouteModule) {
@@ -106,64 +112,74 @@ export class Router {
     this.#routes.push(route)
   }
 
-  public async navigate(path: string, options?: RouterNavigateOptions) {
-    const normalizedURL = this.normalizePath(path)
+  public async navigate(url: string | URL, options?: RouterNavigateOptions) {
+    const isBack = this.#history.isBack
+    const updateId = ++this.#updateId
 
-    if (
-      !options?.revalidate &&
-      (this.#candidateURL?.pathname === normalizedURL.pathname ||
-        this.#currentURL.pathname === normalizedURL.pathname)
-    ) {
-      if (this.#currentURL?.parameters !== normalizedURL.parameters) {
-        this.#previousURL = this.#currentURL
-        this.#currentURL = normalizedURL
+    let fullUrl = normalizeURL(url, {
+      base: this.#options.base,
+      trailingSlash: this.#options.trailingSlash,
+    })
 
-        changeHistory({
-          action:
-            this.#currentURL?.hash !== normalizedURL.hash
-              ? 'replace'
-              : options?.historyAction || 'push',
-          pathname: normalizedURL.pathname,
-          searchParameters: normalizedURL.parameters,
-          hash: normalizedURL.hash,
-        })
+    if (this.#options.urlModifier) {
+      fullUrl = this.#options.urlModifier(fullUrl)
+    }
+
+    if (!(await this.#runPreprocessor(fullUrl))) {
+      return
+    }
+
+    if (this.#updateId !== updateId) {
+      return
+    }
+
+    await this.#options.beforeNavigation?.()
+
+    if (this.#updateId !== updateId) {
+      return
+    }
+
+    const { activeRoutes, newRoutes, oldRoutes, keepRoutes } =
+      this.#categorizeRoutes(fullUrl)
+
+    this.#lastRoute = keepRoutes[keepRoutes.length - 1] ?? null
+
+    if (!isBack) {
+      this.#history.push(fullUrl)
+
+      if (options?.keepScrollPosition ?? true) {
+        this.#scroll.element.scrollTo({ top: 0, behavior: 'instant' })
       }
+    }
 
-      this.#links.forEach((link) => {
-        link.checkCurrent(normalizedURL)
+    this.#announcerElement.create(document, fullUrl.pathname)
+
+    if (this.#options.viewTransition && document.startViewTransition) {
+      const v = document.startViewTransition(() => {
+        return this.#renderNewRoutes(oldRoutes, newRoutes, fullUrl)
       })
-
-      return
+      await v.finished
+    } else {
+      await this.#renderNewRoutes(oldRoutes, newRoutes, fullUrl)
     }
 
-    this.#candidateURL = normalizedURL
+    this.#scroll.update()
+    this.#links.update()
+    this.#announcerElement.done()
 
-    if (!(await this.#runPreprocessor(this.#candidateURL))) {
-      return
+    await this.#options.afterNavigation?.()
+  }
+
+  async #runPreprocessor(url: URL) {
+    if (!this.#options.preprocessor) {
+      return true
     }
-
-    if (normalizedURL.path !== this.#candidateURL.path) {
-      return
-    }
-
-    await this.#processRouteChange(this.#candidateURL, options)
-  }
-
-  public normalizePath(path: string) {
-    return splitPath(path, { base: this.#base })
-  }
-
-  #setupEventListeners() {
-    addEventListener('popstate', this.#popStateListener)
-  }
-
-  async #runPreprocessor(parts: SplitPathResult) {
-    if (!this.preprocessor) return true
 
     try {
       await new Promise<void>((resolve, reject) => {
-        this.preprocessor?.({ path: parts, resolve, reject })
+        this.#options.preprocessor?.({ url: url, resolve, reject })
       })
+
       return true
     } catch (error) {
       console.error(error ?? 'Route change canceled')
@@ -171,33 +187,13 @@ export class Router {
     }
   }
 
-  async #processRouteChange(
-    url: SplitPathResult,
-    options: RouterNavigateOptions = {},
-  ): Promise<void> {
-    const { activeRoutes, newRoutes, oldRoutes, keepRoutes } =
-      this.#categorizeRoutes(url.leaf)
+  #categorizeRoutes(url: URL) {
+    let leaf = url.pathname.replace(this.#options.base, '')
 
-    this.#lastRoute = keepRoutes[keepRoutes.length - 1] ?? null
+    if (!leaf.startsWith('/')) {
+      leaf = `/${leaf}`
+    }
 
-    this.#closeOldRoutes(oldRoutes)
-
-    this.#currentURL = url
-
-    changeHistory({
-      action: options.historyAction || 'push',
-      pathname: url.pathname,
-      searchParameters: url.parameters,
-      hash: url.hash,
-    })
-
-    await this.#renderNewRoutes(newRoutes, url.leaf)
-
-    this.#updateLinks()
-    this.#notifyNavigationComplete(url.pathname)
-  }
-
-  #categorizeRoutes(leaf: string) {
     const activeRoutes = this.#routes.filter((route) => route.isActive)
 
     return {
@@ -214,17 +210,18 @@ export class Router {
     routes.forEach((route) => route.close())
   }
 
-  async #renderNewRoutes(routes: Route[], leaf: string): Promise<void> {
+  async #renderNewRoutes(
+    oldRoutes: Array<Route>,
+    routes: Array<Route>,
+    url: URL,
+  ) {
+    this.#closeOldRoutes(oldRoutes)
+
     for (const route of routes) {
-      const target = this.#lastRoute?.nest ?? this.#rootElement
-      await route.render(target, leaf)
+      const target = this.#lastRoute?.nest ?? this.#options.rootElement
+      await route.render(target, url)
       this.#lastRoute = route
     }
-  }
-
-  #notifyNavigationComplete(pathname: string) {
-    this.postprocessor?.({ pathname })
-    this.#navigationEvent.notify({ pathname })
   }
 
   #sortRoutesByPathDepth() {
@@ -233,47 +230,5 @@ export class Router {
       const depthB = b.pattern.split('/').length
       return depthA - depthB
     })
-  }
-
-  #updateLinks() {
-    this.#cleanupExistingLinks()
-    this.#createNewLinks()
-  }
-
-  #cleanupExistingLinks() {
-    this.#links.forEach((link) => link.destroy())
-    this.#links = []
-  }
-
-  #createNewLinks() {
-    const activeRoutes = this.#routes.filter((route) => route.isActive)
-    const anchors = this.#collectAnchorElements(activeRoutes)
-
-    this.#links = anchors.map((element) => new Link(this, element))
-  }
-
-  #collectAnchorElements(activeRoutes: Route[]) {
-    const rootAnchors = Array.from(
-      this.#rootElement.querySelectorAll<HTMLAnchorElement>('a'),
-    )
-    const routeAnchors = activeRoutes.flatMap((route) =>
-      route.getAnchorElements(),
-    )
-
-    return Array.from(
-      new Set(
-        [...rootAnchors, ...routeAnchors].filter((a) =>
-          a.getAttribute('href')?.startsWith('/'),
-        ),
-      ),
-    )
-  }
-
-  #popStateListener = (event: PopStateEvent) => {
-    if (event.state?.path) {
-      this.navigate(event.state.path, {
-        historyAction: 'none',
-      })
-    }
   }
 }

@@ -1,5 +1,5 @@
 import { render } from '@packages/jsx/render'
-import { isESClass, traverseShadowRoots } from '@packages/utils'
+import { isESClass } from '@packages/utils'
 
 export type RouteModule = () => Promise<{ default?: RouteComponent }>
 export type RouteComponent = CustomElementConstructor | JSX.Component
@@ -53,7 +53,7 @@ export class Route {
     return this.#urlPattern.test({ pathname })
   }
 
-  public async render(container: Element | ShadowRoot, pathname: string) {
+  public async render(container: Element | ShadowRoot, url: URL) {
     this.#mutationObserver.observe(document.head, {
       childList: true,
       subtree: true,
@@ -68,7 +68,7 @@ export class Route {
     await this.#waitForHeadNodesLoad()
 
     if (this.#elementConstructor) {
-      await this.#renderRouteComponent(container, pathname)
+      await this.#renderRouteComponent(container, url)
     }
 
     this.#mutationObserver.disconnect()
@@ -78,53 +78,23 @@ export class Route {
     this.#cleanup()
   }
 
-  public getAnchorElements(): HTMLAnchorElement[] {
-    const anchors: HTMLAnchorElement[] = []
-
-    if (this.#elementInstance) {
-      anchors.push(...this.#elementInstance.querySelectorAll('a'))
-      traverseShadowRoots(this.#elementInstance, (el) => {
-        anchors.push(...el.shadowRoot!.querySelectorAll('a'))
-      })
-    }
-
-    return anchors
-  }
-
   async #initializeRouteModule() {
     const content = await this.#module()
     this.#temporalHeadNodes = [...this.#permanentHeadNodes]
 
     if (typeof content.default === 'function') {
       this.#elementConstructor = content.default
-      await this.#registerCustomElementIfNeeded()
     }
   }
 
-  async #registerCustomElementIfNeeded() {
-    if (this.#elementConstructor && isESClass(this.#elementConstructor)) {
-      const tagName = `e-${this.#elementConstructor.name.toLowerCase()}`
-
-      if (!customElements.get(tagName)) {
-        customElements.define(
-          tagName,
-          this.#elementConstructor as CustomElementConstructor,
-        )
-      }
-    }
-  }
-
-  #appendPermanentHeadNodes(): void {
+  #appendPermanentHeadNodes() {
     this.#permanentHeadNodes.forEach((node) => {
       document.head.appendChild(node.cloneNode(true))
     })
   }
 
-  async #renderRouteComponent(
-    container: Element | ShadowRoot,
-    pathname: string,
-  ) {
-    const urlPatternResult = this.#urlPattern.exec({ pathname })
+  async #renderRouteComponent(container: Element | ShadowRoot, url: URL) {
+    const urlPatternResult = this.#urlPattern.exec({ pathname: url.pathname })
     const routeParams: RouteParameters = { urlPatternResult: urlPatternResult! }
 
     if (isESClass(this.#elementConstructor!)) {

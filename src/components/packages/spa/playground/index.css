@@ -1,0 +1,21 @@
+e-popover-button {
+  --type: toggle;
+}
+
+e-popover {
+  --click-outside: true;
+  --escape: true;
+  --history: true;
+  --restore: true;
+
+  position: fixed;
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 20vmin;
+  height: 20vmin;
+
+  background-color: tomato;
+}

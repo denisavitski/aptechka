@@ -58,7 +58,7 @@ export class MorphRoute {
 
   public abort() {
     return this.#abortController?.abort(
-      `[${this.#pathname}] page loading cancelled`
+      `[${this.#pathname}] page loading cancelled`,
     )
   }
 
@@ -90,6 +90,7 @@ export class MorphRoute {
           signal: this.#abortController.signal,
           headers: {
             'X-MORPH': 'true',
+            'X-MORPH-RAVALIDATE': revalidate ? 'true' : 'false',
             'X-MORPH-CURRENT-PATH': encodeURIComponent(currentPath),
             'X-MORPH-NEW-PATH': encodeURIComponent(path),
             ...this.#headers,
@@ -146,7 +147,7 @@ export class MorphRoute {
   public saveScrollState() {
     if (
       !this.#initialDocument.documentElement.hasAttribute(
-        'data-no-scroll-restoration'
+        'data-no-scroll-restoration',
       )
     ) {
       this.#scrollState.x = this.#morph.scrollValue.left
@@ -168,7 +169,7 @@ export class MorphRoute {
   public saveDocumentState() {
     if (
       !this.#initialDocument.documentElement.hasAttribute(
-        'data-no-page-restoration'
+        'data-no-page-restoration',
       )
     ) {
       this.#modifiedDocument = document.cloneNode(true) as Document

@@ -1,7 +1,5 @@
 export {
   Router,
-  type RouterAfterNavigationCallback,
-  type RouterParameters,
   type RouterPostprocessor,
   type RouterPreprocessor,
   type RouterPreprocessorEntry,

@@ -29,7 +29,7 @@ export function cloneDeep<T>(obj: T): T {
 export function mergeDeep(
   target: object,
   source: object,
-  isObjectFunction = isObject
+  isObjectFunction = isObject,
 ): object {
   for (const key in source) {
     if (isObjectFunction((source as any)[key])) {
@@ -60,7 +60,7 @@ export function compareObjects(obj1: any, obj2: any): boolean {
     const maxArray = (obj1.length > obj2.length ? obj1 : obj2) as Array<any>
     const minArray = (obj1.length > obj2.length ? obj2 : obj1) as Array<any>
     return maxArray.every((item, index) =>
-      compareObjects(item, minArray[index])
+      compareObjects(item, minArray[index]),
     )
   }
 
@@ -92,7 +92,7 @@ export function compareObjects(obj1: any, obj2: any): boolean {
 
 export function pick<T extends object, R extends keyof T>(
   object: T,
-  keys: Array<R>
+  keys: Array<R>,
 ): Pick<T, R> {
   const result = {} as Pick<T, R>
 
@@ -106,10 +106,14 @@ export function pick<T extends object, R extends keyof T>(
 }
 
 export function omit<T extends object, R extends keyof T>(
-  object: T,
-  keys: Array<R>
+  object: T | undefined,
+  keys: Array<R>,
 ): Omit<T, R> {
   const result = {} as Omit<T, R>
+
+  if (!object) {
+    return result
+  }
 
   for (const key in object) {
     if (!keys.includes(key as any)) {
@@ -135,7 +139,7 @@ export function mixin(baseClass: any, ...mixins: any[]) {
         baseClass.prototype,
         name,
         Object.getOwnPropertyDescriptor(baseCtor.prototype, name) ||
-          Object.create(null)
+          Object.create(null),
       )
     })
   })

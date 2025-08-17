@@ -145,3 +145,64 @@ export function updateSearchParameter(
 
   history.replaceState(history.state, '', url.href)
 }
+
+function updateURLAttr(el: Element, attr: string, base: string | URL) {
+  el.setAttribute(attr, new URL(el.getAttribute(attr)!, base).pathname)
+}
+
+export function normalizeRelativeURLs(
+  el: Element | Document,
+  base: string | URL,
+) {
+  el.querySelectorAll('[href^="./"], [href^="../"]').forEach((item) =>
+    updateURLAttr(item, 'href', base),
+  )
+  el.querySelectorAll('[src^="./"], [src^="../"]').forEach((item) =>
+    updateURLAttr(item, 'src', base),
+  )
+}
+
+export function normalizeURL(
+  url: URL | string,
+  {
+    base = '',
+    trailingSlash = false,
+  }: { base?: string; trailingSlash?: boolean } = {},
+) {
+  base = base.replace(/^\/|\/$/g, '')
+
+  const path =
+    typeof url === 'string'
+      ? url.replace(/^\/|\/$/g, '')
+      : url.pathname.replace(/^\/|\/$/g, '')
+
+  let urlString = ''
+
+  if (!path.includes(base)) {
+    urlString = `${base}/${path}`
+  } else {
+    urlString = `/${path}`
+  }
+
+  if (trailingSlash && !urlString.endsWith('/')) {
+    urlString += '/'
+  }
+
+  return new URL(urlString, location.origin)
+}
+
+export function isLocalUrl(href: string) {
+  try {
+    const url = new URL(href)
+
+    if (window.location.origin === url.origin) {
+      if (url.pathname === window.location.pathname) {
+        return !url.hash
+      }
+
+      return true
+    }
+  } catch (e) {}
+
+  return false
+}
