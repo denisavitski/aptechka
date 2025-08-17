@@ -1,5 +1,5 @@
 import { cssValueParser } from '@packages/css-value-parser'
-import { camelToKebab, ChangeHistoryAction, clamp } from '@packages/utils'
+import { camelToKebab, ChangeHistoryAction } from '@packages/utils'
 import { Morph } from './Morph'
 
 export class MorphLink {
@@ -13,20 +13,6 @@ export class MorphLink {
     this.#element.addEventListener('click', this.#clickListener)
 
     this.checkCurrent(location.href.replace(location.origin, ''))
-
-    const paginatedElement = this.#getPaginatedElement(
-      this.#element.getAttribute('data-pagination-set-link') ||
-        this.#element.getAttribute('data-pagination-more-link') ||
-        this.#element.getAttribute('data-pagination-next-link') ||
-        this.#element.getAttribute('data-pagination-prev-link'),
-    )
-
-    if (paginatedElement) {
-      this.updatePagination(
-        paginatedElement.currentPage,
-        paginatedElement.selector,
-      )
-    }
 
     if (this.#element.hasAttribute('data-prefetch')) {
       this.#element.addEventListener('pointerenter', this.#pointerListener)
@@ -127,90 +113,10 @@ export class MorphLink {
     }
   }
 
-  public updatePagination(newPage: number, selector: string) {
-    const paginatedElement = this.#getPaginatedElement(selector)
-
-    if (paginatedElement) {
-      paginatedElement.element.setAttribute(
-        'data-current-page',
-        newPage.toString(),
-      )
-
-      if (this.#element.hasAttribute('data-pagination-more-link')) {
-        if (newPage < paginatedElement.totalPages) {
-          this.#element.style.display = ''
-
-          const counterElement = this.#element.querySelector(
-            '[data-pagination-more-link-counter]',
-          )
-
-          if (counterElement) {
-            counterElement.textContent = (
-              paginatedElement.totalPages - newPage
-            ).toString()
-          }
-
-          const href = this.#element.getAttribute('href')!
-          const url = new URL(href, window.location.origin)
-          url.searchParams.set('page', (newPage + 1).toString())
-
-          const path = url.href.replace(url.origin, '').toString()
-          this.#element.setAttribute('href', path)
-          this.checkCurrent(path)
-        } else {
-          this.#element.style.display = 'none'
-        }
-      } else if (
-        this.#element.hasAttribute('data-pagination-prev-link') ||
-        this.#element.hasAttribute('data-pagination-next-link')
-      ) {
-        const isPrev = this.#element.hasAttribute('data-pagination-prev-link')
-        const href = this.#element.getAttribute('href')!
-        const url = new URL(href, window.location.origin)
-
-        const nextPage = newPage + (isPrev ? -1 : 1)
-
-        url.searchParams.set(
-          'page',
-          clamp(nextPage, 1, paginatedElement.totalPages).toString(),
-        )
-
-        const path = url.href.replace(url.origin, '').toString()
-        this.#element.setAttribute('href', path)
-
-        if (isPrev) {
-          if (nextPage < 1) {
-            this.#element.classList.add('pagination-disabled')
-            this.#element.setAttribute('tabindex', '-1')
-          } else {
-            this.#element.classList.remove('pagination-disabled')
-            this.#element.removeAttribute('tabindex')
-          }
-        } else {
-          if (nextPage > paginatedElement.totalPages) {
-            this.#element.classList.add('pagination-disabled')
-            this.#element.setAttribute('tabindex', '-1')
-          } else {
-            this.#element.classList.remove('pagination-disabled')
-            this.#element.removeAttribute('tabindex')
-          }
-        }
-      } else if (this.#element.hasAttribute('data-pagination-set-link')) {
-        const value = this.#element.getAttribute('data-value')
-
-        if (value === newPage.toString()) {
-          this.#element.classList.add('pagination-current')
-        } else {
-          this.#element.classList.remove('pagination-current')
-        }
-      }
-    }
-  }
-
   public destroy() {
     this.#element.removeEventListener('click', this.#clickListener)
     this.#element.removeEventListener('pointerenter', this.#pointerListener)
-    this.#element.classList.remove('current', 'exact', 'pagination-current')
+    this.#element.classList.remove('current', 'exact')
   }
 
   get #path() {
@@ -220,30 +126,6 @@ export class MorphLink {
     )
 
     return normalizedURL.path
-  }
-
-  #getPaginatedElement(selector?: string | undefined | null) {
-    if (!selector) {
-      return
-    }
-
-    const element = document.querySelector(selector)
-
-    if (element) {
-      const currentPage = parseInt(
-        element.getAttribute('data-current-page') || '1',
-      )
-      const totalPages = parseInt(
-        element.getAttribute('data-total-pages') || '1',
-      )
-
-      return {
-        element,
-        currentPage,
-        totalPages,
-        selector,
-      }
-    }
   }
 
   #click() {
@@ -290,24 +172,12 @@ export class MorphLink {
         'data-scroll-behaviour',
       ) as ScrollBehavior
 
-      const submorph =
-        this.#element
-          .getAttribute('data-submorph')
-          ?.split(',')
-          .map((v) => v.trim()) ||
-        (this.#element.hasAttribute('data-pagination-more-link') && [
-          this.#element.getAttribute('data-pagination-more-link')!,
-        ]) ||
-        (this.#element.hasAttribute('data-pagination-set-link') && [
-          this.#element.getAttribute('data-pagination-set-link')!,
-        ]) ||
-        (this.#element.hasAttribute('data-pagination-next-link') && [
-          this.#element.getAttribute('data-pagination-next-link')!,
-        ]) ||
-        (this.#element.hasAttribute('data-pagination-prev-link') && [
-          this.#element.getAttribute('data-pagination-prev-link')!,
-        ]) ||
-        undefined
+      const submorph = (
+        this.#element.getAttribute('data-submorph') ||
+        this.#element.getAttribute('data-submorph-append')
+      )
+        ?.split(',')
+        .map((v) => v.trim())
 
       const clearState = this.#element.hasAttribute('data-clear-state')
 
@@ -340,45 +210,6 @@ export class MorphLink {
         path = `${pathWithoutParams}?${resultParams.toString()}`
       }
 
-      const paginatedElement = this.#getPaginatedElement(
-        this.#element.getAttribute('data-pagination-set-link') ||
-          this.#element.getAttribute('data-pagination-more-link') ||
-          this.#element.getAttribute('data-pagination-next-link') ||
-          this.#element.getAttribute('data-pagination-prev-link'),
-      )
-
-      if (paginatedElement) {
-        if (this.#element.hasAttribute('data-pagination-set-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              parseInt(this.#element.getAttribute('data-value') || '1'),
-              paginatedElement.selector,
-            )
-          })
-        } else if (this.#element.hasAttribute('data-pagination-prev-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              paginatedElement.currentPage - 1,
-              paginatedElement.selector,
-            )
-          })
-        } else if (this.#element.hasAttribute('data-pagination-next-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              paginatedElement.currentPage + 1,
-              paginatedElement.selector,
-            )
-          })
-        } else if (this.#element.hasAttribute('data-pagination-more-link')) {
-          this.#morph.links.forEach((link) => {
-            link.updatePagination(
-              paginatedElement.currentPage + 1,
-              paginatedElement.selector,
-            )
-          })
-        }
-      }
-
       this.#morph.navigate(path, {
         historyAction,
         centerScroll,
@@ -389,14 +220,14 @@ export class MorphLink {
         clearState,
         keepScrollPosition,
         scrollBehaviour,
-        submorphAppend: this.#element.hasAttribute('data-pagination-more-link'),
+        submorphAppend: this.#element.hasAttribute('data-submorph-append'),
         mergeParams:
-          !!paginatedElement ||
-          (this.#element.hasAttribute('data-merge-params') &&
-            !this.#element.hasAttribute('data-toggle-params')),
+          this.#element.hasAttribute('data-merge-params') &&
+          !this.#element.hasAttribute('data-toggle-params'),
         detail: this.#element.getAttribute('data-detail'),
         removeParams:
           this.#element.getAttribute('data-remove-params') || undefined,
+        scrollTo: this.#element.getAttribute('data-scroll-to') || undefined,
       })
     }
   }

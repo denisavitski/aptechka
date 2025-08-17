@@ -65,6 +65,7 @@ export interface MorphNavigateOptions {
   centerScroll?: boolean
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   scrollBehaviour?: ScrollBehavior
+  scrollTo?: string
   revalidate?: boolean
   keepSearchParameters?: boolean
   submorph?: Array<string>
@@ -288,6 +289,7 @@ export class Morph {
       mergeParams,
       removeParams,
       detail,
+      scrollTo,
     }: MorphNavigateOptions = {},
   ) {
     if (this.#promises.length) {
@@ -753,7 +755,15 @@ export class Morph {
         detail: nextRoute.scrollState,
       })
 
-      if (normalizedURL.hash) {
+      if (scrollTo) {
+        nextRoute.clearScrollState()
+
+        this.#tryScrollToElement(scrollTo, {
+          centerScroll,
+          offsetScroll,
+          behavior: scrollBehaviour,
+        })
+      } else if (normalizedURL.hash) {
         nextRoute.clearScrollState()
 
         this.#tryScrollToElement(normalizedURL.hash, {
