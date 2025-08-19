@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.82.1",
+  "version": "0.82.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -450,7 +450,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.1.0",
-    "@types/three": "^0.178.1",
+    "@types/three": "^0.179.0",
     "tsx": "^4.20.3",
     "vite": "^7.0.6",
     "vite-plugin-dts": "^4.5.4",

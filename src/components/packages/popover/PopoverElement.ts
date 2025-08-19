@@ -1,5 +1,6 @@
-import { ElementLinkedStore } from '@packages/element-linked-store'
 import { CSSProperty } from '@packages/css-property'
+import { viewport } from '@packages/device'
+import { ElementLinkedStore } from '@packages/element-linked-store'
 import {
   debounce,
   dispatchEvent,
@@ -9,7 +10,6 @@ import {
   updateSearchParameter,
 } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
-import { viewport } from '@packages/device'
 
 export interface PopoverEvents {
   popoverTriggered: CustomEvent<{ trigger: any }>
@@ -26,7 +26,7 @@ class PopoverGroups {
   constructor() {
     document.documentElement.addEventListener(
       'click',
-      this.#clickOutsideListener
+      this.#clickOutsideListener,
     )
     addEventListener('keydown', this.#keydownListener)
   }
@@ -110,7 +110,8 @@ class PopoverGroups {
       if (
         path.find(
           (el) =>
-            el instanceof HTMLElement && el.hasAttribute('data-popover-content')
+            el instanceof HTMLElement &&
+            el.hasAttribute('data-popover-content'),
         )
       ) {
         return
@@ -163,7 +164,7 @@ export class PopoverElement extends HTMLElement {
   #closeRestInGroup = new CSSProperty<boolean>(
     this,
     '--close-rest-in-group',
-    false
+    false,
   )
   #group = new CSSProperty(this, '--group', '')
   #clickOutside = new CSSProperty(this, '--click-outside', false)
@@ -190,11 +191,11 @@ export class PopoverElement extends HTMLElement {
 
         if (!e.current) {
           document.documentElement.classList.remove(
-            `${this.group.previous}-closing`
+            `${this.group.previous}-closing`,
           )
 
           document.documentElement.classList.remove(
-            `${this.group.previous}-opened`
+            `${this.group.previous}-opened`,
           )
         }
       }
@@ -204,7 +205,7 @@ export class PopoverElement extends HTMLElement {
       if (this.group.current) {
         document.documentElement.classList.toggle(
           `${this.group.current}-closing`,
-          e.current.closing
+          e.current.closing,
         )
 
         const group = PopoverElement.stack.groups.get(this.group.current)
@@ -212,7 +213,7 @@ export class PopoverElement extends HTMLElement {
 
         document.documentElement.classList.toggle(
           `${this.group.current}-opened`,
-          !!element
+          !!element,
         )
       }
     })
@@ -340,10 +341,13 @@ export class PopoverElement extends HTMLElement {
 
       this.#openFrameId = undefined
 
-      this.#openTransitionTimeoutId = setTimeout(() => {
-        this.#status.set('transitionend', true)
-        dispatchEvent(this, 'popoverTransitionend')
-      }, getElementTransitionDurationMS(this) + 10)
+      this.#openTransitionTimeoutId = setTimeout(
+        () => {
+          this.#status.set('transitionend', true)
+          dispatchEvent(this, 'popoverTransitionend')
+        },
+        getElementTransitionDurationMS(this) + 10,
+      )
     }
 
     if (options?.skipTransition) {
@@ -381,24 +385,27 @@ export class PopoverElement extends HTMLElement {
         bubbles: true,
       })
 
-      this.#closeTimeoutId = setTimeout(() => {
-        this.#status.set('triggered', false)
-        this.#status.set('beforeopen', false)
-        this.#status.set('closing', false)
-        this.#toggleGlobalClass(false, this.closingClass)
+      this.#closeTimeoutId = setTimeout(
+        () => {
+          this.#status.set('triggered', false)
+          this.#status.set('beforeopen', false)
+          this.#status.set('closing', false)
+          this.#toggleGlobalClass(false, this.closingClass)
 
-        dispatchEvent(this, 'popoverClosed', {
-          custom: true,
-          bubbles: true,
-        })
-      }, getElementTransitionDurationMS(this) + 10)
+          dispatchEvent(this, 'popoverClosed', {
+            custom: true,
+            bubbles: true,
+          })
+        },
+        getElementTransitionDurationMS(this) + 10,
+      )
     }, 10)
   }
 
   protected connectedCallback() {
     this.#innerCloseElements = [
       ...this.querySelectorAll<HTMLElement>(
-        `[data-popover-close${this.id ? `="${this.id}"` : ''}]`
+        `[data-popover-close${this.id ? `="${this.id}"` : ''}]`,
       ),
     ]
     this.#innerCloseElements.forEach((el) => {
@@ -407,7 +414,7 @@ export class PopoverElement extends HTMLElement {
 
     this.#resetScrollElements = [
       ...this.querySelectorAll<HTMLElement>(
-        `[data-popover-reset-scroll${this.id ? `="${this.id}"` : ''}]`
+        `[data-popover-reset-scroll${this.id ? `="${this.id}"` : ''}]`,
       ),
     ]
 
