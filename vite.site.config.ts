@@ -7,7 +7,7 @@ export function siteConfig() {
 
   const config: UserConfig = {
     ...shared,
-    plugins: [...shared.plugins!, htmc()],
+    plugins: [...shared.plugins!, (htmc as any)()],
   }
 
   return config

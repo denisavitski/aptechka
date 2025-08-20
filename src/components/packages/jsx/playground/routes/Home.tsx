@@ -2,7 +2,7 @@ const Home: JSX.Component = (props) => {
   return (
     <component>
       <div>
-        <h1>123123</h1>
+        <h1>223</h1>
       </div>
 
       <svg
