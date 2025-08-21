@@ -9,6 +9,12 @@ export interface RouteParameters {
   urlPatternResult: URLPatternResult
 }
 
+export interface RouteEvents {
+  __hmrInstanceReplace: CustomEvent<{
+    element: HTMLElement
+  }>
+}
+
 export class Route {
   readonly #pattern: string
   readonly #module: RouteModule
@@ -109,6 +115,11 @@ export class Route {
       )
     }
 
+    this.#elementInstance?.addEventListener(
+      '__hmrInstanceReplace',
+      this.#instanceReplaceListener,
+    )
+
     this.#findNestTarget()
     this.#isActive = true
   }
@@ -125,7 +136,15 @@ export class Route {
 
   #cleanup() {
     this.#mutationObserver.disconnect()
-    this.#elementInstance?.remove()
+
+    if (this.#elementInstance) {
+      this.#elementInstance.removeEventListener(
+        '__hmrInstanceReplace',
+        this.#instanceReplaceListener,
+      )
+      this.#elementInstance.remove()
+    }
+
     this.#isActive = false
 
     this.#removeTemporalHeadNodes()
@@ -177,4 +196,22 @@ export class Route {
         node.tagName === 'LINK')
     )
   }
+
+  #instanceReplaceListener = (e: RouteEvents['__hmrInstanceReplace']) => {
+    this.#elementInstance!.removeEventListener(
+      '__hmrInstanceReplace',
+      this.#instanceReplaceListener,
+    )
+
+    this.#elementInstance = e.detail.element
+
+    this.#elementInstance!.addEventListener(
+      '__hmrInstanceReplace',
+      this.#instanceReplaceListener,
+    )
+  }
+}
+
+declare global {
+  interface HTMLElementEventMap extends RouteEvents {}
 }

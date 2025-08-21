@@ -1,5 +1,16 @@
 const Home: JSX.Component = (props) => {
-  console.log('HOME')
+  return (
+    <component>
+      <div>
+        <>
+          <h1>123</h1>
+          <h1>123</h1>
+          <h1>123</h1>
+          <h1>123</h1>
+        </>
+      </div>
+    </component>
+  )
 }
 
 export default Home

@@ -28,6 +28,12 @@ export function hmrPlugin() {
                       const componentElement = container.firstElementChild
 
                       if (componentElement) {
+                        el.dispatchEvent(new CustomEvent('__hmrInstanceReplace', {
+                          'detail': {
+                            element: componentElement
+                          }
+                        }))
+
                         el.replaceWith(componentElement)
 
                         componentElement
