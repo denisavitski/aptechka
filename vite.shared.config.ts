@@ -1,9 +1,10 @@
 import { resolve } from 'path'
 import { UserConfig } from 'vite'
+import { hmrPlugin } from './src/components/packages/jsx/plugins/hmr'
 
 export function sharedConfig() {
   const config: UserConfig = {
-    plugins: [],
+    plugins: [hmrPlugin()],
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',

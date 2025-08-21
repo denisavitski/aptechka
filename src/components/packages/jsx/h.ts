@@ -121,6 +121,8 @@ export function h(
 
     const res = jsxTag(props)
 
+    element.__props__ = props
+
     if (res instanceof ComponentProps) {
       if (res?.children || res.attributes) {
         appendChildren(element, res.attributes, res.children)

@@ -6,6 +6,8 @@ export type ComponentDisconnectCallback = (element: HTMLElement) => void
 export const activeComponent: { current: ComponentElement } = { current: null! }
 
 export class ComponentElement extends HTMLElement {
+  public __props__: any
+
   #connectCallbacks: Array<ComponentConnectCallback> = []
   #disconnectCallbacks: Array<ComponentDisconnectCallback> = []
 
