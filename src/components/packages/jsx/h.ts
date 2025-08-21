@@ -121,9 +121,11 @@ export function h(
 
     const res = jsxTag(props)
 
-    element.__props__ = props
+    if (__JSX_HMR_DEV__) {
+      element.__props__ = props
+    }
 
-    if (res instanceof ComponentProps) {
+    if (res instanceof ComponentProps || res instanceof ElementProps) {
       if (res?.children || res.attributes) {
         appendChildren(element, res.attributes, res.children)
       }
@@ -139,3 +141,5 @@ export function Fragment(children: any) {
 
   return fragment
 }
+
+declare const __JSX_HMR_DEV__: boolean

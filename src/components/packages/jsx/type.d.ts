@@ -222,4 +222,8 @@ declare global {
     __storeId: string
     __key: string
   }
+
+  var Fragment: {
+    (props: { children?: any }): any
+  }
 }

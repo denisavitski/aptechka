@@ -1,8 +1,12 @@
 export function hmrPlugin() {
   return {
     name: 'jsx-hmr-plugin',
+    apply: 'serve' as const,
     transform(code: string, id: string) {
-      if (id.endsWith('.jsx') || id.endsWith('.tsx')) {
+      if (
+        (id.endsWith('.jsx') || id.endsWith('.tsx')) &&
+        !id.endsWith('render.tsx')
+      ) {
         let transformed = code
 
         transformed += `\n
@@ -49,6 +53,13 @@ export function hmrPlugin() {
       }
 
       return null
+    },
+    config(_config: any, opt: any) {
+      return {
+        define: {
+          __JSX_HMR_DEV__: opt.command === 'serve',
+        },
+      }
     },
   }
 }
