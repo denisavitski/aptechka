@@ -1,12 +1,12 @@
 import { Store } from '@packages/store'
-import { camelToKebab } from '@packages/utils'
+import { camelToKebab, diff, patch } from '@packages/utils'
 import { ComponentElement } from './ComponentElement'
 import { setAttributes } from './utils/attributes/setAttributes'
 import { filterChildren } from './utils/children/filterChildren'
 import { storeChildren } from './utils/children/storeChildren'
 import { subscribeToStore } from './utils/elementStoreSubscription'
 
-class ComponentProps {
+class Props {
   constructor(
     public tag: string,
     public attributes: JSX.Attributes | undefined,
@@ -14,13 +14,9 @@ class ComponentProps {
   ) {}
 }
 
-class ElementProps {
-  constructor(
-    public tag: string,
-    public attributes: JSX.Attributes | undefined,
-    public children: JSX.Children,
-  ) {}
-}
+class ComponentProps extends Props {}
+class ElementProps extends Props {}
+class HeadProps extends Props {}
 
 export function appendChildren(
   element: Element,
@@ -64,6 +60,11 @@ export function appendChildren(
 
       appendChildren(childElement, child.attributes, child.children, isSVG)
       element.append(childElement)
+    } else if (child instanceof HeadProps) {
+      const headElement = document.createElement(child.tag)
+      appendChildren(headElement, child.attributes, child.children)
+      const patches = diff(document.head, headElement)
+      patch(document.head, patches)
     } else {
       element.append(child)
     }
@@ -80,6 +81,8 @@ export function h(
       return new ComponentProps(jsxTag, attributes, children)
     } else if (jsxTag === 'shadow') {
       return new ComponentProps(jsxTag, attributes, children)
+    } else if (jsxTag === 'head') {
+      return new HeadProps(jsxTag, attributes, children)
     } else {
       return new ElementProps(jsxTag, attributes, children)
     }

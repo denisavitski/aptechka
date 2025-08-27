@@ -90,7 +90,7 @@ export class MorphRoute {
           signal: this.#abortController.signal,
           headers: {
             'X-MORPH': 'true',
-            'X-MORPH-RAVALIDATE': revalidate ? 'true' : 'false',
+            'X-MORPH-REVALIDATE': revalidate ? 'true' : 'false',
             'X-MORPH-CURRENT-PATH': encodeURIComponent(currentPath),
             'X-MORPH-NEW-PATH': encodeURIComponent(path),
             ...this.#headers,

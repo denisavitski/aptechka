@@ -2,7 +2,10 @@ import {
   ChangeHistoryAction,
   ElementOrSelector,
   changeHistory,
+  createScriptElement,
   dispatchEvent,
+  excludeElements,
+  intersectElements,
   isBrowser,
   normalizeBase,
   scrollToElement,
@@ -481,24 +484,24 @@ export class Morph {
       const currentHeadChildren = Array.from(document.head.children)
       const newHeadChildren = Array.from(nextRoute.document.head.children)
 
-      const identicalHeadChildren = this.#intersectElements(
+      const identicalHeadChildren = intersectElements(
         currentHeadChildren,
         newHeadChildren,
       )
 
-      const removeHeadChildren = this.#excludeElements(
+      const removeHeadChildren = excludeElements(
         currentHeadChildren,
         identicalHeadChildren,
       )
 
-      const addHeadChildren = this.#excludeElements(
+      const addHeadChildren = excludeElements(
         newHeadChildren,
         identicalHeadChildren,
       ).filter((child) => !this.excludeHeadChild(child))
 
       addHeadChildren.forEach((child, index) => {
         if (child.tagName === 'SCRIPT') {
-          addHeadChildren[index] = this.#createScript(
+          addHeadChildren[index] = createScriptElement(
             child as HTMLScriptElement,
           )
         }
@@ -789,7 +792,7 @@ export class Morph {
         const scriptElements = el.querySelectorAll('script')
 
         scriptElements.forEach((element) => {
-          element.replaceWith(this.#createScript(element))
+          element.replaceWith(createScriptElement(element))
         })
       })
 
@@ -881,21 +884,6 @@ export class Morph {
     )
   }
 
-  #createScript(element: HTMLScriptElement) {
-    const newScriptTag = document.createElement('script')
-
-    for (let i = 0; i < element.attributes.length; i++) {
-      const attr = element.attributes[i]
-      newScriptTag.setAttribute(attr.name, attr.value)
-    }
-
-    if (!element.hasAttribute('src')) {
-      newScriptTag.innerHTML = element.innerHTML
-    }
-
-    return newScriptTag
-  }
-
   #checkLink = (element: HTMLElement) => {
     return (
       (element.getAttribute('href')?.startsWith('/') ||
@@ -924,31 +912,6 @@ export class Morph {
     const morphElements = [...el.querySelectorAll<HTMLElement>('[data-morph]')]
 
     return morphElements.length ? morphElements : [el]
-  }
-
-  #intersectElements(
-    elements: Array<Element>,
-    elementsToIntersect: Array<Element>,
-  ) {
-    return elements.filter((element) =>
-      elementsToIntersect.find(
-        (elementToIntersect) =>
-          elementToIntersect.outerHTML === element.outerHTML,
-      ),
-    )
-  }
-
-  #excludeElements(
-    elements: Array<Element>,
-    elementsToExclude: Array<Element>,
-  ) {
-    return elements.filter(
-      (element) =>
-        !elementsToExclude.find(
-          (elementToExclude) =>
-            elementToExclude.outerHTML === element.outerHTML,
-        ),
-    )
   }
 
   #isElementEmitsLoadEvent(element: Element) {

@@ -90,17 +90,14 @@ export function traverseShadowRoots(
   callback: (element: Element) => void,
   includeShadowRoots: boolean = true,
 ): void {
-  // Check if the current element has a shadow root
   if (root.shadowRoot) {
     callback(root)
 
     if (includeShadowRoots) {
-      // Traverse the shadow DOM if enabled
       traverseElements(root.shadowRoot, callback, includeShadowRoots)
     }
   }
 
-  // Traverse light DOM children
   traverseElements(root, callback, includeShadowRoots)
 }
 
@@ -115,4 +112,43 @@ function traverseElements(
   for (const element of Array.from(children)) {
     traverseShadowRoots(element, callback, includeShadowRoots)
   }
+}
+
+export function intersectElements(
+  elements: Array<Element>,
+  elementsToIntersect: Array<Element>,
+) {
+  return elements.filter((element) =>
+    elementsToIntersect.find(
+      (elementToIntersect) =>
+        elementToIntersect.outerHTML === element.outerHTML,
+    ),
+  )
+}
+
+export function excludeElements(
+  elements: Array<Element>,
+  elementsToExclude: Array<Element>,
+) {
+  return elements.filter(
+    (element) =>
+      !elementsToExclude.find(
+        (elementToExclude) => elementToExclude.outerHTML === element.outerHTML,
+      ),
+  )
+}
+
+export function createScriptElement(element: HTMLScriptElement) {
+  const newScriptTag = document.createElement('script')
+
+  for (let i = 0; i < element.attributes.length; i++) {
+    const attr = element.attributes[i]
+    newScriptTag.setAttribute(attr.name, attr.value)
+  }
+
+  if (!element.hasAttribute('src')) {
+    newScriptTag.innerHTML = element.innerHTML
+  }
+
+  return newScriptTag
 }
