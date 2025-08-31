@@ -206,3 +206,38 @@ export function isLocalUrl(href: string) {
 
   return false
 }
+
+export function searchParamsObjectToString(parameters?: {
+  [key: string]: any
+}) {
+  if (!parameters) {
+    return ''
+  }
+
+  const params = new URLSearchParams()
+
+  for (const [key, value] of Object.entries(parameters)) {
+    if (
+      value !== undefined &&
+      value !== null &&
+      value !== false &&
+      value !== ''
+    ) {
+      params.append(key, String(value))
+    }
+  }
+
+  return params.toString()
+}
+
+export function searchParamsToObject(params: URLSearchParams) {
+  const object: { [key: string]: any } = {}
+
+  for (const [key, value] of params.entries()) {
+    if (value !== undefined && value !== null) {
+      object[key] = value
+    }
+  }
+
+  return object
+}

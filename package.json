@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.82.6",
+  "version": "0.83.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -27,6 +27,11 @@
       "types": "./lib/animation/index.d.ts",
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js"
+    },
+    "./api-fetcher": {
+      "types": "./lib/api-fetcher/index.d.ts",
+      "require": "./lib/api-fetcher/index.cjs",
+      "default": "./lib/api-fetcher/index.js"
     },
     "./attribute": {
       "types": "./lib/attribute/index.d.ts",
@@ -287,6 +292,9 @@
       "animation": [
         "lib/animation/index.d.ts"
       ],
+      "api-fetcher": [
+        "lib/api-fetcher/index.d.ts"
+      ],
       "attribute": [
         "lib/attribute/index.d.ts"
       ],
@@ -449,12 +457,12 @@
     "dev": "vite --host --mode site"
   },
   "devDependencies": {
-    "@types/node": "^24.1.0",
+    "@types/node": "^24.3.0",
     "@types/three": "^0.179.0",
-    "tsx": "^4.20.3",
-    "vite": "^7.0.6",
+    "tsx": "^4.20.5",
+    "vite": "^7.1.3",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-htmc": "0.1.16",
+    "vite-plugin-htmc": "0.1.17",
     "prettier-plugin-organize-imports": "^4.2.0",
     "csstype": "^3.1.3"
   },
