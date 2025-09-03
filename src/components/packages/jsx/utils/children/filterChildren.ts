@@ -2,8 +2,9 @@ import { Store } from '@packages/store'
 
 export function filterChildren(children: JSX.Children) {
   const filtered: Array<string | Element | Store<any>> = []
+  const arr = Array.isArray(children) ? children : [children]
 
-  children.forEach((child) => {
+  arr.forEach((child) => {
     if (child !== null && child !== undefined) {
       if (typeof child === 'number') {
         filtered.push(child.toString())

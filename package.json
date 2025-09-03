@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.83.0",
+  "version": "0.83.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -127,6 +127,21 @@
       "types": "./lib/jsx/index.d.ts",
       "require": "./lib/jsx/index.cjs",
       "default": "./lib/jsx/index.js"
+    },
+    "./jsx/integrations/astro": {
+      "types": "./lib/jsx/integrations/astro/index.d.ts",
+      "require": "./lib/jsx/integrations/astro/index.cjs",
+      "default": "./lib/jsx/integrations/astro/index.js"
+    },
+    "./jsx/integrations/astro/client": {
+      "types": "./lib/jsx/integrations/astro/client.d.ts",
+      "require": "./lib/jsx/integrations/astro/client.cjs",
+      "default": "./lib/jsx/integrations/astro/client.js"
+    },
+    "./jsx/integrations/astro/server": {
+      "types": "./lib/jsx/integrations/astro/server.d.ts",
+      "require": "./lib/jsx/integrations/astro/server.cjs",
+      "default": "./lib/jsx/integrations/astro/server.js"
     },
     "./ladder": {
       "types": "./lib/ladder/index.d.ts",
@@ -355,6 +370,15 @@
       "jsx": [
         "lib/jsx/index.d.ts"
       ],
+      "jsx/integrations/astro": [
+        "lib/jsx/integrations/astro/index.d.ts"
+      ],
+      "jsx/integrations/astro/client": [
+        "lib/jsx/integrations/astro/client.d.ts"
+      ],
+      "jsx/integrations/astro/server": [
+        "lib/jsx/integrations/astro/server.d.ts"
+      ],
       "ladder": [
         "lib/ladder/index.d.ts"
       ],
@@ -459,12 +483,13 @@
   "devDependencies": {
     "@types/node": "^24.3.0",
     "@types/three": "^0.179.0",
+    "astro": "^5.13.5",
+    "csstype": "^3.1.3",
+    "prettier-plugin-organize-imports": "^4.2.0",
     "tsx": "^4.20.5",
     "vite": "^7.1.3",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-htmc": "0.1.17",
-    "prettier-plugin-organize-imports": "^4.2.0",
-    "csstype": "^3.1.3"
+    "vite-plugin-htmc": "0.1.17"
   },
   "dependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",

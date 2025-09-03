@@ -2,11 +2,13 @@ import { Store } from '@packages/store'
 import { camelToKebab, diff, patch } from '@packages/utils'
 import { ComponentElement } from './ComponentElement'
 import { setAttributes } from './utils/attributes/setAttributes'
+import { createElement } from './utils/children/createElement'
 import { filterChildren } from './utils/children/filterChildren'
+import { hydrateTextNode } from './utils/children/hydrateTextNode'
 import { storeChildren } from './utils/children/storeChildren'
 import { subscribeToStore } from './utils/elementStoreSubscription'
 
-class Props {
+export class Props {
   constructor(
     public tag: string,
     public attributes: JSX.Attributes | undefined,
@@ -14,9 +16,19 @@ class Props {
   ) {}
 }
 
-class ComponentProps extends Props {}
-class ElementProps extends Props {}
-class HeadProps extends Props {}
+export class ComponentProps extends Props {}
+export class ElementProps extends Props {}
+export class HeadProps extends Props {}
+
+let isHydrating = false
+
+export function enableHydration() {
+  isHydrating = true
+}
+
+export function disableHydration() {
+  isHydrating = false
+}
 
 export function appendChildren(
   element: Element,
@@ -28,7 +40,7 @@ export function appendChildren(
 
   setAttributes(element, attributes)
 
-  filteredChildren.forEach((child) => {
+  filteredChildren.forEach((child, index) => {
     if (child instanceof Store) {
       subscribeToStore(element, child, () => {
         storeChildren(element, child)
@@ -46,30 +58,40 @@ export function appendChildren(
     } else if (child instanceof ElementProps) {
       let childElement: Element = null!
 
-      if (child.tag === 'svg') {
-        childElement = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'svg',
-        )
-        appendChildren(childElement, child.attributes, child.children, true)
+      if (isHydrating) {
+        const existingChild = element.children[index]
+        if (
+          existingChild &&
+          existingChild.nodeName.toLowerCase() === child.tag
+        ) {
+          childElement = existingChild
+          appendChildren(childElement, child.attributes, child.children, isSVG)
+        } else {
+          childElement = createElement(child.tag, isSVG)
+          appendChildren(childElement, child.attributes, child.children, isSVG)
+          element.append(childElement)
+        }
       } else {
-        childElement = isSVG
-          ? document.createElementNS('http://www.w3.org/2000/svg', child.tag)
-          : document.createElement(child.tag)
+        childElement = createElement(child.tag, isSVG)
+        appendChildren(childElement, child.attributes, child.children, isSVG)
+        element.append(childElement)
       }
-
-      appendChildren(childElement, child.attributes, child.children, isSVG)
-      element.append(childElement)
     } else if (child instanceof HeadProps) {
       const headElement = document.createElement(child.tag)
       appendChildren(headElement, child.attributes, child.children)
       const patches = diff(document.head, headElement)
       patch(document.head, patches)
     } else {
-      element.append(child)
+      if (!isHydrating) {
+        element.append(child)
+      } else {
+        hydrateTextNode(element, child, index)
+      }
     }
   })
 }
+
+export const indexMap: Map<string, number> = new Map()
 
 export function h(
   jsxTag: string | Function,
@@ -115,7 +137,28 @@ export function h(
       customElements.define(name, Constructor)
     }
 
-    const element = new Constructor()
+    const index = (indexMap.get(name) || 0) + 1
+    indexMap.set(name, index)
+
+    const id = `${name}-${index}`
+
+    let element: ComponentElement
+
+    if (isHydrating) {
+      const existingElement = document.querySelector(
+        `${name}[data-hydrate-id="${id}"]`,
+      )
+
+      if (existingElement && existingElement instanceof Constructor) {
+        element = existingElement
+      } else {
+        element = new Constructor()
+        element.setAttribute('data-hydrate-id', id)
+      }
+    } else {
+      element = new Constructor()
+      element.setAttribute('data-hydrate-id', id)
+    }
 
     const props: JSX.ComponentBaseProps = {
       ...attributes,
@@ -124,9 +167,7 @@ export function h(
 
     const res = jsxTag(props)
 
-    if (__JSX_HMR_DEV__) {
-      element.__props__ = props
-    }
+    element.__props__ = props
 
     if (res instanceof ComponentProps || res instanceof ElementProps) {
       if (res?.children || res.attributes) {
@@ -144,5 +185,3 @@ export function Fragment(children: any) {
 
   return fragment
 }
-
-declare const __JSX_HMR_DEV__: boolean

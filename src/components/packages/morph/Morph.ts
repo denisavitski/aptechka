@@ -316,7 +316,7 @@ export class Morph {
         this.#currentURL.pathname === normalizedURL.pathname)
     ) {
       if (!keepScrollPosition) {
-        this.#tryScrollToElement(normalizedURL.hash || 0, {
+        this.#tryScrollToElement(scrollTo || normalizedURL.hash || 0, {
           centerScroll,
           offsetScroll,
           behavior: 'smooth',
@@ -945,7 +945,8 @@ export class Morph {
   }
 
   #tryScrollToElement(id: string | number, options?: ScrollToElementOptions) {
-    const value = typeof id === 'string' ? document.getElementById(id) : id
+    const value =
+      typeof id === 'string' ? document.querySelector<HTMLElement>(id) : id
 
     if (typeof value === 'number' || value) {
       scrollToElement(value, {

@@ -2,8 +2,9 @@ export function render(
   container: ParentNode,
   Component: JSX.Component,
   params?: object,
+  children?: any,
 ) {
-  const element = <Component {...params}></Component>
+  const element = <Component {...params}>{children}</Component>
   container.append(element)
   return element
 }

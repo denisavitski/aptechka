@@ -2,9 +2,9 @@ import type { Store } from '@packages/store'
 import type { ClassListInput } from './utils/attributes/class'
 import type { StyleAttribute } from './utils/attributes/style'
 
-type StoreOr<T> = T | Store<T | null | undefined>
-
 declare global {
+  type StoreOr<T> = T | Store<T | null | undefined>
+
   namespace JSX {
     export type Children = Array<
       | Element
@@ -23,21 +23,22 @@ declare global {
     type Ref<T = unknown> = { value: T }
 
     type ComponentBaseProps = {
-      children?: Children
+      children?: Children | Children[number]
     }
 
     type Component<TProps extends object = object> = {
       formAssociated?: boolean
       template?: boolean
-      (props: ComponentBaseProps & TProps): Children['number']
+      (props: ComponentBaseProps & TProps): Children[number]
     }
 
     type EventMap = keyof HTMLElementEventMap | keyof SVGElementEventMap
 
     type Events = Partial<{
       [K in `on${Capitalize<EventMap>}`]: (
-        event: (HTMLElementEventMap & SVGElementEventMap)[Uncapitalize<
-          Extract<K, `on${string}`> extends `on${infer T}` ? T : never
+        event: (HTMLElementEventMap & SVGElementEventMap)[Extract<
+          Uncapitalize<Extract<K, `on${string}`>>,
+          EventMap
         >],
       ) => void
     }>
@@ -194,6 +195,7 @@ declare global {
 
       ref?: Ref<any> | Array<Ref<any>>
       key?: string
+      setHtml?: any
     }
 
     type UnknownAttributes = { [key: string]: any }

@@ -52,6 +52,12 @@ export function libConfig() {
           'iframe/index': './src/components/packages/iframe/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
           'jsx/index': './src/components/packages/jsx/index.ts',
+          'jsx/integrations/astro/index':
+            './src/components/packages/jsx/integrations/astro/index.ts',
+          'jsx/integrations/astro/client':
+            './src/components/packages/jsx/integrations/astro/client.ts',
+          'jsx/integrations/astro/server':
+            './src/components/packages/jsx/integrations/astro/server.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
