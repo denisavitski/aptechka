@@ -1,3 +1,7 @@
+import { Fragment, h } from './h'
+const _h = h
+const _Fragment = Fragment
+
 export function render(
   container: ParentNode,
   Component: JSX.Component,
@@ -6,5 +10,6 @@ export function render(
 ) {
   const element = <Component {...params}>{children}</Component>
   container.append(element)
+
   return element
 }

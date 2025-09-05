@@ -1,4 +1,4 @@
-import { render } from '@packages/jsx/render'
+import { hydrate, indexMap, render } from 'aptechka/jsx'
 
 export default (element: HTMLElement) => {
   return async (
@@ -7,19 +7,25 @@ export default (element: HTMLElement) => {
     { default: children, ...slotted }: Record<string, any>,
     { client }: Record<string, string>,
   ) => {
-    const container = document.createElement('div')
+    indexMap.clear()
 
-    render(
-      container,
-      Component,
-      {
-        ...props,
-      },
-      children,
-    )
+    if (client === 'only') {
+      const container = document.createElement('div')
 
-    if (container.firstElementChild) {
-      element.replaceWith(container.firstElementChild!)
+      render(
+        container,
+        Component,
+        {
+          ...props,
+        },
+        children,
+      )
+
+      if (container.firstElementChild) {
+        element.appendChild(container.firstElementChild!)
+      }
+    } else {
+      hydrate(Component, props, children)
     }
   }
 }

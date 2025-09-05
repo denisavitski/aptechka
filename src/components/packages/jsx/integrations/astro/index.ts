@@ -22,11 +22,6 @@ export function AstroIntegration(): AstroIntegration {
               include: ['aptechka/jsx/integrations/astro/client'],
               exclude: ['aptechka/jsx/integrations/astro/server'],
             },
-            esbuild: {
-              jsxFactory: 'h',
-              jsxFragment: 'Fragment',
-              jsxInject: `import { h, Fragment } from 'aptechka/jsx'`,
-            },
           },
         })
       },

@@ -98,6 +98,11 @@ export function h(
   attributes?: JSX.Attributes,
   ...children: JSX.Children
 ) {
+  children = children.filter(Boolean).length
+    ? children
+    : (attributes as any)?.children
+  delete (attributes as any)?.children
+
   if (typeof jsxTag === 'string') {
     if (jsxTag === 'component') {
       return new ComponentProps(jsxTag, attributes, children)
