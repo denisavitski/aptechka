@@ -32,8 +32,8 @@ export function disableHydration() {
 
 export function appendChildren(
   element: Element,
-  attributes: JSX.Attributes | undefined,
-  children: JSX.Children,
+  attributes: any,
+  children: any,
   isSVG = false,
 ) {
   const filteredChildren = filterChildren(children)
@@ -101,7 +101,12 @@ export function h(
   children = children.filter(Boolean).length
     ? children
     : (attributes as any)?.children
+
   delete (attributes as any)?.children
+
+  if (children) {
+    children = children.flat(2)
+  }
 
   if (typeof jsxTag === 'string') {
     if (jsxTag === 'component') {
@@ -145,24 +150,24 @@ export function h(
     const index = (indexMap.get(name) || 0) + 1
     indexMap.set(name, index)
 
-    const id = `${name}-${index}`
+    const id = attributes?.__hydrationId
+      ? attributes.__hydrationId
+      : `${jsxTag.name}-${index}`
 
     let element: ComponentElement
 
     if (isHydrating) {
-      const existingElement = document.querySelector(
-        `${name}[data-hydrate-id="${id}"]`,
-      )
+      const existingElement = document.querySelector(`${name}[data-id="${id}"]`)
 
       if (existingElement && existingElement instanceof Constructor) {
         element = existingElement
       } else {
         element = new Constructor()
-        element.setAttribute('data-hydrate-id', id)
+        element.setAttribute('data-id', id)
       }
     } else {
       element = new Constructor()
-      element.setAttribute('data-hydrate-id', id)
+      element.setAttribute('data-id', id)
     }
 
     const props: JSX.ComponentBaseProps = {
@@ -174,10 +179,10 @@ export function h(
 
     element.__props__ = props
 
-    if (res instanceof ComponentProps || res instanceof ElementProps) {
-      if (res?.children || res.attributes) {
-        appendChildren(element, res.attributes, res.children)
-      }
+    if (res instanceof ElementProps) {
+      appendChildren(element, {}, res)
+    } else if (res instanceof ComponentProps) {
+      appendChildren(element, res.attributes, res.children)
     }
 
     return element

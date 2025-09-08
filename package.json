@@ -128,20 +128,10 @@
       "require": "./lib/jsx/index.cjs",
       "default": "./lib/jsx/index.js"
     },
-    "./jsx/integrations/astro": {
-      "types": "./lib/jsx/integrations/astro/index.d.ts",
-      "require": "./lib/jsx/integrations/astro/index.cjs",
-      "default": "./lib/jsx/integrations/astro/index.js"
-    },
-    "./jsx/integrations/astro/client": {
-      "types": "./lib/jsx/integrations/astro/client.d.ts",
-      "require": "./lib/jsx/integrations/astro/client.cjs",
-      "default": "./lib/jsx/integrations/astro/client.js"
-    },
-    "./jsx/integrations/astro/server": {
-      "types": "./lib/jsx/integrations/astro/server.d.ts",
-      "require": "./lib/jsx/integrations/astro/server.cjs",
-      "default": "./lib/jsx/integrations/astro/server.js"
+    "./jsx/plugins/vite": {
+      "types": "./lib/jsx/plugins/vite/index.d.ts",
+      "require": "./lib/jsx/plugins/vite/index.cjs",
+      "default": "./lib/jsx/plugins/vite/index.js"
     },
     "./ladder": {
       "types": "./lib/ladder/index.d.ts",
@@ -370,14 +360,8 @@
       "jsx": [
         "lib/jsx/index.d.ts"
       ],
-      "jsx/integrations/astro": [
-        "lib/jsx/integrations/astro/index.d.ts"
-      ],
-      "jsx/integrations/astro/client": [
-        "lib/jsx/integrations/astro/client.d.ts"
-      ],
-      "jsx/integrations/astro/server": [
-        "lib/jsx/integrations/astro/server.d.ts"
+      "jsx/plugins/vite": [
+        "lib/jsx/plugins/vite.d.ts"
       ],
       "ladder": [
         "lib/ladder/index.d.ts"
@@ -485,11 +469,13 @@
     "@types/three": "^0.179.0",
     "astro": "^5.13.5",
     "csstype": "^3.1.3",
+    "global-jsdom": "^26.0.0",
     "prettier-plugin-organize-imports": "^4.2.0",
     "tsx": "^4.20.5",
     "vite": "^7.1.3",
     "vite-plugin-dts": "^4.5.4",
-    "vite-plugin-htmc": "0.1.17"
+    "vite-plugin-htmc": "0.1.17",
+    "vite-plugin-static-copy": "^3.1.2"
   },
   "dependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
@@ -498,6 +484,7 @@
   },
   "peerDependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
+    "global-jsdom": "^26.0.0",
     "three": "^0.179.1",
     "urlpattern-polyfill": "^10.1.0"
   }

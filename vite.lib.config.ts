@@ -52,12 +52,8 @@ export function libConfig() {
           'iframe/index': './src/components/packages/iframe/index.ts',
           'intersector/index': './src/components/packages/intersector/index.ts',
           'jsx/index': './src/components/packages/jsx/index.ts',
-          'jsx/integrations/astro/index':
-            './src/components/packages/jsx/integrations/astro/index.ts',
-          'jsx/integrations/astro/client':
-            './src/components/packages/jsx/integrations/astro/client.ts',
-          'jsx/integrations/astro/server':
-            './src/components/packages/jsx/integrations/astro/server.ts',
+          'jsx/plugins/vite/index':
+            './src/components/packages/jsx/plugins/vite/index.ts',
           'ladder/index': './src/components/packages/ladder/index.ts',
           'layout-box/index': './src/components/packages/layout-box/index.ts',
           'loading/index': './src/components/packages/loading/index.ts',
@@ -99,13 +95,17 @@ export function libConfig() {
           'youtube/index': './src/components/packages/youtube/index.ts',
         },
         formats: ['es', 'cjs'],
-        fileName: (format, entryName) =>
-          `${entryName}.${format === 'es' ? 'js' : 'cjs'}`,
+        fileName: (format, entryName) => {
+          return `${entryName}.${format === 'es' ? 'js' : 'cjs'}`
+        },
       },
       rollupOptions: {
-        external: Object.keys({
-          ...packageJson.peerDependencies,
-        }),
+        external: [
+          ...Object.keys({
+            ...packageJson.peerDependencies,
+            'global-jsdom/register': true,
+          }),
+        ],
         // onwarn(warning, defaultHandler) {
         //   if (warning.code === 'SOURCEMAP_ERROR') {
         //     return

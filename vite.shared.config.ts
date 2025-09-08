@@ -1,10 +1,10 @@
 import { resolve } from 'path'
 import { UserConfig } from 'vite'
-import { aptechkaVite } from './src/components/packages/jsx/plugins/vite'
+import { aptechkaJSXVitePlugin } from './src/components/packages/jsx/plugins/vite'
 
 export function sharedConfig() {
   const config: UserConfig = {
-    plugins: [aptechkaVite({ __dev: true })],
+    plugins: [aptechkaJSXVitePlugin({ __dev: true })],
     css: {
       modules: {
         localsConvention: 'camelCaseOnly',

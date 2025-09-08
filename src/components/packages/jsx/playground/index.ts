@@ -1,6 +1,6 @@
 // import { Router } from '@packages/router/Router.ts'
 
-import { hydrate } from '../hydrate'
+import { render } from '../render'
 import { Test } from './Test'
 
 // const router = new Router({
@@ -16,4 +16,4 @@ import { Test } from './Test'
 
 // router.run()
 
-hydrate(Test)
+render(document.body, Test)

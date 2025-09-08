@@ -2,29 +2,31 @@ export interface hmrPluginOptions {
   __dev?: boolean
 }
 
-export function aptechkaVite(options?: hmrPluginOptions) {
+export function aptechkaJSXVitePlugin(options?: hmrPluginOptions) {
   const moduleBase = options?.__dev ? '@packages' : 'aptechka'
 
-  return {
-    name: 'jsx-hmr-plugin',
-    apply: 'serve' as const,
-    transform(code: string, id: string) {
-      if (
-        (id.endsWith('.jsx') || id.endsWith('.tsx')) &&
-        !id.endsWith('render.tsx')
-      ) {
-        let transformed = code
+  return [
+    {
+      name: 'aptechka-jsx-vite-dev',
+      apply: 'serve' as const,
+      transform(code: string, id: string) {
+        if (
+          (id.endsWith('.jsx') || id.endsWith('.tsx')) &&
+          !id.endsWith('render.tsx')
+        ) {
+          let transformed = code
 
-        transformed += `\n
+          transformed += `\n
           if (import.meta.hot) {
             import.meta.hot.accept(async (Module) => {
               const { render } = await import('${moduleBase}/jsx')
-              const { camelToKebab } = await import('${moduleBase}/utils')
+              const { camelToKebab,deepQuerySelectorAll } = await import('${moduleBase}/utils')
+              
               for (const key in Module) {
                 if (Object.prototype.hasOwnProperty.call(Module, key)) {
                   if (typeof Module[key] === 'function') {
                     const tag = \`e-\${camelToKebab(Module[key].name)}\`
-                    const foundedElements = [...document.querySelectorAll(tag)]
+                    const foundedElements = [...deepQuerySelectorAll(tag)]
                  
                     foundedElements.forEach((el) => {
                       const nestElements = el.querySelectorAll('[data-nest]')
@@ -59,26 +61,43 @@ export function aptechkaVite(options?: hmrPluginOptions) {
           }
         `
 
-        return {
-          code: transformed,
-          map: null,
+          return {
+            code: transformed,
+            map: null,
+          }
         }
-      }
 
-      return null
-    },
-    config(_config: any, opt: any) {
-      return {
-        esbuild: {
-          jsxFactory: 'h',
-          jsxFragment: 'Fragment',
-          jsxInject: `import { h, Fragment } from '${moduleBase}/jsx'`,
-        },
+        return null
+      },
+      config(_config: any, opt: any) {
+        return {
+          esbuild: {
+            jsxFactory: 'h',
+            jsxFragment: 'Fragment',
+            jsxInject: `import { h, Fragment } from '${moduleBase}/jsx'`,
+            keepNames: true,
+          },
 
-        define: {
-          __JSX_HMR_DEV__: opt.command === 'serve',
-        },
-      }
+          define: {
+            __JSX_HMR_DEV__: opt.command === 'serve',
+          },
+        }
+      },
     },
-  }
+    {
+      name: 'aptechka-jsx-vite-build',
+      apply: 'build' as const,
+      config(_config: any) {
+        return {
+          esbuild: {
+            jsxFactory: 'h',
+            jsxFragment: 'Fragment',
+            jsxInject: `import { h, Fragment } from '${moduleBase}/jsx'`,
+            keepNames: true,
+            minifyIdentifiers: false,
+          },
+        }
+      },
+    },
+  ]
 }

@@ -152,3 +152,25 @@ export function createScriptElement(element: HTMLScriptElement) {
 
   return newScriptTag
 }
+
+export function deepQuerySelectorAll(selector: string, root = document) {
+  const results = []
+
+  // Ищем элементы в текущем корне
+  const elements = root.querySelectorAll(selector)
+  results.push(...elements)
+
+  // Рекурсивно ищем во всех Shadow DOM
+  const allElements = root.querySelectorAll('*')
+  allElements.forEach((element) => {
+    if (element.shadowRoot) {
+      const shadowResults = deepQuerySelectorAll(
+        selector,
+        element.shadowRoot as any,
+      )
+      results.push(...shadowResults)
+    }
+  })
+
+  return results
+}

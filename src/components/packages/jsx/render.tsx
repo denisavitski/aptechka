@@ -1,6 +1,4 @@
-import { Fragment, h } from './h'
-const _h = h
-const _Fragment = Fragment
+import { disableHydration, enableHydration } from './h'
 
 export function render(
   container: ParentNode,
@@ -9,7 +7,22 @@ export function render(
   children?: any,
 ) {
   const element = <Component {...params}>{children}</Component>
+
   container.append(element)
+
+  return element
+}
+
+export function hydrate(
+  Component: JSX.Component,
+  params?: object,
+  children?: any,
+) {
+  enableHydration()
+
+  const element = <Component {...params}>{children}</Component>
+
+  disableHydration()
 
   return element
 }
