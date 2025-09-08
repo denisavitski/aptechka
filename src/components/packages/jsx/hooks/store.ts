@@ -2,10 +2,10 @@ import {
   Composed,
   Derived,
   DerivedArray,
+  DerivedKeyedArray,
   Resource,
   Store,
 } from '@packages/store'
-import { DerivedKeyedArray } from '@packages/store/DerivedArray'
 import { activeComponent } from '../ComponentElement'
 
 export function useStore<StoreType = unknown>(

@@ -1,8 +1,8 @@
-export interface hmrPluginOptions {
+export interface PluginOptions {
   __dev?: boolean
 }
 
-export function aptechkaJSXVitePlugin(options?: hmrPluginOptions) {
+export function aptechkaJSXVitePlugin(options?: PluginOptions) {
   const moduleBase = options?.__dev ? '@packages' : 'aptechka'
 
   return [

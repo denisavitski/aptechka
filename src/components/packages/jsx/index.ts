@@ -31,4 +31,7 @@ export {
   useStore,
 } from './hooks/store'
 
+export { useElementResize, useWindowResize } from './hooks/resize'
+export { useTicker } from './hooks/ticker'
+
 export { hydrate, render } from './render'

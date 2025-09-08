@@ -1,16 +1,20 @@
 export {
   Store,
   activeStores,
-  type StoreState,
-  type StoreSubscribeCallback,
+  type StoreEqualityCheckCallback,
   type StoreMiddleware,
   type StoreOptions,
-  type StoreEqualityCheckCallback,
+  type StoreState,
+  type StoreSubscribeCallback,
 } from './Store'
 
 export { Derived, type DerivedCallback } from './Derived'
 
-export { DerivedArray, type DerivedArrayCallback } from './DerivedArray'
+export {
+  DerivedArray,
+  DerivedKeyedArray,
+  type DerivedArrayCallback,
+} from './DerivedArray'
 
 export { Resource, type ResourceFetcher } from './Resource'
 
