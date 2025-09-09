@@ -3,9 +3,15 @@ import { useStylesheet } from '@packages/jsx/hooks/component/useStylesheet'
 import { ScrollElement } from '@packages/scroll'
 
 export const DefineTest: JSX.Component = (props) => {
+  console.log('DefineTest')
+
   useShadow()
 
   useStylesheet({
+    ':host': {
+      backgroundColor: 'tomato',
+      display: 'block',
+    },
     'e-scroll': {
       '--axis': 'x',
       '--gap': '10px',

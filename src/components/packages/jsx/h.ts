@@ -193,7 +193,7 @@ function getOrDefineCustomElement(name: string, jsxTag: Function) {
         super()
 
         if (isDefining.value) {
-          fillComponentElement(this, jsxTag, {}, [])
+          this.addLoadCallback(() => fillComponentElement(this, jsxTag, {}, []))
         }
       }
     }
