@@ -1,5 +1,5 @@
 import { Store } from '@packages/store'
-import { camelToKebab, diff, patch } from '@packages/utils'
+import { camelToKebab, diff, isESClass, patch } from '@packages/utils'
 import { ComponentElement } from './ComponentElement'
 import { setAttributes } from './utils/attributes/setAttributes'
 import { createElement } from './utils/children/createElement'
@@ -137,6 +137,10 @@ function handleFunctionTag(
   attributes: JSX.Attributes | undefined,
   children: JSX.Children,
 ) {
+  if (isESClass(jsxTag)) {
+    return createClassElement(jsxTag as any, attributes, children)
+  }
+
   if (jsxTag === Fragment) {
     return Fragment(children)
   }
@@ -146,6 +150,16 @@ function handleFunctionTag(
   }
 
   return createCustomElement(jsxTag, attributes, children)
+}
+
+function createClassElement(
+  jsxTag: CustomElementConstructor,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  const element = new jsxTag()
+  appendChildren(element, attributes, children)
+  return element
 }
 
 function createCustomElement(

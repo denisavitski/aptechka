@@ -4,7 +4,12 @@ import type * as CSS from 'csstype'
 import { useConnect } from './lifecycle'
 
 export type UseStylesheetNestedObject = {
-  [key: string]: CSS.Properties | UseStylesheetNestedObject
+  [key: string]:
+    | CSS.Properties
+    | UseStylesheetNestedObject
+    | string
+    | boolean
+    | number
 }
 
 export type UseStylesheetSource =
