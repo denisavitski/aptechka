@@ -33,6 +33,10 @@ export class ComponentElement extends HTMLElement {
         this.#disconnectCallbacks.push(unsub)
       }
     })
+
+    if (activeComponent.current === this) {
+      activeComponent.current = null!
+    }
   }
 
   protected disconnectedCallback() {
@@ -42,5 +46,9 @@ export class ComponentElement extends HTMLElement {
 
     this.#connectCallbacks = []
     this.#disconnectCallbacks = []
+
+    if (activeComponent.current === this) {
+      activeComponent.current = null!
+    }
   }
 }

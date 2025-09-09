@@ -1,7 +1,7 @@
 // import { Router } from '@packages/router/Router.ts'
 
 import { render } from '../render'
-import { Test } from './Test'
+import { Todo } from './todo/Todo'
 
 // const router = new Router({
 //   base: '/components/packages/jsx/playground',
@@ -16,4 +16,4 @@ import { Test } from './Test'
 
 // router.run()
 
-render(document.body, Test)
+render(document.body, Todo)

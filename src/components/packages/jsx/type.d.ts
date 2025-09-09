@@ -14,6 +14,7 @@ declare global {
       | undefined
       | Store<any>
       | Array<Children>
+      | void
     >
 
     type Fragment = any
