@@ -8,7 +8,7 @@ import { hydrateTextNode } from './utils/children/hydrateTextNode'
 import { storeChildren } from './utils/children/storeChildren'
 import { subscribeToStore } from './utils/elementStoreSubscription'
 
-export class Props {
+class Props {
   constructor(
     public tag: string,
     public attributes: JSX.Attributes | undefined,
@@ -16,14 +16,11 @@ export class Props {
   ) {}
 }
 
-export class ComponentProps extends Props {}
-export class ElementProps extends Props {}
-export class HeadProps extends Props {}
+class ComponentProps extends Props {}
+class ElementProps extends Props {}
+class HeadProps extends Props {}
 
-export const isHydrating = { value: false }
-export const isDefining = { value: false }
-
-export function appendChildren(
+function appendChildren(
   element: Element,
   attributes: any,
   children: any,
@@ -34,171 +31,243 @@ export function appendChildren(
   setAttributes(element, attributes)
 
   filteredChildren.forEach((child, index) => {
-    if (child instanceof Store) {
-      subscribeToStore(element, child, () => {
-        storeChildren(element, child)
-      })
-    } else if (child instanceof ComponentProps) {
-      if (child.tag === 'shadow' && element.shadowRoot) {
-        appendChildren(
-          element.shadowRoot as any,
-          child.attributes,
-          child.children,
-        )
-      } else {
-        appendChildren(element, child.attributes, child.children)
-      }
-    } else if (child instanceof ElementProps) {
-      let childElement: Element = null!
-
-      if (isHydrating.value) {
-        const existingChild = element.children[index]
-        if (
-          existingChild &&
-          existingChild.nodeName.toLowerCase() === child.tag
-        ) {
-          childElement = existingChild
-          appendChildren(childElement, child.attributes, child.children, isSVG)
-        } else {
-          childElement = createElement(child.tag, isSVG)
-          appendChildren(childElement, child.attributes, child.children, isSVG)
-          element.append(childElement)
-        }
-      } else {
-        childElement = createElement(child.tag, isSVG)
-        appendChildren(childElement, child.attributes, child.children, isSVG)
-        element.append(childElement)
-      }
-    } else if (child instanceof HeadProps) {
-      const headElement = document.createElement(child.tag)
-      appendChildren(headElement, child.attributes, child.children)
-      const patches = diff(document.head, headElement)
-      patch(document.head, patches)
-    } else {
-      if (!isHydrating.value) {
-        element.append(child)
-      } else {
-        hydrateTextNode(element, child, index)
-      }
-    }
+    handleChild(element, child, index, isSVG)
   })
 }
 
-export const indexMap: Map<string, number> = new Map()
+function handleChild(
+  element: Element,
+  child: any,
+  index: number,
+  isSVG: boolean,
+) {
+  if (child instanceof Store) {
+    handleStoreChild(element, child)
+  } else if (child instanceof ComponentProps) {
+    handleComponentProps(element, child)
+  } else if (child instanceof ElementProps) {
+    handleElementProps(element, child, index, isSVG)
+  } else if (child instanceof HeadProps) {
+    handleHeadProps(child)
+  } else {
+    handleTextNode(element, child, index)
+  }
+}
+
+function handleStoreChild(element: Element, child: Store) {
+  subscribeToStore(element, child, () => {
+    storeChildren(element, child)
+  })
+}
+
+function handleComponentProps(element: Element, child: ComponentProps) {
+  if (child.tag === 'shadow' && element.shadowRoot) {
+    appendChildren(element.shadowRoot as any, child.attributes, child.children)
+  } else {
+    appendChildren(element, child.attributes, child.children)
+  }
+}
+
+function handleElementProps(
+  element: Element,
+  child: ElementProps,
+  index: number,
+  isSVG: boolean,
+) {
+  let childElement: Element | null = null
+
+  if (isHydrating.value) {
+    const existingChild = element.children[index]
+    if (existingChild?.nodeName.toLowerCase() === child.tag) {
+      childElement = existingChild
+      appendChildren(childElement, child.attributes, child.children, isSVG)
+    } else {
+      childElement = createElement(child.tag, isSVG)
+      appendChildren(childElement, child.attributes, child.children, isSVG)
+      element.append(childElement)
+    }
+  } else {
+    childElement = createElement(child.tag, isSVG)
+    appendChildren(childElement, child.attributes, child.children, isSVG)
+    element.append(childElement)
+  }
+}
+
+function handleHeadProps(child: HeadProps) {
+  const headElement = document.createElement(child.tag)
+  appendChildren(headElement, child.attributes, child.children)
+  const patches = diff(document.head, headElement)
+  patch(document.head, patches)
+}
+
+function handleTextNode(element: Element, child: any, index: number) {
+  if (!isHydrating.value) {
+    element.append(child)
+  } else {
+    hydrateTextNode(element, child, index)
+  }
+}
+
+function processChildren(
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  let result = children.filter(Boolean).length ? children : attributes?.children
+  return result ? result.flat(2) : []
+}
+
+function handleStringTag(
+  tag: string,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  switch (tag) {
+    case 'component':
+    case 'shadow':
+      return new ComponentProps(tag, attributes, children)
+    case 'head':
+      return new HeadProps(tag, attributes, children)
+    default:
+      return new ElementProps(tag, attributes, children)
+  }
+}
+
+function handleFunctionTag(
+  jsxTag: Function,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  if (jsxTag === Fragment) {
+    return Fragment(children)
+  }
+
+  if ((jsxTag as JSX.Component).template) {
+    return jsxTag({ ...attributes })
+  }
+
+  return createCustomElement(jsxTag, attributes, children)
+}
+
+function createCustomElement(
+  jsxTag: Function,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  const name = `e-${camelToKebab(jsxTag.name)}`
+  const Constructor = getOrDefineCustomElement(name, jsxTag)
+
+  if (isDefining.value) {
+    return undefined as any
+  }
+
+  const id = generateElementId(jsxTag.name, attributes)
+  const element = getOrCreateElement(name, id, Constructor)
+
+  fillComponentElement(element, jsxTag, attributes, children)
+
+  return element
+}
+
+function getOrDefineCustomElement(name: string, jsxTag: Function) {
+  let Constructor = customElements.get(name) as typeof ComponentElement
+
+  if (!Constructor) {
+    Constructor = class extends ComponentElement {
+      static formAssociated = (jsxTag as JSX.Component).formAssociated
+
+      constructor() {
+        super()
+
+        if (isDefining.value) {
+          fillComponentElement(this, jsxTag, {}, [])
+        }
+      }
+    }
+
+    customElements.define(name, Constructor)
+  }
+
+  return Constructor
+}
+
+function generateElementId(
+  tagName: string,
+  attributes: JSX.Attributes | undefined,
+) {
+  if (attributes?.__hydrationId) {
+    return attributes.__hydrationId
+  }
+
+  const index = (indexMap.get(tagName) || 0) + 1
+  indexMap.set(tagName, index)
+  return `${tagName}-${index}`
+}
+
+function getOrCreateElement(
+  name: string,
+  id: string,
+  Constructor: typeof ComponentElement,
+) {
+  if (isHydrating.value) {
+    const selector = `${name}[data-id="${id}"]`
+    const existingElement = document.querySelector(selector)
+
+    if (existingElement && existingElement instanceof Constructor) {
+      return existingElement
+    }
+  }
+
+  const element = new Constructor()
+  element.setAttribute('data-id', id)
+  return element
+}
+
+function fillComponentElement(
+  element: ComponentElement,
+  jsxTag: Function,
+  attributes: JSX.Attributes | undefined,
+  children: JSX.Children,
+) {
+  const props: JSX.ComponentBaseProps = {
+    ...attributes,
+    children,
+  }
+
+  const result = jsxTag(props)
+
+  if (__JSX_HMR_DEV__) {
+    element.__props__ = props
+  }
+
+  if (result instanceof ElementProps) {
+    appendChildren(element, {}, result)
+  } else if (result instanceof ComponentProps) {
+    appendChildren(element, result.attributes, result.children)
+  }
+}
+
+export const isHydrating = { value: false }
+export const isDefining = { value: false }
+export const indexMap = new Map<string, number>()
 
 export function h(
   jsxTag: string | Function,
   attributes?: JSX.Attributes,
   ...children: JSX.Children
 ) {
-  children = children.filter(Boolean).length
-    ? children
-    : (attributes as any)?.children
-
-  delete (attributes as any)?.children
-
-  if (children) {
-    children = children.flat(2)
-  }
+  const processedChildren = processChildren(attributes, children)
+  const processedAttributes = { ...attributes }
+  delete processedAttributes.children
 
   if (typeof jsxTag === 'string') {
-    if (jsxTag === 'component') {
-      return new ComponentProps(jsxTag, attributes, children)
-    } else if (jsxTag === 'shadow') {
-      return new ComponentProps(jsxTag, attributes, children)
-    } else if (jsxTag === 'head') {
-      return new HeadProps(jsxTag, attributes, children)
-    } else {
-      return new ElementProps(jsxTag, attributes, children)
-    }
-  } else {
-    if (jsxTag === Fragment) {
-      return Fragment(children)
-    }
-
-    if ((jsxTag as JSX.Component).template) {
-      const res = jsxTag({
-        ...attributes,
-      })
-
-      return res
-    }
-
-    const fillComponent = (element: ComponentElement) => {
-      const props: JSX.ComponentBaseProps = {
-        ...attributes,
-        children,
-      }
-
-      const res = (jsxTag as Function)(props)
-
-      if (__JSX_HMR_DEV__) {
-        element.__props__ = props
-      }
-
-      if (res instanceof ElementProps) {
-        appendChildren(element, {}, res)
-      } else if (res instanceof ComponentProps) {
-        appendChildren(element, res.attributes, res.children)
-      }
-    }
-
-    const name = `e-${camelToKebab(jsxTag.name)}`
-
-    let Constructor = customElements.get(name) as typeof ComponentElement
-
-    if (!Constructor) {
-      Constructor = class extends ComponentElement {
-        static formAssociated = (jsxTag as JSX.Component).formAssociated
-
-        constructor() {
-          super()
-
-          if (isDefining.value) {
-            fillComponent(this)
-          }
-        }
-      }
-
-      customElements.define(name, Constructor)
-    }
-
-    if (isDefining.value) {
-      return
-    }
-
-    const index = (indexMap.get(name) || 0) + 1
-    indexMap.set(name, index)
-
-    const id = attributes?.__hydrationId
-      ? attributes.__hydrationId
-      : `${jsxTag.name}-${index}`
-
-    let element: ComponentElement
-
-    if (isHydrating.value) {
-      const existingElement = document.querySelector(`${name}[data-id="${id}"]`)
-
-      if (existingElement && existingElement instanceof Constructor) {
-        element = existingElement
-      } else {
-        element = new Constructor()
-        element.setAttribute('data-id', id)
-      }
-    } else {
-      element = new Constructor()
-      element.setAttribute('data-id', id)
-    }
-
-    fillComponent(element)
-
-    return element
+    return handleStringTag(jsxTag, processedAttributes, processedChildren)
   }
+
+  return handleFunctionTag(jsxTag, processedAttributes, processedChildren)
 }
 
-export function Fragment(children: any) {
+export function Fragment(children: JSX.Children) {
   const fragment = document.createDocumentFragment()
-  appendChildren(fragment as any, undefined, children)
-
+  appendChildren(fragment as unknown as Element, undefined, children)
   return fragment
 }

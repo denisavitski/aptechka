@@ -27,14 +27,10 @@ export function hydrate(
   return element
 }
 
-export function define(
-  Component: JSX.Component,
-  params?: object,
-  children?: any,
-) {
+export function define(Component: JSX.Component) {
   isDefining.value = true
 
-  const element = <Component {...params}>{children}</Component>
+  const element = <Component></Component>
 
   isDefining.value = false
 
