@@ -20,6 +20,7 @@ export type ComponentElementLoadingType =
 
 export class ComponentElement extends HTMLElement {
   public __props__: any
+  public __innerHTML__: any
   #loadCallback?: Function
   #connectCallbacks: Array<ComponentConnectCallback> = []
   #disconnectCallbacks: Array<ComponentDisconnectCallback> = []

@@ -36,8 +36,8 @@ export function aptechkaJSXVitePlugin(options?: PluginOptions) {
                       const nestElements = el.querySelectorAll('[data-nest]')
 
                       const container = document.createElement('div')
-           
-                      render(container, Module[key], el.__props__)
+
+                      render(container, Module[key], {...el.__props__, setHtml: el.__innerHTML__})
                       const componentElement = container.firstElementChild
 
                       if (componentElement) {

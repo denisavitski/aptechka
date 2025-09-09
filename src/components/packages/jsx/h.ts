@@ -193,7 +193,9 @@ function getOrDefineCustomElement(name: string, jsxTag: Function) {
         super()
 
         if (isDefining.value) {
-          this.addLoadCallback(() => fillComponentElement(this, jsxTag, {}, []))
+          this.addLoadCallback(() => {
+            return fillComponentElement(this, jsxTag, {}, [])
+          })
         }
       }
     }
@@ -242,21 +244,25 @@ function fillComponentElement(
   attributes: JSX.Attributes | undefined,
   children: JSX.Children,
 ) {
-  const props: JSX.ComponentBaseProps = {
+  const props = {
     ...attributes,
     children,
   }
 
-  const result = jsxTag(props)
+  const setHtml = props.setHtml
+  delete props.setHtml
 
   if (__JSX_HMR_DEV__) {
     element.__props__ = props
+    element.__innerHTML__ = setHtml || element.innerHTML
   }
 
+  const result = jsxTag(props)
+
   if (result instanceof ElementProps) {
-    appendChildren(element, {}, result)
+    appendChildren(element, { setHtml }, result)
   } else if (result instanceof ComponentProps) {
-    appendChildren(element, result.attributes, result.children)
+    appendChildren(element, { ...result.attributes, setHtml }, result.children)
   }
 }
 

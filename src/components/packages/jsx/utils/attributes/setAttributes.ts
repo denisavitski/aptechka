@@ -18,7 +18,7 @@ export function setAttribute(element: Element, key: string, value: unknown) {
     setClassAttribute(element, value as ClassListInput)
   } else if (key === 'style') {
     setStyleAttribute(element as HTMLElement, value as any)
-  } else if (key === 'setHtml') {
+  } else if (key === 'setHtml' && value != null) {
     element.innerHTML = value as any
   } else if (typeof value === 'number') {
     if (key === 'tabIndex') {
