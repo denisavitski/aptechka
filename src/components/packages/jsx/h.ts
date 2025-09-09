@@ -20,15 +20,8 @@ export class ComponentProps extends Props {}
 export class ElementProps extends Props {}
 export class HeadProps extends Props {}
 
-let isHydrating = false
-
-export function enableHydration() {
-  isHydrating = true
-}
-
-export function disableHydration() {
-  isHydrating = false
-}
+export const isHydrating = { value: false }
+export const isDefining = { value: false }
 
 export function appendChildren(
   element: Element,
@@ -58,7 +51,7 @@ export function appendChildren(
     } else if (child instanceof ElementProps) {
       let childElement: Element = null!
 
-      if (isHydrating) {
+      if (isHydrating.value) {
         const existingChild = element.children[index]
         if (
           existingChild &&
@@ -82,7 +75,7 @@ export function appendChildren(
       const patches = diff(document.head, headElement)
       patch(document.head, patches)
     } else {
-      if (!isHydrating) {
+      if (!isHydrating.value) {
         element.append(child)
       } else {
         hydrateTextNode(element, child, index)
@@ -131,6 +124,25 @@ export function h(
       return res
     }
 
+    const fillComponent = (element: ComponentElement) => {
+      const props: JSX.ComponentBaseProps = {
+        ...attributes,
+        children,
+      }
+
+      const res = (jsxTag as Function)(props)
+
+      if (__JSX_HMR_DEV__) {
+        element.__props__ = props
+      }
+
+      if (res instanceof ElementProps) {
+        appendChildren(element, {}, res)
+      } else if (res instanceof ComponentProps) {
+        appendChildren(element, res.attributes, res.children)
+      }
+    }
+
     const name = `e-${camelToKebab(jsxTag.name)}`
 
     let Constructor = customElements.get(name) as typeof ComponentElement
@@ -141,10 +153,18 @@ export function h(
 
         constructor() {
           super()
+
+          if (isDefining.value) {
+            fillComponent(this)
+          }
         }
       }
 
       customElements.define(name, Constructor)
+    }
+
+    if (isDefining.value) {
+      return
     }
 
     const index = (indexMap.get(name) || 0) + 1
@@ -156,7 +176,7 @@ export function h(
 
     let element: ComponentElement
 
-    if (isHydrating) {
+    if (isHydrating.value) {
       const existingElement = document.querySelector(`${name}[data-id="${id}"]`)
 
       if (existingElement && existingElement instanceof Constructor) {
@@ -170,20 +190,7 @@ export function h(
       element.setAttribute('data-id', id)
     }
 
-    const props: JSX.ComponentBaseProps = {
-      ...attributes,
-      children,
-    }
-
-    const res = jsxTag(props)
-
-    element.__props__ = props
-
-    if (res instanceof ElementProps) {
-      appendChildren(element, {}, res)
-    } else if (res instanceof ComponentProps) {
-      appendChildren(element, res.attributes, res.children)
-    }
+    fillComponent(element)
 
     return element
   }

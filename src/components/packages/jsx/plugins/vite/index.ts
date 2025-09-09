@@ -18,9 +18,13 @@ export function aptechkaJSXVitePlugin(options?: PluginOptions) {
 
           transformed += `\n
           if (import.meta.hot) {
+            import.meta.hot.on('vite:beforeUpdate', () => {
+            })
+
             import.meta.hot.accept(async (Module) => {
               const { render } = await import('${moduleBase}/jsx')
-              const { camelToKebab,deepQuerySelectorAll } = await import('${moduleBase}/utils')
+              const { camelToKebab, deepQuerySelectorAll } = await import('${moduleBase}/utils')
+              const { getCreationSource } = await import('${moduleBase}/dev')
               
               for (const key in Module) {
                 if (Object.prototype.hasOwnProperty.call(Module, key)) {
@@ -95,6 +99,10 @@ export function aptechkaJSXVitePlugin(options?: PluginOptions) {
             jsxInject: `import { h, Fragment } from '${moduleBase}/jsx'`,
             keepNames: true,
             minifyIdentifiers: false,
+          },
+
+          define: {
+            __JSX_HMR_DEV__: false,
           },
         }
       },

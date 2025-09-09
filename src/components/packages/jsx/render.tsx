@@ -1,4 +1,4 @@
-import { disableHydration, enableHydration } from './h'
+import { isDefining, isHydrating } from './h'
 
 export function render(
   container: ParentNode,
@@ -18,11 +18,25 @@ export function hydrate(
   params?: object,
   children?: any,
 ) {
-  enableHydration()
+  isHydrating.value = true
 
   const element = <Component {...params}>{children}</Component>
 
-  disableHydration()
+  isHydrating.value = false
+
+  return element
+}
+
+export function define(
+  Component: JSX.Component,
+  params?: object,
+  children?: any,
+) {
+  isDefining.value = true
+
+  const element = <Component {...params}>{children}</Component>
+
+  isDefining.value = false
 
   return element
 }

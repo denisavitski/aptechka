@@ -3,6 +3,8 @@ import type { ClassListInput } from './utils/attributes/class'
 import type { StyleAttribute } from './utils/attributes/style'
 
 declare global {
+  declare var __JSX_HMR_DEV__: boolean
+
   type StoreOr<T> = T | Store<T | null | undefined>
 
   namespace JSX {

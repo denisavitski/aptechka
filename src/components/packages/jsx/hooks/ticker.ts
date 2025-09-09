@@ -1,8 +1,25 @@
-import { ticker } from '@packages/ticker'
+import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
+import { activeComponent } from '../ComponentElement'
 import { useConnect } from './component/lifecycle'
 
-export function useTicker(...parameters: Parameters<typeof ticker.subscribe>) {
-  useConnect(() => {
-    return ticker.subscribe(...parameters)
-  })
+export interface UseTickerOptions extends TickerAddOptions {
+  componentCulling?: boolean
+}
+
+export function useTicker(
+  callback: TickerCallback,
+  options?: UseTickerOptions,
+) {
+  if (activeComponent.current) {
+    useConnect(() => {
+      return ticker.subscribe(callback, {
+        ...options,
+        culling: options?.componentCulling
+          ? activeComponent.current
+          : options?.culling,
+      })
+    })
+  } else {
+    return ticker.subscribe(callback, options)
+  }
 }

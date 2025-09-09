@@ -4,8 +4,10 @@ import {
   useShadow,
   useStore,
   useStylesheet,
+  useTicker,
 } from '@packages/jsx'
 import { generateId } from '@packages/utils'
+import { Test } from './Test'
 
 interface TodoItem {
   value: string
@@ -13,7 +15,7 @@ interface TodoItem {
   complete: boolean
 }
 
-const store = useStore<Array<TodoItem>>([])
+const store = useStore<Array<TodoItem>>([], {})
 
 const ListItem: JSX.Component<TodoItem> = (props) => {
   useShadow()
@@ -33,9 +35,10 @@ const ListItem: JSX.Component<TodoItem> = (props) => {
       <shadow>
         <div
           style={{
-            textDecoration: useDerivedStore(completeStore, (e) =>
-              e ? 'line-through' : '',
-            ),
+            textDecoration: useDerivedStore(completeStore, (e) => {
+              store.current.find((v) => v.key === props.key)!.complete = e
+              return e ? 'line-through' : ''
+            }),
           }}
         >
           {props.value}
@@ -100,9 +103,12 @@ export const Todo: JSX.Component = () => {
     },
   })
 
+  useTicker(() => {})
+
   return (
     <component>
       <shadow>
+        <Test></Test>
         <Form></Form>
         <List></List>
       </shadow>

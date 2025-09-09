@@ -33,7 +33,7 @@ class StoreRegistry {
   }
 
   public loadState(
-    state: string | StoreRegistryState | null = localStorage.getItem(this.name)
+    state: string | StoreRegistryState | null = localStorage.getItem(this.name),
   ) {
     if (state) {
       if (typeof state === 'string') {

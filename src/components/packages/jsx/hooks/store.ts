@@ -8,10 +8,8 @@ import {
 } from '@packages/store'
 import { activeComponent } from '../ComponentElement'
 
-export function useStore<StoreType = unknown>(
-  ...parameters: ConstructorParameters<typeof Store<StoreType>>
-) {
-  const store = new Store<StoreType>(...parameters)
+function subscribe<T extends Store<any>>(create: () => T) {
+  const store = create()
 
   if (activeComponent.current) {
     activeComponent.current.addDisconnectCallback(() => {
@@ -20,34 +18,24 @@ export function useStore<StoreType = unknown>(
   }
 
   return store
+}
+
+export function useStore<StoreType = unknown>(
+  ...parameters: ConstructorParameters<typeof Store<StoreType>>
+) {
+  return subscribe(() => new Store<StoreType>(...parameters))
 }
 
 export function useDerivedStore<Type, SourceType>(
   ...parameters: ConstructorParameters<typeof Derived<Type, SourceType>>
 ) {
-  const store = new Derived<Type, SourceType>(...parameters)
-
-  if (activeComponent.current) {
-    activeComponent.current.addDisconnectCallback(() => {
-      store.close()
-    })
-  }
-
-  return store
+  return subscribe(() => new Derived<Type, SourceType>(...parameters))
 }
 
 export function useDerivedArrayStore<Type, SourceType extends Array<any>>(
   ...parameters: ConstructorParameters<typeof DerivedArray<Type, SourceType>>
 ) {
-  const store = new DerivedArray<Type, SourceType>(...parameters)
-
-  if (activeComponent.current) {
-    activeComponent.current.addDisconnectCallback(() => {
-      store.close()
-    })
-  }
-
-  return store
+  return subscribe(() => new DerivedArray<Type, SourceType>(...parameters))
 }
 
 export function useDerivedKeyedArrayStore<Type, SourceType extends Array<any>>(
@@ -55,41 +43,17 @@ export function useDerivedKeyedArrayStore<Type, SourceType extends Array<any>>(
     typeof DerivedKeyedArray<Type, SourceType>
   >
 ) {
-  const store = new DerivedKeyedArray<Type, SourceType>(...parameters)
-
-  if (activeComponent.current) {
-    activeComponent.current.addDisconnectCallback(() => {
-      store.close()
-    })
-  }
-
-  return store
+  return subscribe(() => new DerivedKeyedArray<Type, SourceType>(...parameters))
 }
 
 export function useResourceStore<Type>(
   ...parameters: ConstructorParameters<typeof Resource<Type>>
 ) {
-  const store = new Resource<Type>(...parameters)
-
-  if (activeComponent.current) {
-    activeComponent.current.addDisconnectCallback(() => {
-      store.close()
-    })
-  }
-
-  return store
+  return subscribe(() => new Resource<Type>(...parameters))
 }
 
 export function useComposedStore<Type>(
   ...parameters: ConstructorParameters<typeof Composed<Type>>
 ) {
-  const store = new Composed<Type>(...parameters)
-
-  if (activeComponent.current) {
-    activeComponent.current.addDisconnectCallback(() => {
-      store.close()
-    })
-  }
-
-  return store
+  return subscribe(() => new Composed<Type>(...parameters))
 }

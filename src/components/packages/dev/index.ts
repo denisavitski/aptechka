@@ -13,3 +13,14 @@ export function devMode() {
     }
   })
 }
+
+export function getCreationSource(index = 4) {
+  try {
+    throw new Error()
+  } catch (e: any) {
+    const stack = e.stack.split('\n')
+    const path = stack[index]?.trim()
+    // console.log(stack)
+    return 'http' + path?.split('?')[0].split('http')[1]
+  }
+}
