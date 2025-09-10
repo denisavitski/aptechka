@@ -144,6 +144,10 @@ export class ComponentElement extends HTMLElement {
   #connect() {
     activeComponent.current = this
 
+    this.querySelectorAll('[data-fallback]').forEach((el) => {
+      el.remove()
+    })
+
     if (this.#loadingType !== 'constructor') {
       this.#loadCallback?.()
     }
