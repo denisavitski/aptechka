@@ -1,4 +1,5 @@
 import { Store } from '@packages/store'
+import { uncapitalize } from '@packages/utils'
 import { subscribeToStore } from '../elementStoreSubscription'
 import { ClassListInput, setClassAttribute } from './class'
 import { setStyleAttribute } from './style'
@@ -56,7 +57,7 @@ export function setAttributes(ele: Element, attributes?: JSX.Attributes) {
         setAttribute(ele, key, value)
       } else {
         ele.addEventListener(
-          key.replace('on', '').toLowerCase() as any,
+          uncapitalize(key.replace('on', '')) as any,
           value as EventListener,
         )
       }

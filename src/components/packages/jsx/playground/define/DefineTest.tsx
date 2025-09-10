@@ -1,3 +1,4 @@
+import { CanvasElement } from '@packages/canvas'
 import { useShadow } from '@packages/jsx/hooks/component/useShadow'
 import { useStylesheet } from '@packages/jsx/hooks/component/useStylesheet'
 
@@ -6,29 +7,16 @@ export const DefineTest: JSX.Component = (props) => {
 
   useStylesheet({
     ':host': {
-      backgroundColor: 'tomato',
       display: 'block',
-    },
-    'e-scroll': {
-      '--axis': 'x',
-      '--gap': '10px',
-      '--auto-size': 'true',
-      '--overflow': 'hidden',
-      '--sections-in-view': 3,
-      width: '300px',
-      border: '1px solid red',
-    },
-
-    div: {
-      height: '100px',
-      backgroundColor: 'red',
+      width: '100%',
+      height: '100%',
     },
   })
 
   return (
     <component>
       <shadow>
-        <slot></slot>
+        <CanvasElement></CanvasElement>
       </shadow>
     </component>
   )

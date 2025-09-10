@@ -216,6 +216,7 @@ declare global {
       | `${string}-${string}`
       | keyof HTMLElementTagNameMap
       | keyof SVGElementTagNameMap
+      | CustomElementConstructor
 
     type IntrinsicElementsHTML = {
       [TKey in TagNameMap]?: Attributes

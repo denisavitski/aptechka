@@ -1,8 +1,8 @@
 import { CSSProperty } from '@packages/css-property'
 
 import {
-  ElementResizerCallback,
   elementResizer,
+  ElementResizerCallback,
 } from '@packages/element-resizer'
 
 import { ticker, TickerCallback } from '@packages/ticker'
@@ -159,7 +159,7 @@ export class CanvasElement extends HTMLElement {
       new CustomEvent('canvasRender', {
         composed: true,
         detail: this.detail,
-      })
+      }),
     )
   }
 
@@ -168,7 +168,7 @@ export class CanvasElement extends HTMLElement {
       new CustomEvent('canvasResize', {
         composed: true,
         detail: this.detail,
-      })
+      }),
     )
   }
 }
