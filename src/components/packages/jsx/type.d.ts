@@ -32,6 +32,7 @@ declare global {
     type Component<TProps extends object = object> = {
       formAssociated?: boolean
       template?: boolean
+      define?: string
       (props: ComponentBaseProps & TProps): Children[number]
     }
 

@@ -13,3 +13,7 @@
   height: 150vh;
   background-color: lightblue;
 }
+
+e-define-test {
+  --axis: priv;
+}

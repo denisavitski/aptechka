@@ -1,6 +1,6 @@
 import { cssValueParser } from '@packages/css-value-parser'
 import { RESIZE_ORDER } from '@packages/order'
-import { Store, StoreSubscribeCallback, StoreOptions } from '@packages/store'
+import { Store, StoreOptions, StoreSubscribeCallback } from '@packages/store'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
 
@@ -10,7 +10,7 @@ export interface CSSPropertyOptions<StoreType extends number | boolean | string>
 }
 
 export class CSSProperty<
-  StoreType extends number | boolean | string
+  StoreType extends number | boolean | string,
 > extends Store<StoreType> {
   #element: HTMLElement
   #property: string
@@ -22,7 +22,7 @@ export class CSSProperty<
     elementOrSelector: ElementOrSelector<HTMLElement>,
     property: string,
     defaultValue: StoreType,
-    options?: CSSPropertyOptions<StoreType>
+    options?: CSSPropertyOptions<StoreType>,
   ) {
     super(defaultValue, options)
 
@@ -39,6 +39,7 @@ export class CSSProperty<
   public observe() {
     if (!this.#active) {
       this.#active = true
+      this.#resizeListener()
       windowResizer.subscribe(this.#resizeListener, RESIZE_ORDER.CSS_VARIABLE)
     }
   }
@@ -52,7 +53,7 @@ export class CSSProperty<
 
   public override subscribe(
     callback: StoreSubscribeCallback<StoreType>,
-    order?: number
+    order?: number,
   ) {
     if (!this.subscribers.length) {
       this.observe()

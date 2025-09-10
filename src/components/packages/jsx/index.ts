@@ -6,6 +6,7 @@ export {
 export { Fragment, h, indexMap } from './h'
 
 export { useRef } from './hooks/common'
+export { useCSSProperty } from './hooks/cssProperty'
 
 export { useConnect, useDisconnect } from './hooks/component/lifecycle'
 

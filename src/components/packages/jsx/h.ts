@@ -1,5 +1,11 @@
 import { Store } from '@packages/store'
-import { camelToKebab, diff, isESClass, patch } from '@packages/utils'
+import {
+  camelToKebab,
+  diff,
+  getElementAttributesAdvanced,
+  isESClass,
+  patch,
+} from '@packages/utils'
 import { ComponentElement } from './ComponentElement'
 import { setAttributes } from './utils/attributes/setAttributes'
 import { createElement } from './utils/children/createElement'
@@ -149,7 +155,7 @@ function handleFunctionTag(
     return jsxTag({ ...attributes })
   }
 
-  return createCustomElement(jsxTag, attributes, children)
+  return createCustomElement(jsxTag as JSX.Component, attributes, children)
 }
 
 function createClassElement(
@@ -163,11 +169,11 @@ function createClassElement(
 }
 
 function createCustomElement(
-  jsxTag: Function,
+  jsxTag: JSX.Component,
   attributes: JSX.Attributes | undefined,
   children: JSX.Children,
 ) {
-  const name = `e-${camelToKebab(jsxTag.name)}`
+  const name = jsxTag.define || `e-${camelToKebab(jsxTag.name)}`
   const Constructor = getOrDefineCustomElement(name, jsxTag)
 
   if (isDefining.value) {
@@ -194,7 +200,12 @@ function getOrDefineCustomElement(name: string, jsxTag: Function) {
 
         if (isDefining.value) {
           this.addLoadCallback(() => {
-            return fillComponentElement(this, jsxTag, {}, [])
+            return fillComponentElement(
+              this,
+              jsxTag,
+              getElementAttributesAdvanced(this),
+              [],
+            )
           })
         }
       }

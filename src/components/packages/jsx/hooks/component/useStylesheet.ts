@@ -27,7 +27,7 @@ function createStylesheet(cssText: string) {
 function generateCSS(source: UseStylesheetSource) {
   let cssText = ''
 
-  const processObject = (obj: UseStylesheetSource, selector?: string): void => {
+  const processObject = (obj: UseStylesheetSource, selector?: string) => {
     if (selector) {
       cssText += `${selector} {`
     }
@@ -49,10 +49,7 @@ function generateCSS(source: UseStylesheetSource) {
   return cssText
 }
 
-function addStylesToShadowRoot(
-  shadowRoot: ShadowRoot,
-  cssText: string,
-): () => void {
+function addStylesToShadowRoot(shadowRoot: ShadowRoot, cssText: string) {
   const newStylesheet = createStylesheet(cssText)
   const destroyCallbacks: Array<() => void> = []
 
@@ -72,14 +69,14 @@ function addStylesToShadowRoot(
   return () => destroyCallbacks.forEach((callback) => callback())
 }
 
-function addStylesToDocument(cssText: string): () => void {
+function addStylesToDocument(cssText: string) {
   const styleElement = document.createElement('style')
   styleElement.textContent = cssText
   document.head.appendChild(styleElement)
   return () => styleElement.remove()
 }
 
-export function useStylesheet(source: UseStylesheetSource): void {
+export function useStylesheet(source: UseStylesheetSource) {
   const cssText = generateCSS(source)
 
   if (activeComponent.current.shadowRoot) {
