@@ -43,6 +43,10 @@ export function setIntervalOnIntersection(
         progress: 0,
       })
 
+      previous = current
+
+      tickerUnsubsribe = restartTicker()
+
       intervalId = setInterval(() => {
         tickerUnsubsribe?.()
 
@@ -56,17 +60,21 @@ export function setIntervalOnIntersection(
 
         previous = current
 
-        tickerUnsubsribe = ticker.subscribe((e) => {
-          const progress = e.timeElapsedSinceSubscription / delay
-
-          callback({
-            current,
-            previous,
-            progress,
-          })
-        })
+        tickerUnsubsribe = restartTicker()
       }, delay)
     }
+  }
+
+  const restartTicker = () => {
+    return ticker.subscribe((e) => {
+      const progress = e.timeElapsedSinceSubscription / delay
+
+      callback({
+        current,
+        previous,
+        progress,
+      })
+    })
   }
 
   const intersectorUnsubscribe = intersector.subscribe(element, (e) => {
