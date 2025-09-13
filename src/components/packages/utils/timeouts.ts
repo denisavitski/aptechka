@@ -74,9 +74,24 @@ export function setIntervalOnIntersection(
     toggleInterval()
   })
 
-  return () => {
+  const destroy = () => {
     tickerUnsubsribe?.()
     intersectorUnsubscribe()
     clearInterval(intervalId)
+  }
+
+  const restart = (currentValue?: number, previousValue?: number) => {
+    current = currentValue || 0
+
+    if (previousValue) {
+      previous = previousValue
+    }
+
+    toggleInterval()
+  }
+
+  return {
+    destroy,
+    restart,
   }
 }
