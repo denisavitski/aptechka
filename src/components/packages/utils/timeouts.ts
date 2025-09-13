@@ -98,8 +98,14 @@ export function setIntervalOnIntersection(
     toggleInterval()
   }
 
+  const stop = () => {
+    clearInterval(intervalId)
+    tickerUnsubsribe?.()
+  }
+
   return {
     destroy,
     restart,
+    stop,
   }
 }
