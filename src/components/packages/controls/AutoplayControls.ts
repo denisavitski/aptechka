@@ -1,5 +1,6 @@
-import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 import { Tweened } from '@packages/animation'
+import { intersector } from '@packages/intersector'
+import { ticker, TickerAddOptions, TickerCallback } from '@packages/ticker'
 import { easeInQuad } from '@packages/utils'
 import { Controls } from './Controls'
 
@@ -20,6 +21,8 @@ export class AutoplayControls extends Controls {
   #pauseTimeoutId: ReturnType<typeof setInterval> | undefined
 
   #connected = false
+
+  #isIntersecting = false
 
   constructor(options?: AutoplayControlsOptions) {
     super()
@@ -82,30 +85,44 @@ export class AutoplayControls extends Controls {
     this.#clear()
 
     if (this.#interval) {
-      this.#intervalId = setInterval(
-        this.#intervalCallback,
-        Math.abs(this.#speed)
-      )
+      if (this.#options?.culling) {
+        intersector.subscribe(
+          this.#options?.culling,
+          this.#intersectionListener,
+        )
+      } else {
+        this.#startInterval()
+      }
     } else {
       ticker.subscribe(this.#animationFrameCallback, this.#options)
     }
 
     document.addEventListener(
       'visibilitychange',
-      this.#documentVisibilityChangeListener
+      this.#documentVisibilityChangeListener,
     )
   }
 
   #clear() {
     clearInterval(this.#intervalId)
     ticker.unsubscribe(this.#animationFrameCallback)
-
+    intersector.unsubscribe(this.#intersectionListener)
     clearTimeout(this.#pauseTimeoutId)
+
     this.#paused.close()
 
     document.removeEventListener(
       'visibilitychange',
-      this.#documentVisibilityChangeListener
+      this.#documentVisibilityChangeListener,
+    )
+  }
+
+  #startInterval() {
+    clearInterval(this.#intervalId)
+
+    this.#intervalId = setInterval(
+      this.#intervalCallback,
+      Math.abs(this.#speed),
     )
   }
 
@@ -117,17 +134,21 @@ export class AutoplayControls extends Controls {
           this.#speed *
           this.direction *
           (1 - this.#paused.current),
-        e
+        e,
       )
     }
   }
 
   #intervalCallback = () => {
+    if (!this.#isIntersecting) {
+      return
+    }
+
     if (this.#paused.current !== 1) {
       this.changeEvent.notify(
         'autoplay',
         Math.sign(this.#speed) * this.direction * (1 - this.#paused.current),
-        null
+        null,
       )
     }
   }
@@ -139,6 +160,16 @@ export class AutoplayControls extends Controls {
       } else {
         this.#paused.set(0, { equalize: true })
       }
+    }
+  }
+
+  #intersectionListener = (e: IntersectionObserverEntry) => {
+    this.#isIntersecting = e.isIntersecting
+
+    if (this.#isIntersecting) {
+      this.#startInterval()
+    } else {
+      clearInterval(this.#intervalId)
     }
   }
 }

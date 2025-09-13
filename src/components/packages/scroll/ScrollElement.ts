@@ -1,33 +1,33 @@
 import { Damped, Tweened, TweenedOptions } from '@packages/animation'
+import { TweenEasingName } from '@packages/animation/Tweened'
 import {
-  WheelControls,
-  KeyboardControls,
-  DragControls,
   AutoplayControls,
+  DragControls,
+  KeyboardControls,
+  WheelControls,
 } from '@packages/controls'
-import { TICK_ORDER, RESIZE_ORDER } from '@packages/order'
-import { windowResizer } from '@packages/window-resizer'
+import { CSSProperty } from '@packages/css-property'
+import { cssUnitParser } from '@packages/css-unit-parser'
+import { device } from '@packages/device'
+import { elementResizer } from '@packages/element-resizer'
+import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
 import { Store } from '@packages/store'
 import {
-  getCumulativeOffsetTop,
-  getCumulativeOffsetLeft,
   Axes2D,
-  isBrowser,
   clamp,
-  easeInOutExpo,
   createStylesheet,
-  dispatchEvent,
-  loopNumber,
   debounce,
+  dispatchEvent,
+  easeInOutExpo,
+  getCumulativeOffsetLeft,
+  getCumulativeOffsetTop,
+  isBrowser,
   isElementVisible,
+  loopNumber,
 } from '@packages/utils'
-import { cssUnitParser } from '@packages/css-unit-parser'
-import { CSSProperty } from '@packages/css-property'
-import { device } from '@packages/device'
+import { windowResizer } from '@packages/window-resizer'
 import { ScrollSection } from './ScrollSection'
-import { TweenEasingName } from '@packages/animation/Tweened'
-import { elementResizer } from '@packages/element-resizer'
 
 export type ScrollLine = 'start' | 'end' | null
 
@@ -111,24 +111,24 @@ export class ScrollElement extends HTMLElement {
   #easingCSSProperty = new CSSProperty<TweenEasingName | false>(
     this,
     '--tween-easing',
-    false
+    false,
   )
   #durationCSSProperty = new CSSProperty<number | false>(
     this,
     '--tween-duration',
-    false
+    false,
   )
   #autoSizeCSSProperty = new CSSProperty<boolean>(this, '--auto-size', false)
   #wheelMaxDeltaCSSProperty = new CSSProperty<boolean>(
     this,
     '--wheel-max-delta',
-    false
+    false,
   )
   #dragInertionCSSProperty = new CSSProperty<number>(this, '--drag-inertion', 1)
   #sectionsInViewCSSProperty = new CSSProperty<number>(
     this,
     '--sections-in-view',
-    1
+    1,
   )
   #loopCSSProperty = new CSSProperty<boolean>(this, '--loop', false)
   #dampingCSSProperty = new CSSProperty<number>(this, '--damping', 20)
@@ -138,43 +138,43 @@ export class ScrollElement extends HTMLElement {
   #sectionDistanceScaleCSSProperty = new CSSProperty<number>(
     this,
     '--section-distance-scale',
-    0.5
+    0.5,
   )
   #startSectionCSSProperty = new CSSProperty<number>(this, '--start-section', 0)
   #autoplayCSSProperty = new CSSProperty<number>(this, '--autoplay', 0)
   #autoplayPauseDurationCSSProperty = new CSSProperty<number>(
     this,
     '--autoplay-pause-duration',
-    0
+    0,
   )
   #autoplayUserDirectionCSSProperty = new CSSProperty<boolean>(
     this,
     '--autoplay-user-direction',
-    false
+    false,
   )
   #classesCSSProperty = new CSSProperty<boolean>(this, '--classes', false)
   #currentIndexStartOffsetCSSProperty = new CSSProperty<number>(
     this,
     '--current-index-start-offset',
-    0
+    0,
   )
   #currentIndexEndOffsetCSSProperty = new CSSProperty<number>(
     this,
     '--current-index-end-offset',
-    0
+    0,
   )
   #shiftSectionPositionCSSProperty = new CSSProperty<number>(
     this,
     '--shift-section-position',
     0,
-    { rawValueCheck: false }
+    { rawValueCheck: false },
   )
 
   #focusDelayCSSProperty = new CSSProperty<number>(this, '--focus-delay', 0)
   #focusDurationCSSProperty = new CSSProperty<number>(
     this,
     '--focus-duration',
-    3000
+    3000,
   )
 
   #shiftLimitCSSProperty = new CSSProperty<number>(this, '--shift-limit', 0)
@@ -251,7 +251,7 @@ export class ScrollElement extends HTMLElement {
       this.#mutationObserver = new MutationObserver(
         debounce(() => {
           this.tryResplit()
-        }, 10)
+        }, 10),
       )
     }
   }
@@ -440,7 +440,7 @@ export class ScrollElement extends HTMLElement {
     return Math.ceil(
       this.#visibleSections.length -
         this.#sectionsInViewCSSProperty.current +
-        this.#shiftLimitCSSProperty.current
+        this.#shiftLimitCSSProperty.current,
     )
   }
 
@@ -514,8 +514,8 @@ export class ScrollElement extends HTMLElement {
     return this.currentProgress < start
       ? 0
       : this.currentProgress > end
-      ? 1
-      : (this.currentProgress - start) / (end - start)
+        ? 1
+        : (this.currentProgress - start) / (end - start)
   }
 
   public curve(from: number, distance: number, margin: number = 0) {
@@ -632,12 +632,12 @@ export class ScrollElement extends HTMLElement {
     }
 
     this.#visibleSections = this.#sections.filter((s) =>
-      isElementVisible(s.element)
+      isElementVisible(s.element),
     )
 
     this.style.setProperty(
       '--sections',
-      this.#visibleSections.length.toString()
+      this.#visibleSections.length.toString(),
     )
 
     this.#damped.unlistenAnimationFrame()
@@ -657,11 +657,11 @@ export class ScrollElement extends HTMLElement {
 
     if (this.vertical) {
       this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).rowGap
+        getComputedStyle(this.#contentElement).rowGap,
       )
     } else {
       this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).columnGap
+        getComputedStyle(this.#contentElement).columnGap,
       )
     }
 
@@ -783,7 +783,7 @@ export class ScrollElement extends HTMLElement {
     })
 
     this.#keyboardControls.changeEvent.subscribe(
-      this.#notAutoplayControlListener
+      this.#notAutoplayControlListener,
     )
 
     this.#dragControls = new DragControls({
@@ -1264,7 +1264,7 @@ export class ScrollElement extends HTMLElement {
     scrollEntries.update(
       this,
       this.#axisCSSProperty.current,
-      currentScrollValue
+      currentScrollValue,
     )
   }
 
@@ -1364,7 +1364,7 @@ export class ScrollElement extends HTMLElement {
     if (this.#autoplayCSSProperty.current) {
       this.#autoplayControls.pauseAndContinue(
         this.#autoplayPauseDurationCSSProperty.current,
-        this.sectionalCSSProperty.current
+        this.sectionalCSSProperty.current,
       )
     }
   }
@@ -1470,7 +1470,7 @@ export class ScrollElement extends HTMLElement {
 
       this.#visibleSections.forEach((section, i) => {
         section.setOffsetIndex(
-          i - (this.#counter.current + this.#sectionsInViewCSSProperty.current)
+          i - (this.#counter.current + this.#sectionsInViewCSSProperty.current),
         )
       })
     }
