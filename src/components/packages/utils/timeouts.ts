@@ -1,6 +1,15 @@
 import { intersector } from '@packages/intersector'
+import { ticker } from '@packages/ticker'
 
-export type SetIntervalOnIntersectionCallback = (counter: number) => void
+export interface SetIntervalOnIntersectionEntry {
+  previous: number
+  current: number
+  progress: number
+}
+
+export type SetIntervalOnIntersectionCallback = (
+  entry: SetIntervalOnIntersectionEntry,
+) => void
 
 export interface SetIntervalOnIntersectionOptions {
   restartCounter?: boolean
@@ -10,33 +19,64 @@ export function setIntervalOnIntersection(
   element: HTMLElement,
   delay: number,
   callback: SetIntervalOnIntersectionCallback,
-  options?: SetIntervalOnIntersectionOptions
+  options?: SetIntervalOnIntersectionOptions,
 ) {
   let intervalId: ReturnType<typeof setInterval> | undefined
   let isIntersecting = false
-  let counter = 0
+  let current = 0
+  let previous = 0
+
+  let tickerUnsubsribe: Function | undefined
 
   const toggleInterval = () => {
     clearInterval(intervalId)
+    tickerUnsubsribe?.()
 
     if (options?.restartCounter) {
-      counter = 0
+      current = 0
     }
 
     if (isIntersecting) {
+      callback({
+        current,
+        previous,
+        progress: 0,
+      })
+
       intervalId = setInterval(() => {
-        callback(counter++)
+        tickerUnsubsribe?.()
+
+        current++
+
+        callback({
+          current,
+          previous,
+          progress: 0,
+        })
+
+        previous = current
+
+        tickerUnsubsribe = ticker.subscribe((e) => {
+          const progress = e.timeElapsedSinceSubscription / delay
+
+          callback({
+            current,
+            previous,
+            progress,
+          })
+        })
       }, delay)
     }
   }
 
-  const unsubsribe = intersector.subscribe(element, (e) => {
+  const intersectorUnsubscribe = intersector.subscribe(element, (e) => {
     isIntersecting = e.isIntersecting
     toggleInterval()
   })
 
   return () => {
-    unsubsribe()
+    tickerUnsubsribe?.()
+    intersectorUnsubscribe()
     clearInterval(intervalId)
   }
 }
