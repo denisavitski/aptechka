@@ -5,12 +5,13 @@ export function useShadow(
   init?: Partial<ShadowRootInit>,
   callback?: UseShadowCallback,
 ) {
-  const shadowRoot = activeComponent.current.attachShadow({
-    mode: 'open',
-    ...init,
-  })
+  if (!activeComponent.current.shadowRoot) {
+    const shadowRoot = activeComponent.current.attachShadow({
+      mode: 'open',
+      ...init,
+    })
+    callback?.(shadowRoot)
+  }
 
-  callback?.(shadowRoot)
-
-  return shadowRoot
+  return activeComponent.current.shadowRoot
 }

@@ -76,7 +76,7 @@ export class DerivedKeyedArray<
           )
 
           if (same) {
-            const founded = this.current.find(
+            const founded = this.current?.find(
               (current) =>
                 typeof current === 'object' &&
                 current &&

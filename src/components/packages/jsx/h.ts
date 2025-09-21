@@ -174,9 +174,9 @@ function createCustomElement(
   children: JSX.Children,
 ) {
   const name = jsxTag.define || `e-${camelToKebab(jsxTag.name)}`
-  const Constructor = getOrDefineCustomElement(name, jsxTag)
+  const Constructor = getOrDefineCustomElement(name, jsxTag, attributes)
 
-  if (isDefining.value) {
+  if (attributes?.__onlyDefine) {
     return undefined as any
   }
 
@@ -188,7 +188,11 @@ function createCustomElement(
   return element
 }
 
-function getOrDefineCustomElement(name: string, jsxTag: Function) {
+function getOrDefineCustomElement(
+  name: string,
+  jsxTag: Function,
+  attributes: JSX.Attributes | undefined,
+) {
   let Constructor = customElements.get(name) as typeof ComponentElement
 
   if (!Constructor) {
@@ -198,7 +202,7 @@ function getOrDefineCustomElement(name: string, jsxTag: Function) {
       constructor() {
         super()
 
-        if (isDefining.value) {
+        if (attributes?.__onlyDefine) {
           this.addLoadCallback(() => {
             return fillComponentElement(
               this,
@@ -278,7 +282,6 @@ function fillComponentElement(
 }
 
 export const isHydrating = { value: false }
-export const isDefining = { value: false }
 export const indexMap = new Map<string, number>()
 
 export function h(

@@ -1,4 +1,4 @@
-import { isDefining, isHydrating } from './h'
+import { isHydrating } from './h'
 
 export function render(
   container: ParentNode,
@@ -27,12 +27,8 @@ export function hydrate(
   return element
 }
 
-export function define(Component: JSX.Component) {
-  isDefining.value = true
-
-  const element = <Component></Component>
-
-  isDefining.value = false
+export function define(Component: JSX.Component<any>) {
+  const element = <Component __onlyDefine></Component>
 
   return element
 }

@@ -11,9 +11,11 @@ import { activeComponent } from '../ComponentElement'
 function subscribe<T extends Store<any>>(create: () => T) {
   const store = create()
 
+  console.log('subscribe', activeComponent.current)
   if (activeComponent.current) {
     activeComponent.current.addDisconnectCallback(() => {
       store.close()
+      console.log(store.name, 'close')
     })
   }
 

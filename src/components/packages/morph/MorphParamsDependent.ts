@@ -23,7 +23,7 @@ export class MorphParamsDependent {
 
     document.addEventListener(
       'morphURLParametersChange',
-      this.#urlChangeListener
+      this.#urlChangeListener,
     )
 
     this.#update()
@@ -32,7 +32,7 @@ export class MorphParamsDependent {
   public destroy() {
     document.removeEventListener(
       'morphURLParametersChange',
-      this.#urlChangeListener
+      this.#urlChangeListener,
     )
   }
 
@@ -75,6 +75,10 @@ export class MorphParamsDependent {
         this.#element.style.display = 'none'
       }
     }
+
+    requestAnimationFrame(() => {
+      window.dispatchEvent(new CustomEvent('resize'))
+    })
   }
 
   #urlChangeListener = () => {

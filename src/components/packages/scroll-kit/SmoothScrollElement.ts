@@ -1,6 +1,7 @@
-import { scrollEntries } from '@packages/scroll-entries'
 import { Damped, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
+import { scrollEntries } from '@packages/scroll-entries'
+import { scrollToElement } from '@packages/utils'
 
 const scrollKeys = new Set([
   'ArrowUp',
@@ -61,6 +62,8 @@ export class SmoothScrollElement extends HTMLElement {
     this.addEventListener('wheel', this.#wheelListener as any, {
       passive: false,
     })
+
+    this.#value.set(this.scrollTop, { equalize: true })
 
     this.#value.subscribe((e) => {
       const roundedCurrent = Math.round(e.current)
@@ -133,7 +136,7 @@ export class SmoothScrollElement extends HTMLElement {
 
       if (preventElement) {
         const attrValue = preventElement.getAttribute(
-          'data-prevent-smooth-scroll'
+          'data-prevent-smooth-scroll',
         )
 
         if (!attrValue) {
@@ -160,8 +163,8 @@ export class SmoothScrollElement extends HTMLElement {
     this.stop()
   }
 
-  #pointerdownListener = (e: Event) => {
-    if (this.#checkDisabled()) {
+  #pointerdownListener = (e: PointerEvent) => {
+    if (e.button !== 0 || this.#checkDisabled()) {
       return
     }
 
@@ -170,12 +173,32 @@ export class SmoothScrollElement extends HTMLElement {
 
       if (anchorElement) {
         this.stop()
+
+        const url = new URL(anchorElement.href)
+
+        if (url.hash) {
+          e.preventDefault()
+
+          scrollToElement(url.hash, {
+            behavior:
+              (anchorElement.getAttribute('data-behavior') as any) || 'smooth',
+            center: anchorElement.hasAttribute('data-center'),
+            offset: anchorElement.getAttribute('data-offset') || undefined,
+            scrollElement: this,
+            scrollCallback: (top, behaviour) => {
+              this.setPosition(top, {
+                equalize: behaviour === 'instant',
+              })
+            },
+          })
+        }
       }
     }
   }
 
   #resizeListener = () => {
     this.resize()
+    this.sync()
   }
 
   #keydownListener = (e: KeyboardEvent) => {

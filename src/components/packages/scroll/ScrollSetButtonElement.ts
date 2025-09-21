@@ -1,7 +1,7 @@
 import { CSSProperty } from '@packages/css-property'
+import { isBrowser } from '@packages/utils'
 import { ScrollButtonElement } from './ScrollButtonElement'
 import { ScrollSetOptions } from './ScrollElement'
-import { isBrowser } from '@packages/utils'
 
 export class ScrollSetButtonElement extends ScrollButtonElement {
   #set = new CSSProperty(this, '--set', 1)

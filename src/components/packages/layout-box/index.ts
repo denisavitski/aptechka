@@ -1,37 +1,38 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
+import { elementResizer } from '@packages/element-resizer'
 import { Ladder } from '@packages/ladder'
+import { Notifier } from '@packages/notifier'
 import { RESIZE_ORDER, TICK_ORDER } from '@packages/order'
 import { ScrollEntry, scrollEntries } from '@packages/scroll-entries'
 import { StoreSubscribeCallback } from '@packages/store'
 import { ticker } from '@packages/ticker'
 import {
-  ElementOrSelector,
-  Axes3D,
   Axes2D,
-  isBrowser,
+  Axes3D,
+  ElementOrSelector,
   getCumulativeOffsetLeft,
   getCumulativeOffsetTop,
   getElement,
+  getStickyOffset,
+  isBrowser,
 } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer'
 import { windowResizer } from '@packages/window-resizer'
-import { Notifier } from '@packages/notifier'
 
 export function decomposeCSSMatrix(matrix: WebKitCSSMatrix) {
   const scaleX = Math.sqrt(
-    matrix.m11 * matrix.m11 + matrix.m12 * matrix.m12 + matrix.m13 * matrix.m13
+    matrix.m11 * matrix.m11 + matrix.m12 * matrix.m12 + matrix.m13 * matrix.m13,
   )
   const scaleY = Math.sqrt(
-    matrix.m21 * matrix.m21 + matrix.m22 * matrix.m22 + matrix.m23 * matrix.m23
+    matrix.m21 * matrix.m21 + matrix.m22 * matrix.m22 + matrix.m23 * matrix.m23,
   )
   const scaleZ = Math.sqrt(
-    matrix.m31 * matrix.m31 + matrix.m32 * matrix.m32 + matrix.m33 * matrix.m33
+    matrix.m31 * matrix.m31 + matrix.m32 * matrix.m32 + matrix.m33 * matrix.m33,
   )
 
   const rotationX = Math.atan2(matrix.m32, matrix.m33)
   const rotationY = Math.atan2(
     -matrix.m31,
-    Math.sqrt(matrix.m32 * matrix.m32 + matrix.m33 * matrix.m33)
+    Math.sqrt(matrix.m32 * matrix.m32 + matrix.m33 * matrix.m33),
   )
   const rotationZ = Math.atan2(matrix.m21, matrix.m11)
 
@@ -127,7 +128,7 @@ export class LayoutBox {
 
   constructor(
     element: ElementOrSelector<HTMLElement>,
-    options?: LayoutBoxOptions
+    options?: LayoutBoxOptions,
   ) {
     if (isBrowser) {
       this.#element = getElement(element) || document.body
@@ -181,6 +182,20 @@ export class LayoutBox {
       if (this.#isScrollStep) {
         scrollEntries.notifier.subscribe(this.#scrollEntriesListener)
         this.#scrollEntriesListener()
+
+        this.setScrollStep(() => {
+          return {
+            axis: 'y',
+            value: getStickyOffset(this.element, 'top') * -1,
+          }
+        })
+
+        this.setScrollStep(() => {
+          return {
+            axis: 'x',
+            value: getStickyOffset(this.element, 'left') * -1,
+          }
+        })
       }
 
       elementResizer.subscribe(this.element, this.#resizeListener)
@@ -287,7 +302,7 @@ export class LayoutBox {
 
   public deleteScrollStep(callback: LayoutBoxScrollStepCallback) {
     this.#scrollStepSetterCallbacks = this.#scrollStepSetterCallbacks.filter(
-      (s) => s !== callback
+      (s) => s !== callback,
     )
   }
 
@@ -486,7 +501,7 @@ export class LayoutBox {
 
     this.#depth = Math.max(
       cssUnitParser.parse(computed.getPropertyValue('--depth') || '0px'),
-      1
+      1,
     )
 
     const vl = getCumulativeOffsetLeft(this.#containerElement)
@@ -513,6 +528,9 @@ export class LayoutBox {
 
     this.#left += this.#element.clientLeft
     this.#top += this.#element.clientTop
+
+    this.#left += getStickyOffset(this.element, 'left') * -1
+    this.#top += getStickyOffset(this.element, 'top') * -1
 
     if (this.#isCartesian) {
       const viewHalfWidth = Math.round(vw / 2)

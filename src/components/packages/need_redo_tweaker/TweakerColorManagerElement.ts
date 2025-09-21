@@ -1,8 +1,8 @@
 import { Store } from '@packages/store'
+import { isBrowser } from '@packages/utils'
 import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
 import { createStylesheet, element, input } from './element-constructor'
 import { aptechkaTheme } from './theme'
-import { isBrowser } from '@packages/utils'
 
 const stylesheet = createStylesheet({
   ':host': {

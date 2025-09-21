@@ -6,6 +6,7 @@ export type ComponentConnectCallback = (
 export type ComponentDisconnectCallback = (element: HTMLElement) => void
 
 export const activeComponent: { current: ComponentElement } = { current: null! }
+let previousComponent: ComponentElement | null = null
 
 export const componentElementLoadingTypes = [
   'idle',
@@ -25,12 +26,13 @@ export class ComponentElement extends HTMLElement {
   #connectCallbacks: Array<ComponentConnectCallback> = []
   #disconnectCallbacks: Array<ComponentDisconnectCallback> = []
 
-  #loadingType: ComponentElementLoadingType = 'constructor'
+  #loadingType: ComponentElementLoadingType = 'idle'
   #idleId: ReturnType<typeof requestIdleCallback> | undefined
 
   constructor() {
     super()
 
+    previousComponent = activeComponent.current
     activeComponent.current = this
   }
 
@@ -90,7 +92,7 @@ export class ComponentElement extends HTMLElement {
     }
 
     if (activeComponent.current === this) {
-      activeComponent.current = null!
+      activeComponent.current = previousComponent!
     }
   }
 
@@ -103,7 +105,7 @@ export class ComponentElement extends HTMLElement {
     this.#disconnectCallbacks = []
 
     if (activeComponent.current === this) {
-      activeComponent.current = null!
+      activeComponent.current = previousComponent!
     }
 
     window.removeEventListener('load', this.#windowLoadListener)
@@ -161,7 +163,7 @@ export class ComponentElement extends HTMLElement {
     })
 
     if (activeComponent.current === this) {
-      activeComponent.current = null!
+      activeComponent.current = previousComponent!
     }
   }
 }

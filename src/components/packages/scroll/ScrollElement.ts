@@ -548,6 +548,8 @@ export class ScrollElement extends HTMLElement {
     const previousSection = this.#visibleSections[previousCounter]
     const currentSection = this.#visibleSections[newCounterValue]
 
+    console.log(newCounterValue)
+
     if (previousSection && currentSection) {
       let shiftValue = 0
 

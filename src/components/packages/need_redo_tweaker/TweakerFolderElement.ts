@@ -1,14 +1,14 @@
-import { div, element, createStylesheet } from './element-constructor'
 import { Store } from '@packages/store'
+import { createStylesheet, div, element } from './element-constructor'
 
 import arrowIcon from '@assets/icons/arrow.svg?raw'
 
 import { tweakerStorage } from './tweakerStorage'
 
-import { TweakerFieldElement } from './TweakerFieldElement'
-import { StoreBox } from './TweakerElement'
-import { aptechkaTheme } from './theme'
 import { isBrowser } from '@packages/utils'
+import { StoreBox } from './TweakerElement'
+import { TweakerFieldElement } from './TweakerFieldElement'
+import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({
   '.wrapper': {
@@ -47,11 +47,6 @@ const stylesheet = createStylesheet({
     },
   },
 
-  ':host(.transition-allowed) .body': {
-    transition:
-      'height var(--duration-short), display var(--duration-short) allow-discrete',
-  },
-
   ':host(.opened) .body': {
     height: 'calc-size(auto)',
     display: 'block',
@@ -73,10 +68,9 @@ const stylesheet = createStylesheet({
     width: '20px',
     height: '20px',
     fill: aptechkaTheme.colorFont.var,
-    transition: `transform ${'var(--duration-short)'}`,
   },
 
-  '.opened .arrow': {
+  ':host(.opened) .arrow': {
     transform: 'scaleY(-1)',
   },
 })
@@ -220,7 +214,7 @@ export class TweakerFolderElement extends HTMLElement {
       }
     } else {
       const found = this.#content.current.find(
-        (v) => v.key === storeBox.store.name
+        (v) => v.key === storeBox.store.name,
       )
 
       if (found instanceof TweakerFieldElement) {
@@ -246,7 +240,7 @@ export class TweakerFolderElement extends HTMLElement {
     })
 
     this.#content.current = this.#content.current.filter(
-      (v) => !removedNodes.includes(v)
+      (v) => !removedNodes.includes(v),
     )
 
     if (this.#key && !this.#content.current.length && !addedNodes.length) {

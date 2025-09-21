@@ -1,7 +1,7 @@
 // import { Router } from '@packages/router/Router.ts'
 
 import { define } from '../render'
-import { DefineTest } from './define/DefineTest'
+import { Tweaker } from './tweaker/Tweaker'
 
 // const router = new Router({
 //   base: '/components/packages/jsx/playground',
@@ -16,4 +16,4 @@ import { DefineTest } from './define/DefineTest'
 
 // router.run()
 
-define(DefineTest)
+define(Tweaker)

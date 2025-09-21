@@ -1,7 +1,5 @@
+import { elementResizer } from '@packages/element-resizer'
 import { Store, StoreMiddleware } from '@packages/store'
-import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
-import { createStylesheet, div, element, input } from './element-constructor'
-import { aptechkaTheme } from './theme'
 import {
   clamp,
   isBrowser,
@@ -9,7 +7,9 @@ import {
   setupDrag,
   toStep,
 } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer'
+import { TweakerStoreManagerElement } from './TweakerStoreManagerElement'
+import { createStylesheet, div, element, input } from './element-constructor'
+import { aptechkaTheme } from './theme'
 
 const stylesheet = createStylesheet({
   ':host': {
@@ -146,7 +146,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
               value: v,
               onChange: () => {
                 this.updateStores(
-                  this.#inputElements.map((el) => parseFloat(el.value))
+                  this.#inputElements.map((el) => parseFloat(el.value)),
                 )
               },
             }),
@@ -210,7 +210,7 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
                               knobElement.style.transition = ''
                             }, 100)
                           }
-                        }
+                        },
                       )
                     }
                   },
@@ -292,10 +292,11 @@ export class TweakerNumberManagerElement extends TweakerStoreManagerElement<
 
   #getKnobPosition(knobElement: HTMLElement, inputValue: number) {
     const parentElement = knobElement.parentElement!
-
     const distance = this.#getDistance()
 
-    const progress = distance ? inputValue / distance : 0.5
+    // Корректный расчет прогресса с учетом отрицательных значений
+    const normalizedValue = inputValue - this.#min
+    const progress = distance ? normalizedValue / distance : 0.5
 
     const position =
       (parentElement.offsetWidth - knobElement.offsetWidth) * progress
