@@ -9,6 +9,7 @@ export {
 } from './En3View'
 
 export { En3Clip } from './objects/En3Clip'
+export { En3ClipHelpers } from './objects/En3ClipHelpers'
 export { coverTexture } from './utils/coverTexture'
 export { dispose } from './utils/dispose'
 export { getCurrentViewport } from './utils/getCurrentViewport'

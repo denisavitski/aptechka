@@ -12,11 +12,11 @@ export class En3Clip {
     material: Material,
     elementOrSelector: ElementOrSelector<HTMLElement>,
   ) {
-    this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: false })
+    this.#layoutBox = new LayoutBox(elementOrSelector, { cartesian: true })
 
     this.#planes = [
-      new Plane(new Vector3(0, -1, 0)),
       new Plane(new Vector3(0, 1, 0)),
+      new Plane(new Vector3(0, -1, 0)),
       new Plane(new Vector3(-1, 0, 0)),
       new Plane(new Vector3(1, 0, 0)),
     ]
@@ -40,19 +40,19 @@ export class En3Clip {
   }
 
   #tickListener = () => {
-    const scrollValueX = this.#layoutBox.position.x - this.#layoutBox.left
-    const scrollValueY = this.#layoutBox.position.y - this.#layoutBox.top
+    const scrollValueX = this.#layoutBox.position.x
+    const scrollValueY = this.#layoutBox.position.y
 
-    // Top
-    this.#planes[0].constant = this.#layoutBox.scale.y / 2 + scrollValueY * -1
+    // Top (normal = +Y)
+    this.#planes[0].constant = -scrollValueY + this.#layoutBox.scale.y / 2
 
-    // Bottom
-    this.#planes[1].constant = this.#layoutBox.scale.y / 2 + scrollValueY
+    // Bottom (normal = -Y)
+    this.#planes[1].constant = scrollValueY + this.#layoutBox.scale.y / 2
 
-    // Right
-    this.#planes[2].constant = this.#layoutBox.scale.x / 2 + scrollValueX
+    // Left (normal = -X)
+    this.#planes[2].constant = scrollValueX + this.#layoutBox.scale.x / 2
 
-    // Left
-    this.#planes[3].constant = this.#layoutBox.scale.x / 2 + scrollValueX * -1
+    // Right (normal = +X)
+    this.#planes[3].constant = -scrollValueX + this.#layoutBox.scale.x / 2
   }
 }

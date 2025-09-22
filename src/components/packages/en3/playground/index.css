@@ -5,14 +5,18 @@
 }
 
 .section {
+  position: relative;
   height: 100vh;
 
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .box {
+  position: absolute;
+  left: 0;
+  bottom: 0;
   width: 30vw;
   height: 30vw;
 
