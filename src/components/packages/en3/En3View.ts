@@ -1,8 +1,9 @@
 import { LayoutBox, LayoutBoxOptions } from '@packages/layout-box'
 import { debounce, ElementOrSelector, getElement } from '@packages/utils'
 import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three'
-import { dispose } from './utils/dispose'
 import { En3 } from './En3'
+import { En3Clip } from './objects/En3Clip'
+import { dispose } from './utils/dispose'
 
 export interface En3ViewOptions {
   cameraType?: 'perspective' | 'orthographic'
@@ -17,13 +18,16 @@ export interface En3ViewOptions {
 export type En3AttachedObject3D<T extends Object3D> = T & {
   userData: {
     box: LayoutBox
+    clip?: En3Clip
   }
 }
 
 export type En3AttachOptions = Omit<
   LayoutBoxOptions,
   'containerElement' | 'cartesian' | 'scrollStep'
->
+> & {
+  clip?: boolean
+}
 
 export type En3ViewBeforeRenderCallback = () => void
 
@@ -153,8 +157,8 @@ export class En3View {
         this.#cameraFov === 'auto'
           ? 2 * Math.atan(height / 2 / this.#cameraDistance) * (180 / Math.PI)
           : !this.#camera.userData.controlled
-          ? this.#cameraFov
-          : this.#camera.fov
+            ? this.#cameraFov
+            : this.#camera.fov
     } else if (this.#camera instanceof OrthographicCamera) {
       this.#camera.left = width / -2
       this.#camera.right = width / 2
@@ -182,7 +186,7 @@ export class En3View {
   public attachToHTMLElement<T extends Object3D>(
     element: ElementOrSelector<HTMLElement>,
     object: T,
-    options?: En3AttachOptions
+    options?: En3AttachOptions,
   ) {
     const box = new LayoutBox(element, {
       ...options,
@@ -195,6 +199,11 @@ export class En3View {
 
     object.userData.box = box
 
+    if (options?.clip && 'material' in object) {
+      const clip = new En3Clip(object.material as any, element)
+      object.userData.clip = clip
+    }
+
     this.#attachedObjects.push(object as any)
 
     return object as En3AttachedObject3D<T>
@@ -203,9 +212,10 @@ export class En3View {
   public detachFromHTMLElement(object: Object3D) {
     this.#attachedObjects = this.#attachedObjects.filter((o) => {
       if (o === object) {
-        const data = (object as En3AttachedObject3D<Object3D>).userData
+        const { box, clip } = (object as En3AttachedObject3D<Object3D>).userData
 
-        data.box.destroy()
+        box.destroy()
+        clip?.destroy()
 
         return false
       }
@@ -218,7 +228,7 @@ export class En3View {
   public add<T extends Object3D>(
     object: T,
     element: ElementOrSelector<HTMLElement>,
-    options?: En3AttachOptions
+    options?: En3AttachOptions,
   ): En3AttachedObject3D<T>
   public add<T extends Object3D>(...args: Array<any>): any {
     const object = args[0] as T
