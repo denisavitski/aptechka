@@ -88,7 +88,7 @@ export function libConfig() {
           'ticker/index': './src/components/packages/ticker/index.ts',
           'need_redo_tweaker/index':
             './src/components/packages/need_redo_tweaker/index.ts',
-          notched: './src/components/packages/notched/index.ts',
+          'notched/index': './src/components/packages/notched/index.ts',
           'utils/index': './src/components/packages/utils/index.ts',
           'video/index': './src/components/packages/video/index.ts',
           'window-resizer/index':
