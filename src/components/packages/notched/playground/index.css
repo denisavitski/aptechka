@@ -1,4 +1,5 @@
 e-notched {
+  position: sticky;
   width: 50vw;
   height: 50vh;
 
@@ -11,11 +12,10 @@ e-notched {
   --notched-top-notches: 10.4rem 5rem 1.5rem 1rem, 25rem 5rem 1.5rem 1rem;
   --notched-bottom-notches: 10.4rem 5rem 1.5rem 1rem, 25rem 5rem 1.5rem 1rem;
   --notched-top-left-corner-angle-alpha: 190;
+  --notched-fill: tomato;
+
   /* overflow: hidden; */
   /* border-radius: 2rem; */
-  overflow: hidden;
-
-  background-color: tomato;
 }
 
 .box {
@@ -24,4 +24,8 @@ e-notched {
   background-color: green;
   width: 20rem;
   height: 20rem;
+}
+
+button {
+  cursor: pointer;
 }

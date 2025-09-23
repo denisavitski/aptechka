@@ -13,7 +13,8 @@ export class NotchedElement extends HTMLElement {
   constructor() {
     super()
 
-    const clip = this.hasAttribute('clip')
+    const clipContent = this.hasAttribute('clip-content')
+    const clip = this.hasAttribute('clip') || clipContent
     const clipId = clip ? 'clip-' + generateId(10) : null
 
     const tmpElement = document.createElement('div')
@@ -27,7 +28,11 @@ export class NotchedElement extends HTMLElement {
     `
 
     if (clipId) {
-      this.style.clipPath = `url(#${clipId})`
+      if (clipContent && this.firstElementChild instanceof HTMLElement) {
+        this.firstElementChild.style.clipPath = `url(#${clipId})`
+      } else {
+        this.style.clipPath = `url(#${clipId})`
+      }
     }
 
     this.style.position = 'relative'
@@ -135,7 +140,7 @@ export class NotchedElement extends HTMLElement {
       computed.getPropertyValue('--notched-left-notches'),
     )
 
-    const color = computed.getPropertyValue('--notched-color')
+    const fill = computed.getPropertyValue('--notched-fill')
 
     const path = getSvgPath({
       cornerRadius,
@@ -160,8 +165,8 @@ export class NotchedElement extends HTMLElement {
 
     this.#pathElement.setAttribute('d', path)
 
-    if (color) {
-      this.#pathElement.setAttribute('fill', color)
+    if (fill) {
+      this.#pathElement.setAttribute('fill', fill)
     }
   }
 
