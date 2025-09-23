@@ -1,11 +1,16 @@
 class CSSUnitParser {
   #dummyElement: HTMLElement = null!
 
-  public parse(value: string) {
-    this.#createDummy()
+  public parse(value?: string) {
+    if (!value) {
+      return undefined
+    }
 
+    this.#createDummy()
     this.#dummyElement.style.left = value
-    const computedWidth = getComputedStyle(this.#dummyElement).getPropertyValue('left')
+    const computedWidth = getComputedStyle(this.#dummyElement).getPropertyValue(
+      'left',
+    )
 
     return parseFloat(computedWidth)
   }

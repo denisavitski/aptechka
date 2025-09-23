@@ -1,0 +1,27 @@
+e-notched {
+  width: 50vw;
+  height: 50vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  --corner-radius: 3rem;
+  --corner-smoothing: 1;
+  --top-notches: 10.4rem 5rem 1.5rem 1rem, 25rem 5rem 1.5rem 1rem;
+  --bottom-notches: 10.4rem 5rem 1.5rem 1rem, 25rem 5rem 1.5rem 1rem;
+  --top-left-corner-angle-alpha: 190;
+  /* overflow: hidden; */
+  /* border-radius: 2rem; */
+  overflow: hidden;
+
+  background-color: tomato;
+}
+
+.box {
+  position: absolute;
+  top: 0;
+  background-color: green;
+  width: 20rem;
+  height: 20rem;
+}

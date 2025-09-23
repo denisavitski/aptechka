@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.86.1",
+  "version": "0.87.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -268,6 +268,11 @@
       "require": "./lib/need_redo_tweaker/index.cjs",
       "default": "./lib/need_redo_tweaker/index.js"
     },
+    "./notched": {
+      "types": "./lib/notched/index.d.ts",
+      "require": "./lib/notched/index.cjs",
+      "default": "./lib/notched/index.js"
+    },
     "./utils": {
       "types": "./lib/utils/index.d.ts",
       "require": "./lib/utils/index.cjs",
@@ -443,6 +448,9 @@
       ],
       "need_redo_tweaker": [
         "lib/need_redo_tweaker/index.d.ts"
+      ],
+      "notched": [
+        "lib/notched/index.d.ts"
       ],
       "utils": [
         "lib/utils/index.d.ts"
