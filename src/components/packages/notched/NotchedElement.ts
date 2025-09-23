@@ -3,24 +3,8 @@
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { elementResizer } from '@packages/element-resizer'
 import { ticker } from '@packages/ticker'
-import { createStylesheet, generateId } from '@packages/utils'
+import { generateId } from '@packages/utils'
 import { getSvgPath, NotchParams } from './getSvgPath'
-
-const stylesheet = createStylesheet({
-  ':host': {
-    position: 'relative',
-    zIndex: '1',
-  },
-  svg: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: '-1',
-    display: 'block',
-    width: '100%',
-    height: '100%',
-  },
-})
 
 export class NotchedElement extends HTMLElement {
   #svgElement: SVGElement
@@ -87,68 +71,71 @@ export class NotchedElement extends HTMLElement {
     )
 
     const cornerRadius = cssUnitParser.parse(
-      computed.getPropertyValue('--corner-radius'),
+      computed.getPropertyValue('--notched-corner-radius'),
     )
 
     const topLeftCornerRadius = cssUnitParser.parse(
-      computed.getPropertyValue('--top-left-corner-radius'),
+      computed.getPropertyValue('--notched-top-left-corner-radius'),
     )
 
     const topRightCornerRadius = cssUnitParser.parse(
-      computed.getPropertyValue('--top-right-corner-radius'),
+      computed.getPropertyValue('--notched-top-right-corner-radius'),
     )
 
     const bottomRightCornerRadius = cssUnitParser.parse(
-      computed.getPropertyValue('--bottom-right-corner-radius'),
+      computed.getPropertyValue('--notched-bottom-right-corner-radius'),
     )
 
     const bottomLeftCornerRadius = cssUnitParser.parse(
-      computed.getPropertyValue('--bottom-left-corner-radius'),
+      computed.getPropertyValue('--notched-bottom-left-corner-radius'),
     )
 
     const cornerAngleAlpha =
-      parseFloat(computed.getPropertyValue('--corner-angle-alpha')) || undefined
+      parseFloat(computed.getPropertyValue('--notched-corner-angle-alpha')) ||
+      undefined
 
     const topLeftCornerAngleAlpha =
-      parseFloat(computed.getPropertyValue('--top-left-corner-angle-alpha')) ||
-      undefined
+      parseFloat(
+        computed.getPropertyValue('--notched-top-left-corner-angle-alpha'),
+      ) || undefined
 
     const topRightCornerAngleAlpha =
-      parseFloat(computed.getPropertyValue('--top-right-corner-angle-alpha')) ||
-      undefined
+      parseFloat(
+        computed.getPropertyValue('--notched-top-right-corner-angle-alpha'),
+      ) || undefined
 
     const bottomRightCornerAngleAlpha =
       parseFloat(
-        computed.getPropertyValue('--bottom-right-corner-angle-alpha'),
+        computed.getPropertyValue('--notched-bottom-right-corner-angle-alpha'),
       ) || undefined
 
     const bottomLeftCornerAngleAlpha =
       parseFloat(
-        computed.getPropertyValue('--bottom-left-corner-angle-alpha'),
+        computed.getPropertyValue('--notched-bottom-left-corner-angle-alpha'),
       ) || undefined
 
     const cornerSmoothing =
-      parseFloat(computed.getPropertyValue('--corner-smoothing')) || 0
+      parseFloat(computed.getPropertyValue('--notched-corner-smoothing')) || 0
 
     const preserveSmoothing =
-      computed.getPropertyValue('--preserve-smoothing') === 'false'
+      computed.getPropertyValue('--notched-preserve-smoothing') === 'false'
         ? false
         : true
 
     const topNotches = this.#parseCSSNotchValue(
-      computed.getPropertyValue('--top-notches'),
+      computed.getPropertyValue('--notched-top-notches'),
     )
     const rightNotches = this.#parseCSSNotchValue(
-      computed.getPropertyValue('--right-notches'),
+      computed.getPropertyValue('--notched-right-notches'),
     )
     const bottomNotches = this.#parseCSSNotchValue(
-      computed.getPropertyValue('--bottom-notches'),
+      computed.getPropertyValue('--notched-bottom-notches'),
     )
     const leftNotches = this.#parseCSSNotchValue(
-      computed.getPropertyValue('--left-notches'),
+      computed.getPropertyValue('--notched-left-notches'),
     )
 
-    const color = computed.getPropertyValue('--color')
+    const color = computed.getPropertyValue('--notched-color')
 
     const path = getSvgPath({
       cornerRadius,
