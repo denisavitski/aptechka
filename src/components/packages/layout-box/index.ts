@@ -500,7 +500,7 @@ export class LayoutBox {
     this.#height = Math.max(this.#element.clientHeight, 1)
 
     this.#depth = Math.max(
-      cssUnitParser.parse(computed.getPropertyValue('--depth') || '0px'),
+      cssUnitParser.parse(computed.getPropertyValue('--depth') || '0px') || 0,
       1,
     )
 

@@ -656,13 +656,12 @@ export class ScrollElement extends HTMLElement {
     this.#viewportSize = this.vertical ? this.offsetHeight : this.offsetWidth
 
     if (this.vertical) {
-      this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).rowGap,
-      )
+      this.#gap =
+        cssUnitParser.parse(getComputedStyle(this.#contentElement).rowGap) || 0
     } else {
-      this.#gap = cssUnitParser.parse(
-        getComputedStyle(this.#contentElement).columnGap,
-      )
+      this.#gap =
+        cssUnitParser.parse(getComputedStyle(this.#contentElement).columnGap) ||
+        0
     }
 
     if (this.#autoSizeCSSProperty.current && this.#visibleSections.length) {
