@@ -32,6 +32,7 @@ export function libConfig() {
           'billboard/index': './src/components/packages/billboard/index.ts',
           'cache/index': './src/components/packages/cache/index.ts',
           'canvas/index': './src/components/packages/canvas/index.ts',
+          'color/index': './src/components/packages/color/index.ts',
           'element-linked-store/index':
             './src/components/packages/element-linked-store/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',

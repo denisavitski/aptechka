@@ -1,11 +1,11 @@
-function getActualValue(rule: CSSStyleRule, name: string) {
+export function getStyleRuleActualValue(rule: CSSStyleRule, name: string) {
   const obj = rule.style.getPropertyValue(name)
 
   if (obj) {
     const stringValue = obj.toString()
 
     if (stringValue.startsWith('var')) {
-      return getActualValue(rule, stringValue.slice(4, -1))
+      return getStyleRuleActualValue(rule, stringValue.slice(4, -1))
     } else {
       return stringValue
     }
@@ -14,7 +14,7 @@ function getActualValue(rule: CSSStyleRule, name: string) {
 
 export function getRootVariables<
   T extends string,
-  V extends { [key in T]: string } = { [key in T]: string }
+  V extends { [key in T]: string } = { [key in T]: string },
 >(...names: T[]): V {
   const variables = {} as V
 
@@ -22,7 +22,7 @@ export function getRootVariables<
     Array.from(stylesheet.cssRules).forEach((rule) => {
       if (rule instanceof CSSStyleRule && rule.selectorText === ':root') {
         names.forEach((name) => {
-          const value = getActualValue(rule, name)
+          const value = getStyleRuleActualValue(rule, name)
 
           if (value) {
             variables[name] = value as any
