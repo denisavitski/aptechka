@@ -58,17 +58,19 @@ export class DocumentColors {
       Array.from(stylesheet.cssRules).forEach((rule) => {
         if (rule instanceof CSSStyleRule && rule.selectorText === 'html') {
           Array.from(rule.style).forEach((variableName) => {
-            const value = styles.getPropertyValue(variableName).trim()
+            if (variableName.startsWith('--color')) {
+              const value = styles.getPropertyValue(variableName).trim()
 
-            try {
-              const color = new Color(value)
+              try {
+                const color = new Color(value)
 
-              this.#colorMap.set(variableName, color)
-            } catch (error) {
-              console.warn(
-                `Не удалось распарсить цвет ${variableName}: ${value}`,
-                error,
-              )
+                this.#colorMap.set(variableName, color)
+              } catch (error) {
+                console.warn(
+                  `Не удалось распарсить цвет ${variableName}: ${value}`,
+                  error,
+                )
+              }
             }
           })
         }

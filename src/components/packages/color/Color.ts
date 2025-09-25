@@ -1,6 +1,19 @@
+export interface ColorToStringOptions extends Partial<ColorRGBA> {}
+
+export interface ColorMixOptions {
+  opacityMult?: number
+}
+
+export interface ColorRGBA {
+  r: number
+  g: number
+  b: number
+  a: number
+}
+
 export class Color {
   #hex = ''
-  #rgba = { r: 0, g: 0, b: 0, a: 1 }
+  #rgba: ColorRGBA = { r: 0, g: 0, b: 0, a: 1 }
 
   constructor(color: string) {
     this.#parseColor(color)
@@ -26,7 +39,37 @@ export class Color {
     return { ...this.#rgba }
   }
 
-  mix(otherColor: Color, ratio = 0.5) {
+  public toString(options?: ColorToStringOptions) {
+    if (this.a === 1 && !options) {
+      return this.hex
+    }
+
+    return this.toRGBAString(options)
+  }
+
+  public toRGBString(options?: Omit<ColorToStringOptions, 'a'>) {
+    return `rgb(${options?.r || this.r}, ${options?.g || this.g}, ${options?.b || this.b})`
+  }
+
+  public toRGBAString(options?: ColorToStringOptions) {
+    return `rgba(${options?.r || this.r}, ${options?.g || this.g}, ${options?.b || this.b}, ${options?.a || this.a})`
+  }
+
+  public mix(otherColor: Color, ratio = 0.5, options?: ColorMixOptions) {
+    const rgba = this.mixToRGBA(otherColor, ratio, options)
+    return new Color(this.#rgbaChannelsToString(rgba))
+  }
+
+  public mixToRGBAString(
+    otherColor: Color,
+    ratio = 0.5,
+    options?: ColorMixOptions,
+  ) {
+    const rgba = this.mixToRGBA(otherColor, ratio, options)
+    return this.#rgbaChannelsToString(rgba)
+  }
+
+  public mixToRGBA(otherColor: Color, ratio = 0.5, options?: ColorMixOptions) {
     if (!(otherColor instanceof Color)) {
       throw new Error('Argument must be an instance of Color')
     }
@@ -38,25 +81,15 @@ export class Color {
     const r = Math.round(this.r * (1 - ratio) + otherColor.r * ratio)
     const g = Math.round(this.g * (1 - ratio) + otherColor.g * ratio)
     const b = Math.round(this.b * (1 - ratio) + otherColor.b * ratio)
-    const a = this.a * (1 - ratio) + otherColor.a * ratio
+    const a =
+      (this.a * (1 - ratio) + otherColor.a * ratio) *
+      (options?.opacityMult || 1)
 
-    return new Color(`rgba(${r}, ${g}, ${b}, ${a})`)
+    return { r, g, b, a }
   }
 
-  public toString() {
-    if (this.a === 1) {
-      return this.hex
-    }
-
-    return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`
-  }
-
-  public toRGBString() {
-    return `rgb(${this.r}, ${this.g}, ${this.b})`
-  }
-
-  public toRGBAString() {
-    return `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`
+  #rgbaChannelsToString(rgba: ColorRGBA) {
+    return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
   }
 
   #parseColor(color: string) {
