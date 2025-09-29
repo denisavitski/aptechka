@@ -110,6 +110,10 @@ export class Ticker {
   #idleTime = 0
   #timestamp = 0
   #lastFrameId: number | undefined
+  #lastFrameTime = 0
+  #currentFPS = 0
+  #frameCount = 0
+  #fpsUpdateTime = 0
 
   #isDocumentHidden = false
 
@@ -122,6 +126,10 @@ export class Ticker {
         this.#documentVisibilityChangeListener,
       )
     }
+  }
+
+  public get fps(): number {
+    return this.#currentFPS
   }
 
   public subscribe(callback: TickerCallback, options?: TickerAddOptions) {
@@ -192,14 +200,42 @@ export class Ticker {
 
     this.#timestamp = timestamp - this.#idleTime
 
+    // Расчет FPS
+    this.#updateFPS(timestamp)
+
     for (const subscriber of this.#subscribers) {
       subscriber.tick(this.#timestamp)
     }
   }
 
+  #updateFPS(timestamp: number) {
+    if (this.#lastFrameTime === 0) {
+      this.#lastFrameTime = timestamp
+      this.#fpsUpdateTime = timestamp
+      return
+    }
+
+    this.#frameCount++
+
+    // Обновляем FPS каждую секунду
+    if (timestamp >= this.#fpsUpdateTime + 1000) {
+      this.#currentFPS = Math.round(
+        (this.#frameCount * 1000) / (timestamp - this.#fpsUpdateTime),
+      )
+      this.#frameCount = 0
+      this.#fpsUpdateTime = timestamp
+    }
+
+    this.#lastFrameTime = timestamp
+  }
+
   #documentVisibilityChangeListener = () => {
     if (document.hidden) {
       this.#isDocumentHidden = true
+      // Сбрасываем счетчики FPS при скрытии документа
+      this.#frameCount = 0
+      this.#fpsUpdateTime = 0
+      this.#lastFrameTime = 0
     }
   }
 }
