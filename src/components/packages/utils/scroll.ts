@@ -5,8 +5,6 @@ import {
   type ElementOrSelector,
 } from '@packages/utils'
 
-export function getScrollToElementPosition() {}
-
 export function scrollToElement(
   elementOrSelectorOrNumber: ElementOrSelector<HTMLElement> | number,
   {

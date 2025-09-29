@@ -1,3 +1,25 @@
+export function splitPropgress(
+  progress: number,
+  items: number,
+  initialItemsWithFullProgress: number = 0,
+) {
+  const totalItems = items - initialItemsWithFullProgress
+  const splitted: Array<number> = []
+
+  for (let item = 0; item < items; item++) {
+    const offset = item / totalItems - initialItemsWithFullProgress / totalItems
+
+    const itemProgress = Math.min(
+      1,
+      Math.max(0, (progress - offset) * totalItems),
+    )
+
+    splitted.push(itemProgress)
+  }
+
+  return splitted
+}
+
 export function setElementsProgress(
   progress: number,
   elements: Array<HTMLElement>,

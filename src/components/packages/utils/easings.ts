@@ -64,6 +64,25 @@ export const easeInOutExpo: EasingFunction = (t: number) => {
   return t === 0 || t === 1
     ? t
     : t < 0.5
-    ? 0.5 * 2 ** (10 * 2 * (t - 0.5))
-    : 0.5 * (2 - Math.abs(2 ** (-10 * 2 * (t - 0.5))))
+      ? 0.5 * 2 ** (10 * 2 * (t - 0.5))
+      : 0.5 * (2 - Math.abs(2 ** (-10 * 2 * (t - 0.5))))
 }
+
+export const easings = {
+  linear,
+  easeInQuad,
+  easeOutQuad,
+  easeInOutQuad,
+  easeInCubic,
+  easeOutCubic,
+  easeInOutCubic,
+  easeInQuart,
+  easeOutQuart,
+  easeInOutQuart,
+  easeInQuint,
+  easeOutQuint,
+  easeInOutQuint,
+  easeInExpo,
+  easeOutExpo,
+  easeInOutExpo,
+} as const

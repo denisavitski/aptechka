@@ -1,3 +1,4 @@
+import { TICK_ORDER } from '@packages/order'
 import { Store, StoreOptions } from '@packages/store'
 import {
   TickerAddOptions,
@@ -11,7 +12,6 @@ import {
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
-import { TICK_ORDER } from '@packages/order'
 
 export interface AnimationOptions extends TickerAddOptions {
   min?: number
@@ -19,17 +19,20 @@ export interface AnimationOptions extends TickerAddOptions {
   equalize?: boolean
   restart?: boolean
   current?: number
+  delay?: number
 }
 
 export type AnimationConstructorOptions<Options extends AnimationOptions> =
   StoreOptions<number> & Options
 
 export abstract class Animation<
-  Options extends AnimationOptions = AnimationOptions
+  Options extends AnimationOptions = AnimationOptions,
 > extends Store<number> {
   #maxFPS: number | undefined
   #order = TICK_ORDER.ANIMATION
   #culling: ElementOrSelector | undefined | null | false
+  #delay: number = 0
+  #delayTimeoutId: number | null = null
 
   #isRunning = new Store(false)
 
@@ -130,6 +133,7 @@ export abstract class Animation<
 
   public override reset() {
     super.reset()
+    this.#clearDelayTimeout()
 
     //@ts-ignore
     this.set(this.initial, { equalize: true })
@@ -137,6 +141,7 @@ export abstract class Animation<
 
   public override close() {
     super.close()
+    this.#clearDelayTimeout()
     this.reset()
     this.unlistenAnimationFrame()
   }
@@ -166,17 +171,20 @@ export abstract class Animation<
     this.#culling = nullishCoalescing(options?.culling, this.#culling)
     this.#min = nullishCoalescing(options?.min, this.#min)
     this.#max = nullishCoalescing(options?.max, this.#max)
+    this.#delay = nullishCoalescing(options?.delay, this.#delay)
 
     this.#setTarget(
-      typeof this.#tmpSetValue === 'number' ? this.#tmpSetValue : this.#target
+      typeof this.#tmpSetValue === 'number' ? this.#tmpSetValue : this.#target,
     )
 
     if (options?.equalize && !options?.restart) {
+      this.#clearDelayTimeout()
       this.unlistenAnimationFrame()
       this.current = this.#from = this.#target
     }
 
     if (options?.restart) {
+      this.#clearDelayTimeout()
       this.unlistenAnimationFrame()
       this.current = this.#from = this.initial
 
@@ -191,7 +199,16 @@ export abstract class Animation<
   }
 
   protected start() {
-    this.listenAnimationFrame()
+    this.#clearDelayTimeout()
+
+    if (this.#delay > 0) {
+      this.#delayTimeoutId = window.setTimeout(() => {
+        this.#delayTimeoutId = null
+        this.listenAnimationFrame()
+      }, this.#delay)
+    } else {
+      this.listenAnimationFrame()
+    }
   }
 
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void
@@ -199,11 +216,17 @@ export abstract class Animation<
   #setTarget(value: number) {
     this.#direction = Math.sign(value - this.#target)
     this.#target = clamp(value, this.#min, this.#max)
-
     this.#from = this.current
   }
 
   #animationFrameListener: TickerCallback = (e) => {
     this.handleAnimationFrame(e)
+  }
+
+  #clearDelayTimeout() {
+    if (this.#delayTimeoutId !== null) {
+      window.clearTimeout(this.#delayTimeoutId)
+      this.#delayTimeoutId = null
+    }
   }
 }

@@ -1,5 +1,6 @@
-import { Damped, type DampedOptions } from '@packages/animation'
+import { Damped, Tweened, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
+import { device } from '@packages/device'
 import { scrollEntries } from '@packages/scroll-entries'
 import { scrollToElement } from '@packages/utils'
 
@@ -22,6 +23,8 @@ export class SmoothScrollElement extends HTMLElement {
   #value = new Damped(0)
   #currentRoundedValue = 0
   #needSync = false
+
+  #tweened: Tweened | undefined
 
   public resize() {
     this.#value.min = 0
@@ -57,11 +60,15 @@ export class SmoothScrollElement extends HTMLElement {
   protected connectedCallback() {
     window.addEventListener('resize', this.#resizeListener)
     this.addEventListener('keydown', this.#keydownListener)
-    this.addEventListener('pointerdown', this.#pointerdownListener)
-    this.addEventListener('touchstart', this.#touchListener)
+    document.documentElement.addEventListener(
+      'pointerdown',
+      this.#pointerdownListener,
+    )
+    document.documentElement.addEventListener('touchstart', this.#touchListener)
     this.addEventListener('wheel', this.#wheelListener as any, {
       passive: false,
     })
+    this.addEventListener('scroll', this.#scrollListener)
 
     this.#value.set(this.scrollTop, { equalize: true })
 
@@ -96,14 +103,22 @@ export class SmoothScrollElement extends HTMLElement {
     this.#value.close()
     this.#cssDamping.close()
     this.#cssDisabled.close()
+    this.#tweened?.close()
 
     scrollEntries.unregister(this)
 
     window.removeEventListener('resize', this.#resizeListener)
     this.removeEventListener('keydown', this.#keydownListener)
-    this.removeEventListener('pointerdown', this.#pointerdownListener)
-    this.removeEventListener('touchstart', this.#touchListener)
+    document.documentElement.removeEventListener(
+      'pointerdown',
+      this.#pointerdownListener,
+    )
+    document.documentElement.removeEventListener(
+      'touchstart',
+      this.#touchListener,
+    )
     this.removeEventListener('wheel', this.#wheelListener as any)
+    this.removeEventListener('scroll', this.#scrollListener)
   }
 
   #checkDisabled() {
@@ -113,10 +128,17 @@ export class SmoothScrollElement extends HTMLElement {
     )
   }
 
+  #destroyTweened() {
+    this.#tweened?.close()
+    this.#tweened = undefined
+  }
+
   #wheelListener = (e: WheelEvent) => {
     if (this.#checkDisabled()) {
       return
     }
+
+    this.#destroyTweened()
 
     if (
       !(
@@ -160,6 +182,8 @@ export class SmoothScrollElement extends HTMLElement {
       return
     }
 
+    this.#destroyTweened()
+
     this.stop()
   }
 
@@ -186,6 +210,31 @@ export class SmoothScrollElement extends HTMLElement {
             offset: anchorElement.getAttribute('data-offset') || undefined,
             scrollElement: this,
             scrollCallback: (top, behaviour) => {
+              const duration = parseFloat(
+                anchorElement.getAttribute('data-duration') || '0',
+              )
+
+              const easing = anchorElement.getAttribute('data-easing') as any
+
+              if (duration) {
+                if (this.#tweened) {
+                  this.#tweened.close()
+                }
+
+                this.#tweened = new Tweened(this.#value.current, {
+                  duration: duration,
+                  easing: easing,
+                })
+
+                this.#tweened.subscribe((e) => {
+                  this.setPosition(e.current, {
+                    equalize: true,
+                  })
+                })
+
+                this.#tweened.set(top, { duration, easing })
+              }
+
               this.setPosition(top, {
                 equalize: behaviour === 'instant',
               })
@@ -206,8 +255,16 @@ export class SmoothScrollElement extends HTMLElement {
       return
     }
 
+    this.#destroyTweened()
+
     if (scrollKeys.has(e.code)) {
       this.stop()
+    }
+  }
+
+  #scrollListener = () => {
+    if (device.isMobile) {
+      this.sync()
     }
   }
 }

@@ -1,4 +1,3 @@
-import { easeInOutExpo } from '@packages/utils'
 import { Damped } from '../Damped'
 import { Tweened } from '../Tweened'
 
@@ -6,7 +5,7 @@ const box1 = document.getElementById('box-1')!
 const box2 = document.getElementById('box-2')!
 
 const t1 = new Tweened(0, {
-  easing: easeInOutExpo,
+  easing: 'easeInExpo',
 })
 
 const t2 = new Damped(0, {})

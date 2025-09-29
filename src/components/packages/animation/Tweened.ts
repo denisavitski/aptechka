@@ -6,12 +6,12 @@ import {
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
+import { easings } from '@packages/utils/easings'
 import {
   Animation,
   AnimationConstructorOptions,
   AnimationOptions,
 } from './Animation'
-import * as easings from '@packages/utils/easings'
 
 export type TweenEasingName = keyof typeof easings
 
@@ -26,7 +26,7 @@ export class Tweened extends Animation<TweenedOptions> {
 
   constructor(
     initial?: number,
-    options?: AnimationConstructorOptions<TweenedOptions>
+    options?: AnimationConstructorOptions<TweenedOptions>,
   ) {
     super(initial || 0, options)
 
@@ -40,8 +40,8 @@ export class Tweened extends Animation<TweenedOptions> {
       typeof options?.easing === 'function'
         ? options.easing
         : typeof options?.easing === 'string'
-        ? easings[options.easing as keyof typeof easings] || easings.linear
-        : easings.linear
+          ? easings[options.easing as keyof typeof easings] || easings.linear
+          : this.#easing
 
     this.#duration =
       options?.duration === false
@@ -64,6 +64,6 @@ export class Tweened extends Animation<TweenedOptions> {
 
   protected override start() {
     this.unlistenAnimationFrame()
-    this.listenAnimationFrame()
+    super.start()
   }
 }

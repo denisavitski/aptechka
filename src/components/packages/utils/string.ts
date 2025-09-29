@@ -31,14 +31,14 @@ export function toPascalCase(str: string) {
   return str
     .replace(
       /([a-z\d])([a-z\d]*)/gi,
-      (_, g1, g2) => g1.toUpperCase() + g2.toLowerCase()
+      (_, g1, g2) => g1.toUpperCase() + g2.toLowerCase(),
     )
     .replace(/[^a-z\d]/gi, '')
 }
 
 function sliceAndModifyFirst(
   string: string,
-  method: 'toUpperCase' | 'toLowerCase'
+  method: 'toUpperCase' | 'toLowerCase',
 ) {
   return string.slice(0, 1)[method]() + string.slice(1)
 }
@@ -46,7 +46,7 @@ function sliceAndModifyFirst(
 function sliceAndModify(
   string: string,
   everyWord = false,
-  method: 'toUpperCase' | 'toLowerCase'
+  method: 'toUpperCase' | 'toLowerCase',
 ) {
   if (everyWord) {
     return string
@@ -68,7 +68,7 @@ export function uncapitalize(string: string, everyWord = false) {
 
 export function generateId(
   length: number,
-  characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  characters = 'abcdefghijklmnopqrstuvwxyz0123456789',
 ): string {
   const charactersLength = characters.length
   const key = crypto.getRandomValues(new Uint8Array(length))
@@ -99,7 +99,7 @@ export function declension(
   number: number | string,
   one: string,
   few: string,
-  many: string
+  many: string,
 ) {
   const n = typeof number === 'string' ? parseInt(number) : number
 
@@ -122,4 +122,10 @@ export function declension(
   }
 
   return many
+}
+
+export function getRandomChar(chars?: string) {
+  let c = chars || 'abcdefghijklmnopqrstuvwxyz1234567890!@#$^&*()…æ_+-=;[]/~`'
+  c = c[Math.floor(Math.random() * c.length)]
+  return Math.random() > 0.5 ? c : c.toUpperCase()
 }
