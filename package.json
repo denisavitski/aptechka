@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.88.4",
+  "version": "0.88.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -501,7 +501,7 @@
   "peerDependencies": {
     "construct-style-sheets-polyfill": "^3.1.0",
     "global-jsdom": "^26.0.0",
-    "three": "^0.179.1",
+    "three": "^0.180.0",
     "urlpattern-polyfill": "^10.1.0"
   }
 }
