@@ -1,6 +1,7 @@
 import { Damped, Tweened, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
+import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
 import { scrollToElement } from '@packages/utils'
 
@@ -224,6 +225,7 @@ export class SmoothScrollElement extends HTMLElement {
                 this.#tweened = new Tweened(this.#value.current, {
                   duration: duration,
                   easing: easing,
+                  order: TICK_ORDER.SCROLL,
                 })
 
                 this.#tweened.subscribe((e) => {
@@ -233,11 +235,11 @@ export class SmoothScrollElement extends HTMLElement {
                 })
 
                 this.#tweened.set(top, { duration, easing })
+              } else {
+                this.setPosition(top, {
+                  equalize: behaviour === 'instant',
+                })
               }
-
-              this.setPosition(top, {
-                equalize: behaviour === 'instant',
-              })
             },
           })
         }
