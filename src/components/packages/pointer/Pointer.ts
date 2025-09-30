@@ -1,5 +1,6 @@
 import { Damped, DampedOptions } from '@packages/animation'
 
+import { elementResizer } from '@packages/element-resizer'
 import {
   Dot2D,
   ElementOrSelector,
@@ -9,7 +10,6 @@ import {
   normalize,
   screenToCartesian,
 } from '@packages/utils'
-import { elementResizer } from '@packages/element-resizer'
 import { windowResizer } from '@packages/window-resizer'
 
 export interface PointerParameters {
@@ -41,7 +41,7 @@ export class Pointer {
 
     this.#x = new Damped(0, parameters.damped)
     this.#y = new Damped(0, parameters.damped)
-    this.#z = new Damped(0, { min: 0, max: 1, ...parameters.damped })
+    this.#z = new Damped(0, parameters.damped)
 
     this.#cartesian = parameters.cartesian || false
     this.#normalize = parameters.normalize || false
@@ -94,11 +94,11 @@ export class Pointer {
   public disconnect() {
     this.#element.removeEventListener(
       'pointerenter',
-      this.#pointerEnterListener
+      this.#pointerEnterListener,
     )
     this.#element.removeEventListener(
       'pointerleave',
-      this.#pointerLeaveListener
+      this.#pointerLeaveListener,
     )
     this.#element.removeEventListener('pointermove', this.#pointerMoveListener)
 
