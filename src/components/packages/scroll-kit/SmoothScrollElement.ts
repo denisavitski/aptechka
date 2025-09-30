@@ -40,7 +40,11 @@ export class SmoothScrollElement extends HTMLElement {
   public sync() {
     const currentValue = this.scrollTop
 
-    if (this.#needSync || Math.abs(currentValue - this.#value.current) > 100) {
+    if (
+      device.isMobile ||
+      this.#needSync ||
+      Math.abs(currentValue - this.#value.current) > 100
+    ) {
       this.#needSync = false
       this.#value.set(currentValue, { equalize: true })
     }
@@ -61,11 +65,12 @@ export class SmoothScrollElement extends HTMLElement {
   protected connectedCallback() {
     window.addEventListener('resize', this.#resizeListener)
     this.addEventListener('keydown', this.#keydownListener)
+
     document.documentElement.addEventListener(
       'pointerdown',
       this.#pointerdownListener,
     )
-    document.documentElement.addEventListener('touchstart', this.#touchListener)
+
     this.addEventListener('wheel', this.#wheelListener as any, {
       passive: false,
     })
@@ -110,14 +115,12 @@ export class SmoothScrollElement extends HTMLElement {
 
     window.removeEventListener('resize', this.#resizeListener)
     this.removeEventListener('keydown', this.#keydownListener)
+
     document.documentElement.removeEventListener(
       'pointerdown',
       this.#pointerdownListener,
     )
-    document.documentElement.removeEventListener(
-      'touchstart',
-      this.#touchListener,
-    )
+
     this.removeEventListener('wheel', this.#wheelListener as any)
     this.removeEventListener('scroll', this.#scrollListener)
   }
@@ -135,7 +138,7 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   #wheelListener = (e: WheelEvent) => {
-    if (this.#checkDisabled()) {
+    if (this.#checkDisabled() || device.isMobile) {
       return
     }
 
@@ -178,18 +181,8 @@ export class SmoothScrollElement extends HTMLElement {
     this.shiftPosition(e.deltaY)
   }
 
-  #touchListener = () => {
-    if (this.#checkDisabled()) {
-      return
-    }
-
-    this.#destroyTweened()
-
-    this.stop()
-  }
-
   #pointerdownListener = (e: PointerEvent) => {
-    if (e.button !== 0 || this.#checkDisabled()) {
+    if (e.button !== 0 || this.#checkDisabled() || device.isMobile) {
       return
     }
 
