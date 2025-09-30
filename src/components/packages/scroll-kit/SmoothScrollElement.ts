@@ -83,7 +83,10 @@ export class SmoothScrollElement extends HTMLElement {
 
       scrollEntries.update(this, 'y', e.current)
 
-      if (roundedCurrent !== this.#currentRoundedValue) {
+      if (
+        roundedCurrent !== this.#currentRoundedValue &&
+        (!device.isMobile || this.#tweened?.isRunning.current)
+      ) {
         this.scroll({
           top: roundedCurrent,
           behavior: 'instant',
@@ -182,7 +185,7 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   #pointerdownListener = (e: PointerEvent) => {
-    if (e.button !== 0 || this.#checkDisabled() || device.isMobile) {
+    if (e.button !== 0 || this.#checkDisabled()) {
       return
     }
 
