@@ -7,50 +7,12 @@ import { generateId } from '@packages/utils'
 import { getSvgPath, NotchParams } from './getSvgPath'
 
 export class NotchedElement extends HTMLElement {
-  #svgElement: SVGElement
-  #pathElement: SVGPathElement
+  #clipId: string
 
   constructor() {
     super()
 
-    const clipContent = this.hasAttribute('clip-content')
-    const clip = this.hasAttribute('clip') || clipContent
-    const clipId = clip ? 'clip-' + generateId(10) : null
-
-    const tmpElement = document.createElement('div')
-    tmpElement.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg">
-        ${clipId ? `<clipPath id="${clipId}">` : ''}
-          <path></path>
-        ${clipId ? `</clipPath>` : ''}
-      </svg>
-      <slot></slot>
-    `
-
-    if (clipId) {
-      if (clipContent && this.firstElementChild instanceof HTMLElement) {
-        this.firstElementChild.style.clipPath = `url(#${clipId})`
-      } else {
-        this.style.clipPath = `url(#${clipId})`
-      }
-    }
-
-    this.style.position = 'relative'
-
-    this.#svgElement = tmpElement.querySelector('svg')!
-    this.#svgElement.style.cssText = `
-      position: absolute;
-      top: 0;
-      left: 0;
-      zIndex: -1;
-      display: block;
-      width: 100%;
-      height: 100%;
-    `
-
-    this.#pathElement = tmpElement.querySelector('path')!
-
-    this.prepend(tmpElement.firstElementChild!)
+    this.#clipId = 'clip-' + generateId(10)
   }
 
   protected connectedCallback() {
@@ -68,12 +30,6 @@ export class NotchedElement extends HTMLElement {
     const height = this.offsetHeight
 
     const computed = getComputedStyle(this)
-
-    this.#svgElement.setAttributeNS(
-      'http://www.w3.org/2000/svg',
-      'viewBox',
-      `0 0 ${width} ${height}`,
-    )
 
     const cornerRadius = cssUnitParser.parse(
       computed.getPropertyValue('--notched-corner-radius'),
@@ -140,8 +96,6 @@ export class NotchedElement extends HTMLElement {
       computed.getPropertyValue('--notched-left-notches'),
     )
 
-    const fill = computed.getPropertyValue('--notched-fill')
-
     const path = getSvgPath({
       cornerRadius,
       topLeftCornerRadius,
@@ -163,11 +117,10 @@ export class NotchedElement extends HTMLElement {
       height,
     })
 
-    this.#pathElement.setAttribute('d', path)
-
-    if (fill) {
-      this.#pathElement.setAttribute('fill', fill)
-    }
+    this.style.maskImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${this.offsetWidth}' height='${this.offsetHeight}' viewBox='0 0 ${this.offsetWidth} ${this.offsetHeight}'%3E%3Cdefs%3E%3CclipPath id='${this.#clipId}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23${this.#clipId})' %3E%3Crect width='${this.offsetWidth}' height='${this.offsetHeight}' fill='%23000'/%3E%3C/g%3E%3C/svg%3E")`
+    this.style.maskPosition = `center center`
+    this.style.maskRepeat = `no-repeat`
+    this.style.maskSize = `contain`
   }
 
   #parseCSSNotchValue(value: string) {
