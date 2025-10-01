@@ -1,6 +1,6 @@
 import { CSSProperty } from '@packages/css-property'
-import { PopoverElement } from './PopoverElement'
 import { isBrowser } from '@packages/utils'
+import { PopoverElement } from './PopoverElement'
 
 export type PopoverButtonType = 'open' | 'close' | 'toggle'
 
@@ -25,7 +25,7 @@ export class PopoverButtonElement extends HTMLElement {
             type === 'close' ||
             (type === 'toggle' && this.#popoverElement.opened)
           ) {
-            this.#popoverElement.close()
+            this.#popoverElement.close(true)
           }
         }
       })
@@ -108,7 +108,7 @@ export class PopoverButtonElement extends HTMLElement {
             el
               .getAttribute('data-popover-ids')
               ?.split(',')
-              .find((v) => v.trim() === targetId)
+              .find((v) => v.trim() === targetId),
           )
 
           if (founded) {
@@ -122,22 +122,22 @@ export class PopoverButtonElement extends HTMLElement {
 
         this.#popoverElement.addEventListener(
           'popoverTriggered',
-          this.#popoverTriggeredListener
+          this.#popoverTriggeredListener,
         )
 
         this.#popoverElement.addEventListener(
           'popoverOpened',
-          this.#popoverOpenedListener
+          this.#popoverOpenedListener,
         )
 
         this.#popoverElement.addEventListener(
           'popoverClosing',
-          this.#popoverClosingListener
+          this.#popoverClosingListener,
         )
 
         this.#popoverElement.addEventListener(
           'popoverClosed',
-          this.#popoverClosedListener
+          this.#popoverClosedListener,
         )
       } else {
         console.warn(this, `target ${targetId} not found`)
@@ -187,22 +187,22 @@ export class PopoverButtonElement extends HTMLElement {
     if (this.#popoverElement) {
       this.#popoverElement.removeEventListener(
         'popoverTriggered',
-        this.#popoverTriggeredListener
+        this.#popoverTriggeredListener,
       )
 
       this.#popoverElement.removeEventListener(
         'popoverOpened',
-        this.#popoverOpenedListener
+        this.#popoverOpenedListener,
       )
 
       this.#popoverElement.removeEventListener(
         'popoverClosing',
-        this.#popoverClosingListener
+        this.#popoverClosingListener,
       )
 
       this.#popoverElement.removeEventListener(
         'popoverClosed',
-        this.#popoverClosedListener
+        this.#popoverClosedListener,
       )
     }
   }
@@ -255,7 +255,7 @@ export class PopoverButtonElement extends HTMLElement {
         this.setAttribute('aria-haspopup', 'true')
         this.setAttribute(
           'aria-expanded',
-          this.#popoverElement.opened ? 'true' : 'false'
+          this.#popoverElement.opened ? 'true' : 'false',
         )
         this.setAttribute('aria-controls', this.#popoverElement.id || '')
       } else {

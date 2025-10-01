@@ -128,7 +128,7 @@ class PopoverGroups {
         target instanceof HTMLElement && target.hasAttribute('data-outside')
 
       if (!containsTarget || outsideTarget) {
-        lastPopover.close()
+        lastPopover.close(true)
       }
     }
   }
@@ -140,7 +140,7 @@ class PopoverGroups {
         .find((el) => el.escape.current)
 
       if (lastPopover) {
-        lastPopover.close()
+        lastPopover.close(true)
       }
     }
   }
@@ -357,7 +357,7 @@ export class PopoverElement extends HTMLElement {
     }
   }
 
-  public close() {
+  public close(back?: boolean) {
     if (!this.#opened) {
       return
     }
@@ -370,7 +370,11 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.stack.remove(this.#group.current, this)
 
-    this.#deleteSearchParam()
+    if (back) {
+      history.back()
+    } else {
+      this.#deleteSearchParam()
+    }
 
     this.#startClosingTimeoutId = setTimeout(() => {
       this.#status.set('transitionend', false)
@@ -579,7 +583,7 @@ export class PopoverElement extends HTMLElement {
   }
 
   #closeElementClickListener = () => {
-    this.close()
+    this.close(true)
   }
 }
 
