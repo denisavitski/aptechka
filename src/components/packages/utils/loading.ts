@@ -4,28 +4,40 @@ export function requestLoadingCallback(
 ) {
   let idleId: ReturnType<typeof requestIdleCallback> | undefined
   let timeoutId: ReturnType<typeof setTimeout> | undefined
+  let isCallbackCalled = false
+
+  const safeCallback = () => {
+    if (isCallbackCalled) return
+    isCallbackCalled = true
+
+    try {
+      callback()
+    } catch (error) {
+      console.error('Error in loading callback:', error)
+    }
+  }
 
   const domListener = () => {
-    window.removeEventListener('DOMContentLoaded', loadListener)
-    callback()
+    window.removeEventListener('DOMContentLoaded', domListener)
+    safeCallback()
   }
 
   const loadListener = () => {
     window.removeEventListener('load', loadListener)
-    callback()
+    safeCallback()
   }
 
-  const idleListener = () => {
+  const idleListener = (deadline: IdleDeadline) => {
     idleId = undefined
-    callback()
+    safeCallback()
   }
 
   const delayListener = () => {
-    window.removeEventListener('load', loadListener)
+    window.removeEventListener('load', delayListener) // ← Исправлено
 
     timeoutId = setTimeout(() => {
       requestAnimationFrame(() => {
-        callback()
+        safeCallback()
       })
     }, 1000)
   }
@@ -35,30 +47,38 @@ export function requestLoadingCallback(
     window.removeEventListener('load', loadListener)
     window.removeEventListener('load', delayListener)
 
-    if (idleId && window.cancelIdleCallback) {
+    if (idleId !== undefined && 'cancelIdleCallback' in window) {
       window.cancelIdleCallback(idleId)
     }
 
-    clearTimeout(timeoutId)
+    if (timeoutId !== undefined) {
+      clearTimeout(timeoutId)
+    }
   }
 
-  if (event === 'idle' && window.requestIdleCallback) {
+  if (event === 'idle' && 'requestIdleCallback' in window) {
     idleId = window.requestIdleCallback(idleListener, { timeout: 10000 })
   } else {
+    const readyState = document.readyState
+
     if (event === 'load') {
-      if (document.readyState === 'complete') {
-        loadListener()
+      if (readyState === 'complete') {
+        setTimeout(loadListener, 0)
       } else {
         window.addEventListener('load', loadListener)
       }
     } else if (event === 'loadWithDelay') {
-      if (document.readyState === 'complete') {
-        delayListener()
+      if (readyState === 'complete') {
+        setTimeout(delayListener, 0)
       } else {
         window.addEventListener('load', delayListener)
       }
     } else if (event === 'DOMContentLoaded') {
-      window.addEventListener('DOMContentLoaded', domListener)
+      if (readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', domListener)
+      } else {
+        setTimeout(domListener, 0)
+      }
     }
   }
 
