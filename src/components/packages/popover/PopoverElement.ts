@@ -1,6 +1,7 @@
 import { CSSProperty } from '@packages/css-property'
 import { viewport } from '@packages/device'
 import { ElementLinkedStore } from '@packages/element-linked-store'
+import { popstateAllowed } from '@packages/shared/history'
 import {
   debounce,
   dispatchEvent,
@@ -370,6 +371,7 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.stack.remove(this.#group.current, this)
 
+    popstateAllowed.value = false
     if (back) {
       history.back()
     } else {
@@ -377,6 +379,8 @@ export class PopoverElement extends HTMLElement {
     }
 
     this.#startClosingTimeoutId = setTimeout(() => {
+      popstateAllowed.value = true
+
       this.#status.set('transitionend', false)
       this.#status.set('opened', false)
       this.#status.set('closing', true)
@@ -522,7 +526,13 @@ export class PopoverElement extends HTMLElement {
     }
   }
 
-  #popStateListener = () => {
+  #popStateListener = (e: Event) => {
+    e.preventDefault()
+
+    if (!popstateAllowed.value) {
+      return
+    }
+
     this.#historyAllowed = false
 
     if (

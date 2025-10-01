@@ -18,6 +18,7 @@ import { MorphLink } from './MorphLink'
 
 import { MorphAnnouncer } from './MorphAnnouncer'
 
+import { popstateAllowed } from '@packages/shared/history'
 import { MorphParamsDependent } from './MorphParamsDependent'
 import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 
@@ -960,6 +961,10 @@ export class Morph {
 
   #popStateListener = async (event: PopStateEvent) => {
     event.preventDefault()
+
+    if (!popstateAllowed.value) {
+      return
+    }
 
     this.#isPopstateNavigation = true
 
