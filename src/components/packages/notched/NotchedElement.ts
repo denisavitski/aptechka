@@ -2,23 +2,37 @@
 
 import { cssUnitParser } from '@packages/css-unit-parser'
 import { elementResizer } from '@packages/element-resizer'
-import { ticker } from '@packages/ticker'
 import { generateId } from '@packages/utils'
 import { getSvgPath, NotchParams } from './getSvgPath'
 
 export class NotchedElement extends HTMLElement {
-  #clipId: string
+  #imageElement: HTMLImageElement | null = null
+  #clipId: string | null = null
 
   constructor() {
     super()
 
-    this.#clipId = 'clip-' + generateId(10)
+    const clip = this.hasAttribute('clip')
+
+    this.#clipId = clip ? 'clip-' + generateId(10) : null
+
+    if (!this.#clipId) {
+      this.#imageElement = document.createElement('img')
+      this.#imageElement.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        zIndex: -1;
+        display: block;
+        width: 100%;
+        height: 100%;
+      `
+      this.prepend(this.#imageElement)
+    }
   }
 
   protected connectedCallback() {
     elementResizer.subscribe(this, this.#resizeListener)
-
-    ticker.subscribe(this.#resizeListener)
   }
 
   protected disconnectedCallback() {
@@ -117,10 +131,16 @@ export class NotchedElement extends HTMLElement {
       height,
     })
 
-    this.style.maskImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${this.offsetWidth}' height='${this.offsetHeight}' viewBox='0 0 ${this.offsetWidth} ${this.offsetHeight}'%3E%3Cdefs%3E%3CclipPath id='${this.#clipId}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23${this.#clipId})' %3E%3Crect width='${this.offsetWidth}' height='${this.offsetHeight}' fill='%23000'/%3E%3C/g%3E%3C/svg%3E")`
-    this.style.maskPosition = `center center`
-    this.style.maskRepeat = `no-repeat`
-    this.style.maskSize = `contain`
+    if (this.#clipId) {
+      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${this.offsetWidth}' height='${this.offsetHeight}' viewBox='0 0 ${this.offsetWidth} ${this.offsetHeight}'%3E%3Cdefs%3E%3CclipPath id='${this.#clipId}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23${this.#clipId})' %3E%3Crect width='${this.offsetWidth}' height='${this.offsetHeight}' fill='%23000'/%3E%3C/g%3E%3C/svg%3E`
+      this.style.maskImage = `url("${svg}")`
+      this.style.maskPosition = `center center`
+      this.style.maskRepeat = `no-repeat`
+      this.style.maskSize = `contain`
+    } else if (this.#imageElement) {
+      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/svg%3E`
+      this.#imageElement.src = svg
+    }
   }
 
   #parseCSSNotchValue(value: string) {
