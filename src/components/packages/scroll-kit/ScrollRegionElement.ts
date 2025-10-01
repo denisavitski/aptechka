@@ -1,5 +1,5 @@
-import { ElementLinkedStore } from '@packages/element-linked-store'
 import { CSSProperty } from '@packages/css-property'
+import { ElementLinkedStore } from '@packages/element-linked-store'
 import { elementResizer } from '@packages/element-resizer'
 import { ticker } from '@packages/ticker'
 import {
@@ -7,6 +7,7 @@ import {
   dispatchEvent,
   getCumulativeOffsetTop,
   getStickyOffset,
+  requestLoadingCallback,
 } from '@packages/utils'
 import { windowResizer } from '@packages/window-resizer'
 
@@ -27,17 +28,17 @@ export class ScrollRegionElement extends HTMLElement {
   #statusHolderCSSProperty = new CSSProperty<string | false>(
     this,
     '--scroll-region-status-holder',
-    false
+    false,
   )
   #progressHolderCSSProperty = new CSSProperty<string | false>(
     this,
     '--scroll-region-progress-holder',
-    false
+    false,
   )
   #disabledCSSProperty = new CSSProperty<boolean>(
     this,
     '--scroll-region-disabled',
-    false
+    false,
   )
   #startOffsetCSSProperty = new CSSProperty<number>(
     this,
@@ -45,7 +46,7 @@ export class ScrollRegionElement extends HTMLElement {
     0,
     {
       rawValueCheck: false,
-    }
+    },
   )
   #startOffsetMinCSSProperty = new CSSProperty<number | false>(
     this,
@@ -53,7 +54,7 @@ export class ScrollRegionElement extends HTMLElement {
     false,
     {
       rawValueCheck: false,
-    }
+    },
   )
   #startExtraOffsetCSSProperty = new CSSProperty<number>(
     this,
@@ -61,7 +62,7 @@ export class ScrollRegionElement extends HTMLElement {
     0,
     {
       rawValueCheck: false,
-    }
+    },
   )
   #distanceCSSProperty = new CSSProperty<number>(
     this,
@@ -69,7 +70,7 @@ export class ScrollRegionElement extends HTMLElement {
     0,
     {
       rawValueCheck: false,
-    }
+    },
   )
   #distanceOffsetCSSProperty = new CSSProperty<number>(
     this,
@@ -77,17 +78,17 @@ export class ScrollRegionElement extends HTMLElement {
     0,
     {
       rawValueCheck: false,
-    }
+    },
   )
   #progressVarCSSProperty = new CSSProperty<string>(
     this,
     '--scroll-region-progress-var',
-    ''
+    '',
   )
   #enterOnceCSSProperty = new CSSProperty<boolean>(
     this,
     '--scroll-region-enter-once',
-    false
+    false,
   )
 
   #status = new ElementLinkedStore(this, {
@@ -105,6 +106,8 @@ export class ScrollRegionElement extends HTMLElement {
   #progress = 0
 
   #visible = false
+
+  #loadingUnsub: ReturnType<typeof requestLoadingCallback> | undefined
 
   public get start() {
     return this.#start
@@ -148,7 +151,7 @@ export class ScrollRegionElement extends HTMLElement {
     if (typeof this.#startOffsetMinCSSProperty.current === 'number') {
       this.#start += Math.max(
         this.#startOffsetCSSProperty.current,
-        this.#startOffsetMinCSSProperty.current
+        this.#startOffsetMinCSSProperty.current,
       )
     } else {
       this.#start += this.#startOffsetCSSProperty.current
@@ -189,7 +192,7 @@ export class ScrollRegionElement extends HTMLElement {
     if (this.#progressVarCSSProperty.current) {
       this.#progressHolderElement.style.setProperty(
         this.#cssVar(this.#progressVarCSSProperty.current),
-        this.#progress.toFixed(6)
+        this.#progress.toFixed(6),
       )
     }
 
@@ -228,10 +231,7 @@ export class ScrollRegionElement extends HTMLElement {
   }
 
   public destroy() {
-    document.removeEventListener(
-      'readystatechange',
-      this.#readyStateChangeListener
-    )
+    this.#loadingUnsub?.()
 
     this.disable(false)
 
@@ -277,14 +277,7 @@ export class ScrollRegionElement extends HTMLElement {
       this.#scrollElement = window
     }
 
-    if (document.readyState === 'complete') {
-      this.#readyStateChangeListener()
-    } else {
-      document.addEventListener(
-        'readystatechange',
-        this.#readyStateChangeListener
-      )
-    }
+    this.#loadingUnsub = requestLoadingCallback('load', this.#loadingListener)
   }
 
   protected disconnectedCallback() {
@@ -294,7 +287,7 @@ export class ScrollRegionElement extends HTMLElement {
   #addGlobalClasses() {
     if (this.hasAttribute('data-global-class')) {
       document.documentElement.classList.add(
-        this.getAttribute('data-global-class')!
+        this.getAttribute('data-global-class')!,
       )
     }
   }
@@ -302,7 +295,7 @@ export class ScrollRegionElement extends HTMLElement {
   #removeGlobalClasses() {
     if (this.hasAttribute('data-global-class')) {
       document.documentElement.classList.remove(
-        this.getAttribute('data-global-class')!
+        this.getAttribute('data-global-class')!,
       )
     }
   }
@@ -323,7 +316,7 @@ export class ScrollRegionElement extends HTMLElement {
     this.#progressHolderCSSProperty.subscribe((e) => {
       if (this.#progressHolderElement) {
         this.#progressHolderElement.style.removeProperty(
-          this.#cssVar(this.#progressVarCSSProperty.current)
+          this.#cssVar(this.#progressVarCSSProperty.current),
         )
       }
 
@@ -345,7 +338,7 @@ export class ScrollRegionElement extends HTMLElement {
         this.#tickListener()
       } else if (e.previous) {
         this.#progressHolderElement.style.removeProperty(
-          this.#cssVar(e.previous)
+          this.#cssVar(e.previous),
         )
       }
     })
@@ -401,10 +394,8 @@ export class ScrollRegionElement extends HTMLElement {
     return `--${value}`
   }
 
-  #readyStateChangeListener = () => {
-    if (document.readyState === 'complete') {
-      this.#init()
-    }
+  #loadingListener = () => {
+    this.#init()
   }
 }
 
