@@ -78,13 +78,20 @@ export class SmoothScrollElement extends HTMLElement {
 
   public scrollToElement(
     elementOrSelector: ElementOrSelector<HTMLElement>,
-    options?: Omit<ScrollToElementOptions, 'scrollCallback' | 'scrollElement'>,
+    options?: Omit<
+      ScrollToElementOptions,
+      'scrollCallback' | 'scrollElement' | 'startValue'
+    >,
   ) {
     scrollToElement(elementOrSelector, {
       ...options,
       scrollElement: this,
+      startValue: this.#value.current,
       scrollCallback: (top) => {
-        this.scrollToValue(top, options?.behavior)
+        this.scrollToValue(
+          top,
+          options?.duration ? 'instant' : options?.behavior,
+        )
       },
     })
   }

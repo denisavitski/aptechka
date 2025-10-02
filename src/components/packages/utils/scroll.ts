@@ -15,6 +15,7 @@ export interface ScrollToElementOptions
   behavior?: ScrollBehavior
   offset?: number | string | ElementOrSelector<HTMLElement>
   center?: boolean
+  startValue?: number
   scrollElement?: HTMLElement | Window
   scrollCallback?: (value: number) => void
 }
@@ -29,6 +30,7 @@ export function scrollToElement(
     scrollCallback,
     duration,
     easing,
+    startValue,
   }: ScrollToElementOptions = {},
 ) {
   let elementPosition
@@ -89,12 +91,18 @@ export function scrollToElement(
         tweened.close()
       }
 
+      console.log(startValue)
+
       let tweenedStart = 0
 
-      if (scrollContainerElement instanceof HTMLElement) {
-        tweenedStart = scrollContainerElement.scrollTop
+      if (startValue) {
+        tweenedStart = startValue
       } else {
-        tweenedStart = window.scrollY
+        if (scrollContainerElement instanceof HTMLElement) {
+          tweenedStart = scrollContainerElement.scrollTop
+        } else {
+          tweenedStart = window.scrollY
+        }
       }
 
       tweened = new Tweened(tweenedStart, {
