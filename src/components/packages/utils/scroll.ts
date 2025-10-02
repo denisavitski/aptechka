@@ -31,23 +31,27 @@ export function scrollToElement(
     easing,
   }: ScrollToElementOptions = {},
 ) {
-  let start
+  let elementPosition
   let centerElement = scrollElement
   let scrollContainerElement = scrollElement
 
   if (typeof elementOrSelectorOrNumber === 'number') {
-    start = elementOrSelectorOrNumber
+    elementPosition = elementOrSelectorOrNumber
   } else {
     const element = getElement(elementOrSelectorOrNumber)
 
     if (element) {
       centerElement = element
       scrollContainerElement = scrollElement || findScrollParentElement(element)
-      start = getCumulativeOffsetTop(element)
+      elementPosition = getCumulativeOffsetTop(element)
     }
   }
 
-  if (centerElement && scrollContainerElement && typeof start === 'number') {
+  if (
+    centerElement &&
+    scrollContainerElement &&
+    typeof elementPosition === 'number'
+  ) {
     const offsetValue =
       typeof offset === 'number'
         ? offset
@@ -61,7 +65,7 @@ export function scrollToElement(
         : innerHeight
 
     const centerValue = center ? (innerHeight / 2) * -1 + height / 2 : 0
-    const top = start + offsetValue + centerValue
+    const top = elementPosition + offsetValue + centerValue
 
     const scrollToValue = (value: number) => {
       if (

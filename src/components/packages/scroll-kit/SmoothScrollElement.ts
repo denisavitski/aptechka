@@ -216,7 +216,7 @@ export class SmoothScrollElement extends HTMLElement {
         if (url.hash) {
           e.preventDefault()
 
-          this.scrollToElement(anchorElement, {
+          this.scrollToElement(url.hash, {
             behavior:
               (anchorElement.getAttribute('data-scroll-behavior') as any) ||
               'smooth',
