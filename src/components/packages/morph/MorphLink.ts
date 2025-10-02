@@ -153,6 +153,12 @@ export class MorphLink {
         ? cssValueParser.parse(offsetScrollRawValue)
         : undefined
 
+      const scrollDuration =
+        parseFloat(this.#element.getAttribute('data-scroll-duration') || '0') ||
+        undefined
+      const scrollEasing =
+        (this.#element.getAttribute('data-scroll-easing') as any) || undefined
+
       const revalidate =
         this.#element.hasAttribute('data-revalidate') ||
         this.#element.hasAttribute('data-pagination-more-link') ||
@@ -220,6 +226,8 @@ export class MorphLink {
         clearState,
         keepScrollPosition,
         scrollBehaviour,
+        scrollDuration,
+        scrollEasing,
         submorphAppend: this.#element.hasAttribute('data-submorph-append'),
         mergeParams:
           this.#element.hasAttribute('data-merge-params') &&

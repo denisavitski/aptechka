@@ -41,7 +41,7 @@ export class Notifier<Callback extends NotifierCallback = NotifierCallback> {
 
   public unsubscribe(callback: Callback) {
     this.#subscribers = this.#subscribers.filter(
-      (subscriber) => subscriber.callback !== callback
+      (subscriber) => subscriber.callback !== callback,
     )
   }
 

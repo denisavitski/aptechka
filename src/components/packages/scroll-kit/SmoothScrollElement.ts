@@ -1,9 +1,12 @@
 import { Damped, Tweened, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
-import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
-import { scrollToElement } from '@packages/utils'
+import {
+  ElementOrSelector,
+  scrollToElement,
+  ScrollToElementOptions,
+} from '@packages/utils'
 
 const scrollKeys = new Set([
   'ArrowUp',
@@ -60,6 +63,32 @@ export class SmoothScrollElement extends HTMLElement {
     this.resize()
     this.sync()
     this.#value.set(value, options)
+  }
+
+  public scrollToValue(value: number, behavior?: ScrollBehavior | undefined) {
+    if (device.isMobile) {
+      this.scroll({
+        top: value,
+        behavior,
+      })
+    } else {
+      this.setPosition(value, {
+        equalize: behavior === 'instant',
+      })
+    }
+  }
+
+  public scrollToElement(
+    elementOrSelector: ElementOrSelector<HTMLElement>,
+    options?: Omit<ScrollToElementOptions, 'scrollCallback' | 'scrollElement'>,
+  ) {
+    scrollToElement(elementOrSelector, {
+      ...options,
+      scrollElement: this,
+      scrollCallback: (top) => {
+        this.scrollToValue(top, options?.behavior)
+      },
+    })
   }
 
   protected connectedCallback() {
@@ -200,43 +229,20 @@ export class SmoothScrollElement extends HTMLElement {
         if (url.hash) {
           e.preventDefault()
 
-          scrollToElement(url.hash, {
+          this.scrollToElement(anchorElement, {
             behavior:
-              (anchorElement.getAttribute('data-behavior') as any) || 'smooth',
-            center: anchorElement.hasAttribute('data-center'),
-            offset: anchorElement.getAttribute('data-offset') || undefined,
-            scrollElement: this,
-            scrollCallback: (top, behaviour) => {
-              const duration = parseFloat(
-                anchorElement.getAttribute('data-duration') || '0',
-              )
-
-              const easing = anchorElement.getAttribute('data-easing') as any
-
-              if (duration) {
-                if (this.#tweened) {
-                  this.#tweened.close()
-                }
-
-                this.#tweened = new Tweened(this.#value.current, {
-                  duration: duration,
-                  easing: easing,
-                  order: TICK_ORDER.SCROLL,
-                })
-
-                this.#tweened.subscribe((e) => {
-                  this.setPosition(e.current, {
-                    equalize: true,
-                  })
-                })
-
-                this.#tweened.set(top, { duration, easing })
-              } else {
-                this.setPosition(top, {
-                  equalize: behaviour === 'instant',
-                })
-              }
-            },
+              (anchorElement.getAttribute('data-scroll-behavior') as any) ||
+              'smooth',
+            offset:
+              anchorElement.getAttribute('data-scroll-offset') || undefined,
+            center: anchorElement.hasAttribute('data-scroll-center'),
+            duration:
+              parseFloat(
+                anchorElement.getAttribute('data-scroll-duration') || '0',
+              ) || undefined,
+            easing:
+              (anchorElement.getAttribute('data-scroll-easing') as any) ||
+              undefined,
           })
         }
       }

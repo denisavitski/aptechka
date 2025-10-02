@@ -1,6 +1,7 @@
 import {
   ChangeHistoryAction,
   ElementOrSelector,
+  ScrollToElementOptions,
   changeHistory,
   createScriptElement,
   dispatchEvent,
@@ -69,6 +70,8 @@ export interface MorphNavigateOptions {
   centerScroll?: boolean
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   scrollBehaviour?: ScrollBehavior
+  scrollDuration?: number
+  scrollEasing?: ScrollToElementOptions['easing']
   scrollTo?: string
   revalidate?: boolean
   keepSearchParameters?: boolean
@@ -101,11 +104,6 @@ export interface MorphEvents {
 export interface MorphGetRouteOptions {
   searchParameters?: string
   revalidate?: boolean
-}
-
-interface ScrollToElementOptions
-  extends Pick<MorphNavigateOptions, 'centerScroll' | 'offsetScroll'> {
-  behavior?: ScrollBehavior
 }
 
 export class Morph {
@@ -283,6 +281,8 @@ export class Morph {
       historyAction = 'push',
       centerScroll,
       offsetScroll,
+      scrollDuration,
+      scrollEasing,
       scrollBehaviour,
       revalidate,
       keepSearchParameters,
@@ -318,8 +318,10 @@ export class Morph {
     ) {
       if (!keepScrollPosition) {
         this.#tryScrollToElement(scrollTo || normalizedURL.hash || 0, {
-          centerScroll,
-          offsetScroll,
+          center: centerScroll,
+          offset: offsetScroll,
+          duration: scrollDuration,
+          easing: scrollEasing,
           behavior: 'smooth',
         })
       }
@@ -763,16 +765,20 @@ export class Morph {
         nextRoute.clearScrollState()
 
         this.#tryScrollToElement(scrollTo, {
-          centerScroll,
-          offsetScroll,
+          center: centerScroll,
+          offset: offsetScroll,
+          duration: scrollDuration,
+          easing: scrollEasing,
           behavior: scrollBehaviour,
         })
       } else if (normalizedURL.hash) {
         nextRoute.clearScrollState()
 
         this.#tryScrollToElement(normalizedURL.hash, {
-          centerScroll,
-          offsetScroll,
+          center: centerScroll,
+          offset: offsetScroll,
+          duration: scrollDuration,
+          easing: scrollEasing,
           behavior: scrollBehaviour,
         })
       } else if (this.#isPopstateNavigation) {
@@ -945,16 +951,17 @@ export class Morph {
     this.#scrollListener()
   }
 
-  #tryScrollToElement(id: string | number, options?: ScrollToElementOptions) {
+  #tryScrollToElement(
+    id: string | number,
+    options?: Omit<ScrollToElementOptions, 'scrollElement'>,
+  ) {
     const value =
       typeof id === 'string' ? document.querySelector<HTMLElement>(id) : id
 
     if (typeof value === 'number' || value) {
       scrollToElement(value, {
         scrollElement: this.#currentScrollElement,
-        behavior: options?.behavior || 'instant',
-        center: options?.centerScroll,
-        offset: options?.offsetScroll,
+        ...options,
       })
     }
   }

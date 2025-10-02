@@ -1,5 +1,5 @@
 import { Notifier } from '@packages/notifier'
-import { generateId } from '@packages/utils'
+import { generateId } from '@packages/utils/string'
 import { storeRegistry } from './StoreRegistry'
 
 export interface StoreState<StoreType> {

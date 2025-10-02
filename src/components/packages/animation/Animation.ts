@@ -6,12 +6,10 @@ import {
   TickerCallbackEntry,
   ticker,
 } from '@packages/ticker'
-import {
-  ElementOrSelector,
-  clamp,
-  nullishCoalescing,
-  preciseNumber,
-} from '@packages/utils'
+import { ElementOrSelector } from '@packages/utils/dom'
+import { clamp } from '@packages/utils/math'
+import { preciseNumber } from '@packages/utils/number'
+import { nullishCoalescing } from '@packages/utils/polyfills'
 
 export interface AnimationOptions extends TickerAddOptions {
   min?: number

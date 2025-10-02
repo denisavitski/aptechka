@@ -1,9 +1,23 @@
+import { Tweened, TweenedOptions } from '@packages/animation/Tweened'
+import { TICK_ORDER } from '@packages/order'
+import type { SmoothScrollElement } from '@packages/scroll-kit'
 import {
   findScrollParentElement,
   getCumulativeOffsetTop,
   getElement,
   type ElementOrSelector,
 } from '@packages/utils'
+
+let tweened: Tweened | undefined
+
+export interface ScrollToElementOptions
+  extends Pick<TweenedOptions, 'duration' | 'easing'> {
+  behavior?: ScrollBehavior
+  offset?: number | string | ElementOrSelector<HTMLElement>
+  center?: boolean
+  scrollElement?: HTMLElement | Window
+  scrollCallback?: (value: number) => void
+}
 
 export function scrollToElement(
   elementOrSelectorOrNumber: ElementOrSelector<HTMLElement> | number,
@@ -13,13 +27,9 @@ export function scrollToElement(
     center = false,
     scrollElement,
     scrollCallback,
-  }: {
-    behavior?: ScrollBehavior
-    offset?: number | string | ElementOrSelector<HTMLElement>
-    center?: boolean
-    scrollElement?: HTMLElement | Window
-    scrollCallback?: (top: number, behaviour: ScrollBehavior) => void
-  } = {},
+    duration,
+    easing,
+  }: ScrollToElementOptions = {},
 ) {
   let start
   let centerElement = scrollElement
@@ -53,13 +63,57 @@ export function scrollToElement(
     const centerValue = center ? (innerHeight / 2) * -1 + height / 2 : 0
     const top = start + offsetValue + centerValue
 
-    if (scrollCallback) {
-      scrollCallback(top, behavior)
-    } else {
-      scrollContainerElement.scroll({
-        top,
-        behavior,
+    const scrollToValue = (value: number) => {
+      if (
+        scrollContainerElement instanceof HTMLElement &&
+        scrollContainerElement.tagName === 'E-SMOOTH-SCROLL'
+      ) {
+        ;(scrollContainerElement as SmoothScrollElement).scrollToValue(
+          value,
+          duration ? 'instant' : behavior,
+        )
+      } else {
+        scrollContainerElement.scroll({
+          top: value,
+          behavior: duration ? 'instant' : behavior,
+        })
+      }
+    }
+
+    if (duration) {
+      if (tweened) {
+        tweened.close()
+      }
+
+      let tweenedStart = 0
+
+      if (scrollContainerElement instanceof HTMLElement) {
+        tweenedStart = scrollContainerElement.scrollTop
+      } else {
+        tweenedStart = window.scrollY
+      }
+
+      tweened = new Tweened(tweenedStart, {
+        duration: duration,
+        easing: easing,
+        order: TICK_ORDER.SCROLL,
       })
+
+      tweened.subscribe((e) => {
+        if (scrollCallback) {
+          scrollCallback(e.current)
+        } else {
+          scrollToValue(e.current)
+        }
+      })
+
+      tweened.set(top, { duration, easing })
+    } else {
+      if (scrollCallback) {
+        scrollCallback(top)
+      } else {
+        scrollToValue(top)
+      }
     }
   }
 }

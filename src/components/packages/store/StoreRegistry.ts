@@ -1,4 +1,4 @@
-import { isBrowser } from '@packages/utils'
+import { isBrowser } from '@packages/utils/browser'
 import { Store, activeStores } from './Store'
 
 export interface StoreRegistryStateStore {

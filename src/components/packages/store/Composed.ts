@@ -1,4 +1,4 @@
-import { debounce } from '@packages/utils'
+import { debounce } from '@packages/utils/function'
 import { Store, StoreOptions } from './Store'
 
 export type ComposedCallback<ComposedType> = () => ComposedType
@@ -9,7 +9,7 @@ export class Composed<ComposedType> extends Store<ComposedType> {
   constructor(
     stores: Array<Store<any>>,
     callback: ComposedCallback<ComposedType>,
-    parameters?: StoreOptions<ComposedType>
+    parameters?: StoreOptions<ComposedType>,
   ) {
     super(null!, parameters)
 
@@ -21,7 +21,7 @@ export class Composed<ComposedType> extends Store<ComposedType> {
       this.#unsubscribers.push(
         store.subscribe(() => {
           update()
-        })
+        }),
       )
     })
   }

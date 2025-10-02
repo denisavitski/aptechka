@@ -1,12 +1,8 @@
 import { TickerCallbackEntry } from '@packages/ticker'
-import {
-  EasingFunction,
-  clamp,
-  linear,
-  nullishCoalescing,
-  preciseNumber,
-} from '@packages/utils'
-import { easings } from '@packages/utils/easings'
+import { easings, linear, type EasingFunction } from '@packages/utils/easings'
+import { clamp } from '@packages/utils/math'
+import { preciseNumber } from '@packages/utils/number'
+import { nullishCoalescing } from '@packages/utils/polyfills'
 import {
   Animation,
   AnimationConstructorOptions,
