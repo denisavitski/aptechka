@@ -1,3 +1,4 @@
+import { device } from '@packages/device'
 import { SourceElement } from '@packages/source'
 import { ticker } from '@packages/ticker'
 import { dispatchEvent, isBrowser } from '@packages/utils'
@@ -13,6 +14,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   #progress = 0
   #needToPlay = false
   #clickElement: HTMLElement = this
+  #isFullScreen = false
 
   protected override connectedCallback() {
     super.connectedCallback()
@@ -72,6 +74,18 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     })
 
     this.#clickElement.addEventListener('click', this.#clickListener)
+
+    this.consumerElement.addEventListener('play', this.#playListener)
+    this.consumerElement.addEventListener('pause', this.#pauseListener)
+    this.consumerElement.addEventListener(
+      'webkitendfullscreen',
+      this.#fullscreenEndListener,
+    )
+
+    document.addEventListener(
+      'fullscreenchange',
+      this.#fullscreenChangeListener,
+    )
   }
 
   protected override disconnectedCallback() {
@@ -82,10 +96,35 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     this.#progress = 0
 
     this.#clickElement.removeEventListener('click', this.#clickListener)
+
+    this.consumerElement.removeEventListener('play', this.#playListener)
+    this.consumerElement.removeEventListener('pause', this.#pauseListener)
+    this.consumerElement.removeEventListener(
+      'webkitendfullscreen',
+      this.#fullscreenEndListener,
+    )
+
+    document.removeEventListener(
+      'fullscreenchange',
+      this.#fullscreenChangeListener,
+    )
   }
 
   protected override createConsumer() {
-    return document.createElement('video')
+    const video = document.createElement('video')
+
+    if (this.hasAttribute('playsinline')) {
+      video.setAttribute('playsinline', '')
+      video.setAttribute('webkit-playsinline', '')
+    }
+
+    if (!this.hasAttribute('controls')) {
+      video.removeAttribute('controls')
+    } else {
+      video.setAttribute('controls', '')
+    }
+
+    return video
   }
 
   protected override consumeSource(url: string | null) {
@@ -135,6 +174,52 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         this.consumerElement.pause()
       }
     }
+  }
+
+  #playListener = () => {
+    const fullscreenAttr = this.getAttribute('fullscreen')
+    const hasPlaysinline = this.hasAttribute('playsinline')
+
+    let shouldEnterFullscreen = false
+
+    if (fullscreenAttr === 'mobile') {
+      shouldEnterFullscreen =
+        device.isMobile && !(device.isApple && hasPlaysinline)
+    } else if (fullscreenAttr !== null) {
+      shouldEnterFullscreen = !(device.isApple && hasPlaysinline)
+    }
+
+    if (shouldEnterFullscreen) {
+      this.consumerElement
+        .requestFullscreen()
+        .then(() => {
+          this.#isFullScreen = true
+        })
+        .catch((err) => {
+          console.log('Fullscreen request failed:', err)
+        })
+    }
+  }
+
+  #pauseListener = () => {
+    if (
+      this.#isFullScreen &&
+      this.hasAttribute('fullscreen') &&
+      this.hasAttribute('exit-fullscreen-when-paused')
+    ) {
+      this.#isFullScreen = false
+      document.exitFullscreen().catch((err) => {
+        console.log('Exit fullscreen failed:', err)
+      })
+    }
+  }
+
+  #fullscreenEndListener = () => {
+    this.#isFullScreen = false
+  }
+
+  #fullscreenChangeListener = () => {
+    this.#isFullScreen = !!document.fullscreenElement
   }
 }
 
