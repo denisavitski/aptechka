@@ -199,8 +199,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     }
 
     if (shouldEnterFullscreen) {
+      this.#lockOrientation()
+
       this.consumerElement
-        .requestFullscreen()
+        .requestFullscreen({ navigationUI: 'show' })
         .then(() => {
           this.#isFullScreen = true
         })
@@ -233,6 +235,22 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
     if (!this.#isFullScreen && this.hasAttribute('pause-on-exit-fullscreen')) {
       this.consumerElement.pause()
+    }
+  }
+
+  #lockOrientation() {
+    const isPortrait = window.innerHeight > window.innerWidth
+
+    if (screen.orientation && 'lock' in screen.orientation) {
+      if (isPortrait) {
+        ;(screen.orientation as any).lock('portrait').catch((error: any) => {
+          console.log('Orientation lock failed: ', error)
+        })
+      } else {
+        ;(screen.orientation as any).lock('landscape').catch((error: any) => {
+          console.log('Orientation lock failed: ', error)
+        })
+      }
     }
   }
 }
