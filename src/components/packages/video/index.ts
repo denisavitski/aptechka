@@ -214,7 +214,8 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
     if (
       this.#isFullScreen &&
       this.hasAttribute('fullscreen') &&
-      this.hasAttribute('exit-fullscreen-when-paused')
+      this.hasAttribute('exit-fullscreen-when-paused') &&
+      this.consumerElement.readyState === 4
     ) {
       this.#isFullScreen = false
       document.exitFullscreen().catch((err) => {
