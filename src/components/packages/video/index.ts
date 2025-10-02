@@ -82,6 +82,11 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       this.#fullscreenEndListener,
     )
 
+    this.consumerElement.addEventListener(
+      'webkitendfullscreen',
+      this.#fullscreenEndListener,
+    )
+
     document.addEventListener(
       'fullscreenchange',
       this.#fullscreenChangeListener,
@@ -167,6 +172,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   }
 
   #clickListener = () => {
+    if (this.#isFullScreen) {
+      return
+    }
+
     if (this.hasAttribute('click-controls')) {
       if (this.consumerElement.paused) {
         this.consumerElement.play()
@@ -220,6 +229,10 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
 
   #fullscreenChangeListener = () => {
     this.#isFullScreen = !!document.fullscreenElement
+
+    if (!this.#isFullScreen && this.hasAttribute('pause-on-exit-fullscreen')) {
+      this.consumerElement.pause()
+    }
   }
 }
 
