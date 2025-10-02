@@ -372,10 +372,13 @@ export class PopoverElement extends HTMLElement {
     PopoverElement.stack.remove(this.#group.current, this)
 
     popstateAllowed.value = false
-    if (back) {
-      history.back()
-    } else {
-      this.#deleteSearchParam()
+
+    if (this.#history.current) {
+      if (back) {
+        history.back()
+      } else {
+        this.#deleteSearchParam()
+      }
     }
 
     this.#startClosingTimeoutId = setTimeout(() => {
