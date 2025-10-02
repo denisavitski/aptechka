@@ -1,4 +1,4 @@
-import { Damped, Tweened, type DampedOptions } from '@packages/animation'
+import { Damped, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
 import { scrollEntries } from '@packages/scroll-entries'
@@ -27,8 +27,6 @@ export class SmoothScrollElement extends HTMLElement {
   #value = new Damped(0)
   #currentRoundedValue = 0
   #needSync = false
-
-  #tweened: Tweened | undefined
 
   public resize() {
     this.#value.min = 0
@@ -112,10 +110,7 @@ export class SmoothScrollElement extends HTMLElement {
 
       scrollEntries.update(this, 'y', e.current)
 
-      if (
-        roundedCurrent !== this.#currentRoundedValue &&
-        (!device.isMobile || this.#tweened?.isRunning.current)
-      ) {
+      if (roundedCurrent !== this.#currentRoundedValue && !device.isMobile) {
         this.scroll({
           top: roundedCurrent,
           behavior: 'instant',
@@ -141,7 +136,6 @@ export class SmoothScrollElement extends HTMLElement {
     this.#value.close()
     this.#cssDamping.close()
     this.#cssDisabled.close()
-    this.#tweened?.close()
 
     scrollEntries.unregister(this)
 
@@ -164,17 +158,10 @@ export class SmoothScrollElement extends HTMLElement {
     )
   }
 
-  #destroyTweened() {
-    this.#tweened?.close()
-    this.#tweened = undefined
-  }
-
   #wheelListener = (e: WheelEvent) => {
     if (this.#checkDisabled() || device.isMobile) {
       return
     }
-
-    this.#destroyTweened()
 
     if (
       !(
@@ -258,8 +245,6 @@ export class SmoothScrollElement extends HTMLElement {
     if (this.#checkDisabled()) {
       return
     }
-
-    this.#destroyTweened()
 
     if (scrollKeys.has(e.code)) {
       this.stop()
