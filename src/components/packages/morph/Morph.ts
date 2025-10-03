@@ -1,15 +1,13 @@
 import {
-  ChangeHistoryAction,
-  ElementOrSelector,
-  ScrollToElementOptions,
-  changeHistory,
   createScriptElement,
   dispatchEvent,
+  ElementOrSelector,
   excludeElements,
   intersectElements,
   isBrowser,
   normalizeBase,
   scrollToElement,
+  ScrollToElementOptions,
   splitPath,
   wait,
 } from '@packages/utils'
@@ -19,7 +17,11 @@ import { MorphLink } from './MorphLink'
 
 import { MorphAnnouncer } from './MorphAnnouncer'
 
-import { popstateAllowed } from '@packages/shared/history'
+import {
+  historyManager,
+  HistoryManagerChangeAction,
+  HistoryManagerPopStateEvent,
+} from '@packages/shared/historyManager'
 import { MorphParamsDependent } from './MorphParamsDependent'
 import { MorphRoute, MorphRouteScrollState } from './MorphRoute'
 
@@ -66,7 +68,7 @@ export type MorphPreprocessor = (entry: MorphPreprocessorEntry) => void
 export type MorphPathnameModifier = (pathname: string) => string
 
 export interface MorphNavigateOptions {
-  historyAction?: ChangeHistoryAction
+  historyAction?: HistoryManagerChangeAction
   centerScroll?: boolean
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   scrollBehaviour?: ScrollBehavior
@@ -171,11 +173,9 @@ export class Morph {
       this.findLinks()
       this.findParamsDependent()
 
-      history.scrollRestoration = 'manual'
+      historyManager.addPopStateHandler(this.#popStateListener)
 
-      addEventListener('popstate', this.#popStateListener)
-
-      changeHistory({
+      historyManager.__change({
         action: 'replace',
         pathname: normalizedURL.pathname,
         searchParameters: normalizedURL.parameters,
@@ -336,7 +336,7 @@ export class Morph {
         this.#previousURL = this.#currentURL
         this.#currentURL = normalizedURL
 
-        changeHistory({
+        historyManager.__change({
           action:
             this.#currentURL?.hash !== normalizedURL.hash
               ? 'replace'
@@ -573,7 +573,7 @@ export class Morph {
         normalizedURL.leaf,
       )
 
-      changeHistory({
+      historyManager.__change({
         action: historyAction,
         pathname: normalizedURL.pathname,
         searchParameters:
@@ -966,10 +966,8 @@ export class Morph {
     }
   }
 
-  #popStateListener = async (event: PopStateEvent) => {
-    event.preventDefault()
-
-    if (!popstateAllowed.value) {
+  #popStateListener = async (event: HistoryManagerPopStateEvent) => {
+    if (event.state?.data?.popover || event.previousState?.data?.popover) {
       return
     }
 

@@ -1,7 +1,7 @@
 import { CSSProperty } from '@packages/css-property'
 import { viewport } from '@packages/device'
 import { ElementLinkedStore } from '@packages/element-linked-store'
-import { popstateAllowed } from '@packages/shared/history'
+import { historyManager } from '@packages/shared/historyManager'
 import {
   debounce,
   dispatchEvent,
@@ -149,6 +149,7 @@ class PopoverGroups {
 
 export class PopoverElement extends HTMLElement {
   private static stack = new PopoverGroups()
+  private static popoverHistoryTransactionsDepth = 0
 
   public urlValue = ''
 
@@ -171,7 +172,6 @@ export class PopoverElement extends HTMLElement {
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #checkViewportBounds = new CSSProperty(this, '--check-viewport-bounds', false)
-  #historyAllowed = true
   #lastTrigger: any
   #status = new ElementLinkedStore(this, {
     triggered: false,
@@ -182,6 +182,7 @@ export class PopoverElement extends HTMLElement {
   })
   #innerCloseElements: Array<HTMLElement> = []
   #resetScrollElements: Array<HTMLElement> = []
+  #isFromPopState = false
 
   constructor() {
     super()
@@ -302,8 +303,14 @@ export class PopoverElement extends HTMLElement {
       },
     })
 
-    if (this.#history.current && this.#historyAllowed) {
-      history.pushState(history.state, '', this.#path)
+    if (this.#history.current) {
+      this.beginHistoryTransaction()
+
+      if (!this.#isFromPopState) {
+        historyManager.pushState(this.#path, { popover: true })
+      }
+
+      this.endHistoryTransaction()
     }
 
     this.#status.set('beforeopen', true)
@@ -311,9 +318,7 @@ export class PopoverElement extends HTMLElement {
     this.#opened = true
 
     const opened = () => {
-      // if (this.#group.current) {
       PopoverElement.stack.add(this.#group.current, this)
-      // }
 
       this.#resetScrollElements.forEach((el) => {
         el.scroll({
@@ -371,19 +376,19 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.stack.remove(this.#group.current, this)
 
-    popstateAllowed.value = false
-
     if (this.#history.current) {
+      this.beginHistoryTransaction()
+
       if (back) {
-        history.back()
+        historyManager.back()
       } else {
         this.#deleteSearchParam()
       }
+
+      this.endHistoryTransaction()
     }
 
     this.#startClosingTimeoutId = setTimeout(() => {
-      popstateAllowed.value = true
-
       this.#status.set('transitionend', false)
       this.#status.set('opened', false)
       this.#status.set('closing', true)
@@ -411,6 +416,16 @@ export class PopoverElement extends HTMLElement {
         getElementTransitionDurationMS(this) + 10,
       )
     }, 10)
+  }
+
+  private beginHistoryTransaction() {
+    PopoverElement.popoverHistoryTransactionsDepth++
+  }
+
+  private endHistoryTransaction() {
+    setTimeout(() => {
+      PopoverElement.popoverHistoryTransactionsDepth--
+    }, 0)
   }
 
   protected connectedCallback() {
@@ -441,23 +456,24 @@ export class PopoverElement extends HTMLElement {
 
     this.setAttribute('role', 'dialog')
 
-    addEventListener('popstate', this.#popStateListener)
+    historyManager.addPopStateHandler(this.#popStateListener, true)
 
     setTimeout(() => {
-      if (this.#restore.current) {
-        this.#historyAllowed = false
+      this.#isFromPopState = true
 
+      if (this.#restore.current) {
         this.urlValue = parseSearchParameters(location.search)[this.id]
 
         if (location.search.includes(this.id)) {
           this.open({ trigger: this.idWithValue })
         }
-
-        this.#historyAllowed = true
       } else {
         this.#deleteSearchParam()
-        this.#historyAllowed = true
       }
+
+      setTimeout(() => {
+        this.#isFromPopState = false
+      }, 0)
     }, 0)
 
     this.#checkViewportBounds.subscribe(() => {
@@ -496,7 +512,7 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#openFrameId)
     clearTimeout(this.#openTransitionTimeoutId)
 
-    removeEventListener('popstate', this.#popStateListener)
+    historyManager.removePopStateHandler(this.#popStateListener)
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
@@ -525,18 +541,16 @@ export class PopoverElement extends HTMLElement {
     if (this.#history.current) {
       const url = new URL(location.href)
       url.searchParams.delete(this.id)
-      history.replaceState(history.state, '', url.href)
+      historyManager.replaceState(url.href)
     }
   }
 
-  #popStateListener = (e: Event) => {
-    e.preventDefault()
-
-    if (!popstateAllowed.value) {
+  #popStateListener = () => {
+    if (PopoverElement.popoverHistoryTransactionsDepth > 0) {
       return
     }
 
-    this.#historyAllowed = false
+    this.#isFromPopState = true
 
     if (
       this.#opened &&
@@ -551,7 +565,10 @@ export class PopoverElement extends HTMLElement {
     ) {
       this.open({ trigger: this.idWithValue })
     }
-    this.#historyAllowed = true
+
+    setTimeout(() => {
+      this.#isFromPopState = false
+    }, 0)
   }
 
   #resizeListener = () => {
