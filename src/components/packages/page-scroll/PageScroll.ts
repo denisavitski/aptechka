@@ -100,7 +100,7 @@ export class PageScroll {
       directionX < 0,
     )
 
-    dispatchEvent(document, 'pageScrollEvent', {
+    dispatchEvent(document, 'pageScroll', {
       detail: this.value,
     })
   }
@@ -108,6 +108,6 @@ export class PageScroll {
 
 declare global {
   interface DocumentEventMap {
-    pageScrollEvent: PageScrollEvent
+    pageScroll: PageScrollEvent
   }
 }
