@@ -1,4 +1,4 @@
-export function splitPropgress(
+export function splitProgress(
   progress: number,
   items: number,
   initialItemsWithFullProgress: number = 0,
