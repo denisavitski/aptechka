@@ -57,7 +57,7 @@ class CSSValueParser {
       if (value.includes('raw!')) {
         return value.replace('raw!', '')
       } else {
-        return cssUnitParser.parse(value)
+        return cssUnitParser.parse(value, element)
       }
     } else if (value === 'true') {
       return true
