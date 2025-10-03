@@ -49,7 +49,7 @@ class CSSValueParser {
       } else if (unit === 'owmw') {
         return ((element?.offsetWidth || 0) - viewport.width) * (num / 100)
       } else if (unit && CSSValueParser.CSS_UNITS.has(unit as any)) {
-        return cssUnitParser.parse(value)
+        return cssUnitParser.parse(value, element)
       } else {
         return value
       }

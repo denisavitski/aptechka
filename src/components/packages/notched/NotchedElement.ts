@@ -1,6 +1,7 @@
 // https://github.com/sanalabs/corner-smoothing
 
 import { cssUnitParser } from '@packages/css-unit-parser'
+import { cssValueParser } from '@packages/css-value-parser'
 import { elementResizer } from '@packages/element-resizer'
 import { generateId } from '@packages/utils'
 import { getSvgPath, NotchParams } from './getSvgPath'
@@ -158,10 +159,10 @@ export class NotchedElement extends HTMLElement {
         .filter((v) => !!v)
 
       notches.push({
-        start: cssUnitParser.parse(valuesStrings[0]!) || 0,
-        length: cssUnitParser.parse(valuesStrings[1]!) || 0,
-        slope: cssUnitParser.parse(valuesStrings[2]!) || 0,
-        depth: cssUnitParser.parse(valuesStrings[3]!) || 0,
+        start: cssValueParser.parse(valuesStrings[0]!, this) || 0,
+        length: cssValueParser.parse(valuesStrings[1]!, this) || 0,
+        slope: cssValueParser.parse(valuesStrings[2]!, this) || 0,
+        depth: cssValueParser.parse(valuesStrings[3]!, this) || 0,
       })
     })
 
