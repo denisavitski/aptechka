@@ -267,8 +267,6 @@ export class Morph {
     return false
   }
 
-  public setHeaders(path: string) {}
-
   public needRavalidation(path: string) {
     const normalizedURL = this.normalizePath(path)
     const route = this.#getRoute(normalizedURL.path)

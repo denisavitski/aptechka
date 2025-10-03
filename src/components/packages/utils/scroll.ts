@@ -91,8 +91,6 @@ export function scrollToElement(
         tweened.close()
       }
 
-      console.log(startValue)
-
       let tweenedStart = 0
 
       if (startValue) {
