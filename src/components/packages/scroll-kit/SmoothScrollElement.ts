@@ -208,12 +208,12 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   #pointerdownListener = (e: PointerEvent) => {
-    if (e.button !== 0 || this.#checkDisabled()) {
-      return
-    }
-
     if (e.target instanceof Element) {
       const anchorElement = e.target.closest('a')
+
+      if (e.button !== 0 || (this.#checkDisabled() && !anchorElement)) {
+        return
+      }
 
       if (anchorElement) {
         this.stop()
