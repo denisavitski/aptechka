@@ -217,7 +217,8 @@ export class SmoothScrollElement extends HTMLElement {
 
       if (
         anchorElement &&
-        !anchorElement.hasAttribute('data-smooth-scroll-skip')
+        !anchorElement.hasAttribute('data-smooth-scroll-skip') &&
+        this.contains(anchorElement)
       ) {
         this.stop()
 
