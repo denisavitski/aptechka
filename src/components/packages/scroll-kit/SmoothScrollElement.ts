@@ -215,7 +215,10 @@ export class SmoothScrollElement extends HTMLElement {
         return
       }
 
-      if (anchorElement) {
+      if (
+        anchorElement &&
+        !anchorElement.hasAttribute('data-smooth-scroll-skip')
+      ) {
         this.stop()
 
         const url = new URL(anchorElement.href)

@@ -63,10 +63,8 @@ export function splitPath(
   }
 
   const pathname = base + leaf
-  const hash = split1[1]
-  const path = `${pathname}${parameters ? '?' + parameters : ''}${
-    hash ? '#' + hash : ''
-  }`
+  const hash = split1[1] ? `#${split1[1]}` : ''
+  const path = `${pathname}${parameters ? '?' + parameters : ''}${hash}`
 
   const result: SplitPathResult = {
     leaf,
