@@ -2,7 +2,7 @@ import { SourceElement } from '@packages/source'
 import { isBrowser } from '@packages/utils'
 
 export class IFrameElement extends SourceElement<HTMLElement> {
-  #iframeElement: HTMLElement | null = null
+  #iframeElement: HTMLIFrameElement | null = null
 
   constructor() {
     super({
@@ -10,6 +10,10 @@ export class IFrameElement extends SourceElement<HTMLElement> {
         mediaBuckets: false,
       },
     })
+  }
+
+  public get iframeElement() {
+    return this.#iframeElement
   }
 
   protected override createConsumer() {
@@ -29,6 +33,7 @@ export class IFrameElement extends SourceElement<HTMLElement> {
         .replace(/\\"/g, '"') || ''
 
     this.#iframeElement = this.consumerElement.querySelector('iframe')
+    this.#iframeElement?.setAttribute('scrolling', 'none')
 
     if (this.#iframeElement) {
       this.#iframeElement.onload = this.#iframeLoadListener

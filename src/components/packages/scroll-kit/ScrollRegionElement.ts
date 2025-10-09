@@ -21,8 +21,8 @@ export interface ScrollRegionElementEvents {
 }
 
 export class ScrollRegionElement extends HTMLElement {
-  #statusHolderElement = this
-  #progressHolderElement = this
+  #statusHolderElements: Array<HTMLElement> = [this]
+  #progressHolderElements: Array<HTMLElement> = [this]
   #scrollElement: HTMLElement | Window | null = null
 
   #statusHolderCSSProperty = new CSSProperty<string | false>(
@@ -190,10 +190,17 @@ export class ScrollRegionElement extends HTMLElement {
     this.#progress = this.#scrolled / this.#distance || 0
 
     if (this.#progressVarCSSProperty.current) {
-      this.#progressHolderElement.style.setProperty(
-        this.#cssVar(this.#progressVarCSSProperty.current),
-        this.#progress.toFixed(6),
-      )
+      for (
+        let index = 0;
+        index < this.#progressHolderElements.length;
+        index++
+      ) {
+        const element = this.#progressHolderElements[index]
+        element.style.setProperty(
+          this.#cssVar(this.#progressVarCSSProperty.current),
+          this.#progress.toFixed(6),
+        )
+      }
     }
 
     this.#status.set('activated', scrollValue >= this.#start)
@@ -302,27 +309,56 @@ export class ScrollRegionElement extends HTMLElement {
 
   #init() {
     this.#statusHolderCSSProperty.subscribe((e) => {
-      if (this.#statusHolderElement) {
-        this.#status.removeElement(this.#statusHolderElement)
+      if (this.#statusHolderElements.length) {
+        this.#statusHolderElements.forEach((el) => {
+          this.#status.removeElement(el)
+        })
       }
 
-      this.#statusHolderElement = e.current
-        ? document.querySelector(e.current) || this
-        : this
+      this.#statusHolderElements = []
 
-      this.#status.addElement(this.#statusHolderElement)
+      if (e.current) {
+        e.current
+          .split(',')
+          .map((v) => v.trim())
+          .forEach((selector) => {
+            const element = document.querySelector(selector)
+
+            if (element instanceof HTMLElement) {
+              this.#statusHolderElements.push(element)
+              this.#status.addElement(element)
+            }
+          })
+      } else {
+        this.#statusHolderElements = [this]
+      }
     })
 
     this.#progressHolderCSSProperty.subscribe((e) => {
-      if (this.#progressHolderElement) {
-        this.#progressHolderElement.style.removeProperty(
-          this.#cssVar(this.#progressVarCSSProperty.current),
-        )
+      if (this.#progressHolderElements.length) {
+        this.#progressHolderElements.forEach((el) => {
+          el.style.removeProperty(
+            this.#cssVar(this.#progressVarCSSProperty.current),
+          )
+        })
       }
 
-      this.#progressHolderElement = e.current
-        ? document.querySelector(e.current) || this
-        : this
+      this.#progressHolderElements = []
+
+      if (e.current) {
+        e.current
+          .split(',')
+          .map((v) => v.trim())
+          .forEach((selector) => {
+            const element = document.querySelector(selector)
+
+            if (element instanceof HTMLElement) {
+              this.#progressHolderElements.push(element)
+            }
+          })
+      } else {
+        this.#progressHolderElements = [this]
+      }
     })
 
     this.#disabledCSSProperty.subscribe((e) => {
@@ -337,9 +373,9 @@ export class ScrollRegionElement extends HTMLElement {
       if (e.current) {
         this.#tickListener()
       } else if (e.previous) {
-        this.#progressHolderElement.style.removeProperty(
-          this.#cssVar(e.previous),
-        )
+        this.#progressHolderElements.forEach((el) => {
+          el.style.removeProperty(this.#cssVar(e.previous!))
+        })
       }
     })
 
