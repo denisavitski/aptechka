@@ -212,8 +212,12 @@ export abstract class Animation<
   protected abstract handleAnimationFrame(e: TickerCallbackEntry): void
 
   #setTarget(value: number) {
-    this.#direction = Math.sign(value - this.#target)
+    const direction = Math.sign(value - this.#target)
+
     this.#target = clamp(value, this.#min, this.#max)
+
+    this.#direction = direction
+
     this.#from = this.current
   }
 

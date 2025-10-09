@@ -22,7 +22,7 @@ export class Damped extends Animation<DampedOptions> {
 
   constructor(
     initial?: number,
-    options?: AnimationConstructorOptions<DampedOptions>
+    options?: AnimationConstructorOptions<DampedOptions>,
   ) {
     super(initial, options)
 

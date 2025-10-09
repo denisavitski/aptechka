@@ -1,6 +1,7 @@
 import { Damped, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
 import { device } from '@packages/device'
+import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
 import {
   ElementOrSelector,
@@ -24,7 +25,7 @@ export class SmoothScrollElement extends HTMLElement {
   #cssDisabled = new CSSProperty(this, '--smooth-scroll-disabled', false)
   #cssDamping = new CSSProperty(this, '--smooth-scroll-damping', 10)
 
-  #value = new Damped(0)
+  #value = new Damped(0, { order: TICK_ORDER.SCROLL })
   #currentRoundedValue = 0
   #needSync = false
 
