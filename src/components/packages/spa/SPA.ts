@@ -1,5 +1,4 @@
 import { Cache } from '@packages/cache'
-import { History } from '@packages/history'
 import {
   LocalLinks,
   LocalLinksLinkOptions,
@@ -7,6 +6,7 @@ import {
 } from '@packages/local-links'
 import { PageAnnouncerElement } from '@packages/page-announcer'
 import { PageScroll } from '@packages/page-scroll'
+import { historyManager } from '@packages/shared/historyManager'
 import {
   dispatchEvent,
   morph,
@@ -42,10 +42,11 @@ export class SPA {
 
   #scroll: PageScroll = null!
   #links: LocalLinks = null!
-  #history: History = null!
 
   #announcerElement: PageAnnouncerElement = null!
   #updateId = 0
+
+  #isBack = false
 
   constructor(options?: SPAOptions) {
     if (!SPA.instance) {
@@ -75,16 +76,20 @@ export class SPA {
       })
       this.#links.update()
 
-      this.#history = new History({
-        onPop: (url) => {
-          this.navigate(url)
-        },
+      historyManager.addPopStateHandler((event) => {
+        if (event.state?.data?.popover || event.previousState?.data?.popover) {
+          return
+        }
+
+        if (event.state?.page) {
+          this.#isBack = true
+          this.navigate(location.href.replace(location.origin, ''), {
+            scrollTop: (event.state.data?.scrollTop as number) || 0,
+            scrollLeft: (event.state.data?.scrollLeft as number) || 0,
+          })
+        }
       })
     }
-  }
-
-  public history() {
-    return this.#history
   }
 
   public get scroll() {
@@ -92,7 +97,8 @@ export class SPA {
   }
 
   public async navigate(url: URL | string, options?: SPANavigateOptions) {
-    const isBack = this.#history.isBack
+    let isBack = this.#isBack
+    this.#isBack = false
     const updateId = ++this.#updateId
 
     let fullUrl = normalizeURL(url, {
@@ -131,11 +137,16 @@ export class SPA {
     }
 
     if (!isBack) {
-      this.#history.push(fullUrl)
-
-      if (options?.keepScrollPosition ?? true) {
-        this.#scroll.element.scrollTo({ top: 0, behavior: 'instant' })
-      }
+      historyManager.updateCurrentState({
+        scrollTop: this.#scroll.y,
+        scrollLeft: this.#scroll.x,
+      })
+      historyManager.pushState(fullUrl)
+    } else {
+      historyManager.updatePreviousState({
+        scrollTop: this.#scroll.y,
+        scrollLeft: this.#scroll.x,
+      })
     }
 
     const html = this.#domParser.parseFromString(contents, 'text/html')
@@ -174,6 +185,14 @@ export class SPA {
     this.#scroll.update()
     this.#links.update()
     this.#announcerElement.done()
+
+    if (!options?.keepScrollPosition) {
+      this.#scroll.element.scrollTo({
+        top: options?.scrollTop || 0,
+        left: options?.scrollLeft || 0,
+        behavior: 'instant',
+      })
+    }
 
     await this.#options.afterDiff?.()
 

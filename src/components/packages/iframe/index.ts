@@ -33,7 +33,6 @@ export class IFrameElement extends SourceElement<HTMLElement> {
         .replace(/\\"/g, '"') || ''
 
     this.#iframeElement = this.consumerElement.querySelector('iframe')
-    this.#iframeElement?.setAttribute('scrolling', 'none')
 
     if (this.#iframeElement) {
       this.#iframeElement.onload = this.#iframeLoadListener

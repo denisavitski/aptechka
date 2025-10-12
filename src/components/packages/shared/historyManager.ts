@@ -75,18 +75,13 @@ class HistoryManager {
   }
 
   #handlePopState(event: PopStateEvent) {
-    const targetState = event.state as HistoryManagerState | null
+    const targetState = this.getPreviousState()
+    const previousState = this.getCurrentState()
 
-    const previousState =
-      this.#previousStates.length > 0
-        ? this.#previousStates[this.#previousStates.length - 1]
-        : null
-
-    if (this.#previousStates.length > 0) {
-      this.#previousStates.pop()
+    if (targetState) {
+      this.#previousStates[this.#previousStates.length - 2] = previousState
+      this.#previousStates[this.#previousStates.length - 1] = targetState
     }
-
-    this.#previousStates.push(targetState)
 
     this.#popStateHandlers.forEach((handler) => {
       handler({
@@ -95,6 +90,14 @@ class HistoryManager {
         previousState: previousState,
       })
     })
+  }
+
+  #getPathname(url: string | URL) {
+    if (typeof url === 'string') {
+      return url
+    } else {
+      return url.pathname
+    }
   }
 
   public getPreviousState(): HistoryManagerState | null {
@@ -124,9 +127,31 @@ class HistoryManager {
     }
   }
 
-  public pushState(page: string, data?: Record<string, unknown>) {
+  public updateCurrentState(data: Record<string, unknown>) {
+    let state = this.getCurrentState()
+
+    if (state) {
+      state.data = {
+        ...state.data,
+        ...data,
+      }
+    }
+  }
+
+  public updatePreviousState(data: Record<string, unknown>) {
+    let state = this.getPreviousState()
+
+    if (state) {
+      state.data = {
+        ...state.data,
+        ...data,
+      }
+    }
+  }
+
+  public pushState(page: string | URL, data?: Record<string, unknown>) {
     const state: HistoryManagerState = {
-      page,
+      page: this.#getPathname(page),
       data,
       timestamp: Date.now(),
     }
@@ -134,9 +159,9 @@ class HistoryManager {
     history.pushState(state, '', page)
   }
 
-  public replaceState(page: string, data?: Record<string, unknown>) {
+  public replaceState(page: string | URL, data?: Record<string, unknown>) {
     const state: HistoryManagerState = {
-      page,
+      page: this.#getPathname(page),
       data,
       timestamp: Date.now(),
     }

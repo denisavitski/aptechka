@@ -26,9 +26,11 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   #sourceManager: SourceManager = null!
   #consumerElement: T = null!
   #consumerHolderElement: HTMLElement = this
+  #loadTriggerElements: Array<HTMLElement> = []
   #isFirstLoadHappened = false
-  #lazyLoaded = false
   #isLazy = false
+  #lazyLoaded = false
+  #isManualLoad = false
   #id: string = ''
   #idWithUrl = ''
 
@@ -139,6 +141,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
     this.querySelectorAll('.source-consumer').forEach((el) => el?.remove())
 
+    this.#loadTriggerElements = [
+      ...this.querySelectorAll<HTMLElement>('[data-load-trigger]'),
+    ]
+    this.#loadTriggerElements.forEach((el) => {
+      el.addEventListener('click', this.#loadTriggerListener)
+    })
+
     this.#consumerElement = this.createConsumer()
 
     this.#consumerElement.style.cssText = `
@@ -189,9 +198,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     })
 
     this.#isLazy = this.hasAttribute('lazy')
+    this.#isManualLoad = this.hasAttribute('manual-load')
 
     this.#sourceManager.subscribe((d) => {
-      if (!this.#isLazy || (this.#isLazy && this.#lazyLoaded)) {
+      if (
+        (!this.#isLazy && !this.#isManualLoad) ||
+        (this.#isLazy && this.#lazyLoaded)
+      ) {
         this.#loadSource(d.current)
       }
     })
@@ -203,6 +216,10 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
   protected disconnectedCallback() {
     clearTimeout(this.#clearTimeoutId)
+
+    this.#loadTriggerElements.forEach((el) => {
+      el.removeEventListener('click', this.#loadTriggerListener)
+    })
 
     this.#intersectionObserver.disconnect()
 
@@ -257,7 +274,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
 
       this.consumeSource(this.#currentURL)
 
-      if (!this.#isLazy && !this.#isFirstLoadHappened) {
+      if (!this.#isLazy && !this.#isFirstLoadHappened && !this.#isManualLoad) {
         loading.add(this.#idWithUrl)
       }
 
@@ -278,10 +295,14 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     }
   }
 
+  #loadTriggerListener = () => {
+    this.triggerLazyLoad()
+  }
+
   #intersectionListener = (entries: Array<IntersectionObserverEntry>) => {
     const entry = entries[0]
 
-    if (this.#isLazy) {
+    if (this.#isLazy && !this.#isManualLoad) {
       if (
         (!this.#lazyLoaded || this.hasAttribute('reload-source')) &&
         entry.isIntersecting

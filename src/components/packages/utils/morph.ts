@@ -197,9 +197,9 @@ function clone(node: Node): Node {
     const script = document.createElement('script')
 
     for (let { name, value } of (node as Element).attributes) {
-      if (name === 'src') {
-        value = cachebust(value)
-      }
+      // if (name === 'src') {
+      //   value = cachebust(value)
+      // }
       script.setAttribute(name, value)
     }
 
@@ -350,6 +350,7 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
     node: clone(to),
   }
 }
+
 function patchAttributes(el: Element, patches: AttributePatch[]): void {
   if (patches.length === 0) {
     return
@@ -362,6 +363,20 @@ function patchAttributes(el: Element, patches: AttributePatch[]): void {
       el.setAttribute(name, value!)
     }
   }
+}
+
+function updateScripts(node: Node) {
+  if (node instanceof HTMLElement) {
+    if (node.tagName === 'SCRIPT') {
+      node = clone(node)
+    } else {
+      node.querySelectorAll('script').forEach((script) => {
+        script.replaceWith(clone(script))
+      })
+    }
+  }
+
+  return node
 }
 
 export async function patch(
@@ -387,7 +402,10 @@ export async function patch(
     }
 
     case ACTION_CREATE: {
-      const { node } = PATCH as CreatePatch
+      let { node } = PATCH as CreatePatch
+
+      node = updateScripts(node)
+
       parent.appendChild(node)
       return
     }
@@ -404,7 +422,7 @@ export async function patch(
       if (!el) {
         return
       }
-      const { node, value } = PATCH as ReplacePatch
+      let { node, value } = PATCH as ReplacePatch
 
       if (typeof value === 'string') {
         el.nodeValue = value
@@ -412,6 +430,8 @@ export async function patch(
       }
 
       if (node) {
+        node = updateScripts(node)
+
         if (el instanceof Element && node instanceof Element) {
           el.replaceWith(node)
         } else if (el.parentNode) {
@@ -443,7 +463,8 @@ export async function patch(
     }
   }
 }
+
 export async function morph(from: Node, to: Node): Promise<void> {
   const patches = diff(from, to)
-  return patch(document, patches)
+  await patch(document, patches)
 }

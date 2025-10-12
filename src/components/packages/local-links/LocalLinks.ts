@@ -9,6 +9,8 @@ export interface LocalLinksOptions {
 
 export interface LocalLinksLinkOptions {
   keepScrollPosition?: boolean
+  scrollLeft?: number
+  scrollTop?: number
   cache?: boolean
   revalidate?: boolean
 }
@@ -28,13 +30,19 @@ export class LocalLinks {
 
   public update() {
     document.querySelectorAll('a').forEach((link) => {
-      const linkURL = normalizeURL(link.getAttribute('href')!, {
-        base: this.#options.base,
-        trailingSlash: this.#options.trailingSlash,
-      })
+      const href = link.getAttribute('href')
 
-      if (linkURL.pathname === location.pathname) {
-        link.classList.add('current')
+      if (href) {
+        const linkURL = normalizeURL(href, {
+          base: this.#options.base,
+          trailingSlash: this.#options.trailingSlash,
+        })
+
+        if (linkURL.pathname === location.pathname) {
+          link.classList.add('current')
+        } else {
+          link.classList.remove('current')
+        }
       } else {
         link.classList.remove('current')
       }
@@ -79,6 +87,8 @@ export class LocalLinks {
       keepScrollPosition: 'keepScrollPosition' in anchorElement.dataset,
       cache: 'cache' in anchorElement.dataset,
       revalidate: 'revalidate' in anchorElement.dataset,
+      scrollLeft: parseFloat(anchorElement.dataset.scrollLeft || '0'),
+      scrollTop: parseFloat(anchorElement.dataset.scrollTop || '0'),
     }
 
     return {
@@ -91,9 +101,13 @@ export class LocalLinks {
   }
 
   #clickListener = (event: Event) => {
-    event.preventDefault()
+    const result = this.#processClickEvent(event)
 
-    const { url, options = {} } = this.#processClickEvent(event) ?? {}
+    if (!result) {
+      return
+    }
+
+    const { url, options = {} } = result
 
     if (!url) {
       return
