@@ -331,6 +331,7 @@ export class ScrollRegionElement extends HTMLElement {
           })
       } else {
         this.#statusHolderElements = [this]
+        this.#status.addElement(this)
       }
     })
 
