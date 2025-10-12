@@ -7,6 +7,7 @@ import {
   ElementOrSelector,
   scrollToElement,
   ScrollToElementOptions,
+  scrollToElementTweened,
 } from '@packages/utils'
 
 const scrollKeys = new Set([
@@ -35,6 +36,7 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   public stop() {
+    scrollToElementTweened.value?.set(this.scrollTop, { equalize: true })
     this.#value.unlistenAnimationFrame()
     this.#needSync = true
   }

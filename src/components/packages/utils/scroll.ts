@@ -8,7 +8,7 @@ import {
   type ElementOrSelector,
 } from '@packages/utils'
 
-let tweened: Tweened | undefined
+export const scrollToElementTweened: { value: Tweened | null } = { value: null }
 
 export interface ScrollToElementOptions
   extends Pick<TweenedOptions, 'duration' | 'easing'> {
@@ -87,8 +87,8 @@ export function scrollToElement(
     }
 
     if (duration) {
-      if (tweened) {
-        tweened.close()
+      if (scrollToElementTweened.value) {
+        scrollToElementTweened.value.close()
       }
 
       let tweenedStart = 0
@@ -103,13 +103,11 @@ export function scrollToElement(
         }
       }
 
-      tweened = new Tweened(tweenedStart, {
-        duration: duration,
-        easing: easing,
+      scrollToElementTweened.value = new Tweened(tweenedStart, {
         order: TICK_ORDER.SCROLL,
       })
 
-      tweened.subscribe((e) => {
+      scrollToElementTweened.value.subscribe((e) => {
         if (scrollCallback) {
           scrollCallback(e.current)
         } else {
@@ -117,7 +115,13 @@ export function scrollToElement(
         }
       })
 
-      tweened.set(top, { duration, easing })
+      scrollToElementTweened.value.set(top, {
+        duration: Math.min(
+          duration,
+          duration * (Math.abs(tweenedStart - top) / 3000),
+        ),
+        easing,
+      })
     } else {
       if (scrollCallback) {
         scrollCallback(top)
