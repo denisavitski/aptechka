@@ -86,6 +86,8 @@ export function libConfig() {
           'source/index': './src/components/packages/source/index.ts',
           'spa/index': './src/components/packages/spa/index.ts',
           'store/index': './src/components/packages/store/index.ts',
+          'subtree-observer/index':
+            './src/components/packages/subtree-observer/index.ts',
           'ticker/index': './src/components/packages/ticker/index.ts',
           'need_redo_tweaker/index':
             './src/components/packages/need_redo_tweaker/index.ts',

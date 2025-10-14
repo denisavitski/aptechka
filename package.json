@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.91.3",
+  "version": "0.92.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -263,6 +263,11 @@
       "require": "./lib/store/index.cjs",
       "default": "./lib/store/index.js"
     },
+    "./subtree-observer": {
+      "types": "./lib/subtree-observer/index.d.ts",
+      "require": "./lib/subtree-observer/index.cjs",
+      "default": "./lib/subtree-observer/index.js"
+    },
     "./ticker": {
       "types": "./lib/ticker/index.d.ts",
       "require": "./lib/ticker/index.cjs",
@@ -450,6 +455,9 @@
       ],
       "store": [
         "lib/store/index.d.ts"
+      ],
+      "subtree-observer": [
+        "lib/subtree-observer/index.d.ts"
       ],
       "ticker": [
         "lib/ticker/index.d.ts"
