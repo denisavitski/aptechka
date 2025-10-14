@@ -81,13 +81,11 @@ export class SPA {
           return
         }
 
-        if (event.state?.page) {
-          this.#isBack = true
-          this.navigate(location.href.replace(location.origin, ''), {
-            scrollTop: (event.state.data?.scrollTop as number) || 0,
-            scrollLeft: (event.state.data?.scrollLeft as number) || 0,
-          })
-        }
+        this.#isBack = true
+        this.navigate(location.href.replace(location.origin, ''), {
+          scrollTop: (event.state?.data?.scrollTop as number) || 0,
+          scrollLeft: (event.state?.data?.scrollLeft as number) || 0,
+        })
       })
     }
   }
@@ -137,13 +135,13 @@ export class SPA {
     }
 
     if (!isBack) {
-      historyManager.updateCurrentState({
+      historyManager.updateCurrentStateData({
         scrollTop: this.#scroll.y,
         scrollLeft: this.#scroll.x,
       })
       historyManager.pushState(fullUrl)
     } else {
-      historyManager.updatePreviousState({
+      historyManager.updatePreviousStateData({
         scrollTop: this.#scroll.y,
         scrollLeft: this.#scroll.x,
       })

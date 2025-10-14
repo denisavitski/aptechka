@@ -127,7 +127,7 @@ class HistoryManager {
     }
   }
 
-  public updateCurrentState(data: Record<string, unknown>) {
+  public updateCurrentStateData(data: Record<string, unknown>) {
     let state = this.getCurrentState()
 
     if (state) {
@@ -138,7 +138,7 @@ class HistoryManager {
     }
   }
 
-  public updatePreviousState(data: Record<string, unknown>) {
+  public updatePreviousStateData(data: Record<string, unknown>) {
     let state = this.getPreviousState()
 
     if (state) {
