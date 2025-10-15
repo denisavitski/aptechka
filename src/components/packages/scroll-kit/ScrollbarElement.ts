@@ -12,6 +12,16 @@ export class ScrollbarElement extends HTMLElement {
   #activeTimeoutId: ReturnType<typeof setTimeout> | undefined
 
   protected connectedCallback() {
+    this.#init()
+    document.addEventListener('spaAfterUpdate', this.#spaUpdateListener)
+  }
+
+  protected disconnectedCallback() {
+    this.#destroy()
+    document.removeEventListener('spaAfterUpdate', this.#spaUpdateListener)
+  }
+
+  #init() {
     const scrollSelector = this.getAttribute('data-scroll')
 
     let scrollElement: HTMLElement | Window | null = null
@@ -50,7 +60,7 @@ export class ScrollbarElement extends HTMLElement {
     }
   }
 
-  protected disconnectedCallback() {
+  #destroy() {
     this.#scrollElement?.removeEventListener('scroll', this.#scrollListener)
     this.#thumbElement?.removeEventListener('pointerdown', this.#grabListener)
 
@@ -193,6 +203,11 @@ export class ScrollbarElement extends HTMLElement {
     } else {
       ticker.unsubscribe(this.#tickListener)
     }
+  }
+
+  #spaUpdateListener = () => {
+    this.#destroy()
+    this.#init()
   }
 }
 
