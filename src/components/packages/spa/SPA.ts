@@ -171,25 +171,34 @@ export class SPA {
 
     this.#announcerElement.create(html, title)
 
+    const updateDone = () => {
+      this.#scroll.update()
+      this.#links.update()
+      this.#announcerElement.done()
+
+      if (!options?.keepScrollPosition) {
+        this.#scroll.element.scrollTo({
+          top: options?.scrollTop || 0,
+          left: options?.scrollLeft || 0,
+          behavior: 'instant',
+        })
+      }
+    }
+
     if (this.#options.viewTransition && document.startViewTransition) {
       const v = document.startViewTransition(() => {
         return morph(document, html)
       })
+
+      await v.updateCallbackDone
+
+      updateDone()
+
       await v.finished
     } else {
       await morph(document, html)
-    }
 
-    this.#scroll.update()
-    this.#links.update()
-    this.#announcerElement.done()
-
-    if (!options?.keepScrollPosition) {
-      this.#scroll.element.scrollTo({
-        top: options?.scrollTop || 0,
-        left: options?.scrollLeft || 0,
-        behavior: 'instant',
-      })
+      updateDone()
     }
 
     await this.#options.afterDiff?.()
