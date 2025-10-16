@@ -56,7 +56,11 @@ export class PageScroll {
   }
 
   public update() {
-    this.#element?.removeEventListener('scroll', this.#scrollListener)
+    if (this.#element === document.documentElement) {
+      window.removeEventListener('scroll', this.#scrollListener)
+    } else {
+      this.#element?.removeEventListener('scroll', this.#scrollListener)
+    }
 
     this.#y = 0
     this.#x = 0
@@ -67,7 +71,11 @@ export class PageScroll {
 
     this.#isWindow = this.#element === window
 
-    this.#element?.addEventListener('scroll', this.#scrollListener)
+    if (this.#element === document.documentElement) {
+      window.addEventListener('scroll', this.#scrollListener)
+    } else {
+      this.#element?.addEventListener('scroll', this.#scrollListener)
+    }
 
     this.#scrollListener()
   }
