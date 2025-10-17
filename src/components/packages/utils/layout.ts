@@ -1,7 +1,7 @@
 export function getCumulativePosition(
   target: HTMLElement,
   from: 'offsetLeft' | 'offsetTop' = 'offsetLeft',
-  stopElement?: HTMLElement
+  stopElement?: HTMLElement,
 ) {
   let acc = 0
 
@@ -15,35 +15,35 @@ export function getCumulativePosition(
 
 export function getCumulativeOffsetLeft(
   target: HTMLElement,
-  stopElement?: HTMLElement
+  stopElement?: HTMLElement,
 ) {
   return getCumulativePosition(target, 'offsetLeft', stopElement)
 }
 
 export function getCumulativeOffsetTop(
   target: HTMLElement,
-  stopElement?: HTMLElement
+  stopElement?: HTMLElement,
 ) {
   return getCumulativePosition(target, 'offsetTop', stopElement)
 }
 
 export function getStickyOffset(el: HTMLElement, type: 'top' | 'left') {
-  const stickyParents: HTMLElement[] = []
-  let parent = el.parentElement
+  const stickyElements: HTMLElement[] = []
+  let currentElement: HTMLElement | null = el
 
-  while (parent) {
-    const style = window.getComputedStyle(parent)
+  while (currentElement) {
+    const style = window.getComputedStyle(currentElement)
 
     if (style.position === 'sticky') {
-      stickyParents.push(parent)
+      stickyElements.push(currentElement)
     }
 
-    parent = parent.parentElement
+    currentElement = currentElement.parentElement
   }
 
-  const stickyOffset = stickyParents.reduce(
+  const stickyOffset = stickyElements.reduce(
     (p, c) => p + (type === 'top' ? c.offsetTop : c.offsetLeft),
-    0
+    0,
   )
 
   return stickyOffset
