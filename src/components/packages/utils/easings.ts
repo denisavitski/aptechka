@@ -68,6 +68,14 @@ export const easeInOutExpo: EasingFunction = (t: number) => {
       : 0.5 * (2 - Math.abs(2 ** (-10 * 2 * (t - 0.5))))
 }
 
+export const easeOvershoot: EasingFunction = (t: number) => {
+  return (
+    3 * (1 - t) * (1 - t) * t * 0.33 +
+    3 * (1 - t) * t * t * 1.42 +
+    t * t * t * 0.05
+  )
+}
+
 export const easings = {
   linear,
   easeInQuad,
@@ -85,4 +93,5 @@ export const easings = {
   easeInExpo,
   easeOutExpo,
   easeInOutExpo,
+  easeOvershoot,
 } as const

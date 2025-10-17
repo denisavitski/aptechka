@@ -1,3 +1,54 @@
+export function distributeProgress(
+  progress: number,
+  ...items: Array<{
+    weight: number
+    callback?: (progress: number) => void
+  }>
+): number[] {
+  if (items.length === 0) {
+    return []
+  }
+
+  if (items.some((item) => item.weight < 0)) {
+    throw new Error('Все веса должны быть неотрицательными числами')
+  }
+
+  const weights = items.map((item) => item.weight)
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+
+  if (totalWeight === 0) {
+    items.forEach((item) => item.callback?.(0))
+    return Array(items.length).fill(0)
+  }
+
+  const distributed: number[] = []
+  let accumulatedProgress = 0
+
+  for (let i = 0; i < items.length; i++) {
+    const { weight, callback } = items[i]
+    const itemShare = weight / totalWeight
+
+    const itemStart = accumulatedProgress
+    const itemEnd = accumulatedProgress + itemShare
+
+    let itemProgress = 0
+
+    if (progress >= itemEnd) {
+      itemProgress = 1
+    } else if (progress > itemStart) {
+      itemProgress = (progress - itemStart) / itemShare
+    }
+
+    const finalProgress = Math.min(1, Math.max(0, itemProgress))
+    distributed.push(finalProgress)
+
+    callback?.(finalProgress)
+
+    accumulatedProgress = itemEnd
+  }
+
+  return distributed
+}
 export function splitProgress(
   progress: number,
   items: number,
