@@ -18,7 +18,17 @@ export interface IAPIResponseJSON<T = null> {
   headers: Headers
 }
 
-const cache = new Cache()
+export const apiFetcherCache = new Cache()
+
+const pendingRequests = new Map<string, Promise<IAPIResponseJSON<any>>>()
+
+export function apiFetcherClearPendingRequests() {
+  pendingRequests.clear()
+}
+
+export function apiFetcherGetPendingRequestsCount() {
+  return pendingRequests.size
+}
 
 export async function apiFetcher<Params extends object = {}, Result = any>(
   input: string,
@@ -48,11 +58,13 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
     const cacheAllowed = cacheTTL > 0
 
     if (options?.forceClearCache || (globalThis as any).forceClearCache) {
-      cache.delete(cacheKey)
+      apiFetcherCache.delete(cacheKey)
+      pendingRequests.delete(cacheKey)
     }
 
+    // Проверяем кеш данных
     if (cacheAllowed) {
-      const cached = cache.get(cacheKey) as Result
+      const cached = apiFetcherCache.get(cacheKey) as Result
       if (cached) {
         return {
           ...baseResult,
@@ -64,43 +76,60 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
       }
     }
 
-    const response = await fetch(url, options?.init)
+    const pendingRequest = pendingRequests.get(cacheKey)
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      return {
-        ...baseResult,
-        error: errorText,
-        status: 'error',
-        time: Date.now() - startTime,
-        headers: response.headers,
+    if (pendingRequest) {
+      return pendingRequest
+    }
+
+    const requestPromise = (async (): Promise<IAPIResponseJSON<Result>> => {
+      try {
+        const response = await fetch(url, options?.init)
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          return {
+            ...baseResult,
+            error: errorText,
+            status: 'error',
+            time: Date.now() - startTime,
+            headers: response.headers,
+          }
+        }
+
+        const contentType = response.headers.get('content-type')
+        if (!contentType?.includes('application/json')) {
+          return {
+            ...baseResult,
+            error: 'Endpoint did not return JSON',
+            status: 'error',
+            time: Date.now() - startTime,
+            headers: response.headers,
+          }
+        }
+
+        const jsonData = await response.json()
+
+        if (cacheAllowed) {
+          apiFetcherCache.set(cacheKey, jsonData, cacheTTL)
+        }
+
+        return {
+          ...baseResult,
+          data: jsonData,
+          status: 'success',
+          time: Date.now() - startTime,
+          headers: response.headers,
+        }
+      } finally {
+        // Удаляем запрос из pending после завершения (успешного или с ошибкой)
+        pendingRequests.delete(cacheKey)
       }
-    }
+    })()
 
-    const contentType = response.headers.get('content-type')
-    if (!contentType?.includes('application/json')) {
-      return {
-        ...baseResult,
-        error: 'Endpoint did not return JSON',
-        status: 'error',
-        time: Date.now() - startTime,
-        headers: response.headers,
-      }
-    }
+    pendingRequests.set(cacheKey, requestPromise)
 
-    const jsonData = await response.json()
-
-    if (cacheAllowed) {
-      cache.set(cacheKey, jsonData, cacheTTL)
-    }
-
-    return {
-      ...baseResult,
-      data: jsonData,
-      status: 'success',
-      time: Date.now() - startTime,
-      headers: response.headers,
-    }
+    return await requestPromise
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
 
