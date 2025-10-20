@@ -37,6 +37,7 @@ export function libConfig() {
             './src/components/packages/element-linked-store/index.ts',
           'connector/index': './src/components/packages/connector/index.ts',
           'controls/index': './src/components/packages/controls/index.ts',
+          'cookies/index': './src/components/packages/cookies/index.ts',
           'css-property/index':
             './src/components/packages/css-property/index.ts',
           'css-unit-parser/index':
