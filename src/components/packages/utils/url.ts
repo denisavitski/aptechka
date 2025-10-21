@@ -169,10 +169,12 @@ export function normalizeURL(
 ) {
   base = base.replace(/^\/|\/$/g, '')
 
-  const path =
-    typeof url === 'string'
-      ? url.replace(/^\/|\/$/g, '')
-      : url.pathname.replace(/^\/|\/$/g, '')
+  const urlObj = typeof url === 'string' ? new URL(url, location.origin) : url
+
+  const hash = urlObj.hash
+  const search = urlObj.search
+
+  const path = urlObj.pathname.replace(/^\/|\/$/g, '')
 
   let urlString = ''
 
@@ -184,6 +186,14 @@ export function normalizeURL(
 
   if (trailingSlash && !urlString.endsWith('/')) {
     urlString += '/'
+  }
+
+  if (search) {
+    urlString += search
+  }
+
+  if (hash) {
+    urlString += hash
   }
 
   return new URL(urlString, location.origin)

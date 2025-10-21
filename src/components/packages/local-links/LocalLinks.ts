@@ -4,7 +4,9 @@ export interface LocalLinksOptions {
   base?: string
   trailingSlash?: boolean
   onClick?: (url: URL, options: LocalLinksLinkOptions) => void
-  includeAnchor?: ((element: HTMLAnchorElement) => boolean) | undefined
+  includeAnchor?:
+    | ((element: HTMLAnchorElement, event: Event) => boolean)
+    | undefined
 }
 
 export interface LocalLinksLinkOptions {
@@ -68,7 +70,7 @@ export class LocalLinks {
 
     if (
       typeof this.#options.includeAnchor === 'function' &&
-      !this.#options.includeAnchor(anchorElement)
+      !this.#options.includeAnchor(anchorElement, e)
     ) {
       return
     }
