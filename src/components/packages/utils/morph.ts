@@ -197,9 +197,6 @@ function clone(node: Node): Node {
     const script = document.createElement('script')
 
     for (let { name, value } of (node as Element).attributes) {
-      // if (name === 'src') {
-      //   value = cachebust(value)
-      // }
       script.setAttribute(name, value)
     }
 
@@ -351,19 +348,30 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
   }
 }
 
+// === изменено ===
 function patchAttributes(el: Element, patches: AttributePatch[]): void {
-  if (patches.length === 0) {
-    return
-  }
+  if (patches.length === 0) return
 
   for (const { type, name, value } of patches) {
     if (type === ACTION_REMOVE_ATTR) {
+      // не удаляем preserve-* классы
+      if (name === 'class') continue
       el.removeAttribute(name)
     } else if (type === ACTION_SET_ATTR) {
-      el.setAttribute(name, value!)
+      if (name === 'class' && value) {
+        const preserved = Array.from(el.classList).filter((c) =>
+          c.startsWith('preserve-'),
+        )
+        const newClasses = value.split(/\s+/).filter(Boolean)
+        const merged = Array.from(new Set([...newClasses, ...preserved]))
+        el.setAttribute('class', merged.join(' '))
+      } else {
+        el.setAttribute(name, value!)
+      }
     }
   }
 }
+// =================
 
 function updateScripts(node: Node) {
   if (node instanceof HTMLElement) {
@@ -375,7 +383,6 @@ function updateScripts(node: Node) {
       })
     }
   }
-
   return node
 }
 
@@ -397,70 +404,53 @@ export async function patch(
   }
 
   switch (PATCH.type) {
-    case ACTION_PRESERVE: {
+    case ACTION_PRESERVE:
       return
-    }
 
     case ACTION_CREATE: {
       let { node } = PATCH as CreatePatch
-
       node = updateScripts(node)
-
       parent.appendChild(node)
       return
     }
 
     case ACTION_REMOVE: {
-      if (!el) {
-        return
-      }
+      if (!el) return
       parent.removeChild(el)
       return
     }
 
     case ACTION_REPLACE: {
-      if (!el) {
-        return
-      }
+      if (!el) return
       let { node, value } = PATCH as ReplacePatch
-
       if (typeof value === 'string') {
         el.nodeValue = value
         return
       }
-
       if (node) {
         node = updateScripts(node)
-
         if (el instanceof Element && node instanceof Element) {
           el.replaceWith(node)
         } else if (el.parentNode) {
           el.parentNode.replaceChild(node, el)
         }
       }
-
       return
     }
 
     case ACTION_UPDATE: {
-      if (!el || el.nodeType !== NODE_TYPE_ELEMENT) {
-        return
-      }
+      if (!el || el.nodeType !== NODE_TYPE_ELEMENT) return
       const { attributes, children } = PATCH as UpdatePatch
-
       patchAttributes(el as Element, attributes)
-
       const elements = Array.from(el.childNodes)
-
       await Promise.all(
         children.map((child, index) => patch(el!, child, elements[index])),
       )
       return
     }
 
-    case ACTION_SKIP: {
+    case ACTION_SKIP:
       return
-    }
   }
 }
 
