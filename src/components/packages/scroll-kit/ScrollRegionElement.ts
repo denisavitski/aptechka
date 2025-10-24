@@ -255,7 +255,9 @@ export class ScrollRegionElement extends HTMLElement {
   }
 
   public enable() {
-    ticker.subscribe(this.#tickListener, { culling: this })
+    ticker.subscribe(this.#tickListener, {
+      culling: this.getAttribute('data-culling-element') || this,
+    })
     elementResizer.subscribe(this, this.#resizeListener)
     windowResizer.subscribe(this.#resizeListener)
     this.#tickListener()
