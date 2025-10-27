@@ -13,6 +13,7 @@ import {
   normalizeBase,
   normalizeRelativeURLs,
   normalizeURL,
+  scrollToElement,
 } from '@packages/utils'
 
 export type SPAURLModifier = (url: URL) => URL
@@ -83,8 +84,7 @@ export class SPA {
 
         this.#isBack = true
         this.navigate(location.href.replace(location.origin, ''), {
-          scrollTop: (event.state?.data?.scrollTop as number) || 0,
-          scrollLeft: (event.state?.data?.scrollLeft as number) || 0,
+          scrollValue: (event.state?.data?.scrollTop as number) || 0,
         })
       })
     }
@@ -137,13 +137,11 @@ export class SPA {
     if (!isBack) {
       historyManager.updateCurrentStateData({
         scrollTop: this.#scroll.y,
-        scrollLeft: this.#scroll.x,
       })
       historyManager.pushState(fullUrl)
     } else {
       historyManager.updatePreviousStateData({
         scrollTop: this.#scroll.y,
-        scrollLeft: this.#scroll.x,
       })
     }
 
@@ -177,10 +175,10 @@ export class SPA {
       this.#announcerElement.done()
 
       if (!options?.keepScrollPosition) {
-        this.#scroll.element.scrollTo({
-          top: options?.scrollTop || 0,
-          left: options?.scrollLeft || 0,
+        scrollToElement(options?.scrollValue || 0, {
+          scrollElement: this.#scroll.element,
           behavior: 'instant',
+          ...options?.scrollOptions,
         })
       }
     }

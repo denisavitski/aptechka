@@ -1,5 +1,11 @@
 import { historyManager } from '@packages/shared/historyManager'
-import { isLocalUrl, NODE_TYPE_ELEMENT, normalizeURL } from '@packages/utils'
+import {
+  ElementOrSelector,
+  isLocalUrl,
+  NODE_TYPE_ELEMENT,
+  normalizeURL,
+  ScrollToElementOptions,
+} from '@packages/utils'
 
 export interface LocalLinksOptions {
   base?: string
@@ -12,10 +18,13 @@ export interface LocalLinksOptions {
 
 export interface LocalLinksLinkOptions {
   keepScrollPosition?: boolean
-  scrollLeft?: number
-  scrollTop?: number
   cache?: boolean
   revalidate?: boolean
+  scrollValue?: ElementOrSelector<HTMLElement> | number
+  scrollOptions?: Pick<
+    ScrollToElementOptions,
+    'behavior' | 'center' | 'duration' | 'easing' | 'offset' | 'startValue'
+  >
 }
 
 export class LocalLinks {
@@ -90,8 +99,24 @@ export class LocalLinks {
       keepScrollPosition: 'keepScrollPosition' in anchorElement.dataset,
       cache: 'cache' in anchorElement.dataset,
       revalidate: 'revalidate' in anchorElement.dataset,
-      scrollLeft: parseFloat(anchorElement.dataset.scrollLeft || '0'),
-      scrollTop: parseFloat(anchorElement.dataset.scrollTop || '0'),
+      scrollValue: anchorElement.dataset.scrollTo,
+    }
+
+    const scrollOptions: LocalLinksLinkOptions['scrollOptions'] = {
+      behavior: anchorElement.dataset.scrollBehavior as any,
+      center: !!anchorElement.dataset.scrollCenter,
+      duration: anchorElement.dataset.scrollDuration
+        ? parseFloat(anchorElement.dataset.scrollDuration)
+        : undefined,
+      easing: anchorElement.dataset.scrollEasing as any,
+      offset: anchorElement.dataset.scrollOffset,
+      startValue: anchorElement.dataset.scrollStartValue
+        ? parseFloat(anchorElement.dataset.scrollStartValue)
+        : undefined,
+    }
+
+    if (Object.values(scrollOptions).length) {
+      options.scrollOptions = scrollOptions
     }
 
     e.preventDefault()
