@@ -15,6 +15,7 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
   #needToPlay = false
   #clickElement: HTMLElement = this
   #isFullScreen = false
+  #pointerEnter = false
 
   protected override connectedCallback() {
     super.connectedCallback()
@@ -91,6 +92,9 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       'fullscreenchange',
       this.#fullscreenChangeListener,
     )
+
+    this.addEventListener('pointerenter', this.#pointerEnterListener)
+    this.addEventListener('pointerleave', this.#pointerLeaveListener)
   }
 
   protected override disconnectedCallback() {
@@ -113,6 +117,9 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
       'fullscreenchange',
       this.#fullscreenChangeListener,
     )
+
+    this.removeEventListener('pointerenter', this.#pointerEnterListener)
+    this.removeEventListener('pointerleave', this.#pointerLeaveListener)
   }
 
   protected override createConsumer() {
@@ -252,6 +259,38 @@ export class VideoElement extends SourceElement<HTMLVideoElement> {
         })
       }
     }
+  }
+
+  #pointerEnterListener = () => {
+    this.#pointerEnter = true
+    this.classList.remove('pointer-leave')
+    this.classList.add('pointer-entered')
+
+    if (this.hasAttribute('pointer-enter-replay')) {
+      let media = this.getAttribute('pointer-enter-replay')
+      media = !media || media === 'true' ? '(min-width: 0px)' : media
+
+      if (matchMedia(media).matches) {
+        this.consumerElement.pause()
+        this.consumerElement.currentTime = 0
+
+        requestAnimationFrame(() => {
+          if (this.#pointerEnter) {
+            this.consumerElement.play().then(() => {
+              if (this.#pointerEnter) {
+                this.classList.add('pointer-enter')
+              }
+            })
+          }
+        })
+      }
+    }
+  }
+
+  #pointerLeaveListener = () => {
+    this.#pointerEnter = false
+    this.classList.remove('pointer-enter')
+    this.classList.add('pointer-leave')
   }
 }
 
