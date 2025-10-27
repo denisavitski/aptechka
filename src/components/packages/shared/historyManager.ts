@@ -32,6 +32,10 @@ class HistoryManager {
     this.#setupTracking()
   }
 
+  public get size() {
+    return this.#previousStates.length
+  }
+
   #setupTracking() {
     window.addEventListener('popstate', this.#handlePopState.bind(this))
     this.#overrideHistoryMethods()

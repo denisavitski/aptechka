@@ -1,3 +1,4 @@
+import { historyManager } from '@packages/shared/historyManager'
 import { isLocalUrl, NODE_TYPE_ELEMENT, normalizeURL } from '@packages/utils'
 
 export interface LocalLinksOptions {
@@ -93,6 +94,13 @@ export class LocalLinks {
       scrollTop: parseFloat(anchorElement.dataset.scrollTop || '0'),
     }
 
+    e.preventDefault()
+
+    if (anchorElement.hasAttribute('data-back') && historyManager.size > 1) {
+      history.back()
+      return
+    }
+
     return {
       url: normalizeURL(new URL(href), {
         base: this.#options.base,
@@ -114,8 +122,6 @@ export class LocalLinks {
     if (!url) {
       return
     }
-
-    event.preventDefault()
 
     this.#options.onClick?.(url, options)
   }
