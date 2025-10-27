@@ -249,3 +249,23 @@ export function searchParamsToObject(params: URLSearchParams) {
 
   return object
 }
+
+export function addParamsToURL<T extends Record<string, any>>(
+  url: string,
+  options?: T,
+): string {
+  if (!options) return url
+
+  const [baseUrl, existingQuery] = url.split('?')
+  const searchParams = new URLSearchParams(existingQuery)
+
+  Object.entries(options).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      searchParams.set(key, value.toString())
+    }
+  })
+
+  const queryString = searchParams.toString()
+
+  return queryString ? `${baseUrl}?${queryString}` : baseUrl
+}
