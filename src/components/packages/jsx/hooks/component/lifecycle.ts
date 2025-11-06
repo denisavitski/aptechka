@@ -14,6 +14,10 @@ export function useComponent(callback?: ComponentConnectCallback) {
 
 export function useConnect(callback: ComponentConnectCallback) {
   activeComponent.current.addConnectCallback(callback)
+
+  if (__JSX_HMR_DEV__) {
+    activeComponent.current.addDisconnectCallback(() => {})
+  }
 }
 
 export function useDisconnect(callback: ComponentDisconnectCallback) {

@@ -1,10 +1,11 @@
 import { Damped, type DampedOptions } from '@packages/animation'
 import { CSSProperty } from '@packages/css-property'
-import { device } from '@packages/device'
+import { device, viewport } from '@packages/device'
 import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
 import {
   ElementOrSelector,
+  getElement,
   scrollToElement,
   ScrollToElementOptions,
   scrollToElementTweened,
@@ -23,6 +24,8 @@ const scrollKeys = new Set([
 ])
 
 export class SmoothScrollElement extends HTMLElement {
+  #scrollElement: HTMLElement | Window = this
+
   #cssDisabled = new CSSProperty(this, '--smooth-scroll-disabled', false)
   #cssDamping = new CSSProperty(this, '--smooth-scroll-damping', 10)
 
@@ -32,7 +35,13 @@ export class SmoothScrollElement extends HTMLElement {
 
   public resize() {
     this.#value.min = 0
-    this.#value.max = this.scrollHeight - this.offsetHeight
+
+    if (this.#scrollElement instanceof HTMLElement) {
+      this.#value.max =
+        this.#scrollElement.scrollHeight - this.#scrollElement.offsetHeight
+    } else {
+      this.#value.max = document.documentElement.offsetHeight - viewport.height
+    }
   }
 
   public stop() {
@@ -42,7 +51,13 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   public sync() {
-    const currentValue = this.scrollTop
+    let currentValue = 0
+
+    if (this.#scrollElement instanceof HTMLElement) {
+      currentValue = this.#scrollElement.scrollTop
+    } else {
+      currentValue = this.#scrollElement.scrollY
+    }
 
     if (
       device.isMobile ||
@@ -88,7 +103,7 @@ export class SmoothScrollElement extends HTMLElement {
   ) {
     scrollToElement(elementOrSelector, {
       ...options,
-      scrollElement: this,
+      scrollElement: this.#scrollElement,
       startValue: this.#value.current,
       scrollCallback: (top) => {
         this.scrollToValue(
@@ -100,18 +115,28 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    if (this.dataset.element === 'window') {
+      this.#scrollElement = window
+    } else {
+      this.#scrollElement =
+        getElement<HTMLElement>(this.dataset.element) || this
+    }
+
     window.addEventListener('resize', this.#resizeListener)
-    this.addEventListener('keydown', this.#keydownListener)
+    this.#scrollElement.addEventListener(
+      'keydown',
+      this.#keydownListener as any,
+    )
 
     document.documentElement.addEventListener(
       'pointerdown',
       this.#pointerdownListener,
     )
 
-    this.addEventListener('wheel', this.#wheelListener as any, {
+    this.#scrollElement.addEventListener('wheel', this.#wheelListener as any, {
       passive: false,
     })
-    this.addEventListener('scroll', this.#scrollListener)
+    this.#scrollElement.addEventListener('scroll', this.#scrollListener)
 
     this.#value.set(this.scrollTop, { equalize: true })
 
@@ -121,11 +146,16 @@ export class SmoothScrollElement extends HTMLElement {
       scrollEntries.update(this, 'y', e.current)
 
       if (roundedCurrent !== this.#currentRoundedValue && !device.isMobile) {
-        this.scroll({
+        this.#scrollElement.scroll({
           top: roundedCurrent,
           behavior: 'instant',
         })
       }
+
+      document.documentElement.classList.toggle(
+        'scrolling',
+        roundedCurrent !== this.#currentRoundedValue,
+      )
 
       this.#currentRoundedValue = roundedCurrent
     })
@@ -149,16 +179,21 @@ export class SmoothScrollElement extends HTMLElement {
 
     scrollEntries.unregister(this)
 
+    document.documentElement.classList.remove('scrolling')
+
     window.removeEventListener('resize', this.#resizeListener)
-    this.removeEventListener('keydown', this.#keydownListener)
+    this.#scrollElement.removeEventListener(
+      'keydown',
+      this.#keydownListener as any,
+    )
 
     document.documentElement.removeEventListener(
       'pointerdown',
       this.#pointerdownListener,
     )
 
-    this.removeEventListener('wheel', this.#wheelListener as any)
-    this.removeEventListener('scroll', this.#scrollListener)
+    this.#scrollElement.removeEventListener('wheel', this.#wheelListener as any)
+    this.#scrollElement.removeEventListener('scroll', this.#scrollListener)
   }
 
   #checkDisabled() {

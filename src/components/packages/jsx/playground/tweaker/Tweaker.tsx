@@ -1,4 +1,4 @@
-import { useShadow, useStylesheet } from '@packages/jsx'
+import { useConnect, useShadow, useStylesheet } from '@packages/jsx'
 import { useDerivedKeyedArrayStore, useStore } from '@packages/jsx/hooks/store'
 
 export interface FolderProps {
@@ -31,15 +31,20 @@ export const Tweaker: JSX.Component = () => {
     return <Folder {...e}></Folder>
   })
 
-  const s = useStore(1, { name: 'heh' })
+  useConnect(() => {
+    const callback = () => {
+      folders.add({ key: 'q' })
+    }
+    addEventListener('keydown', callback)
 
-  s.subscribe(() => {
-    console.log('s SUB')
+    return () => {
+      removeEventListener('keydown', callback)
+    }
   })
 
   return (
     <component>
-      <shadow>{folders}</shadow>
+      <shadow>{foldersEls}</shadow>
     </component>
   )
 }
