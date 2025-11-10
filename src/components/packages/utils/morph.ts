@@ -92,7 +92,9 @@ const same: SameComparators = {
 
 function hasPermanentParent(node: Node | null | undefined): boolean {
   if (!node) return false
+
   let current: Node | null = node
+
   while (current) {
     if (
       current.nodeType === NODE_TYPE_ELEMENT &&
@@ -185,9 +187,9 @@ function cachebust(src: string): string {
 function clone(node: Node): Node {
   if (
     node.nodeType === NODE_TYPE_ELEMENT &&
-    (node as Element).hasAttribute('data-persist')
+    (node as Element).hasAttribute('data-preserve')
   ) {
-    return node
+    return node.cloneNode(true)
   }
 
   if (
@@ -241,6 +243,11 @@ function uniqueChildren(from: Element, to: Element): Patch[] {
     if (node.nodeType === NODE_TYPE_ELEMENT) {
       const key = getKey(node as Element)
 
+      if (hasPermanentParent(node)) {
+        patches.push({ type: ACTION_PRESERVE })
+        continue
+      }
+
       if (remove.has(key)) {
         patches.push({ type: ACTION_REMOVE })
         continue
@@ -252,7 +259,6 @@ function uniqueChildren(from: Element, to: Element): Patch[] {
           attributes: attributes(node as Element, nodeTo as Element),
           children: children(node as Element, nodeTo as Element),
         })
-
         continue
       }
     }
@@ -348,14 +354,26 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
   }
 }
 
-// === изменено ===
 function patchAttributes(el: Element, patches: AttributePatch[]): void {
   if (patches.length === 0) return
 
   for (const { type, name, value } of patches) {
     if (type === ACTION_REMOVE_ATTR) {
-      // не удаляем preserve-* классы
-      if (name === 'class') continue
+      // Для удаления атрибута проверяем текущее значение класса
+      if (name === 'class') {
+        const currentClasses = el.getAttribute('class')
+        if (currentClasses?.includes('preserve-')) {
+          const preserved = Array.from(el.classList).filter((c) =>
+            c.startsWith('preserve-'),
+          )
+          if (preserved.length > 0) {
+            el.setAttribute('class', preserved.join(' '))
+          } else {
+            el.removeAttribute('class')
+          }
+          continue
+        }
+      }
       el.removeAttribute(name)
     } else if (type === ACTION_SET_ATTR) {
       if (name === 'class' && value) {
@@ -371,10 +389,13 @@ function patchAttributes(el: Element, patches: AttributePatch[]): void {
     }
   }
 }
-// =================
 
 function updateScripts(node: Node) {
   if (node instanceof HTMLElement) {
+    if (node.hasAttribute('data-preserve')) {
+      return node
+    }
+
     if (node.tagName === 'SCRIPT') {
       node = clone(node)
     } else {
@@ -416,12 +437,22 @@ export async function patch(
 
     case ACTION_REMOVE: {
       if (!el) return
+      if (
+        el.nodeType === NODE_TYPE_ELEMENT &&
+        (el as Element).hasAttribute('data-preserve')
+      )
+        return
       parent.removeChild(el)
       return
     }
 
     case ACTION_REPLACE: {
       if (!el) return
+      if (
+        el.nodeType === NODE_TYPE_ELEMENT &&
+        (el as Element).hasAttribute('data-preserve')
+      )
+        return
       let { node, value } = PATCH as ReplacePatch
       if (typeof value === 'string') {
         el.nodeValue = value
@@ -453,7 +484,6 @@ export async function patch(
       return
   }
 }
-
 export async function morph(from: Node, to: Node): Promise<void> {
   const patches = diff(from, to)
   await patch(document, patches)
