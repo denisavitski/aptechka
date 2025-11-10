@@ -30,6 +30,8 @@ export interface SPAOptions
 export interface SPANavigateOptions extends LocalLinksLinkOptions {}
 
 export interface SPAEvents {
+  spaBeforeFetch: CustomEvent
+  spaAfterFetch: CustomEvent
   spaBeforeUpdate: CustomEvent
   spaAfterUpdate: CustomEvent
 }
@@ -108,6 +110,10 @@ export class SPA {
       fullUrl = this.#options.urlModifier(fullUrl)
     }
 
+    dispatchEvent(document, 'spaBeforeFetch', {
+      custom: true,
+    })
+
     let contents: string | void = this.#cache.get(fullUrl.toString())
 
     if (!contents || options?.revalidate) {
@@ -121,6 +127,10 @@ export class SPA {
           window.location.assign(fullUrl)
         })
     }
+
+    dispatchEvent(document, 'spaAfterFetch', {
+      custom: true,
+    })
 
     if (!contents) {
       return
