@@ -17,10 +17,15 @@ export class CookiesClient {
     const encodedValue = encodeURIComponent(value)
     let cookieStr = `${name}=${encodedValue}`
 
-    if (options.maxAge) {
-      const expires = new Date(Date.now() + options.maxAge * 1000)
-      cookieStr += `; Expires=${expires.toUTCString()}`
-      cookieStr += `; Max-Age=${options.maxAge}`
+    if (options.maxAge !== undefined) {
+      if (options.maxAge <= 0) {
+        cookieStr += `; Expires=${new Date(0).toUTCString()}`
+        cookieStr += `; Max-Age=0`
+      } else {
+        const expires = new Date(Date.now() + options.maxAge * 1000)
+        cookieStr += `; Expires=${expires.toUTCString()}`
+        cookieStr += `; Max-Age=${options.maxAge}`
+      }
     } else if (options.expires) {
       cookieStr += `; Expires=${options.expires.toUTCString()}`
     }
@@ -73,10 +78,24 @@ export class CookiesClient {
     name: string,
     options: Pick<CookiesClientOptions, 'path' | 'domain'> = {},
   ): void {
-    this.set(name, '', {
-      ...options,
-      maxAge: -1,
-    })
+    const domains = options.domain
+      ? [options.domain, `.${options.domain}`]
+      : ['']
+    const paths = options.path ? [options.path, '/'] : ['', '/']
+
+    for (const domain of domains) {
+      for (const path of paths) {
+        document.cookie = [
+          `${name}=`,
+          'Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+          'Max-Age=0',
+          path ? `Path=${path}` : '',
+          domain ? `Domain=${domain}` : '',
+        ]
+          .filter(Boolean)
+          .join('; ')
+      }
+    }
   }
 
   public static serialize(
