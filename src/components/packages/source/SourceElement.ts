@@ -255,18 +255,18 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     this.#consumerElement.onload = null
     this.#consumerElement.onerror = null
 
-    this.#status.set('loaded', false)
-    this.#status.set('error', false)
-    this.#status.set('loading', false)
-    this.#status.set('clear', false)
-    this.#status.set('playing', false)
-    this.#status.set('metadata', false)
+    this.#status.setKey('loaded', false)
+    this.#status.setKey('error', false)
+    this.#status.setKey('loading', false)
+    this.#status.setKey('clear', false)
+    this.#status.setKey('playing', false)
+    this.#status.setKey('metadata', false)
 
     if (source) {
       this.#idWithUrl = `${this.#id}-${source.url}`
       const isKeepSourceParameters = this.hasAttribute('keep-source-parameters')
 
-      this.#status.set('loading', true)
+      this.#status.setKey('loading', true)
 
       this.#currentURL = isKeepSourceParameters
         ? source.url
@@ -324,9 +324,9 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   }
 
   #loadListener = () => {
-    this.#status.set('loaded', true)
-    this.#status.set('error', false)
-    this.#status.set('loading', false)
+    this.#status.setKey('loaded', true)
+    this.#status.setKey('error', false)
+    this.#status.setKey('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
       loading.complete(this.#idWithUrl)
@@ -340,21 +340,21 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
     if (clearDuration) {
       this.#clearTimeoutId = setTimeout(
         () => {
-          this.#status.set('clear', true)
+          this.#status.setKey('clear', true)
         },
         parseFloat(clearDuration) * 1000,
       )
     } else {
-      this.#status.set('clear', true)
+      this.#status.setKey('clear', true)
     }
 
     this.#isFirstLoadHappened = true
   }
 
   #errorListener = (url: string) => {
-    this.#status.set('loaded', false)
-    this.#status.set('error', true)
-    this.#status.set('loading', false)
+    this.#status.setKey('loaded', false)
+    this.#status.setKey('error', true)
+    this.#status.setKey('loading', false)
 
     if (!this.#isLazy && !this.#isFirstLoadHappened) {
       loading.error(this.#idWithUrl)
@@ -366,13 +366,13 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
   }
 
   #playListener = () => {
-    this.#status.set('playing', true)
+    this.#status.setKey('playing', true)
 
     dispatchEvent(this, 'sourcePlay', { custom: true })
   }
 
   #pauseListener = () => {
-    this.#status.set('playing', false)
+    this.#status.setKey('playing', false)
 
     dispatchEvent(this, 'sourcePause', { custom: true })
   }
@@ -387,7 +387,7 @@ export abstract class SourceElement<T extends HTMLElement> extends HTMLElement {
         consumerElement.tagName === 'AUDIO') &&
       consumerElement.readyState >= 1
     ) {
-      this.#status.set('metadata', true)
+      this.#status.setKey('metadata', true)
 
       dispatchEvent(this, 'sourceMetadataLoaded', { custom: true })
 

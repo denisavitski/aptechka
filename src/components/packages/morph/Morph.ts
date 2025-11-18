@@ -6,8 +6,6 @@ import {
   intersectElements,
   isBrowser,
   normalizeBase,
-  scrollToElement,
-  ScrollToElementOptions,
   splitPath,
   wait,
 } from '@packages/utils'
@@ -17,6 +15,10 @@ import { MorphLink } from './MorphLink'
 
 import { MorphAnnouncer } from './MorphAnnouncer'
 
+import {
+  ScrollNavigator,
+  ScrollNavigatorOptions,
+} from '@packages/scroll-kit/ScrollNavigator'
 import {
   historyManager,
   HistoryManagerChangeAction,
@@ -73,7 +75,7 @@ export interface MorphNavigateOptions {
   offsetScroll?: number | ElementOrSelector<HTMLElement>
   scrollBehaviour?: ScrollBehavior
   scrollDuration?: number
-  scrollEasing?: ScrollToElementOptions['easing']
+  scrollEasing?: ScrollNavigatorOptions['easing']
   scrollTo?: string
   revalidate?: boolean
   keepSearchParameters?: boolean
@@ -951,13 +953,13 @@ export class Morph {
 
   #tryScrollToElement(
     id: string | number,
-    options?: Omit<ScrollToElementOptions, 'scrollElement'>,
+    options?: Omit<ScrollNavigatorOptions, 'scrollElement'>,
   ) {
     const value =
       typeof id === 'string' ? document.querySelector<HTMLElement>(id) : id
 
     if (typeof value === 'number' || value) {
-      scrollToElement(value, {
+      ScrollNavigator.scrollToElement(value, {
         scrollElement: this.#currentScrollElement,
         ...options,
       })

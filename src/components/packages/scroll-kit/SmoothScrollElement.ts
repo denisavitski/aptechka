@@ -1,15 +1,10 @@
-import { Damped, type DampedOptions } from '@packages/animation'
+import { Damped } from '@packages/animation-kit/Damped'
 import { CSSProperty } from '@packages/css-property'
 import { device, viewport } from '@packages/device'
 import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
-import {
-  ElementOrSelector,
-  getElement,
-  scrollToElement,
-  ScrollToElementOptions,
-  scrollToElementTweened,
-} from '@packages/utils'
+import { ElementOrSelector, getElement } from '@packages/utils'
+import { ScrollNavigator, ScrollNavigatorOptions } from './ScrollNavigator'
 
 const scrollKeys = new Set([
   'ArrowUp',
@@ -25,146 +20,119 @@ const scrollKeys = new Set([
 
 export class SmoothScrollElement extends HTMLElement {
   #scrollElement: HTMLElement | Window = this
-
+  #pointerElement: HTMLElement = this
   #cssDisabled = new CSSProperty(this, '--smooth-scroll-disabled', false)
   #cssDamping = new CSSProperty(this, '--smooth-scroll-damping', 10)
-
-  #value = new Damped(0, { order: TICK_ORDER.SCROLL })
-  #currentRoundedValue = 0
+  #damped = new Damped()
+  #rounded = 0
   #needSync = false
 
-  public resize() {
-    this.#value.min = 0
+  constructor() {
+    super()
+    this.#damped.setTickerOptions({ order: TICK_ORDER.SCROLL })
+  }
 
-    if (this.#scrollElement instanceof HTMLElement) {
-      this.#value.max =
-        this.#scrollElement.scrollHeight - this.#scrollElement.offsetHeight
-    } else {
-      this.#value.max = document.documentElement.offsetHeight - viewport.height
-    }
+  public resize() {
+    const min = 0
+    const max =
+      this.#scrollElement instanceof HTMLElement
+        ? this.#scrollElement.scrollHeight - this.#scrollElement.offsetHeight
+        : document.documentElement.offsetHeight - viewport.height
+
+    this.#damped.setEdges(min, max)
   }
 
   public stop() {
-    scrollToElementTweened.value?.set(this.scrollTop, { equalize: true })
-    this.#value.unlistenAnimationFrame()
+    ScrollNavigator.tryStop(this.#scrollElement, this.scrollTop)
+    this.#damped.stopAnimation()
     this.#needSync = true
   }
 
-  public sync() {
-    let currentValue = 0
-
-    if (this.#scrollElement instanceof HTMLElement) {
-      currentValue = this.#scrollElement.scrollTop
-    } else {
-      currentValue = this.#scrollElement.scrollY
-    }
+  public trySync() {
+    const cv = this.#currentScroll
 
     if (
       device.isMobile ||
       this.#needSync ||
-      Math.abs(currentValue - this.#value.current) > 100
+      Math.abs(cv - this.#damped.current) > 100
     ) {
       this.#needSync = false
-      this.#value.set(currentValue, { equalize: true })
+      this.#damped.setWithoutAnimation(cv)
     }
   }
 
   public shiftPosition(value: number) {
     this.resize()
-    this.sync()
-    this.#value.shift(value)
+    this.trySync()
+    this.#damped.set(this.#damped.target + value)
   }
 
-  public setPosition(value: number, options?: DampedOptions) {
+  public setPosition(value: number, behavior?: ScrollBehavior) {
     this.resize()
-    this.sync()
-    this.#value.set(value, options)
+    this.trySync()
+
+    if (behavior === 'instant') {
+      this.#damped.setWithoutAnimation(value)
+    } else {
+      this.#damped.set(value)
+    }
   }
 
-  public scrollToValue(value: number, behavior?: ScrollBehavior | undefined) {
+  public scrollToValue(value: number, behavior?: ScrollBehavior) {
     if (device.isMobile) {
-      this.scroll({
-        top: value,
-        behavior,
-      })
+      this.scroll({ top: value, behavior })
     } else {
-      this.setPosition(value, {
-        equalize: behavior === 'instant',
-      })
+      this.setPosition(value, behavior)
     }
   }
 
   public scrollToElement(
     elementOrSelector: ElementOrSelector<HTMLElement>,
     options?: Omit<
-      ScrollToElementOptions,
+      ScrollNavigatorOptions,
       'scrollCallback' | 'scrollElement' | 'startValue'
     >,
   ) {
-    scrollToElement(elementOrSelector, {
+    ScrollNavigator.scrollToElement(elementOrSelector, {
       ...options,
       scrollElement: this.#scrollElement,
-      startValue: this.#value.current,
-      scrollCallback: (top) => {
+      startValue: this.#damped.current,
+      scrollCallback: (top) =>
         this.scrollToValue(
           top,
           options?.duration ? 'instant' : options?.behavior,
-        )
-      },
+        ),
     })
   }
 
-  protected connectedCallback() {
-    if (this.dataset.element === 'window') {
-      this.#scrollElement = window
-    } else {
-      this.#scrollElement =
-        getElement<HTMLElement>(this.dataset.element) || this
-    }
+  public connectedCallback() {
+    this.#initScrollElement()
+    this.#addListeners()
 
-    window.addEventListener('resize', this.#resizeListener)
-    this.#scrollElement.addEventListener(
-      'keydown',
-      this.#keydownListener as any,
-    )
+    this.#damped.setWithoutAnimation(this.scrollTop)
 
-    document.documentElement.addEventListener(
-      'pointerdown',
-      this.#pointerdownListener,
-    )
-
-    this.#scrollElement.addEventListener('wheel', this.#wheelListener as any, {
-      passive: false,
-    })
-    this.#scrollElement.addEventListener('scroll', this.#scrollListener)
-
-    this.#value.set(this.scrollTop, { equalize: true })
-
-    this.#value.subscribe((e) => {
-      const roundedCurrent = Math.round(e.current)
+    this.#damped.subscribe((e) => {
+      const rounded = Math.round(e.current)
 
       scrollEntries.update(this, 'y', e.current)
 
-      if (roundedCurrent !== this.#currentRoundedValue && !device.isMobile) {
-        this.#scrollElement.scroll({
-          top: roundedCurrent,
-          behavior: 'instant',
-        })
+      if (rounded !== this.#rounded && !device.isMobile) {
+        this.#setNativeScroll(rounded)
       }
 
       document.documentElement.classList.toggle(
         'scrolling',
-        roundedCurrent !== this.#currentRoundedValue,
+        rounded !== this.#rounded,
       )
 
-      this.#currentRoundedValue = roundedCurrent
+      this.#rounded = rounded
     })
 
     this.#cssDamping.observe()
     this.#cssDisabled.observe()
 
     this.#cssDamping.subscribe((e) => {
-      this.#value.damping = e.current
+      this.#damped.setOptions({ damping: e.current })
     })
 
     scrollEntries.register(this)
@@ -172,26 +140,65 @@ export class SmoothScrollElement extends HTMLElement {
     this.resize()
   }
 
-  protected disconnectedCallback() {
-    this.#value.close()
+  public disconnectedCallback() {
+    this.#damped.close()
     this.#cssDamping.close()
     this.#cssDisabled.close()
 
     scrollEntries.unregister(this)
 
     document.documentElement.classList.remove('scrolling')
+    this.#removeListeners()
+  }
 
+  get #currentScroll(): number {
+    return this.#scrollElement instanceof HTMLElement
+      ? this.#scrollElement.scrollTop
+      : this.#scrollElement.scrollY
+  }
+
+  #setNativeScroll(top: number) {
+    this.#scrollElement.scroll({ top, behavior: 'instant' })
+  }
+
+  #initScrollElement() {
+    if (this.dataset.element === 'window') {
+      this.#scrollElement = window
+      this.#pointerElement = document.documentElement
+    } else {
+      this.#scrollElement =
+        getElement<HTMLElement>(this.dataset.element) || this
+      this.#scrollElement.setAttribute('tabindex', '0')
+      this.#pointerElement = this
+    }
+  }
+
+  #addListeners() {
+    window.addEventListener('resize', this.#resizeListener)
+    this.#scrollElement.addEventListener(
+      'keydown',
+      this.#keydownListener as any,
+    )
+    this.#pointerElement.addEventListener(
+      'pointerdown',
+      this.#pointerdownListener,
+    )
+    this.#scrollElement.addEventListener('wheel', this.#wheelListener as any, {
+      passive: false,
+    })
+    this.#scrollElement.addEventListener('scroll', this.#scrollListener)
+  }
+
+  #removeListeners() {
     window.removeEventListener('resize', this.#resizeListener)
     this.#scrollElement.removeEventListener(
       'keydown',
       this.#keydownListener as any,
     )
-
-    document.documentElement.removeEventListener(
+    this.#pointerElement.removeEventListener(
       'pointerdown',
       this.#pointerdownListener,
     )
-
     this.#scrollElement.removeEventListener('wheel', this.#wheelListener as any)
     this.#scrollElement.removeEventListener('scroll', this.#scrollListener)
   }
@@ -203,107 +210,88 @@ export class SmoothScrollElement extends HTMLElement {
     )
   }
 
-  #wheelListener = (e: WheelEvent) => {
-    if (this.#checkDisabled() || device.isMobile) {
-      return
-    }
+  #inOverflowDirection(e: WheelEvent) {
+    const dy = Math.sign(e.deltaY)
+    return !(
+      (dy < 0 && this.#damped.target === 0 && this.#damped.direction < 0) ||
+      (dy > 0 &&
+        this.#damped.target === this.#damped.max &&
+        this.#damped.direction > 0)
+    )
+  }
 
-    if (
-      !(
-        (Math.sign(e.deltaY) < 0 &&
-          this.#value.target === 0 &&
-          this.#value.direction < 0) ||
-        (Math.sign(e.deltaY) > 0 &&
-          this.#value.target === this.#value.max &&
-          this.#value.direction > 0)
-      )
-    ) {
+  #shouldSkipSmoothScroll(e: WheelEvent) {
+    if (!(e.target instanceof Element)) return false
+
+    const el = e.target.closest('[data-prevent-smooth-scroll]')
+    if (!el) return false
+
+    const attr = el.getAttribute('data-prevent-smooth-scroll')
+    if (!attr) return true
+
+    return !matchMedia(attr).matches
+  }
+
+  #wheelListener = (e: WheelEvent) => {
+    if (this.#checkDisabled() || device.isMobile) return
+
+    if (!this.#inOverflowDirection(e)) {
       e.stopPropagation()
     }
 
-    if (e.target instanceof Element) {
-      const preventElement = e.target.closest('[data-prevent-smooth-scroll]')
+    if (this.#shouldSkipSmoothScroll(e)) return
 
-      if (preventElement) {
-        const attrValue = preventElement.getAttribute(
-          'data-prevent-smooth-scroll',
-        )
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
 
-        if (!attrValue) {
-          return
-        } else if (matchMedia(attrValue).matches) {
-          return
-        }
-      }
-    }
-
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      return
-    }
+    ScrollNavigator.tryStop(this.#scrollElement, this.scrollTop)
 
     e.preventDefault()
     this.shiftPosition(e.deltaY)
   }
 
   #pointerdownListener = (e: PointerEvent) => {
-    if (e.target instanceof Element) {
-      const anchorElement = e.target.closest('a')
+    if (!(e.target instanceof Element)) return
 
-      if (e.button !== 0 || (this.#checkDisabled() && !anchorElement)) {
-        return
-      }
+    const anchor = e.target.closest('a')
+    if (e.button !== 0 || (this.#checkDisabled() && !anchor)) return
 
-      if (
-        anchorElement &&
-        !anchorElement.hasAttribute('data-smooth-scroll-skip') &&
-        this.contains(anchorElement)
-      ) {
-        this.stop()
+    if (
+      anchor &&
+      !anchor.hasAttribute('data-smooth-scroll-skip') &&
+      this.contains(anchor)
+    ) {
+      this.stop()
+      const url = new URL(anchor.href)
 
-        const url = new URL(anchorElement.href)
-
-        if (url.hash) {
-          e.preventDefault()
-
-          this.scrollToElement(url.hash, {
-            behavior:
-              (anchorElement.getAttribute('data-scroll-behavior') as any) ||
-              'smooth',
-            offset:
-              anchorElement.getAttribute('data-scroll-offset') || undefined,
-            center: anchorElement.hasAttribute('data-scroll-center'),
-            duration:
-              parseFloat(
-                anchorElement.getAttribute('data-scroll-duration') || '0',
-              ) || undefined,
-            easing:
-              (anchorElement.getAttribute('data-scroll-easing') as any) ||
-              undefined,
-          })
-        }
+      if (url.hash) {
+        e.preventDefault()
+        this.scrollToElement(url.hash, {
+          behavior:
+            (anchor.getAttribute('data-scroll-behavior') as any) || 'smooth',
+          offset: anchor.getAttribute('data-scroll-offset') || undefined,
+          center: anchor.hasAttribute('data-scroll-center'),
+          duration:
+            parseFloat(anchor.getAttribute('data-scroll-duration') || '0') ||
+            undefined,
+          easing:
+            (anchor.getAttribute('data-scroll-easing') as any) || undefined,
+        })
       }
     }
   }
 
   #resizeListener = () => {
     this.resize()
-    this.sync()
+    this.trySync()
   }
 
   #keydownListener = (e: KeyboardEvent) => {
-    if (this.#checkDisabled()) {
-      return
-    }
-
-    if (scrollKeys.has(e.code)) {
-      this.stop()
-    }
+    if (this.#checkDisabled()) return
+    if (scrollKeys.has(e.code)) this.stop()
   }
 
   #scrollListener = () => {
-    if (device.isMobile) {
-      this.sync()
-    }
+    this.trySync()
   }
 }
 

@@ -293,8 +293,8 @@ export class PopoverElement extends HTMLElement {
 
     this.#toggleGlobalClass(false, this.closingClass)
 
-    this.#status.set('closing', false)
-    this.#status.set('triggered', true)
+    this.#status.setKey('closing', false)
+    this.#status.setKey('triggered', true)
 
     dispatchEvent(this, 'popoverTriggered', {
       custom: true,
@@ -313,7 +313,7 @@ export class PopoverElement extends HTMLElement {
       this.endHistoryTransaction()
     }
 
-    this.#status.set('beforeopen', true)
+    this.#status.setKey('beforeopen', true)
 
     this.#opened = true
 
@@ -329,7 +329,7 @@ export class PopoverElement extends HTMLElement {
       })
 
       this.#toggleGlobalClass(true, this.openClass)
-      this.#status.set('opened', true)
+      this.#status.setKey('opened', true)
 
       if (this.#dispatchResize.current) {
         dispatchEvent(window, 'resize', { custom: true })
@@ -349,7 +349,7 @@ export class PopoverElement extends HTMLElement {
 
       this.#openTransitionTimeoutId = setTimeout(
         () => {
-          this.#status.set('transitionend', true)
+          this.#status.setKey('transitionend', true)
           dispatchEvent(this, 'popoverTransitionend')
         },
         getElementTransitionDurationMS(this) + 10,
@@ -389,9 +389,9 @@ export class PopoverElement extends HTMLElement {
     }
 
     this.#startClosingTimeoutId = setTimeout(() => {
-      this.#status.set('transitionend', false)
-      this.#status.set('opened', false)
-      this.#status.set('closing', true)
+      this.#status.setKey('transitionend', false)
+      this.#status.setKey('opened', false)
+      this.#status.setKey('closing', true)
 
       this.#toggleGlobalClass(false, this.openClass)
       this.#toggleGlobalClass(true, this.closingClass)
@@ -403,9 +403,9 @@ export class PopoverElement extends HTMLElement {
 
       this.#closeTimeoutId = setTimeout(
         () => {
-          this.#status.set('triggered', false)
-          this.#status.set('beforeopen', false)
-          this.#status.set('closing', false)
+          this.#status.setKey('triggered', false)
+          this.#status.setKey('beforeopen', false)
+          this.#status.setKey('closing', false)
           this.#toggleGlobalClass(false, this.closingClass)
 
           dispatchEvent(this, 'popoverClosed', {

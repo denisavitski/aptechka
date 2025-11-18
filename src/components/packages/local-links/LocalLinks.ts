@@ -1,10 +1,10 @@
+import { ScrollNavigatorOptions } from '@packages/scroll-kit/ScrollNavigator'
 import { historyManager } from '@packages/shared/historyManager'
 import {
   ElementOrSelector,
   isLocalUrl,
   NODE_TYPE_ELEMENT,
   normalizeURL,
-  ScrollToElementOptions,
 } from '@packages/utils'
 
 export interface LocalLinksOptions {
@@ -22,7 +22,7 @@ export interface LocalLinksLinkOptions {
   revalidate?: boolean
   scrollValue?: ElementOrSelector<HTMLElement> | number
   scrollOptions?: Pick<
-    ScrollToElementOptions,
+    ScrollNavigatorOptions,
     'behavior' | 'center' | 'duration' | 'easing' | 'offset' | 'startValue'
   >
 }

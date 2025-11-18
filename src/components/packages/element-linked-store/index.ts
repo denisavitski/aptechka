@@ -3,7 +3,7 @@ import { Store } from '@packages/store'
 export type ElementLinkedStoreValueType = boolean | string | number
 
 export class ElementLinkedStore<
-  T extends { [key in string]: ElementLinkedStoreValueType }
+  T extends { [key in string]: ElementLinkedStoreValueType },
 > extends Store<T> {
   #elements: Array<HTMLElement>
 
@@ -13,7 +13,7 @@ export class ElementLinkedStore<
     this.#elements = Array.isArray(element) ? element : [element]
 
     for (const key in this.initial) {
-      this.set(key as Extract<keyof T, 'string'>, this.initial[key]!)
+      this.setKey(key as Extract<keyof T, 'string'>, this.initial[key]!)
     }
   }
 
@@ -49,11 +49,14 @@ export class ElementLinkedStore<
     super.reset()
 
     for (const key in this.initial) {
-      this.set(key as Extract<keyof T, 'string'>, this.initial[key as keyof T]!)
+      this.setKey(
+        key as Extract<keyof T, 'string'>,
+        this.initial[key as keyof T]!,
+      )
     }
   }
 
-  public set(key: keyof T, value: ElementLinkedStoreValueType) {
+  public setKey(key: keyof T, value: ElementLinkedStoreValueType) {
     const k = key as string
 
     this.current = { ...this.current, [key]: value }
@@ -61,7 +64,7 @@ export class ElementLinkedStore<
     if (k.startsWith('--')) {
       if (value) {
         this.#elements.forEach((el) =>
-          el.style.setProperty(k, value.toString())
+          el.style.setProperty(k, value.toString()),
         )
       } else {
         this.#elements.forEach((el) => el.style.removeProperty(k))

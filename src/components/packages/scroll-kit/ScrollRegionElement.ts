@@ -203,7 +203,7 @@ export class ScrollRegionElement extends HTMLElement {
       }
     }
 
-    this.#status.set('activated', scrollValue >= this.#start)
+    this.#status.setKey('activated', scrollValue >= this.#start)
 
     if (
       this.#visible &&
@@ -262,7 +262,7 @@ export class ScrollRegionElement extends HTMLElement {
     windowResizer.subscribe(this.#resizeListener)
     this.#tickListener()
 
-    this.#status.set('enabled', true)
+    this.#status.setKey('enabled', true)
   }
 
   public disable(resetStatus = true) {
@@ -410,10 +410,10 @@ export class ScrollRegionElement extends HTMLElement {
   #enter() {
     const scrollValue = this.scrollValue
 
-    this.#status.set('entered', true)
+    this.#status.setKey('entered', true)
 
     if (scrollValue === 0) {
-      this.#status.set('enteredOnLoad', true)
+      this.#status.setKey('enteredOnLoad', true)
     }
 
     this.#addGlobalClasses()
@@ -422,7 +422,7 @@ export class ScrollRegionElement extends HTMLElement {
   }
 
   #exit() {
-    this.#status.set('entered', false)
+    this.#status.setKey('entered', false)
 
     this.#removeGlobalClasses()
 

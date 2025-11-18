@@ -6,6 +6,7 @@ import {
 } from '@packages/local-links'
 import { PageAnnouncerElement } from '@packages/page-announcer'
 import { PageScroll } from '@packages/page-scroll'
+import { ScrollNavigator } from '@packages/scroll-kit/ScrollNavigator'
 import { historyManager } from '@packages/shared/historyManager'
 import {
   dispatchEvent,
@@ -13,7 +14,6 @@ import {
   normalizeBase,
   normalizeRelativeURLs,
   normalizeURL,
-  scrollToElement,
 } from '@packages/utils'
 
 export type SPAURLModifier = (url: URL) => URL
@@ -185,7 +185,7 @@ export class SPA {
       this.#announcerElement.done()
 
       if (!options?.keepScrollPosition) {
-        scrollToElement(options?.scrollValue || 0, {
+        ScrollNavigator.scrollToElement(options?.scrollValue || 0, {
           scrollElement: this.#scroll.element,
           behavior: 'instant',
           ...options?.scrollOptions,

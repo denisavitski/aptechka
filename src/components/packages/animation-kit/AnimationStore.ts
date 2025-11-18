@@ -15,6 +15,7 @@ export abstract class AnimationStore extends Store<number> {
   #isAnimationSet = false
   #min = -Infinity
   #max = Infinity
+  #direction = 1
 
   constructor(initialValue = 0) {
     super(initialValue)
@@ -28,6 +29,18 @@ export abstract class AnimationStore extends Store<number> {
 
   public get target() {
     return this.#target
+  }
+
+  public get direction() {
+    return this.#direction
+  }
+
+  public get min() {
+    return this.#min
+  }
+
+  public get max() {
+    return this.#max
   }
 
   public override close() {
@@ -46,8 +59,17 @@ export abstract class AnimationStore extends Store<number> {
       } else {
         this.#target = clamp(value, this.#min, this.#max)
       }
+
+      this.#direction = Math.sign(
+        this.#target - (this.previous || this.initial),
+      )
+
       this.startAnimation()
     }
+  }
+
+  public setWithoutAnimation(value: number) {
+    super.current = this.#target = clamp(value, this.#min, this.#max)
   }
 
   public setEdges(min = -Infinity, max = Infinity) {
@@ -80,12 +102,12 @@ export abstract class AnimationStore extends Store<number> {
 
   public stopAnimation() {
     if (this.#active) {
+      ticker.unsubscribe(this.#tickListener)
+
       this.#active = false
       super.current = this.target
 
       this.onAnimationStop?.()
-
-      ticker.unsubscribe(this.#tickListener)
     }
   }
 

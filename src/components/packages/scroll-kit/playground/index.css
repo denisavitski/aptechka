@@ -3,6 +3,19 @@ body {
   overflow: hidden;
 }
 
+.nav {
+  position: fixed;
+  top: 5vh;
+  left: 50vw;
+
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav__link {
+}
+
 .scroll {
   width: 100%;
   height: 100%;
@@ -16,7 +29,7 @@ body {
 
 .scroll__section {
   flex-shrink: 0;
-  height: 100vh;
+  height: 80vh;
   background-color: lightblue;
 
   display: flex;

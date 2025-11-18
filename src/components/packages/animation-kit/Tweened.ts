@@ -2,9 +2,9 @@ import { TweenEasingName } from '@packages/animation/Tweened'
 import { TickerCallbackEntry } from '@packages/ticker'
 import {
   clamp,
+  easeInOutCubic,
   EasingFunction,
   easings,
-  linear,
   nullishCoalescing,
   preciseNumber,
 } from '@packages/utils'
@@ -17,7 +17,7 @@ export interface TweenedOptions {
 }
 
 export class Tweened extends AnimationStore {
-  #easing: EasingFunction = linear
+  #easing: EasingFunction = easeInOutCubic
   #duration = 1000
 
   constructor(options?: TweenedOptions) {
