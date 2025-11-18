@@ -25,6 +25,7 @@ body {
   gap: 10vh;
 
   overflow: hidden auto;
+  /* scroll-behavior: smooth; */
 }
 
 .scroll__section {
@@ -44,4 +45,21 @@ body {
   height: 20vmin;
 
   background-color: tomato;
+}
+
+.slider {
+  display: flex;
+  gap: 2rem;
+  overflow: auto hidden;
+
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+}
+
+.slider__item {
+  flex-shrink: 0;
+  width: 20vmin;
+  height: 20vmin;
+  background-color: tomato;
+  scroll-snap-align: start;
 }

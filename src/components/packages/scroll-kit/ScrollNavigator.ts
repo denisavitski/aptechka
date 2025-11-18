@@ -77,9 +77,16 @@ export abstract class ScrollNavigator {
     ) {
       this.#currentScrollContainer = scrollContainerElement
 
+      const initial =
+        startValue ??
+        (scrollContainerElement instanceof HTMLElement
+          ? scrollContainerElement.scrollTop
+          : window.scrollY)
+
       const offsetValue = this.#resolveOffset(offset)
       const top = this.#computeFinalTop(
         elementPosition,
+        initial,
         offsetValue,
         center,
         centerElement,
@@ -94,8 +101,7 @@ export abstract class ScrollNavigator {
           top,
           duration,
           easing,
-          startValue,
-          scrollContainerElement,
+          initial,
           scrollCallback,
           performScroll,
         )
@@ -119,6 +125,7 @@ export abstract class ScrollNavigator {
 
   static #computeFinalTop(
     elementPosition: number,
+    initial: number,
     offsetValue: number,
     center: boolean,
     centerElement: Element | Window,
@@ -138,7 +145,7 @@ export abstract class ScrollNavigator {
         ? scrollContainerElement.scrollHeight - viewport.height
         : document.documentElement.scrollHeight - viewport.height
 
-    return clamp(maxScroll, 0, top)
+    return clamp(top, 0, maxScroll)
   }
 
   static #performScroll(
@@ -167,19 +174,14 @@ export abstract class ScrollNavigator {
     top: number,
     duration: number,
     easing: TweenedOptions['easing'],
-    startValue: number | undefined,
-    container: HTMLElement | Window,
+    initial: number,
     scrollCallback: ((value: number) => void) | undefined,
     performScroll: (value: number) => void,
   ) {
     if (this.#tweened) this.#tweened.close()
 
-    const initial =
-      startValue ??
-      (container instanceof HTMLElement ? container.scrollTop : window.scrollY)
-
     this.#tweened = new Tweened({
-      initial,
+      initial: initial,
       duration: Math.min(duration, duration * (Math.abs(initial - top) / 3000)),
       easing,
     })

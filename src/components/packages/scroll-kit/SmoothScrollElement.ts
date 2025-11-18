@@ -97,11 +97,12 @@ export class SmoothScrollElement extends HTMLElement {
       ...options,
       scrollElement: this.#scrollElement,
       startValue: this.#damped.current,
-      scrollCallback: (top) =>
+      scrollCallback: (top) => {
         this.scrollToValue(
           top,
           options?.duration ? 'instant' : options?.behavior,
-        ),
+        )
+      },
     })
   }
 
@@ -124,6 +125,8 @@ export class SmoothScrollElement extends HTMLElement {
         'scrolling',
         rounded !== this.#rounded,
       )
+
+      console.log(rounded)
 
       this.#rounded = rounded
     })
@@ -179,10 +182,7 @@ export class SmoothScrollElement extends HTMLElement {
       'keydown',
       this.#keydownListener as any,
     )
-    this.#pointerElement.addEventListener(
-      'pointerdown',
-      this.#pointerdownListener,
-    )
+    this.#pointerElement.addEventListener('click', this.#pointerdownListener)
     this.#scrollElement.addEventListener('wheel', this.#wheelListener as any, {
       passive: false,
     })
@@ -195,10 +195,7 @@ export class SmoothScrollElement extends HTMLElement {
       'keydown',
       this.#keydownListener as any,
     )
-    this.#pointerElement.removeEventListener(
-      'pointerdown',
-      this.#pointerdownListener,
-    )
+    this.#pointerElement.removeEventListener('click', this.#pointerdownListener)
     this.#scrollElement.removeEventListener('wheel', this.#wheelListener as any)
     this.#scrollElement.removeEventListener('scroll', this.#scrollListener)
   }
@@ -260,11 +257,13 @@ export class SmoothScrollElement extends HTMLElement {
       !anchor.hasAttribute('data-smooth-scroll-skip') &&
       this.contains(anchor)
     ) {
-      this.stop()
       const url = new URL(anchor.href)
 
       if (url.hash) {
         e.preventDefault()
+
+        this.stop()
+
         this.scrollToElement(url.hash, {
           behavior:
             (anchor.getAttribute('data-scroll-behavior') as any) || 'smooth',

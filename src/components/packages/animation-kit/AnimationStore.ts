@@ -64,12 +64,17 @@ export abstract class AnimationStore extends Store<number> {
         this.#target - (this.previous || this.initial),
       )
 
-      this.startAnimation()
+      if (!this.#isAnimationSet) {
+        this.startAnimation()
+      }
     }
   }
 
   public setWithoutAnimation(value: number) {
-    super.current = this.#target = clamp(value, this.#min, this.#max)
+    this.#isAnimationSet = true
+    this.current = clamp(value, this.#min, this.#max)
+    this.#target = this.current
+    this.#isAnimationSet = false
   }
 
   public setEdges(min = -Infinity, max = Infinity) {
