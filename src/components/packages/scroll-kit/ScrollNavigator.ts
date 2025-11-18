@@ -3,6 +3,7 @@ import { viewport } from '@packages/device'
 import { TICK_ORDER } from '@packages/order'
 import type { SmoothScrollElement } from '@packages/scroll-kit'
 import {
+  clamp,
   findScrollParentElement,
   getCumulativeOffsetTop,
   getElement,
@@ -137,7 +138,7 @@ export abstract class ScrollNavigator {
         ? scrollContainerElement.scrollHeight - viewport.height
         : document.documentElement.scrollHeight - viewport.height
 
-    return Math.min(maxScroll, top)
+    return clamp(maxScroll, 0, top)
   }
 
   static #performScroll(
