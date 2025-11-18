@@ -111,7 +111,7 @@ export abstract class Animation<
       : 0
   }
 
-  public set(value: number, options?: Options) {
+  public override set(value: number, options?: Options) {
     if (this.#target !== value || options?.restart) {
       this.#tmpSetValue = value
 

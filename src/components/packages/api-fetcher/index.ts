@@ -15,7 +15,7 @@ export interface IAPIResponseJSON<T = null> {
   error: string | null
   time: number
   cached?: boolean
-  headers: Headers
+  response: Response
 }
 
 export const apiFetcherCache = new Cache()
@@ -40,7 +40,7 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
     data: null,
     error: null,
     status: 'unknown',
-    headers: new Headers(),
+    response: new Response(),
   }
 
   try {
@@ -93,7 +93,7 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
             error: errorText,
             status: 'error',
             time: Date.now() - startTime,
-            headers: response.headers,
+            response: response,
           }
         }
 
@@ -104,7 +104,7 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
             error: 'Endpoint did not return JSON',
             status: 'error',
             time: Date.now() - startTime,
-            headers: response.headers,
+            response: response,
           }
         }
 
@@ -119,7 +119,7 @@ export async function apiFetcher<Params extends object = {}, Result = any>(
           data: jsonData,
           status: 'success',
           time: Date.now() - startTime,
-          headers: response.headers,
+          response: response,
         }
       } finally {
         // Удаляем запрос из pending после завершения (успешного или с ошибкой)

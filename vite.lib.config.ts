@@ -27,6 +27,8 @@ export function libConfig() {
         entry: {
           'accordion/index': './src/components/packages/accordion/index.ts',
           'animation/index': './src/components/packages/animation/index.ts',
+          'animation-kit/index':
+            './src/components/packages/animation-kit/index.ts',
           'api-fetcher/index': './src/components/packages/api-fetcher/index.ts',
           'attribute/index': './src/components/packages/attribute/index.ts',
           'billboard/index': './src/components/packages/billboard/index.ts',

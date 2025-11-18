@@ -28,6 +28,11 @@
       "require": "./lib/animation/index.cjs",
       "default": "./lib/animation/index.js"
     },
+    "./animation-kit": {
+      "types": "./lib/animation-kit/index.d.ts",
+      "require": "./lib/animation-kit/index.cjs",
+      "default": "./lib/animation-kit/index.js"
+    },
     "./api-fetcher": {
       "types": "./lib/api-fetcher/index.d.ts",
       "require": "./lib/api-fetcher/index.cjs",
@@ -316,6 +321,9 @@
       ],
       "animation": [
         "lib/animation/index.d.ts"
+      ],
+      "animation-kit": [
+        "lib/animation-kit/index.d.ts"
       ],
       "api-fetcher": [
         "lib/api-fetcher/index.d.ts"

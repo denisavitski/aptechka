@@ -112,28 +112,8 @@ export class Store<StoreType = unknown> {
     }
   }
 
-  public setCurrent(value: StoreType) {
+  public set(value: StoreType) {
     this.current = value
-  }
-
-  public update(callback: (value: StoreType) => StoreType) {
-    this.current = callback(this.current)
-  }
-
-  public add<
-    T extends StoreType extends Array<any> ? StoreType[number] : StoreType,
-  >(value: T) {
-    if (Array.isArray(this.current)) {
-      ;(this.current as any) = [...this.current, value]
-    }
-  }
-
-  public filter<
-    T extends StoreType extends Array<any> ? StoreType[number] : StoreType,
-  >(callback: (value: T) => void) {
-    if (Array.isArray(this.current)) {
-      ;(this.current as any) = this.current.filter(callback)
-    }
   }
 
   public get subscribers() {
@@ -200,6 +180,10 @@ export class Store<StoreType = unknown> {
     this.#state.current = this.#state.initial
 
     unshareStore(this)
+  }
+
+  protected _handleSet(value: StoreType) {
+    this.#state.current = value
   }
 }
 
