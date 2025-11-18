@@ -1,3 +1,4 @@
+import { TICK_ORDER } from '@packages/order'
 import { Store } from '@packages/store'
 import {
   ticker,
@@ -70,7 +71,10 @@ export abstract class AnimationStore extends Store<number> {
 
       this.onAnimationStart?.()
 
-      ticker.subscribe(this.#tickListener, this.#tickerOptions)
+      ticker.subscribe(this.#tickListener, {
+        order: TICK_ORDER.ANIMATION,
+        ...this.#tickerOptions,
+      })
     }
   }
 
