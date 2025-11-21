@@ -246,7 +246,7 @@ export class SmoothScrollElement extends HTMLElement {
     this.shiftPosition(e.deltaY)
   }
 
-  #pointerdownListener = (e: PointerEvent) => {
+  #pointerdownListener = (e: MouseEvent) => {
     if (!(e.target instanceof Element)) return
 
     const anchor = e.target.closest('a')
