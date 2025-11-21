@@ -126,8 +126,6 @@ export class SmoothScrollElement extends HTMLElement {
         rounded !== this.#rounded,
       )
 
-      console.log(rounded)
-
       this.#rounded = rounded
     })
 
