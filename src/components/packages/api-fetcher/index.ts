@@ -30,7 +30,7 @@ export function apiFetcherGetPendingRequestsCount() {
   return pendingRequests.size
 }
 
-export async function apiFetcher<Params extends object = {}, Result = any>(
+export async function apiFetcher<Result = any, Params extends object = {}>(
   input: string,
   options?: IAPIFetcherOptions<Params>,
 ): Promise<IAPIResponseJSON<Result>> {
