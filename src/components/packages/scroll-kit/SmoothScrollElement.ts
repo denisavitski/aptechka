@@ -3,6 +3,7 @@ import { CSSProperty } from '@packages/css-property'
 import { device, viewport } from '@packages/device'
 import { TICK_ORDER } from '@packages/order'
 import { scrollEntries } from '@packages/scroll-entries'
+import { ticker } from '@packages/ticker'
 import { ElementOrSelector, getElement } from '@packages/utils'
 import { ScrollNavigator, ScrollNavigatorOptions } from './ScrollNavigator'
 
@@ -54,7 +55,7 @@ export class SmoothScrollElement extends HTMLElement {
     if (
       device.isMobile ||
       this.#needSync ||
-      Math.abs(cv - this.#damped.current) > 100
+      Math.abs(cv - this.#damped.current) >= 5
     ) {
       this.#needSync = false
       this.#damped.setWithoutAnimation(cv)
@@ -121,11 +122,6 @@ export class SmoothScrollElement extends HTMLElement {
         this.#setNativeScroll(rounded)
       }
 
-      document.documentElement.classList.toggle(
-        'scrolling',
-        rounded !== this.#rounded,
-      )
-
       this.#rounded = rounded
     })
 
@@ -138,10 +134,14 @@ export class SmoothScrollElement extends HTMLElement {
 
     scrollEntries.register(this)
 
+    ticker.subscribe(this.#tickListener, { culling: this })
+
     this.resize()
   }
 
   public disconnectedCallback() {
+    ticker.unsubscribe(this.#tickListener)
+
     this.#damped.close()
     this.#cssDamping.close()
     this.#cssDisabled.close()
@@ -289,6 +289,13 @@ export class SmoothScrollElement extends HTMLElement {
 
   #scrollListener = () => {
     this.trySync()
+  }
+
+  #tickListener = () => {
+    const current = Math.round(this.#damped.current)
+    const target = Math.round(this.#damped.target)
+
+    document.documentElement.classList.toggle('scrolling', current !== target)
   }
 }
 
