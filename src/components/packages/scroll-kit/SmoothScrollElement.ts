@@ -230,6 +230,8 @@ export class SmoothScrollElement extends HTMLElement {
   #wheelListener = (e: WheelEvent) => {
     if (this.#checkDisabled() || device.isMobile) return
 
+    this.trySync()
+
     if (!this.#inOverflowDirection(e)) {
       e.stopPropagation()
     }
@@ -288,7 +290,9 @@ export class SmoothScrollElement extends HTMLElement {
   }
 
   #scrollListener = () => {
-    this.trySync()
+    if (device.isMobile) {
+      this.trySync()
+    }
   }
 
   #tickListener = () => {
