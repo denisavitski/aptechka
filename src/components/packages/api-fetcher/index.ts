@@ -12,7 +12,7 @@ export interface IAPIFetcherOptions<Params extends object = {}> {
 export interface IAPIResponseJSON<T = null> {
   status: 'success' | 'unknown' | 'error'
   data: T | null
-  error: string | null
+  errors: Array<string>
   time: number
   cached?: boolean
   response: Response
@@ -38,7 +38,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
 
   const baseResult: Omit<IAPIResponseJSON<Result>, 'time'> = {
     data: null,
-    error: null,
+    errors: [],
     status: 'unknown',
     response: new Response(),
   }
@@ -90,7 +90,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
           const errorText = await response.text()
           return {
             ...baseResult,
-            error: errorText,
+            errors: [errorText],
             status: 'error',
             time: Date.now() - startTime,
             response: response,
@@ -101,7 +101,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
         if (!contentType?.includes('application/json')) {
           return {
             ...baseResult,
-            error: 'Endpoint did not return JSON',
+            errors: ['Endpoint did not return JSON'],
             status: 'error',
             time: Date.now() - startTime,
             response: response,
@@ -116,7 +116,12 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
 
         return {
           ...baseResult,
-          data: jsonData,
+          errors: jsonData.error
+            ? [jsonData.error]
+            : jsonData.errors
+              ? jsonData.errors
+              : baseResult.errors,
+          data: jsonData.data || jsonData,
           status: 'success',
           time: Date.now() - startTime,
           response: response,
@@ -135,7 +140,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
 
     return {
       ...baseResult,
-      error: errorMessage,
+      errors: [errorMessage],
       status: 'error',
       time: Date.now() - startTime,
     }
