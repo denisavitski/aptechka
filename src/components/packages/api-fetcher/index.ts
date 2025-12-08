@@ -62,13 +62,18 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
       pendingRequests.delete(cacheKey)
     }
 
-    // Проверяем кеш данных
     if (cacheAllowed) {
-      const cached = apiFetcherCache.get(cacheKey) as Result
+      const cached = apiFetcherCache.get(cacheKey) as any
+
       if (cached) {
         return {
           ...baseResult,
-          data: cached,
+          errors: cached.error
+            ? [cached.error]
+            : cached.errors
+              ? cached.errors
+              : baseResult.errors,
+          data: cached.data || cached,
           cached: true,
           status: 'success',
           time: Date.now() - startTime,
@@ -127,7 +132,6 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
           response: response,
         }
       } finally {
-        // Удаляем запрос из pending после завершения (успешного или с ошибкой)
         pendingRequests.delete(cacheKey)
       }
     })()
