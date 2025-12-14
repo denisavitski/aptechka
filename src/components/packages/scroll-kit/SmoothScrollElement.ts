@@ -224,7 +224,7 @@ export class SmoothScrollElement extends HTMLElement {
     const attr = el.getAttribute('data-prevent-smooth-scroll')
     if (!attr) return true
 
-    return !matchMedia(attr).matches
+    return matchMedia(attr).matches
   }
 
   #wheelListener = (e: WheelEvent) => {
