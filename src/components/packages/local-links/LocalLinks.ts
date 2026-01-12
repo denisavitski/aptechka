@@ -85,7 +85,10 @@ export class LocalLinks {
       return
     }
 
-    if (anchorElement.closest('[data-router-ignore]')) {
+    if (
+      anchorElement.closest('[data-router-ignore]') ||
+      anchorElement.getAttribute('href')?.startsWith('http')
+    ) {
       return
     }
 
