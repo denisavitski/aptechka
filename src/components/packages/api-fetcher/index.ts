@@ -30,6 +30,33 @@ export function apiFetcherGetPendingRequestsCount() {
   return pendingRequests.size
 }
 
+function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
+  if (!headers) return {}
+
+  if (headers instanceof Headers) {
+    return Object.fromEntries(
+      Array.from(headers.entries()).sort(([a], [b]) => a.localeCompare(b)),
+    )
+  }
+
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(
+      [...headers].sort(([a], [b]) => a.localeCompare(b)),
+    )
+  }
+
+  return Object.fromEntries(
+    Object.entries(headers).sort(([a], [b]) => a.localeCompare(b)),
+  )
+}
+
+function buildCacheKey(baseKey: string, init?: RequestInit): string {
+  const method = (init?.method || 'GET').toUpperCase()
+  const headers = normalizeHeaders(init?.headers)
+
+  return `${baseKey}::${method}::${JSON.stringify(headers)}`
+}
+
 export async function apiFetcher<Result = any, Params extends object = {}>(
   input: string,
   options?: IAPIFetcherOptions<Params>,
@@ -45,6 +72,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
 
   try {
     let url = input
+
     if (options?.params) {
       const params = searchParamsObjectToString(options.params)
       if (params) {
@@ -53,7 +81,9 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
       }
     }
 
-    const cacheKey = options?.cacheKey ?? url
+    const baseCacheKey = options?.cacheKey ?? url
+    const cacheKey = buildCacheKey(baseCacheKey, options?.init)
+
     const cacheTTL = options?.cacheTTLMinutes ?? 0
     const cacheAllowed = cacheTTL > 0
 
@@ -82,7 +112,6 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
     }
 
     const pendingRequest = pendingRequests.get(cacheKey)
-
     if (pendingRequest) {
       return pendingRequest
     }
@@ -98,7 +127,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
             errors: [errorText],
             status: 'error',
             time: Date.now() - startTime,
-            response: response,
+            response,
           }
         }
 
@@ -109,7 +138,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
             errors: ['Endpoint did not return JSON'],
             status: 'error',
             time: Date.now() - startTime,
-            response: response,
+            response,
           }
         }
 
@@ -129,7 +158,7 @@ export async function apiFetcher<Result = any, Params extends object = {}>(
           data: jsonData.data || jsonData,
           status: 'success',
           time: Date.now() - startTime,
-          response: response,
+          response,
         }
       } finally {
         pendingRequests.delete(cacheKey)
