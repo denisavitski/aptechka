@@ -4,7 +4,28 @@ import { cssUnitParser } from '@packages/css-unit-parser'
 import { cssValueParser } from '@packages/css-value-parser'
 import { elementResizer } from '@packages/element-resizer'
 import { generateId } from '@packages/utils'
-import { getSvgPath, NotchParams } from './getSvgPath'
+import { getSvgPath, GetSvgPathParams, NotchParams } from './getSvgPath'
+
+export interface NotchedElementUpdateParameters {
+  cornerRadius: number
+  topLeftCornerRadius: number
+  topRightCornerRadius: number
+  bottomRightCornerRadius: number
+  bottomLeftCornerRadius: number
+  cornerAngleAlpha: number
+  topLeftCornerAngleAlpha: number
+  topRightCornerAngleAlpha: number
+  bottomRightCornerAngleAlpha: number
+  bottomLeftCornerAngleAlpha: number
+  cornerSmoothing: number
+  preserveSmoothing: number
+  topNotches: number
+  rightNotches: number
+  bottomNotches: number
+  leftNotches: number
+  width: number
+  height: number
+}
 
 export class NotchedElement extends HTMLElement {
   #imageElement: HTMLImageElement | null = null
@@ -32,6 +53,28 @@ export class NotchedElement extends HTMLElement {
     }
   }
 
+  public update(params: Omit<GetSvgPathParams, 'width' | 'height'>) {
+    const width = this.offsetWidth
+    const height = this.offsetHeight
+
+    const path = getSvgPath({
+      ...params,
+      width,
+      height,
+    })
+
+    if (this.#clipId) {
+      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${this.offsetWidth}' height='${this.offsetHeight}' viewBox='0 0 ${this.offsetWidth} ${this.offsetHeight}'%3E%3Cdefs%3E%3CclipPath id='${this.#clipId}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23${this.#clipId})' %3E%3Crect width='${this.offsetWidth}' height='${this.offsetHeight}' fill='%23000'/%3E%3C/g%3E%3C/svg%3E`
+      this.style.maskImage = `url("${svg}")`
+      this.style.maskPosition = `center center`
+      this.style.maskRepeat = `no-repeat`
+      this.style.maskSize = `contain`
+    } else if (this.#imageElement) {
+      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/svg%3E`
+      this.#imageElement.src = svg
+    }
+  }
+
   protected connectedCallback() {
     elementResizer.subscribe(this, this.#resizeListener)
   }
@@ -41,8 +84,9 @@ export class NotchedElement extends HTMLElement {
   }
 
   #resizeListener = () => {
-    const width = this.offsetWidth
-    const height = this.offsetHeight
+    if (this.hasAttribute('manual-update')) {
+      return
+    }
 
     const computed = getComputedStyle(this)
 
@@ -111,7 +155,7 @@ export class NotchedElement extends HTMLElement {
       computed.getPropertyValue('--notched-left-notches'),
     )
 
-    const path = getSvgPath({
+    this.update({
       cornerRadius,
       topLeftCornerRadius,
       topRightCornerRadius,
@@ -128,20 +172,7 @@ export class NotchedElement extends HTMLElement {
       rightNotches,
       bottomNotches,
       leftNotches,
-      width,
-      height,
     })
-
-    if (this.#clipId) {
-      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${this.offsetWidth}' height='${this.offsetHeight}' viewBox='0 0 ${this.offsetWidth} ${this.offsetHeight}'%3E%3Cdefs%3E%3CclipPath id='${this.#clipId}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/clipPath%3E%3C/defs%3E%3Cg clip-path='url(%23${this.#clipId})' %3E%3Crect width='${this.offsetWidth}' height='${this.offsetHeight}' fill='%23000'/%3E%3C/g%3E%3C/svg%3E`
-      this.style.maskImage = `url("${svg}")`
-      this.style.maskPosition = `center center`
-      this.style.maskRepeat = `no-repeat`
-      this.style.maskSize = `contain`
-    } else if (this.#imageElement) {
-      const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/svg%3E`
-      this.#imageElement.src = svg
-    }
   }
 
   #parseCSSNotchValue(value: string) {

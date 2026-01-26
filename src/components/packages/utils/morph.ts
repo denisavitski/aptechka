@@ -92,9 +92,7 @@ const same: SameComparators = {
 
 function hasPermanentParent(node: Node | null | undefined): boolean {
   if (!node) return false
-
   let current: Node | null = node
-
   while (current) {
     if (
       current.nodeType === NODE_TYPE_ELEMENT &&
@@ -107,7 +105,60 @@ function hasPermanentParent(node: Node | null | undefined): boolean {
   return false
 }
 
+function scriptAttributesChanged(from: Element, to: Element): boolean {
+  if (from.localName !== 'script' || to.localName !== 'script') {
+    return false
+  }
+
+  const importantAttrs = [
+    'src',
+    'type',
+    'async',
+    'defer',
+    'module',
+    'nomodule',
+    'integrity',
+    'crossorigin',
+  ]
+
+  for (const attr of importantAttrs) {
+    const fromValue = from.getAttribute(attr)
+    const toValue = to.getAttribute(attr)
+
+    if (fromValue !== toValue) {
+      return true
+    }
+  }
+
+  if (from.textContent !== to.textContent) {
+    return true
+  }
+
+  return false
+}
+
 function attributes(from: Element, to: Element): AttributePatch[] {
+  if (from.localName === 'script' && to.localName === 'script') {
+    const patches: AttributePatch[] = []
+
+    for (const attr of from.attributes) {
+      patches.push({
+        type: ACTION_REMOVE_ATTR,
+        name: attr.name,
+      })
+    }
+
+    for (const attr of to.attributes) {
+      patches.push({
+        type: ACTION_SET_ATTR,
+        name: attr.name,
+        value: attr.value,
+      })
+    }
+
+    return patches
+  }
+
   if (from.attributes.length === 0 && to.attributes.length === 0) {
     return []
   }
@@ -145,14 +196,11 @@ function attributes(from: Element, to: Element): AttributePatch[] {
 
 function serialize(el: Element, data = true): string {
   let key = `${el.localName}`
-
   for (const { name, value } of el.attributes) {
     if (data && name.startsWith('data-')) continue
     key += `[${name}=${value}]`
   }
-
   key += el.innerHTML
-
   return key
 }
 
@@ -196,14 +244,7 @@ function clone(node: Node): Node {
     node.nodeType === NODE_TYPE_ELEMENT &&
     (node as Element).localName === 'script'
   ) {
-    const script = document.createElement('script')
-
-    for (let { name, value } of (node as Element).attributes) {
-      script.setAttribute(name, value)
-    }
-
-    script.innerHTML = (node as Element).innerHTML
-
+    const script = node.cloneNode(true) as HTMLScriptElement
     return script
   }
 
@@ -227,7 +268,6 @@ function uniqueChildren(from: Element, to: Element): Patch[] {
   for (const child of to.children) {
     const key = getKey(child)
     const fromEl = remove.get(key)
-
     if (fromEl) {
       if (serialize(child, false) !== serialize(fromEl, false)) {
         update.set(key, clone(child) as Element)
@@ -235,25 +275,21 @@ function uniqueChildren(from: Element, to: Element): Patch[] {
     } else {
       add.set(key, clone(child) as Element)
     }
-
     remove.delete(key)
   }
 
   for (const node of from.childNodes) {
     if (node.nodeType === NODE_TYPE_ELEMENT) {
       const key = getKey(node as Element)
-
       if (hasPermanentParent(node)) {
         patches.push({ type: ACTION_PRESERVE })
         continue
       }
-
       if (remove.has(key)) {
         patches.push({ type: ACTION_REMOVE })
         continue
       } else if (update.has(key)) {
         const nodeTo = update.get(key)
-
         patches.push({
           type: ACTION_UPDATE,
           attributes: attributes(node as Element, nodeTo as Element),
@@ -309,7 +345,6 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
     if (from.nodeType === NODE_TYPE_TEXT) {
       const a = from.nodeValue
       const b = to.nodeValue
-
       if (a?.trim().length === 0 && b?.trim().length === 0) {
         return { type: ACTION_SKIP }
       }
@@ -317,6 +352,18 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
 
     if (from.nodeType === NODE_TYPE_ELEMENT) {
       if (same.name(from as Element, to as Element)) {
+        if (
+          (from as Element).localName === 'script' &&
+          (to as Element).localName === 'script'
+        ) {
+          if (scriptAttributesChanged(from as Element, to as Element)) {
+            return {
+              type: ACTION_REPLACE,
+              node: clone(to),
+            }
+          }
+        }
+
         const childFn =
           (from as Element).tagName === 'HEAD' ? uniqueChildren : children
 
@@ -326,11 +373,7 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
           children: childFn(from as Element, to as Element),
         }
       }
-
-      return {
-        type: ACTION_REPLACE,
-        node: clone(to),
-      }
+      return { type: ACTION_REPLACE, node: clone(to) }
     } else if (from.nodeType === NODE_TYPE_DOCUMENT) {
       return diff(
         (from as Document).documentElement,
@@ -340,18 +383,11 @@ export function diff(from: Node | undefined, to: Node | undefined): Patch {
       if (same.value(from, to)) {
         return { type: ACTION_SKIP }
       }
-
-      return {
-        type: ACTION_REPLACE,
-        value: to.nodeValue!,
-      }
+      return { type: ACTION_REPLACE, value: to.nodeValue! }
     }
   }
 
-  return {
-    type: ACTION_REPLACE,
-    node: clone(to),
-  }
+  return { type: ACTION_REPLACE, node: clone(to) }
 }
 
 function patchAttributes(el: Element, patches: AttributePatch[]): void {
@@ -359,7 +395,6 @@ function patchAttributes(el: Element, patches: AttributePatch[]): void {
 
   for (const { type, name, value } of patches) {
     if (type === ACTION_REMOVE_ATTR) {
-      // Для удаления атрибута проверяем текущее значение класса
       if (name === 'class') {
         const currentClasses = el.getAttribute('class')
         if (currentClasses?.includes('preserve-')) {
@@ -390,23 +425,6 @@ function patchAttributes(el: Element, patches: AttributePatch[]): void {
   }
 }
 
-function updateScripts(node: Node) {
-  if (node instanceof HTMLElement) {
-    if (node.hasAttribute('data-preserve')) {
-      return node
-    }
-
-    if (node.tagName === 'SCRIPT') {
-      node = clone(node)
-    } else {
-      node.querySelectorAll('script').forEach((script) => {
-        script.replaceWith(clone(script))
-      })
-    }
-  }
-  return node
-}
-
 export async function patch(
   parent: Node,
   PATCH: Patch,
@@ -430,7 +448,14 @@ export async function patch(
 
     case ACTION_CREATE: {
       let { node } = PATCH as CreatePatch
-      node = updateScripts(node)
+      if (node instanceof HTMLScriptElement) {
+        const newScript = document.createElement('script')
+        for (const { name, value } of node.attributes) {
+          newScript.setAttribute(name, value)
+        }
+        newScript.textContent = node.textContent
+        node = newScript
+      }
       parent.appendChild(node)
       return
     }
@@ -453,17 +478,30 @@ export async function patch(
         (el as Element).hasAttribute('data-preserve')
       )
         return
+
       let { node, value } = PATCH as ReplacePatch
       if (typeof value === 'string') {
         el.nodeValue = value
         return
       }
+
       if (node) {
-        node = updateScripts(node)
-        if (el instanceof Element && node instanceof Element) {
-          el.replaceWith(node)
-        } else if (el.parentNode) {
-          el.parentNode.replaceChild(node, el)
+        if (node instanceof HTMLScriptElement) {
+          const newScript = document.createElement('script')
+          for (const { name, value } of node.attributes) {
+            newScript.setAttribute(name, value)
+          }
+          newScript.textContent = node.textContent
+
+          if (el.parentNode) {
+            el.parentNode.replaceChild(newScript, el)
+          }
+        } else {
+          if (el instanceof Element && node instanceof Element) {
+            el.replaceWith(node)
+          } else if (el.parentNode) {
+            el.parentNode.replaceChild(node, el)
+          }
         }
       }
       return
@@ -472,7 +510,9 @@ export async function patch(
     case ACTION_UPDATE: {
       if (!el || el.nodeType !== NODE_TYPE_ELEMENT) return
       const { attributes, children } = PATCH as UpdatePatch
+
       patchAttributes(el as Element, attributes)
+
       const elements = Array.from(el.childNodes)
       await Promise.all(
         children.map((child, index) => patch(el!, child, elements[index])),
@@ -484,6 +524,7 @@ export async function patch(
       return
   }
 }
+
 export async function morph(from: Node, to: Node): Promise<void> {
   const patches = diff(from, to)
   await patch(document, patches)

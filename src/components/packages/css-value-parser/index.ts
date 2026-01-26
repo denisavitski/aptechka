@@ -47,6 +47,13 @@ class CSSValueParser {
       } else if (unit === 'ohmh') {
         return ((element?.offsetHeight || 0) - viewport.height) * (num / 100)
       } else if (unit === 'owmw') {
+        return ((element?.offsetWidth || 0) + viewport.width) * (num / 100)
+      } else if (unit === 'ohph') {
+        console.log(
+          ((element?.offsetHeight || 0) + viewport.height) * (num / 100),
+        )
+        return ((element?.offsetHeight || 0) + viewport.height) * (num / 100)
+      } else if (unit === 'owpw') {
         return ((element?.offsetWidth || 0) - viewport.width) * (num / 100)
       } else if (unit && CSSValueParser.CSS_UNITS.has(unit as any)) {
         return cssUnitParser.parse(value, element)
