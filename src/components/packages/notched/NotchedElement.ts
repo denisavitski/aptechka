@@ -6,45 +6,70 @@ import { elementResizer } from '@packages/element-resizer'
 import { generateId } from '@packages/utils'
 import { getSvgPath, GetSvgPathParams, NotchParams } from './getSvgPath'
 
-export interface NotchedElementUpdateParameters {
-  cornerRadius: number
-  topLeftCornerRadius: number
-  topRightCornerRadius: number
-  bottomRightCornerRadius: number
-  bottomLeftCornerRadius: number
-  cornerAngleAlpha: number
-  topLeftCornerAngleAlpha: number
-  topRightCornerAngleAlpha: number
-  bottomRightCornerAngleAlpha: number
-  bottomLeftCornerAngleAlpha: number
-  cornerSmoothing: number
-  preserveSmoothing: number
-  topNotches: number
-  rightNotches: number
-  bottomNotches: number
-  leftNotches: number
-  width: number
-  height: number
-}
-
 export class NotchedElement extends HTMLElement {
   #imageElement: HTMLImageElement | null = null
+  #svgElement: SVGElement | null = null
   #clipId: string | null = null
+  #clipPathId: string | null = null
 
   constructor() {
     super()
 
     const clip = this.hasAttribute('clip')
+    const svgInside = this.hasAttribute('svg-inside')
 
     this.#clipId = clip ? 'clip-' + generateId(10) : null
 
-    if (!this.#clipId) {
+    if (svgInside) {
+      this.#clipPathId = 'clip-path-' + generateId(10)
+
+      this.#svgElement = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'svg',
+      )
+      this.#svgElement.setAttribute('width', '0')
+      this.#svgElement.setAttribute('height', '0')
+      this.#svgElement.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        pointer-events: none;
+      `
+
+      // Создаем defs с clipPath
+      const defs = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'defs',
+      )
+      const clipPath = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'clipPath',
+      )
+      clipPath.setAttribute('id', this.#clipPathId)
+
+      const path = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'path',
+      )
+      path.setAttribute('d', '')
+
+      clipPath.appendChild(path)
+      defs.appendChild(clipPath)
+      this.#svgElement.appendChild(defs)
+
+      this.prepend(this.#svgElement)
+
+      this.style.clipPath = `url(#${this.#clipPathId})`
+    } else if (!this.#clipId) {
       this.#imageElement = document.createElement('img')
       this.#imageElement.style.cssText = `
         position: absolute;
         top: 0;
         left: 0;
-        zIndex: -1;
+        z-index: -1;
         display: block;
         width: 100%;
         height: 100%;
@@ -69,6 +94,16 @@ export class NotchedElement extends HTMLElement {
       this.style.maskPosition = `center center`
       this.style.maskRepeat = `no-repeat`
       this.style.maskSize = `contain`
+    } else if (this.#svgElement && this.#clipPathId) {
+      const clipPath = this.#svgElement.querySelector(
+        `[id="${this.#clipPathId}"]`,
+      )
+      if (clipPath) {
+        const pathElement = clipPath.querySelector('path')
+        if (pathElement) {
+          pathElement.setAttribute('d', path)
+        }
+      }
     } else if (this.#imageElement) {
       const svg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}'%3E%3Cpath fill='%23000' d='${path}'/%3E%3C/svg%3E`
       this.#imageElement.src = svg
