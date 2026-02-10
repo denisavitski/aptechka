@@ -261,7 +261,13 @@ export function addParamsToURL<T extends Record<string, any>>(
 
   Object.entries(options).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
-      searchParams.set(key, value.toString())
+      if (Array.isArray(value)) {
+        value.forEach((v) => {
+          searchParams.append(key, v.toString())
+        })
+      } else {
+        searchParams.set(key, value.toString())
+      }
     }
   })
 
