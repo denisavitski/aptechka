@@ -16,10 +16,12 @@ export class SizeElement extends HTMLElement {
     }
 
     elementResizer.subscribe(this, this.#resizeListener)
+    document.addEventListener('spaAfterUpdate', this.#resizeListener)
   }
 
   protected disconnectedCallback() {
     elementResizer.unsubscribe(this.#resizeListener)
+    document.removeEventListener('spaAfterUpdate', this.#resizeListener)
   }
 
   #setVar(varName: string, value?: string) {

@@ -84,7 +84,7 @@ export class BillboardItem {
       'previous-sibling',
       'next-sibling',
       'current-active',
-      'previous-active'
+      'previous-active',
     )
   }
 
@@ -180,7 +180,7 @@ export class BillboardElement extends HTMLElement {
   protected connectedCallback() {
     const itemElements = [
       ...this.querySelectorAll<HTMLElement>(
-        `[data-billboard-item${this.id ? `="${this.id}"` : ''}]`
+        `[data-billboard-item${this.id ? `="${this.id}"` : ''}]`,
       ),
     ]
 
@@ -322,14 +322,14 @@ export class BillboardElement extends HTMLElement {
       this.#timeouts.push(
         setTimeout(() => {
           window.dispatchEvent(new Event('resize'))
-        }, 0)
+        }, 0),
       )
     }
 
     this.#timeouts.push(
       setTimeout(() => {
         this.classList.remove('next-round', 'prev-round')
-      }, 10)
+      }, 10),
     )
   }
 
@@ -363,7 +363,7 @@ export class BillboardElement extends HTMLElement {
         if (dir) {
           this.shift(dir)
         }
-      }
+      },
     )
   }
 }
