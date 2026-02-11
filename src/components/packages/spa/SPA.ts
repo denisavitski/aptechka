@@ -28,7 +28,7 @@ export interface SPAOptions
 }
 
 export interface SPANavigateOptions extends LocalLinksLinkOptions {
-  noFetching?: boolean
+  pushStateNoFetch?: boolean
 }
 
 export interface SPAEvents {
@@ -112,7 +112,7 @@ export class SPA {
       fullUrl = this.#options.urlModifier(fullUrl)
     }
 
-    if (options?.noFetching) {
+    if (options?.pushStateNoFetch) {
       historyManager.updateCurrentStateData({
         scrollTop: this.#scroll.y,
       })
