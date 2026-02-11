@@ -27,7 +27,9 @@ export interface SPAOptions
   urlModifier?: SPAURLModifier
 }
 
-export interface SPANavigateOptions extends LocalLinksLinkOptions {}
+export interface SPANavigateOptions extends LocalLinksLinkOptions {
+  noFetching?: boolean
+}
 
 export interface SPAEvents {
   spaBeforeFetch: CustomEvent
@@ -108,6 +110,16 @@ export class SPA {
 
     if (this.#options.urlModifier) {
       fullUrl = this.#options.urlModifier(fullUrl)
+    }
+
+    if (options?.noFetching) {
+      historyManager.updateCurrentStateData({
+        scrollTop: this.#scroll.y,
+      })
+
+      historyManager.pushState(fullUrl)
+
+      return
     }
 
     dispatchEvent(document, 'spaBeforeFetch', {
