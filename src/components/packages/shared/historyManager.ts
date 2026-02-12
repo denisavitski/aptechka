@@ -19,7 +19,7 @@ export interface HistoryManagerPopStateEvent extends PopStateEvent {
   previousState: HistoryManagerState | null
 }
 
-type PopStateHandler = (event: HistoryManagerPopStateEvent) => void
+export type PopStateHandler = (event: HistoryManagerPopStateEvent) => void
 
 class HistoryManager {
   #previousStates: (HistoryManagerState | null)[]

@@ -1,6 +1,6 @@
 {
   "name": "aptechka",
-  "version": "0.96.6",
+  "version": "0.97.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/denisavitski/aptechka.git"
@@ -248,6 +248,11 @@
       "require": "./lib/sequence/index.cjs",
       "default": "./lib/sequence/index.js"
     },
+    "./shared": {
+      "types": "./lib/shared/index.d.ts",
+      "require": "./lib/shared/index.cjs",
+      "default": "./lib/shared/index.js"
+    },
     "./size-element": {
       "types": "./lib/size-element/index.d.ts",
       "require": "./lib/size-element/index.cjs",
@@ -456,6 +461,9 @@
       ],
       "sequence": [
         "lib/sequence/index.d.ts"
+      ],
+      "shared": [
+        "lib/shared/index.d.ts"
       ],
       "size-element": [
         "lib/size-element/index.d.ts"

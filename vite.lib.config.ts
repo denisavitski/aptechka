@@ -83,6 +83,7 @@ export function libConfig() {
             './src/components/packages/scroll-entries/index.ts',
           'scroll-kit/index': './src/components/packages/scroll-kit/index.ts',
           'sequence/index': './src/components/packages/sequence/index.ts',
+          'shared/index': './src/components/packages/shared/index.ts',
           'size-element/index':
             './src/components/packages/size-element/index.ts',
           'slicer/index': './src/components/packages/slicer/index.ts',
