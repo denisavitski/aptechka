@@ -99,6 +99,7 @@ export class SPA {
           location.href.replace(location.origin, ''),
           {
             scrollValue: (event.state?.data?.scrollTop as number) || 0,
+            pushStateNoFetch: event.state?.data?.pushStateNoFetch as boolean,
           },
         )
 
@@ -158,11 +159,10 @@ export class SPA {
     }
 
     if (options?.pushStateNoFetch) {
-      historyManager.updateCurrentStateData({
-        scrollTop: this.#scroll.y,
-      })
+      if (!isBack) {
+        historyManager.pushState(fullUrl, { pushStateNoFetch: true })
+      }
 
-      historyManager.pushState(fullUrl)
       return
     }
 

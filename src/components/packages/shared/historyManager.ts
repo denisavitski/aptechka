@@ -7,8 +7,8 @@ export interface HistoryManagerState {
 export interface HistoryManagerChangeParameters {
   action: HistoryManagerChangeAction
   pathname: string
-  searchParameters?: string | undefined
-  hash?: string | undefined
+  searchParameters?: string
+  hash?: string
   data?: Record<string, unknown>
 }
 
@@ -22,12 +22,29 @@ export interface HistoryManagerPopStateEvent extends PopStateEvent {
 export type PopStateHandler = (event: HistoryManagerPopStateEvent) => void
 
 class HistoryManager {
-  #previousStates: (HistoryManagerState | null)[]
+  #previousStates: HistoryManagerState[]
   #popStateHandlers: PopStateHandler[]
+  #maxHistorySize: number = 50
 
   constructor() {
     history.scrollRestoration = 'manual'
-    this.#previousStates = [history.state]
+
+    // Инициализируем с текущим состоянием или создаем дефолтное
+    const initialState = history.state as HistoryManagerState | null
+    if (initialState?.page) {
+      this.#previousStates = [initialState]
+    } else {
+      const defaultState: HistoryManagerState = {
+        page:
+          window.location.pathname +
+          window.location.search +
+          window.location.hash,
+        timestamp: Date.now(),
+      }
+      this.#previousStates = [defaultState]
+      history.replaceState(defaultState, '', defaultState.page)
+    }
+
     this.#popStateHandlers = []
     this.#setupTracking()
   }
@@ -50,7 +67,9 @@ class HistoryManager {
       title: string,
       url?: string | null,
     ) => {
-      this.#updateHistory(state)
+      if (state && 'page' in state) {
+        this.#updateHistory(state as HistoryManagerState, false)
+      }
       return originalPushState.call(history, state, title, url)
     }
 
@@ -59,48 +78,52 @@ class HistoryManager {
       title: string,
       url?: string | null,
     ) => {
-      this.#updateHistory(state, true)
+      if (state && 'page' in state) {
+        this.#updateHistory(state as HistoryManagerState, true)
+      }
       return originalReplaceState.call(history, state, title, url)
     }
   }
 
-  #updateHistory(
-    state: HistoryManagerState | null,
-    isReplace: boolean = false,
-  ) {
+  #updateHistory(state: HistoryManagerState, isReplace: boolean = false) {
     if (isReplace && this.#previousStates.length > 0) {
       this.#previousStates[this.#previousStates.length - 1] = state
     } else {
       this.#previousStates.push(state)
-      if (this.#previousStates.length > 50) {
+      if (this.#previousStates.length > this.#maxHistorySize) {
         this.#previousStates.shift()
       }
     }
   }
 
   #handlePopState(event: PopStateEvent) {
-    const targetState = this.getPreviousState()
     const previousState = this.getCurrentState()
+    const currentState = event.state as HistoryManagerState | null
 
-    if (targetState) {
-      this.#previousStates[this.#previousStates.length - 2] = previousState
-      this.#previousStates[this.#previousStates.length - 1] = targetState
+    // Синхронизируем с браузерным history
+    if (currentState && currentState.page) {
+      this.#previousStates.push(currentState)
+
+      // Ограничиваем размер истории
+      if (this.#previousStates.length > this.#maxHistorySize) {
+        this.#previousStates.shift()
+      }
     }
 
     this.#popStateHandlers.forEach((handler) => {
       handler({
         ...event,
-        state: targetState,
+        state: currentState,
         previousState: previousState,
       })
     })
   }
 
-  #getPathname(url: string | URL) {
+  #getPathname(url: string | URL): string {
     if (typeof url === 'string') {
       return url
     } else {
-      return url.pathname
+      return url.pathname + url.search + url.hash
     }
   }
 
@@ -132,45 +155,63 @@ class HistoryManager {
   }
 
   public updateCurrentStateData(data: Record<string, unknown>) {
-    let state = this.getCurrentState()
-
+    const state = this.getCurrentState()
     if (state) {
-      state.data = {
-        ...state.data,
-        ...data,
+      const newState: HistoryManagerState = {
+        ...state,
+        data: {
+          ...state.data,
+          ...data,
+        },
       }
+
+      // Обновляем внутреннее состояние
+      this.#previousStates[this.#previousStates.length - 1] = newState
+
+      // Синхронизируем с history API
+      history.replaceState(newState, '', state.page)
     }
   }
 
   public updatePreviousStateData(data: Record<string, unknown>) {
-    let state = this.getPreviousState()
-
+    const state = this.getPreviousState()
     if (state) {
-      state.data = {
-        ...state.data,
-        ...data,
+      const newState: HistoryManagerState = {
+        ...state,
+        data: {
+          ...state.data,
+          ...data,
+        },
       }
+
+      // Обновляем внутреннее состояние
+      this.#previousStates[this.#previousStates.length - 2] = newState
+
+      // Для предыдущего состояния не вызываем replaceState,
+      // так как это может нарушить навигацию браузера
     }
   }
 
   public pushState(page: string | URL, data?: Record<string, unknown>) {
+    const pageString = page.toString()
     const state: HistoryManagerState = {
       page: this.#getPathname(page),
       data,
       timestamp: Date.now(),
     }
 
-    history.pushState(state, '', page)
+    history.pushState(state, '', pageString)
   }
 
   public replaceState(page: string | URL, data?: Record<string, unknown>) {
+    const pageString = page.toString()
     const state: HistoryManagerState = {
       page: this.#getPathname(page),
       data,
       timestamp: Date.now(),
     }
 
-    history.replaceState(state, '', page)
+    history.replaceState(state, '', pageString)
   }
 
   public back() {
@@ -185,20 +226,44 @@ class HistoryManager {
     history.go(delta)
   }
 
+  public syncWithBrowser() {
+    // Полная синхронизация с текущим состоянием браузера
+    const browserState = history.state as HistoryManagerState | null
+    if (browserState?.page) {
+      const currentState = this.getCurrentState()
+      if (currentState?.page !== browserState.page) {
+        this.#previousStates.push(browserState)
+      }
+    }
+  }
+
+  public clearHistory() {
+    // Оставляем только текущее состояние
+    const currentState = this.getCurrentState()
+    if (currentState) {
+      this.#previousStates = [currentState]
+    }
+  }
+
   // Для Morph. Убрать когда там будут URL
   public __change(parameters: HistoryManagerChangeParameters) {
     if (parameters.action === 'none') {
       return
     }
 
-    const por = parameters?.searchParameters
+    const searchParams = parameters.searchParameters || ''
     const hash = parameters.hash
       ? parameters.hash.startsWith('#')
         ? parameters.hash
         : '#' + parameters.hash
       : ''
-    const searhParameters = por ? (por.startsWith('?') ? por : '?' + por) : ''
-    const pathPlus = `${parameters.pathname}${searhParameters}${hash}`
+    const searchString = searchParams
+      ? searchParams.startsWith('?')
+        ? searchParams
+        : '?' + searchParams
+      : ''
+
+    const pathPlus = `${parameters.pathname}${searchString}${hash}`
 
     if (parameters.action === 'push') {
       this.pushState(pathPlus, parameters.data)
@@ -208,10 +273,28 @@ class HistoryManager {
   }
 
   public debugHistory() {
-    console.log('Current history state:')
+    console.log('=== HistoryManager Debug ===')
+    console.log('Current browser state:', history.state)
+    console.log('Internal states stack:')
     this.#previousStates.forEach((state, index) => {
-      console.log(`[${index}]:`, state?.page)
+      const isCurrent = index === this.#previousStates.length - 1
+      console.log(
+        `[${index}]${isCurrent ? ' (current)' : ''}:`,
+        state?.page,
+        state?.timestamp ? new Date(state.timestamp).toLocaleTimeString() : '',
+        state?.data ? '(has data)' : '',
+      )
     })
+    console.log('============================')
+  }
+
+  public setMaxHistorySize(size: number) {
+    if (size > 0) {
+      this.#maxHistorySize = size
+      while (this.#previousStates.length > size) {
+        this.#previousStates.shift()
+      }
+    }
   }
 }
 
