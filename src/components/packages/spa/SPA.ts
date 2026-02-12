@@ -21,21 +21,30 @@ export type SPAURLModifier = (url: URL) => URL
 export interface SPAOptions
   extends Pick<LocalLinksOptions, 'base' | 'trailingSlash' | 'includeAnchor'> {
   scrollSelector?: string
-  beforeDiff?: (newDocument: Document) => void | Promise<void>
-  afterDiff?: () => void | Promise<void>
+  beforeDiff?: (
+    newDocument: Document,
+    signal: AbortSignal,
+  ) => void | Promise<void>
+  afterDiff?: (signal: AbortSignal) => void | Promise<void>
   viewTransition?: boolean
   urlModifier?: SPAURLModifier
 }
 
 export interface SPANavigateOptions extends LocalLinksLinkOptions {
   pushStateNoFetch?: boolean
+  signal?: AbortSignal
 }
 
 export interface SPAEvents {
-  spaBeforeFetch: CustomEvent
-  spaAfterFetch: CustomEvent
-  spaBeforeUpdate: CustomEvent
-  spaAfterUpdate: CustomEvent
+  spaBeforeFetch: CustomEvent<{ signal: AbortSignal }>
+  spaAfterFetch: CustomEvent<{ signal: AbortSignal }>
+  spaBeforeUpdate: CustomEvent<{ signal: AbortSignal }>
+  spaAfterUpdate: CustomEvent<{ signal: AbortSignal }>
+}
+
+export interface SPANavigationHandle extends Promise<void> {
+  signal: AbortSignal
+  abort: () => void
 }
 
 export class SPA {
@@ -72,11 +81,10 @@ export class SPA {
         trailingSlash: this.#options.trailingSlash,
         includeAnchor: options?.includeAnchor,
         onClick: (url, options) => {
-          try {
-            this.navigate(url, options)
-          } catch (e) {
-            window.location.assign(url)
-          }
+          const navigation = this.navigate(url, options)
+          navigation.signal.addEventListener('abort', () => {
+            console.log('Navigation aborted')
+          })
         },
       })
       this.#links.update()
@@ -87,8 +95,15 @@ export class SPA {
         }
 
         this.#isBack = true
-        this.navigate(location.href.replace(location.origin, ''), {
-          scrollValue: (event.state?.data?.scrollTop as number) || 0,
+        const navigation = this.navigate(
+          location.href.replace(location.origin, ''),
+          {
+            scrollValue: (event.state?.data?.scrollTop as number) || 0,
+          },
+        )
+
+        navigation.signal.addEventListener('abort', () => {
+          console.log('Popstate navigation aborted')
         })
       })
     }
@@ -98,10 +113,40 @@ export class SPA {
     return this.#scroll
   }
 
-  public async navigate(url: URL | string, options?: SPANavigateOptions) {
+  public navigate(
+    url: URL | string,
+    options?: SPANavigateOptions,
+  ): SPANavigationHandle {
+    const abortController = new AbortController()
+    const signal = options?.signal || abortController.signal
+
+    const navigationPromise = this.#navigateInternal(url, {
+      ...options,
+      signal,
+    }).catch((error: unknown) => {
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw error
+      }
+      console.error('Navigation failed:', error)
+      throw error
+    }) as Promise<void>
+
+    const navigationHandle = Object.assign(navigationPromise, {
+      signal,
+      abort: () => abortController.abort(),
+    })
+
+    return navigationHandle
+  }
+
+  async #navigateInternal(
+    url: URL | string,
+    options?: SPANavigateOptions & { signal: AbortSignal },
+  ) {
     let isBack = this.#isBack
     this.#isBack = false
     const updateId = ++this.#updateId
+    const { signal } = options || { signal: new AbortController().signal }
 
     let fullUrl = normalizeURL(url, {
       base: this.#options.base,
@@ -118,30 +163,42 @@ export class SPA {
       })
 
       historyManager.pushState(fullUrl)
-
       return
     }
 
+    signal.throwIfAborted()
+
     dispatchEvent(document, 'spaBeforeFetch', {
       custom: true,
+      detail: { signal },
     })
 
     let contents: string | void = this.#cache.get(fullUrl.toString())
 
     if (!contents || options?.revalidate) {
-      contents = await fetch(`${fullUrl}`, {
-        headers: {
-          'X-SPA': 'true',
-        },
-      })
-        .then((res) => res.text())
-        .catch(() => {
-          window.location.assign(fullUrl)
+      try {
+        const response = await fetch(`${fullUrl}`, {
+          headers: {
+            'X-SPA': 'true',
+          },
+          signal,
         })
+
+        contents = await response.text()
+      } catch (error: unknown) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          throw error
+        }
+        window.location.assign(fullUrl)
+        return
+      }
     }
+
+    signal.throwIfAborted()
 
     dispatchEvent(document, 'spaAfterFetch', {
       custom: true,
+      detail: { signal },
     })
 
     if (!contents) {
@@ -151,6 +208,8 @@ export class SPA {
     if (options?.cache) {
       this.#cache.set(fullUrl.toString(), contents)
     }
+
+    signal.throwIfAborted()
 
     if (this.#updateId !== updateId) {
       return
@@ -167,10 +226,14 @@ export class SPA {
       })
     }
 
+    signal.throwIfAborted()
+
     const html = this.#domParser.parseFromString(contents, 'text/html')
     normalizeRelativeURLs(html, fullUrl)
 
-    await this.#options.beforeDiff?.(html)
+    await this.#options.beforeDiff?.(html, signal)
+
+    signal.throwIfAborted()
 
     if (this.#updateId !== updateId) {
       return
@@ -178,6 +241,7 @@ export class SPA {
 
     dispatchEvent(document, 'spaBeforeUpdate', {
       custom: true,
+      detail: { signal },
     })
 
     let title = html.querySelector('title')?.textContent
@@ -188,6 +252,8 @@ export class SPA {
       const h1 = document.querySelector('h1')
       title = h1?.innerText ?? h1?.textContent ?? fullUrl.pathname
     }
+
+    signal.throwIfAborted()
 
     this.#announcerElement.create(html, title)
 
@@ -212,19 +278,26 @@ export class SPA {
 
       await v.updateCallbackDone
 
+      signal.throwIfAborted()
+
       updateDone()
 
       await v.finished
     } else {
       await morph(document, html)
 
+      signal.throwIfAborted()
+
       updateDone()
     }
 
-    await this.#options.afterDiff?.()
+    await this.#options.afterDiff?.(signal)
+
+    signal.throwIfAborted()
 
     dispatchEvent(document, 'spaAfterUpdate', {
       custom: true,
+      detail: { signal },
     })
   }
 }
