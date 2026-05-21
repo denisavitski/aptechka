@@ -442,6 +442,10 @@ export class PopoverElement extends HTMLElement {
   }
 
   protected connectedCallback() {
+    if (this.#isAnchorDomMutation) {
+      return
+    }
+
     this.#innerCloseElements = [
       ...this.querySelectorAll<HTMLElement>(
         `[data-popover-close${this.id ? `="${this.id}"` : ''}]`,
@@ -498,6 +502,10 @@ export class PopoverElement extends HTMLElement {
   }
 
   protected disconnectedCallback() {
+    if (this.#isAnchorDomMutation) {
+      return
+    }
+
     this.#innerCloseElements.forEach((el) => {
       el.removeEventListener('click', this.#closeElementClickListener)
     })

@@ -14,6 +14,8 @@ e-popover {
   --duration: 0.5s;
   --history: true;
   --restore: true;
+  --escape: true;
+  --click-outside: true;
   /* --close-rest-in-group: true; */
 
   display: none;
