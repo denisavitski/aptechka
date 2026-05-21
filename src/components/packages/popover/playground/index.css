@@ -27,6 +27,14 @@ e-popover {
   --dominance: 10;
 }
 
+e-popover.portal {
+  --anchor: "#popover-portal";
+}
+
+e-popover.body-anchor {
+  --anchor: body;
+}
+
 e-popover.x {
   /* --group: x; */
 }
@@ -46,4 +54,16 @@ e-popover.opened {
 e-popover-button {
   --type: toggle;
   cursor: pointer;
+}
+
+#popover-portal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+#popover-portal e-popover {
+  pointer-events: auto;
 }

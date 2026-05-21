@@ -1,6 +1,21 @@
 import { Dot2D } from '@packages/utils'
 import { Texture } from 'three'
 
+function getTextureImageAspect(image: Texture['image']): number {
+  if (
+    image != null &&
+    typeof image === 'object' &&
+    'width' in image &&
+    'height' in image
+  ) {
+    const { width, height } = image as { width: number; height: number }
+
+    return width / height
+  }
+
+  return 1
+}
+
 /**
  * texture.matrixAutoUpdate must be false
  */
@@ -11,7 +26,7 @@ export function coverTexture(
 ) {
   const width = planeSize.x
   const height = planeSize.y
-  const _aspect = aspect || texture.image.width / texture.image.height
+  const _aspect = aspect ?? getTextureImageAspect(texture.image)
 
   let sx = 0
   let sy = 0

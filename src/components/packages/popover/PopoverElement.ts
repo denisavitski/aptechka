@@ -172,6 +172,7 @@ export class PopoverElement extends HTMLElement {
   #clickOutside = new CSSProperty(this, '--click-outside', false)
   #escape = new CSSProperty(this, '--escape', false)
   #checkViewportBounds = new CSSProperty(this, '--check-viewport-bounds', false)
+  #anchor = new CSSProperty(this, '--anchor', '')
   #lastTrigger: any
   #status = new ElementLinkedStore(this, {
     triggered: false,
@@ -183,6 +184,8 @@ export class PopoverElement extends HTMLElement {
   #innerCloseElements: Array<HTMLElement> = []
   #resetScrollElements: Array<HTMLElement> = []
   #isFromPopState = false
+  #anchorPlaceholder: Comment | null = null
+  #isAnchorDomMutation = false
 
   constructor() {
     super()
@@ -261,6 +264,10 @@ export class PopoverElement extends HTMLElement {
     return this.#escape
   }
 
+  public get anchor() {
+    return this.#anchor
+  }
+
   public get opened() {
     return this.#opened
   }
@@ -294,6 +301,10 @@ export class PopoverElement extends HTMLElement {
     this.#toggleGlobalClass(false, this.closingClass)
 
     this.#status.setKey('closing', false)
+
+    this.#anchor.check()
+    this.#moveToAnchor()
+
     this.#status.setKey('triggered', true)
 
     dispatchEvent(this, 'popoverTriggered', {
@@ -408,6 +419,8 @@ export class PopoverElement extends HTMLElement {
           this.#status.setKey('closing', false)
           this.#toggleGlobalClass(false, this.closingClass)
 
+          this.#restoreFromAnchor()
+
           dispatchEvent(this, 'popoverClosed', {
             custom: true,
             bubbles: true,
@@ -453,6 +466,7 @@ export class PopoverElement extends HTMLElement {
     this.#clickOutside.observe()
     this.#escape.observe()
     this.#checkViewportBounds.observe()
+    this.#anchor.observe()
 
     this.setAttribute('role', 'dialog')
 
@@ -501,6 +515,7 @@ export class PopoverElement extends HTMLElement {
     this.#clickOutside.close()
     this.#escape.close()
     this.#checkViewportBounds.close()
+    this.#anchor.close()
 
     this.removeAttribute('role')
 
@@ -513,6 +528,10 @@ export class PopoverElement extends HTMLElement {
     clearTimeout(this.#openTransitionTimeoutId)
 
     historyManager.removePopStateHandler(this.#popStateListener)
+
+    if (!this.#isAnchorDomMutation) {
+      this.#cleanupAnchorPlaceholder()
+    }
 
     this.style.removeProperty('--content-width')
     this.style.removeProperty('--content-height')
@@ -614,6 +633,146 @@ export class PopoverElement extends HTMLElement {
 
   #closeElementClickListener = () => {
     this.close(true)
+  }
+
+  #queryAnchorIn(root: ParentNode, selector: string): HTMLElement | null {
+    if (!('querySelector' in root)) {
+      return null
+    }
+
+    let anchor = root.querySelector<HTMLElement>(selector)
+
+    if (
+      !anchor &&
+      !selector.startsWith('#') &&
+      !selector.startsWith('.') &&
+      !selector.startsWith('[')
+    ) {
+      anchor = root.querySelector<HTMLElement>(`#${selector}`)
+    }
+
+    return anchor
+  }
+
+  #normalizeAnchorSelector(value: string): string {
+    const trimmed = value.trim()
+
+    if (
+      (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+      (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+      return trimmed.slice(1, -1).trim()
+    }
+
+    return trimmed
+  }
+
+  #getAnchorSelector(): string | null {
+    const fromAttr =
+      this.getAttribute('anchor')?.trim() ||
+      this.getAttribute('data-popover-anchor')?.trim()
+    const fromCssRaw = this.#anchor.currentRawValue.trim()
+    const fromCssParsed =
+      typeof this.#anchor.current === 'string'
+        ? this.#anchor.current.trim()
+        : ''
+
+    const selector = this.#normalizeAnchorSelector(
+      fromAttr || fromCssRaw || fromCssParsed || '',
+    )
+
+    return selector || null
+  }
+
+  #resolveAnchorHost(selector: string): HTMLElement | null {
+    switch (selector.toLowerCase()) {
+      case 'body':
+        return document.body
+      case 'html':
+      case 'documentelement':
+        return document.documentElement
+      default:
+        return null
+    }
+  }
+
+  #resolveAnchorElement(): HTMLElement | null {
+    const selector = this.#getAnchorSelector()
+
+    if (!selector) {
+      return null
+    }
+
+    const host = this.#resolveAnchorHost(selector)
+
+    if (host) {
+      return host
+    }
+
+    const root = this.getRootNode()
+    const anchor =
+      this.#queryAnchorIn(document, selector) ||
+      (root instanceof Document || root instanceof ShadowRoot
+        ? this.#queryAnchorIn(root, selector)
+        : null)
+
+    if (!anchor) {
+      console.warn(this, `anchor target "${selector}" not found`)
+    }
+
+    return anchor
+  }
+
+  #moveToAnchor() {
+    const anchor = this.#resolveAnchorElement()
+
+    if (!anchor || anchor === this.parentElement) {
+      return
+    }
+
+    if (!this.isConnected) {
+      return
+    }
+
+    if (!this.#anchorPlaceholder) {
+      this.#anchorPlaceholder = document.createComment('e-popover-anchor')
+      const parent = this.parentNode
+
+      if (parent) {
+        parent.insertBefore(this.#anchorPlaceholder, this.nextSibling)
+      }
+    }
+
+    this.#isAnchorDomMutation = true
+
+    try {
+      anchor.appendChild(this)
+    } finally {
+      this.#isAnchorDomMutation = false
+    }
+  }
+
+  #restoreFromAnchor() {
+    const placeholderParent = this.#anchorPlaceholder?.parentNode
+
+    if (!placeholderParent) {
+      return
+    }
+
+    this.#isAnchorDomMutation = true
+
+    try {
+      placeholderParent.insertBefore(this, this.#anchorPlaceholder)
+      this.#anchorPlaceholder!.remove()
+      this.#anchorPlaceholder = null
+    } finally {
+      this.#isAnchorDomMutation = false
+    }
+  }
+
+  #cleanupAnchorPlaceholder() {
+    this.#anchorPlaceholder?.remove()
+    this.#anchorPlaceholder = null
   }
 }
 
