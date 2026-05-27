@@ -30,6 +30,13 @@ class PopoverGroups {
       this.#clickOutsideListener,
     )
     addEventListener('keydown', this.#keydownListener)
+
+    document.addEventListener('astro:before-preparation', this.#resetAll)
+    document.addEventListener('spaBeforeFetch', this.#resetAll)
+  }
+
+  #resetAll = () => {
+    this.resetAll()
   }
 
   public get groups() {
@@ -64,6 +71,41 @@ class PopoverGroups {
 
     this.#stack.push(element)
     group.push(element)
+  }
+
+  public removeSync(groupName: string, element: PopoverElement) {
+    this.#stack = this.#stack.filter((e) => e !== element)
+
+    const group = this.#groups.get(groupName)
+
+    if (group) {
+      const filtered = group.filter((el) => el !== element)
+
+      if (filtered.length) {
+        this.#groups.set(groupName, filtered)
+      } else {
+        this.#groups.delete(groupName)
+      }
+    }
+  }
+
+  public resetAll() {
+    const popovers = new Set<PopoverElement>()
+
+    this.#stack.forEach((popover) => popovers.add(popover))
+    this.#groups.forEach((group) =>
+      group.forEach((popover) => popovers.add(popover)),
+    )
+    document.querySelectorAll('e-popover').forEach((element) => {
+      if (element instanceof PopoverElement) {
+        popovers.add(element)
+      }
+    })
+
+    popovers.forEach((popover) => popover.resetForNavigation())
+
+    this.#stack = []
+    this.#groups.clear()
   }
 
   public remove(groupName: string, element: PopoverElement) {
@@ -186,6 +228,7 @@ export class PopoverElement extends HTMLElement {
   #isFromPopState = false
   #anchorPlaceholder: Comment | null = null
   #isAnchorDomMutation = false
+  #skipHistorySync = false
 
   constructor() {
     super()
@@ -288,10 +331,43 @@ export class PopoverElement extends HTMLElement {
     }
   }
 
+  public static resetAllForNavigation() {
+    PopoverElement.stack.resetAll()
+  }
+
+  public resetForNavigation() {
+    this.#skipHistorySync = true
+
+    cancelAnimationFrame(this.#openFrameId!)
+    clearTimeout(this.#startClosingTimeoutId)
+    clearTimeout(this.#closeTimeoutId)
+    clearTimeout(this.#openTransitionTimeoutId)
+
+    this.#opened = false
+    PopoverElement.stack.removeSync(this.#group.current, this)
+
+    this.#status.reset()
+    this.#toggleGlobalClass(false, this.openClass)
+    this.#toggleGlobalClass(false, this.closingClass)
+    this.#clearGroupDocumentClasses()
+
+    if (this.#anchorPlaceholder) {
+      this.#restoreFromAnchor()
+    }
+
+    this.#syncCssProperties()
+
+    setTimeout(() => {
+      this.#skipHistorySync = false
+    }, 0)
+  }
+
   public open(options?: { skipTransition?: boolean; trigger?: any }) {
     if (this.#opened) {
       return
     }
+
+    this.#syncCssProperties()
 
     this.#lastTrigger = options?.trigger
 
@@ -387,7 +463,7 @@ export class PopoverElement extends HTMLElement {
 
     PopoverElement.stack.remove(this.#group.current, this)
 
-    if (this.#history.current) {
+    if (this.#history.current && !this.#skipHistorySync) {
       this.beginHistoryTransaction()
 
       if (back) {
@@ -471,6 +547,8 @@ export class PopoverElement extends HTMLElement {
     this.#escape.observe()
     this.#checkViewportBounds.observe()
     this.#anchor.observe()
+
+    this.#syncCssProperties()
 
     this.setAttribute('role', 'dialog')
 
@@ -565,11 +643,37 @@ export class PopoverElement extends HTMLElement {
   }
 
   #deleteSearchParam() {
-    if (this.#history.current) {
-      const url = new URL(location.href)
-      url.searchParams.delete(this.id)
-      historyManager.replaceState(url.href)
+    if (this.#skipHistorySync || !this.#history.current) {
+      return
     }
+
+    const url = new URL(location.href)
+    url.searchParams.delete(this.id)
+    historyManager.replaceState(url.href)
+  }
+
+  #clearGroupDocumentClasses() {
+    const groups = new Set(
+      [this.#group.current, this.#group.previous].filter(Boolean),
+    )
+
+    groups.forEach((group) => {
+      document.documentElement.classList.remove(`${group}-closing`)
+      document.documentElement.classList.remove(`${group}-opened`)
+    })
+  }
+
+  #syncCssProperties() {
+    this.#history.check()
+    this.#restore.check()
+    this.#dispatchResize.check()
+    this.#closeRest.check()
+    this.#closeRestInGroup.check()
+    this.#group.check()
+    this.#clickOutside.check()
+    this.#escape.check()
+    this.#checkViewportBounds.check()
+    this.#anchor.check()
   }
 
   #popStateListener = () => {

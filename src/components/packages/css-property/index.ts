@@ -73,6 +73,7 @@ export class CSSProperty<
   public override close() {
     this.unobserve()
     super.close()
+    this.#currentRawValue = this.initial.toString()
   }
 
   public check() {
@@ -80,19 +81,20 @@ export class CSSProperty<
       .getPropertyValue(this.#property)
       .trim()
 
-    if (this.#rawValueCheck && this.#currentRawValue === rawValue) {
+    const nextValue = rawValue
+      ? cssValueParser.parse(rawValue, this.#element)
+      : this.initial
+
+    if (
+      this.#rawValueCheck &&
+      this.#currentRawValue === rawValue &&
+      this.current === nextValue
+    ) {
       return
     }
 
     this.#currentRawValue = rawValue
-
-    if (rawValue) {
-      const result = cssValueParser.parse(this.#currentRawValue, this.#element)
-
-      this.current = result
-    } else {
-      this.current = this.initial
-    }
+    this.current = nextValue
   }
 
   #resizeListener = () => {
